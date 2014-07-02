@@ -18,19 +18,19 @@ $data = array(
 			),
 		),
 		array(
-			'topic_name' => 'test1',
+			'topic_name' => 'test6',
 			'partitions' => array(
 				array(
-					'partition_id' => 0,
+					'partition_id' => 2,
 					'messages' => array(
 						'32321`1```````````',
 						'message2',
 					),
 				),
 				array(
-					'partition_id' => 1,
+					'partition_id' => 5,
 					'messages' => array(
-						'32321`1```````````',
+						'9932321`1```````````',
 						'message2',
 					),
 				),
@@ -39,7 +39,7 @@ $data = array(
 	),
 );
 
-$conn = new \Kafka\Socket('localhost', '9092');
+$conn = new \Kafka\Socket('192.168.1.115', '9092');
 $conn->connect();
 $data = \Kafka\Protocol\Encoder::buildProduceRequest($data);
 $conn->write($data);
@@ -48,25 +48,6 @@ $conn->write($data);
 $dataLen = unpack('N', $conn->read(4));
 $dataLen = $dataLen[1];
 $data = $conn->read($dataLen);
-$initoffset = 4;
-$topicCount = unpack('N', substr($data, $initoffset, 4));
-$initoffset += 4;
-$topicCount = $topicCount[1];
-for ($i = 0; $i < $topicCount; $i++) {
-	$topicLen = unpack('n', substr($data, $initoffset, 2));	
-	$topicLen = $topicLen[1];		
-	$initoffset += 2;
-	$topic_name = substr($data, $initoffset, $topicLen);
-	$initoffset += $topicLen;
-	$partitionCount = unpack('N', substr($data, $initoffset, 4));
-	$partitionCount = $partitionCount[1];
-	$initoffset += 4;
-	for ($j = 0; $j < $partitionCount; $j++) {
-		$info = unpack('Nn', substr($data, $initoffset, 6));
-		$initoffset += 6;
-		$offset = \Kafka\Protocol\Encoder::unpackInt64(substr($data, $initoffset, 8));
-		$initoffset += 8;
-	var_dump($offset);
-	}
-	var_dump($topic_name);
-}
+var_dump(bin2hex($data));
+$result = \Kafka\Protocol\Decoder::decodeProduceResponse($data);
+var_dump($result);

@@ -171,7 +171,72 @@ class Encoder extends Protocol
         
         $header = self::requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = pack('nN', $payloads['required_ack'], $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], array(self, '_encodeProcudeTopic'), $compression);
+        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeProcudeTopic'), $compression);
+        $data   = self::encodeString($header . $data, self::PACK_INT32);
+        return $data;
+    }
+
+    // }}}
+    // {{{ public static function buildMetadataRequest()
+
+    /**
+     * build metadata request protocol 
+     * 
+     * @param array $topics 
+     * @static
+     * @access public
+     * @return string
+     */
+    public static function buildMetadataRequest($topics)
+    {
+        if (!is_array($topics)) {
+            $topics = array($topics);    
+        }
+
+        foreach ($topics as $topic) {
+            if (!is_string($topic)) {
+                throw new \Kafka\Exception('in topic array have invalid value. ');    
+            }    
+        }
+        
+        $header = self::requestHeader('kafka-php', 0, self::METADATA_REQUEST);
+        $data   = self::encodeArray($topics, array(__CLASS__, 'encodeString'), self::PACK_INT16);
+        $data   = self::encodeString($header . $data, self::PACK_INT32);
+        return $data;
+    }
+
+    // }}}
+    // {{{ public static function buildFetchRequest()
+
+    /**
+     * build fetch request 
+     * 
+     * @param array $payloads 
+     * @static
+     * @access public
+     * @return string
+     */
+    public static function buildFetchRequest($payloads)
+    {
+        if (!isset($payloads['data'])) {
+            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+        } 
+
+        if (!isset($payloads['replica_id'])) { 
+            $payloads['replica_id'] = -1;
+        }
+
+        if (!isset($payloads['max_wait_time'])) {
+            $payloads['max_wait_time'] = 100; // default timeout 100ms
+        }
+
+        if (!isset($payloads['min_bytes'])) {
+            $payloads['min_bytes'] = 64 * 1024; // 64k
+        }
+        
+        $header = self::requestHeader('kafka-php', 0, self::FETCH_REQUEST);
+        $data   = pack('NNN', $payloads['replica_id'], $payloads['max_wait_time'], $payloads['min_bytes']);
+        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
         return $data;
     }
@@ -255,7 +320,66 @@ class Encoder extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array(self, '_encodeProcudePartion'), $compression);
+        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeProcudePartion'), $compression);
+
+        return $topic . $partitions;
+    }
+
+    // }}}
+    // {{{ private static function _encodeFetchPartion()
+
+    /**
+     * encode signal part 
+     * 
+     * @param partions 
+     * @static
+     * @access private
+     * @return string
+     */
+    private static function _encodeFetchPartion($values)
+    {
+        if (!isset($values['partition_id'])) {
+            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+        }
+
+        if (!isset($values['offset'])) {
+            $values['offset'] = 0;
+        }
+
+        if (!isset($values['max_bytes'])) {
+            $values['max_bytes'] = 100 * 1024 * 1024;
+        }
+
+        $data = pack('N', $values['partition_id']);
+        $data .= self::packInt64($values['offset']);
+        $data .= pack('N', $values['max_bytes']);
+
+        return $data;
+    }
+
+    // }}}
+    // {{{ private static function _encodeFetchTopic()
+
+    /**
+     * encode signal topic 
+     * 
+     * @param partions 
+     * @static
+     * @access private
+     * @return string
+     */
+    private static function _encodeFetchTopic($values)
+    {
+        if (!isset($values['topic_name'])) {
+            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+        }
+
+        if (!isset($values['partitions']) || empty($values['partitions'])) {
+            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+        }
+
+        $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
+        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeFetchPartion'));
 
         return $topic . $partitions;
     }
