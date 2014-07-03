@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka;
+namespace Kafka\Exception;
 
 use \Kafka\Exception;
 
@@ -28,6 +28,6 @@ use \Kafka\Exception;
 +------------------------------------------------------------------------------
 */
 
-class OutOfRange extends \Exception
+class OutOfRange extends Exception
 {
 }
