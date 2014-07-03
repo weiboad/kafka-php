@@ -169,5 +169,54 @@ class Decoder extends Protocol
     }
 
     // }}}
+    // {{{ public function decodeOffsetResponse()
+
+    /**
+     * decode offset response 
+     * 
+     * @param string $data 
+     * @access public
+     * @return array
+     */
+    public function decodeOffsetResponse($data)
+    {
+        $result = array();
+        $offset = 4;
+        $topicCount = unpack('N', substr($data, $offset, 4));
+        $offset += 4;
+        $topicCount = array_shift($topicCount);
+        for ($i = 0; $i < $topicCount; $i++) {
+            $topicLen = unpack('n', substr($data, $offset, 2)); // int16 topic name length	
+            $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;	
+            $offset += 2;
+            $topicName = substr($data, $offset, $topicLen);
+            $offset += $topicLen;
+            $partitionCount = unpack('N', substr($data, $offset, 4));
+            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
+            $offset += 4;
+            $result[$topicName] = array();
+            for ($j = 0; $j < $partitionCount; $j++) {
+                $partitionId = unpack('N', substr($data, $offset, 4));
+                $offset += 4;
+                $errCode     = unpack('n', substr($data, $offset, 2));
+                $offset += 2;
+                $offsetCount = unpack('N', substr($data, $offset, 4)); 
+                $offset += 4;
+                $offsetCount = array_shift($offsetCount);
+                $offsetArr = array();
+                for ($z = 0; $z < $offsetCount; $z++) {
+                    $offsetArr[] = self::unpackInt64(substr($data, $offset, 8));
+                    $offset += 8;
+                }
+                $result[$topicName][$partitionId[1]] = array(
+                    'errCode' => $errCode[1],
+                    'offset'  => $offsetArr
+                );
+            }
+        }
+        return $result; 
+    }
+
+    // }}}
     // }}}
 }

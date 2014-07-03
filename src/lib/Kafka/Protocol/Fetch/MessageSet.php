@@ -141,7 +141,7 @@ class MessageSet implements \Iterator
      */
     public function valid()
     {
-        return $this->valid && $this->validCount < $this->messageSetSize;
+        return $this->valid && $this->validByteCount <= $this->messageSetSize;
     }
 
     // }}}

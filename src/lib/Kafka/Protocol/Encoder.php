@@ -242,6 +242,34 @@ class Encoder extends Protocol
     }
 
     // }}}
+    // {{{ public static function buildOffsetRequest()
+
+    /**
+     * build offset request 
+     * 
+     * @param array $payloads 
+     * @static
+     * @access public
+     * @return string
+     */
+    public static function buildOffsetRequest($payloads)
+    {
+        if (!isset($payloads['data'])) {
+            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+        } 
+
+        if (!isset($payloads['replica_id'])) { 
+            $payloads['replica_id'] = -1;
+        }
+
+        $header = self::requestHeader('kafka-php', 0, self::OFFSET_REQUEST);
+        $data   = pack('N', $payloads['replica_id']);
+        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeOffsetTopic'));
+        $data   = self::encodeString($header . $data, self::PACK_INT32);
+        return $data;
+    }
+
+    // }}}
     // {{{ private static function _encodeMessage()
 
     /**
@@ -380,6 +408,65 @@ class Encoder extends Protocol
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
         $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeFetchPartion'));
+
+        return $topic . $partitions;
+    }
+
+    // }}}
+    // {{{ private static function _encodeOffsetPartion()
+
+    /**
+     * encode signal part 
+     * 
+     * @param partions 
+     * @static
+     * @access private
+     * @return string
+     */
+    private static function _encodeOffsetPartion($values)
+    {
+        if (!isset($values['partition_id'])) {
+            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+        }
+
+        if (!isset($values['time'])) {
+            $values['time'] = 300000; // 5min
+        }
+
+        if (!isset($values['max_offset'])) {
+            $values['max_offset'] = 100000;
+        }
+
+        $data = pack('N', $values['partition_id']);
+        $data .= self::packInt64($values['time']);
+        $data .= pack('N', $values['max_offset']);
+
+        return $data;
+    }
+
+    // }}}
+    // {{{ private static function _encodeOffsetTopic()
+
+    /**
+     * encode signal topic 
+     * 
+     * @param partions 
+     * @static
+     * @access private
+     * @return string
+     */
+    private static function _encodeOffsetTopic($values)
+    {
+        if (!isset($values['topic_name'])) {
+            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+        }
+
+        if (!isset($values['partitions']) || empty($values['partitions'])) {
+            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+        }
+
+        $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
+        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeOffsetPartion'));
 
         return $topic . $partitions;
     }

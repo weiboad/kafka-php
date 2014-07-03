@@ -10,14 +10,14 @@ $data = array(
 			'partitions' => array(
 				array(
 					'partition_id' => 0,
-                    'offset' => 444,
+                    'offset' => 34,
 				),
 			),
 		),
 	),
 );
 
-$conn = new \Kafka\Socket('localhost', '9092');
+$conn = new \Kafka\Socket('192.168.1.115', '9092');
 $conn->connect();
 $data = \Kafka\Protocol\Encoder::buildFetchRequest($data);
 $conn->write($data);
