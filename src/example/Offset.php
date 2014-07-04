@@ -9,14 +9,14 @@ $data = array(
 				array(
 					'partition_id' => 0,
                     'max_offset' => 1,
-                    'time'  => microtime() 
+                    'time'  => -2 
 				),
 			),
 		),
 	),
 );
 
-$conn = new \Kafka\Socket('192.168.1.115', '9092');
+$conn = new \Kafka\Socket('localhost', '9092');
 $conn->connect();
 $data = \Kafka\Protocol\Encoder::buildOffsetRequest($data);
 var_dump(bin2hex($data));

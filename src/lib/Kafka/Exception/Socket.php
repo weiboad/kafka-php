@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka;
+namespace Kafka\Exception;
 
 use \Kafka\Exception;
 

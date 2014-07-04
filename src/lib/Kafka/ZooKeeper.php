@@ -40,6 +40,16 @@ class ZooKeeper
      */
     const BROKER_DETAIL_PATH = '/brokers/ids/%d';
 
+    /**
+     * get topic detail  
+     */
+    const TOPIC_PATCH = '/brokers/topics/%s';
+
+    /**
+     * get partition state 
+     */
+    const PARTITION_STATE = '/brokers/topics/%s/partitions/%d/state';
+
     // }}}
     // {{{ members
 
@@ -105,15 +115,71 @@ class ZooKeeper
      */
     public function getBrokerDetail($brokerId)
     { 
+        $result = array();
         $path = sprintf(self::BROKER_DETAIL_PATH, (int) $brokerId);
-        $result = $this->zookeeper->get($path);
-        if (!$result) {
-            return false;   
+        if ($this->zookeeper->exists($path)) {
+            $result = $this->zookeeper->get($path);
+            if (!$result) {
+                return false;   
+            }
+
+            $result = json_decode($result, true);
         }
 
-        $result = json_decode($result, true);
         return $result;
     }
 
+    // }}}
+    // {{{ public function getTopicDetail()
+    
+    /**
+     * get topic detail 
+     * 
+     * @param string $topicName 
+     * @access public
+     * @return void
+     */
+    public function getTopicDetail($topicName)
+    { 
+        $result = array();
+        $path = sprintf(self::TOPIC_PATCH, (string) $topicName);
+        if ($this->zookeeper->exists($path)) {
+            $result = $this->zookeeper->get($path);
+            if (!$result) {
+                return false;   
+            }
+            $result = json_decode($result, true);
+        }
+
+        return $result;
+    }
+
+    // }}}
+    // {{{ public function getPartitionState()
+    
+    /**
+     * get partition state 
+     * 
+     * @param string $topicName 
+     * @param integer $partitionId 
+     * @access public
+     * @return void
+     */
+    public function getPartitionState($topicName, $partitionId = 0)
+    { 
+        $result = array();
+        $path = sprintf(self::PARTITION_STATE, (string) $topicName, (int) $partitionId);
+        if ($this->zookeeper->exists($path)) {
+            $result = $this->zookeeper->get($path);
+            if (!$result) {
+                return false;   
+            }
+            $result = json_decode($result, true);
+        }
+
+        return $result;
+    }
+
+    // }}}
     // }}}
 }
