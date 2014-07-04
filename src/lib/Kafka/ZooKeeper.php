@@ -50,6 +50,11 @@ class ZooKeeper
      */
     const PARTITION_STATE = '/brokers/topics/%s/partitions/%d/state';
 
+    /**
+     * register consumer  
+     */
+    const REG_CONSUMER = '/consumers/%s/ids/%d';
+
     // }}}
     // {{{ members
 
@@ -179,6 +184,87 @@ class ZooKeeper
 
         return $result;
     }
+
+    // }}}
+    // {{{ public function registerConsumer()
+    
+    /**
+     * register consumer 
+     * 
+     * @param string $topicName 
+     * @param integer $partitionId 
+     * @access public
+     * @return void
+     */
+    public function registerConsumer($groupId, $consumerId, $topics = array())
+    { 
+        if (empty($topics)) {
+            return true;    
+        }
+
+        $path = sprintf(self::REG_CONSUMER, (string) $groupId, (int) $consumerId);
+        $subData = array();
+        foreach ($topics as $topic) {
+            $subData[$topic] = 1; 
+        }
+        $data = array(
+            'version' => '1',
+            'pattern' => 'white_list',
+            'subscription' => $subData,
+        );
+        if (!$this->zookeeper->exists($path)) {
+            $this->makeZkPath($path);
+            $this->makeZkNode($path, json_encode($data));
+            $this->zookeeper->set($path, json_encode($data));
+        } else {
+            $this->zookeeper->set($path, json_encode($data));
+        }
+    }
+
+    // }}}
+    // {{{ protected function makeZkPath()
+
+	/**
+	 * Equivalent of "mkdir -p" on ZooKeeper
+	 *
+	 * @param string $path  The path to the node
+	 * @param mixed  $value The value to assign to each new node along the path
+	 *
+	 * @return bool
+	 */
+	protected function makeZkPath($path, $value = 0) {
+		$parts = explode('/', $path);
+		$parts = array_filter($parts);
+		$subpath = '';
+		while (count($parts) > 1) {
+			$subpath .= '/' . array_shift($parts);
+			if (!$this->zookeeper->exists($subpath)) {
+				$this->makeZkNode($subpath, $value);
+			}
+		}
+	}
+
+    // }}}
+    // {{{ protected function makeZkNode()
+
+	/**
+	 * Create a node on ZooKeeper at the given path
+	 *
+	 * @param string $path  The path to the node
+	 * @param mixed  $value The value to assign to the new node
+	 *
+	 * @return bool
+	 */
+	protected function makeZkNode($path, $value) {
+		$params = array(
+			array(
+				'perms'  => \Zookeeper::PERM_ALL,
+				'scheme' => 'world',
+				'id'     => 'anyone',
+			)
+		);
+		return $this->zookeeper->create($path, $value, $params);
+	}
 
     // }}}
     // }}}

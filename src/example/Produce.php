@@ -1,9 +1,6 @@
 <?php
 require 'autoloader.php';
 
-$data = array(
-);
-
 $produce = \Kafka\Produce::getInstance('localhost', '2181');
 
 $produce->setRequireAck(-1);
