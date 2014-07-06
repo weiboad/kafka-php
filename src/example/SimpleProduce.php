@@ -39,15 +39,11 @@ $data = array(
 	),
 );
 
-$conn = new \Kafka\Socket('localhost', '9092');
+$conn = new \Kafka\Socket('192.168.1.115', '9092');
 $conn->connect();
-$data = \Kafka\Protocol\Encoder::buildProduceRequest($data);
-$conn->write($data);
-//var_dump(\Kafka\Protocol\Encoder::unpackInt64($conn->read(8))); // partition count
+$encoder = new \Kafka\Protocol\Encoder($conn);
+$encoder->produceRequest($data);
 
-$dataLen = unpack('N', $conn->read(4));
-$dataLen = $dataLen[1];
-$data = $conn->read($dataLen);
-var_dump(bin2hex($data));
-$result = \Kafka\Protocol\Decoder::decodeProduceResponse($data);
+$decoder = new \Kafka\Protocol\Decoder($conn);
+$result = $decoder->produceResponse();
 var_dump($result);

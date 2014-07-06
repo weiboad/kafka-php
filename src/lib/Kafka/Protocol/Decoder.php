@@ -29,7 +29,7 @@ namespace Kafka\Protocol;
 class Decoder extends Protocol
 {
     // {{{ functions
-    // {{{ public function decodeProduceResponse()
+    // {{{ public function produceResponse()
 
     /**
      * decode produce response 
@@ -38,14 +38,21 @@ class Decoder extends Protocol
      * @access public
      * @return array
      */
-    public function decodeProduceResponse($data)
+    public function produceResponse()
     {
-        //  data -> 0000000000000002000574657374360000000200000002000000000000000000140000000500000000000000000014000474657374000000010000000000000000000000000033
         $result = array();
+        $dataLen = unpack('N', $this->stream->read(4, true));
+        $dataLen = array_shift($dataLen);
+        if (!$dataLen) {
+            throw new \Kafka\Exception('produce response invalid.');    
+        }
+        $data = $this->stream->read($dataLen, true);
+
+        // parse data struct
         $offset = 4;
         $topicCount = unpack('N', substr($data, $offset, 4));
+        $topicCount = array_shift($topicCount);
         $offset += 4;
-        $topicCount = isset($topicCount[1]) ? $topicCount[1] : 0;
         for ($i = 0; $i < $topicCount; $i++) {
             $topicLen = unpack('n', substr($data, $offset, 2)); // int16 topic name length	
             $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;	
@@ -74,7 +81,24 @@ class Decoder extends Protocol
     }
 
     // }}}
-    // {{{ public function decodeMetaDataResponse()
+    // {{{ public function fetchResponse()
+
+    /**
+     * decode fetch response 
+     * 
+     * @param string $data 
+     * @access public
+     * @return Iterator
+     */
+    public function fetchResponse()
+    {
+        $result = array();
+
+        return new \Kafka\Protocol\Fetch\Topic($this->stream);
+    }
+
+    // }}}
+    // {{{ public function metaDataResponse()
 
     /**
      * decode metadata response 
@@ -83,11 +107,17 @@ class Decoder extends Protocol
      * @access public
      * @return array
      */
-    public function decodeMetaDataResponse($data)
+    public function metaDataResponse()
     {
         $result = array();
         $broker = array();
         $topic = array();
+        $dataLen = unpack('N', $this->stream->read(4, true));
+        $dataLen = array_shift($dataLen);
+        if (!$dataLen) {
+            throw new \Kafka\Exception('metaData response invalid.');    
+        }
+        $data = $this->stream->read($dataLen, true);
         $offset = 4;
         $brokerCount = unpack('N', substr($data, $offset, 4));
         $offset += 4;
@@ -169,7 +199,7 @@ class Decoder extends Protocol
     }
 
     // }}}
-    // {{{ public function decodeOffsetResponse()
+    // {{{ public function offsetResponse()
 
     /**
      * decode offset response 
@@ -178,9 +208,15 @@ class Decoder extends Protocol
      * @access public
      * @return array
      */
-    public function decodeOffsetResponse($data)
+    public function offsetResponse()
     {
         $result = array();
+        $dataLen = unpack('N', $this->stream->read(4, true));
+        $dataLen = array_shift($dataLen);
+        if (!$dataLen) {
+            throw new \Kafka\Exception('offset response invalid.');    
+        }
+        $data = $this->stream->read($dataLen, true);
         $offset = 4;
         $topicCount = unpack('N', substr($data, $offset, 4));
         $offset += 4;
@@ -215,6 +251,180 @@ class Decoder extends Protocol
             }
         }
         return $result; 
+    }
+
+    // }}}
+    // {{{ public function commitOffsetResponse()
+
+    /**
+     * decode commit offset response 
+     * 
+     * @param string $data 
+     * @access public
+     * @return array
+     */
+    public function commitOffsetResponse()
+    {
+        $result = array();
+        $dataLen = unpack('N', $this->stream->read(4, true));
+        $dataLen = array_shift($dataLen);
+        if (!$dataLen) {
+            throw new \Kafka\Exception('commit offset response invalid.');    
+        }
+        $data = $this->stream->read($dataLen, true);
+        $offset = 4;
+        $topicCount = unpack('N', substr($data, $offset, 4));
+        $offset += 4;
+        $topicCount = array_shift($topicCount);
+        for ($i = 0; $i < $topicCount; $i++) {
+            $topicLen = unpack('n', substr($data, $offset, 2)); // int16 topic name length	
+            $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;	
+            $offset += 2;
+            $topicName = substr($data, $offset, $topicLen);
+            $offset += $topicLen;
+            $partitionCount = unpack('N', substr($data, $offset, 4));
+            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
+            $offset += 4;
+            $result[$topicName] = array();
+            for ($j = 0; $j < $partitionCount; $j++) {
+                $partitionId = unpack('N', substr($data, $offset, 4));
+                $offset += 4;
+                $errCode     = unpack('n', substr($data, $offset, 2));
+                $offset += 2;
+                $result[$topicName][$partitionId[1]] = array(
+                    'errCode' => $errCode[1],
+                );
+            }
+        }
+        return $result; 
+    }
+
+    // }}}
+    // {{{ public function fetchOffsetResponse()
+
+    /**
+     * decode fetch offset response 
+     * 
+     * @param string $data 
+     * @access public
+     * @return array
+     */
+    public function fetchOffsetResponse()
+    {
+        $result = array();
+        $dataLen = unpack('N', $this->stream->read(4, true));
+        $dataLen = array_shift($dataLen);
+        if (!$dataLen) {
+            throw new \Kafka\Exception('offset response invalid.');    
+        }
+        $data = $this->stream->read($dataLen, true);
+        $offset = 4;
+        $topicCount = unpack('N', substr($data, $offset, 4));
+        $offset += 4;
+        $topicCount = array_shift($topicCount);
+        for ($i = 0; $i < $topicCount; $i++) {
+            $topicLen = unpack('n', substr($data, $offset, 2)); // int16 topic name length	
+            $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;	
+            $offset += 2;
+            $topicName = substr($data, $offset, $topicLen);
+            $offset += $topicLen;
+            $partitionCount = unpack('N', substr($data, $offset, 4));
+            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
+            $offset += 4;
+            $result[$topicName] = array();
+            for ($j = 0; $j < $partitionCount; $j++) {
+                $partitionId = unpack('N', substr($data, $offset, 4));
+                $offset += 4;
+                $partitionOffset = self::unpackInt64(substr($data, $offset, 8));
+                $offset += 8;
+                $metaLen = unpack('n', substr($data, $offset, 2));
+                $metaLen = array_shift($metaLen);
+                $offset += 2;
+                $metaData = '';
+                if ($metaLen) {
+                    $metaData = substr($data, $offset, $metaLen);
+                    $offset += $metaLen;
+                }
+                $errCode = unpack('n', substr($data, $offset, 2));
+                $offset += 2;
+                $result[$topicName][$partitionId[1]] = array(
+                    'offset'   => $partitionOffset,
+                    'metadata' => $metaData,
+                    'errCode'  => $errCode[1],
+                );
+            }
+        }
+        return $result; 
+    }
+
+    // }}}
+    // {{{ public static function getError()
+
+    /**
+     * get error 
+     * 
+     * @param integer $errCode 
+     * @static
+     * @access public
+     * @return string
+     */
+    public static function getError($errCode)
+    {
+        $error = '';
+        switch($errCode) {
+            case 0:
+                $error = 'No error--it worked!';
+                break;
+            case -1:
+                $error = 'An unexpected server error';
+                break;
+            case 1:
+                $error = 'The requested offset is outside the range of offsets maintained by the server for the given topic/partition.';
+                break;
+            case 2:
+                $error = 'This indicates that a message contents does not match its CRC';
+                break;
+            case 3:
+                $error = 'This request is for a topic or partition that does not exist on this broker.';
+                break;
+            case 4:
+                $error = 'The message has a negative size';
+                break;
+            case 5:
+                $error = 'This error is thrown if we are in the middle of a leadership election and there is currently no leader for this partition and hence it is unavailable for writes';
+                break;
+            case 6:
+                $error = 'This error is thrown if the client attempts to send messages to a replica that is not the leader for some partition. It indicates that the clients metadata is out of date.';
+                break;
+            case 7:
+                $error = 'This error is thrown if the request exceeds the user-specified time limit in the request.';
+                break;
+            case 8:
+                $error = 'This is not a client facing error and is used only internally by intra-cluster broker communication.';
+                break;
+            case 10:
+                $error = 'The server has a configurable maximum message size to avoid unbounded memory allocation. This error is thrown if the client attempt to produce a message larger than this maximum.';
+                break;
+            case 11:
+                $error = 'Internal error code for broker-to-broker communication.';
+                break;
+            case 12:
+                $error = 'If you specify a string larger than configured maximum for offset metadata';
+                break;
+            case 14:
+                $error = 'The broker returns this error code for an offset fetch request if it is still loading offsets (after a leader change for that offsets topic partition).';
+                break;
+            case 15:
+                $error = 'The broker returns this error code for consumer metadata requests or offset commit requests if the offsets topic has not yet been created.';
+                break;
+            case 16:
+                $error = 'The broker returns this error code if it receives an offset fetch or commit request for a consumer group that it is not a coordinator for.';
+                break;
+            default:
+                $error = 'Unknown error';
+        }  
+
+        return $error;
     }
 
     // }}}

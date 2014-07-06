@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Produce
+class Consumer
 {
     // {{{ consts
     // }}}
@@ -49,20 +49,12 @@ class Produce
     private $payload = array();
 
     /**
-     * default the server will not send any response 
+     * consumer group 
      * 
-     * @var float
+     * @var string
      * @access private
      */
-    private $requiredAck = 0;
-
-    /**
-     * default timeout is 100ms 
-     * 
-     * @var float
-     * @access private
-     */
-    private $timeout = 100;
+    private $group = '';
 
     /**
      * produce instance 
@@ -123,82 +115,47 @@ class Produce
     }
 
     // }}}
-    // {{{ public function setMessages()
+    // {{{ public function setPartition()
 
     /**
-     * set send messages  
+     * set topic partition  
      * 
      * @access public
      * @return void
      */
-    public function setMessages($topicName, $partitionId = 0, $messages = array())
+    public function setPartition($topicName, $partitionId = 0, $offset = 0)
     {
-        if (isset($this->payload[$topicName][$partitionId])) {
-            $this->payload[$topicName][$partitionId] = 
-                    array_merge($messages, $this->payload[$topicName][$partitionId]);    
-        } else {
-            $this->payload[$topicName][$partitionId] = $messages;    
-        }
+        $this->payload[$topicName][$partitionId] = $offset;    
         
         return $this; 
     }
 
     // }}}
-    // {{{ public function setRequireAck()
+    // {{{ public function setGroup()
     
     /**
-     * set request mode
-     * This field indicates how many acknowledgements the servers should receive
-     * before responding to the request. If it is 0 the server will not send any
-     * response (this is the only case where the server will not reply to a
-     * request). If it is 1, the server will wait the data is written to the
-     * local log before sending a response. If it is -1 the server will block
-     * until the message is committed by all in sync replicas before sending a
-     * response. For any number > 1 the server will block waiting for this
-     * number of acknowledgements to occur (but the server will never wait for
-     * more acknowledgements than there are in-sync replicas). 
+     * set consumer group
      * 
-     * @param int $ack 
+     * @param string $group 
      * @access public
      * @return void
      */
-    public function setRequireAck($ack = 0)
+    public function setGroup($group)
     {
-        if ($ack >= -1) {
-            $this->requiredAck = (int) $ack;    
-        }
-
+        $this->group = (string) $group;
         return $this;
     }
 
     // }}}
-    // {{{ public function setTimeOut()
+    // {{{ public function fetch()
     
     /**
-     * set request timeout
-     * 
-     * @param int $timeout 
-     * @access public
-     * @return void
-     */
-    public function setTimeOut($timeout = 100)
-    {
-        if ((int) $timeout) {
-            $this->timeout = (int) $timeout;   
-        }
-        return $this;
-    }
-
-    // }}}
-    // {{{ public function send()
-    
-    /**
-     * send message to broker 
+     * fetch message to broker 
      * 
      * @access public
      * @return void
      */
-    public function send()
+    public function fetch()
     {
         $data = $this->_formatPayload();
         if (empty($data)) {
@@ -206,24 +163,16 @@ class Produce
         }
 
         $responseData = array();
+        $streams = array();
         foreach ($data as $host => $requestData) {
             $conn = $this->client->getStream($host);
             $encoder = new \Kafka\Protocol\Encoder($conn);     
-            $encoder->produceRequest($requestData);
-            if ((int) $this->requiredAck !== 0) { // get broker response
-                $decoder = new \Kafka\Protocol\Decoder($conn);
-                $response = $decoder->produceResponse();
-                foreach ($response as $topicName => $info) {
-                    if (!isset($responseData[$topicName])) {
-                        $responseData[$topicName] = $info; 
-                    } else {
-                        $responseData[$topicName] = array_merge($info, $responseData[$topicName]);    
-                    }
-                }
-            }
+            $encoder->fetchRequest($requestData);
+            $streams[] = $conn;
         }
-
-        return $responseData;
+            
+        $fetch = new \Kafka\Protocol\Fetch\Topic($streams);
+        return $fetch;
     }
 
     // }}}
@@ -243,9 +192,9 @@ class Produce
 
         $data = array();
         foreach ($this->payload as $topicName => $partitions) {
-            foreach ($partitions as $partitionId => $messages) {
+            foreach ($partitions as $partitionId => $offset) {
                 $host = $this->client->getHostByPartition($topicName, $partitionId); 
-                $data[$host][$topicName][$partitionId] = $messages;
+                $data[$host][$topicName][$partitionId] = $offset;
             }     
         }
         
@@ -254,10 +203,10 @@ class Produce
             $topicData = array();
             foreach ($info as $topicName => $partitions) {
                 $partitionData = array();
-                foreach ($partitions as $partitionId => $messages) {
+                foreach ($partitions as $partitionId => $offset) {
                     $partitionData[] = array(
                         'partition_id' => $partitionId,
-                        'messages'     => $messages,
+                        'offset'       => $offset,
                     );
                 }
                 $topicData[] = array(
@@ -267,8 +216,6 @@ class Produce
             }    
 
             $requestData[$host] = array(
-                'required_ack' => $this->requiredAck,
-                'timeout'      => $this->timeout,
                 'data' => $topicData,
             );
         }

@@ -53,7 +53,17 @@ class ZooKeeper
     /**
      * register consumer  
      */
-    const REG_CONSUMER = '/consumers/%s/ids/%d';
+    const REG_CONSUMER = '/consumers/%s/ids/%s';
+
+    /**
+     * list consumer  
+     */
+    const LIST_CONSUMER = '/consumers/%s/ids';
+
+    /**
+     * partition owner
+     */
+    const PARTITION_OWNER = '/consumers/%s/owners/%s/%d';
 
     // }}}
     // {{{ members
@@ -202,7 +212,7 @@ class ZooKeeper
             return true;    
         }
 
-        $path = sprintf(self::REG_CONSUMER, (string) $groupId, (int) $consumerId);
+        $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
         $subData = array();
         foreach ($topics as $topic) {
             $subData[$topic] = 1; 
@@ -215,9 +225,87 @@ class ZooKeeper
         if (!$this->zookeeper->exists($path)) {
             $this->makeZkPath($path);
             $this->makeZkNode($path, json_encode($data));
-            $this->zookeeper->set($path, json_encode($data));
         } else {
             $this->zookeeper->set($path, json_encode($data));
+        }
+    }
+
+    // }}}
+    // {{{ public function listConsumer()
+    
+    /**
+     * list consumer 
+     * 
+     * @param string $groupId 
+     * @access public
+     * @return void
+     */
+    public function listConsumer($groupId)
+    { 
+        $path = sprintf(self::LIST_CONSUMER, (string) $groupId);
+        if (!$this->zookeeper->exists($path)) {
+            return array();
+        } else {
+            return $this->zookeeper->getChildren($path);
+        }
+    }
+
+    // }}}
+    // {{{ public function getConsumersPerTopic()
+    
+    /**
+     * get consumer per topic
+     * 
+     * @param string $groupId 
+     * @access public
+     * @return array
+     */
+    public function getConsumersPerTopic($groupId)
+    { 
+        $consumers = $this->listConsumer($groupId);
+        if (empty($consumers)) {
+            return array();    
+        }
+
+        $topics = array();
+        foreach ($consumers as $consumerId) {
+            $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
+            if (!$this->zookeeper->exists($path)) {
+                continue;    
+            }
+            
+            $info = $this->zookeeper->get($path); 
+            $info = json_decode($info, true);
+            $subTopic = isset($info['subscription']) ? $info['subscription'] : array();
+            foreach ($subTopic as $topic => $num) {
+                $topics[$topic] = $consumerId;    
+            }
+        }
+
+        return $topics;
+    }
+
+    // }}}
+    // {{{ public function addPartitionOwner()
+    
+    /**
+     * add partition owner 
+     * 
+     * @param string $groupId 
+     * @param string $topicName 
+     * @param integer $partitionId 
+     * @param string $consumerId 
+     * @access public
+     * @return void
+     */
+    public function addPartitionOwner($groupId, $topicName, $partitionId, $consumerId)
+    { 
+        $path = sprintf(self::PARTITION_OWNER, (string) $groupId, $topicName, (string) $partitionId);
+        if (!$this->zookeeper->exists($path)) {
+            $this->makeZkPath($path);
+            $this->makeZkNode($path, $consumerId);
+        } else {
+            $this->zookeeper->set($path, $consumerId);
         }
     }
 

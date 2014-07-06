@@ -33,10 +33,34 @@ class Topic implements \Iterator, \Countable
     /**
      * kafka socket object 
      * 
+     * @var array
+     * @access private
+     */
+    private $streams = array();
+
+    /**
+     * each topic count 
+     * 
+     * @var array
+     * @access private
+     */
+    private $topicCounts = array();
+
+    /**
+     * current iterator stream 
+     * 
      * @var mixed
      * @access private
      */
-    private $stream = null;
+    private $currentStreamKey = 0;
+
+    /**
+     * currentStreamCount 
+     * 
+     * @var float
+     * @access private
+     */
+    private $currentStreamCount = 0;
 
     /**
      * validCount 
@@ -91,9 +115,12 @@ class Topic implements \Iterator, \Countable
      * @access public
      * @return void
      */
-    public function __construct(\Kafka\Socket $stream)
+    public function __construct($streams)
     {
-        $this->stream = $stream;
+        if (!is_array($streams)) {
+            $streams = array($streams);    
+        }
+        $this->streams = $streams;
         $this->topicCount = $this->getTopicCount();
     }
 
@@ -193,12 +220,18 @@ class Topic implements \Iterator, \Countable
      */
     protected function getTopicCount()
     {
-        // read topic count
-        $data = $this->stream->read(4, true);
-        $data = unpack('N', $data);
-        $count = array_shift($data); 
-        if ($count <= 0) {
-            throw new \Kafka\Exception\OutOfRange($size . ' is not a valid topic count');
+        $count = 0;
+        foreach ($this->streams as $key => $stream) {
+            // read topic count
+            $stream->read(8, true);
+            $data = $stream->read(4, true);
+            $data = unpack('N', $data);
+            $topicCount = array_shift($data); 
+            $count += $topicCount;
+            $this->topicCounts[$key] = $topicCount;
+            if ($count <= 0) {
+                throw new \Kafka\Exception\OutOfRange($size . ' is not a valid topic count');
+            }
         }
 
         return $count;
@@ -218,9 +251,19 @@ class Topic implements \Iterator, \Countable
         if ($this->validCount >= $this->topicCount) {
             return false;
         } 
+
+        if ($this->currentStreamCount >= $this->topicCounts[$this->currentStreamKey]) {
+            $this->currentStreamKey++;    
+        }
+
+        if (!isset($this->streams[$this->currentStreamKey])) {
+            return false;    
+        }
+
+        $stream = $this->streams[$this->currentStreamKey];
         
         try {
-            $topicLen = $this->stream->read(2, true);
+            $topicLen = $stream->read(2, true);
             $topicLen = unpack('n', $topicLen);
             $topicLen = array_shift($topicLen);
             if ($topicLen <= 0) {
@@ -228,15 +271,30 @@ class Topic implements \Iterator, \Countable
             }
 
             // topic name
-            $this->key = $this->stream->read($topicLen, true);
-            $this->current = new Partition($this->stream); 
+            $this->key = $stream->read($topicLen, true);
+            $this->current = new Partition($this); 
         } catch (\Kafka\Exception $e) {
             return false;
         }
 
         $this->validCount++;
+        $this->currentStreamCount++;
 
         return true;
+    }
+
+    // }}}
+    // {{{ public function getStream()
+
+    /**
+     * get current stream 
+     * 
+     * @access public
+     * @return \Kafka\Socket
+     */
+    public function getStream()
+    {
+        return $this->streams[$this->currentStreamKey]; 
     }
 
     // }}}

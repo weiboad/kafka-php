@@ -7,14 +7,10 @@ $data = array(
 
 $conn = new \Kafka\Socket('192.168.1.115', '9092');
 $conn->connect();
-$data = \Kafka\Protocol\Encoder::buildMetadataRequest($data);
-var_dump(bin2hex($data));
-$conn->write($data);
-//var_dump(\Kafka\Protocol\Encoder::unpackInt64($conn->read(8))); // partition count
 
-$dataLen = unpack('N', $conn->read(4));
-$dataLen = $dataLen[1];
-$data = $conn->read($dataLen);
-var_dump(bin2hex($data));
-$result = \Kafka\Protocol\Decoder::decodeMetaDataResponse($data);
+$encoder = new \Kafka\Protocol\Encoder($conn);
+$encoder->metadataRequest($data);
+
+$decoder = new \Kafka\Protocol\Decoder($conn);
+$result = $decoder->metaDataResponse();
 var_dump($result);

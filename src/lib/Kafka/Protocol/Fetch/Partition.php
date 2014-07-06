@@ -95,6 +95,14 @@ class Partition implements \Iterator, \Countable
      */
     private $valid = false;
 
+    /**
+     * cuerrent topic name 
+     * 
+     * @var string
+     * @access private
+     */
+    private $topicName = '';
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -102,14 +110,15 @@ class Partition implements \Iterator, \Countable
     /**
      * __construct 
      * 
-     * @param \Kafka\Socket $stream 
+     * @param \Kafka\Protocol\Fetch\Topic $topic 
      * @param int $initOffset 
      * @access public
      * @return void
      */
-    public function __construct(\Kafka\Socket $stream)
+    public function __construct(\Kafka\Protocol\Fetch\Topic $topic)
     {
-        $this->stream = $stream;
+        $this->stream    = $topic->getStream();
+        $this->topicName = $topic->current();
         $this->partitionCount = $this->getPartitionCount();
     }
 

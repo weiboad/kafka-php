@@ -1,11 +1,12 @@
 <?php
 require 'autoloader.php';
 
-$zk = new \Kafka\ZooKeeper('localhost', 2181);
-$list = $zk->registerConsumer('testgroup', 1, array('test'));
+$zk = new \Kafka\ZooKeeper('hadoop11', 2181);
+$list = $zk->getConsumersPerTopic('testgroup');
 
-$zk = new \Zookeeper('localhost:2181');
+var_dump($list);
+//$zk = new \Zookeeper('hadoop11:2181');
 
-$path = '/consumers/testgroup/owners/test/0';
-$path = '/consumers/testgroup/ids/1';
-var_dump($zk->get($path));
+//$path = '/consumers/testgroup/ids/2';
+////$path = '/consumers/testgroup/ids';
+//var_dump($zk->get($path));

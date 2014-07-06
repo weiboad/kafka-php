@@ -78,7 +78,33 @@ abstract class Protocol
     const CONSUMER_METADATA_REQUEST = 10;
 
     // }}}
+    // {{{ members
+
+    /**
+     * stream 
+     * 
+     * @var mixed
+     * @access protected
+     */
+    protected $stream = null;
+
+    // }}}
     // {{{ functions
+    // {{{ public function __construct()
+
+    /**
+     * __construct 
+     * 
+     * @param \Kafka\Socket $stream 
+     * @access public
+     * @return void
+     */
+    public function __construct(\Kafka\Socket $stream)
+    {
+        $this->stream = $stream; 
+    }
+
+    // }}}
     // {{{ public static function packInt64()
 
     /**
@@ -90,13 +116,20 @@ abstract class Protocol
      */
     public static function packInt64($big)
     {
-        $left  = 0xffffffff00000000;
-        $right = 0x00000000ffffffff;
+        if ($big == -1) { // -1L
+            $data = hex2bin('ffffffffffffffff');
+        } else if ($big == -2) { // -2L
+            $data = hex2bin('fffffffffffffffe');
+        } else {
+            $left  = 0xffffffff00000000;
+            $right = 0x00000000ffffffff;
 
-        $l = ($big & $left) >> 32;
-        $r = $big & $right;
+            $l = ($big & $left) >> 32;
+            $r = $big & $right;
+            $data = pack('NN', $l, $r); 
+        }
 
-        return pack('NN', $l, $r); 
+        return $data;
     }
 
     // }}}
@@ -115,5 +148,6 @@ abstract class Protocol
         return $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
     }
 
+    // }}}
     // }}}
 } 
