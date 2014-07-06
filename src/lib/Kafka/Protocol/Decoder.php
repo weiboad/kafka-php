@@ -98,7 +98,7 @@ class Decoder extends Protocol
     }
 
     // }}}
-    // {{{ public function metaDataResponse()
+    // {{{ public function metadataResponse()
 
     /**
      * decode metadata response 
@@ -107,7 +107,7 @@ class Decoder extends Protocol
      * @access public
      * @return array
      */
-    public function metaDataResponse()
+    public function metadataResponse()
     {
         $result = array();
         $broker = array();

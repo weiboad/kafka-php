@@ -12,5 +12,5 @@ $encoder = new \Kafka\Protocol\Encoder($conn);
 $encoder->metadataRequest($data);
 
 $decoder = new \Kafka\Protocol\Decoder($conn);
-$result = $decoder->metaDataResponse();
+$result = $decoder->metadataResponse();
 var_dump($result);

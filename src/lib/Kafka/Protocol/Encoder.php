@@ -487,7 +487,7 @@ class Encoder extends Protocol
         }
 
         if (!isset($values['time'])) {
-            $values['time'] = 300000; // 5min
+            $values['time'] = -1; // -1 
         }
 
         if (!isset($values['max_offset'])) {
