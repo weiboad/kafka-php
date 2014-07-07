@@ -165,7 +165,6 @@ class Message
      */
     public function __toString()
     {
-        var_dump($this->value);
         return $this->value;        
     }
 

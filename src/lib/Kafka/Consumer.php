@@ -176,6 +176,20 @@ class Consumer
     }
 
     // }}}
+    // {{{ public function getClient()
+    
+    /**
+     * get client object 
+     * 
+     * @access public
+     * @return void
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    // }}}
     // {{{ private function _formatPayload()
     
     /**

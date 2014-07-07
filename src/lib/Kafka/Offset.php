@@ -135,7 +135,7 @@ class Offset
             ),
         );
    
-        $this->encoder->commitOffsetRequest($requestData);
+        $this->encoder->commitOffsetRequest($data);
         $result = $this->decoder->commitOffsetResponse();
         if (!isset($result[$topicName][$partitionId]['errCode'])) {
             throw new \Kafka\Exception('commit topic offset failed.');
