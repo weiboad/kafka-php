@@ -118,7 +118,7 @@ class Partition implements \Iterator, \Countable
     public function __construct(\Kafka\Protocol\Fetch\Topic $topic)
     {
         $this->stream    = $topic->getStream();
-        $this->topicName = $topic->current();
+        $this->topicName = $topic->key();
         $this->partitionCount = $this->getPartitionCount();
     }
 
@@ -235,6 +235,34 @@ class Partition implements \Iterator, \Countable
     }
 
     // }}}
+    // {{{ public function getTopicName()
+
+    /**
+     * get partition topic name 
+     * 
+     * @access public
+     * @return void
+     */
+    public function getTopicName()
+    {
+        return $this->topicName;
+    }
+
+    // }}}
+    // {{{ public function getStream()
+
+    /**
+     * get current stream 
+     * 
+     * @access public
+     * @return \Kafka\Socket
+     */
+    public function getStream()
+    {
+        return $this->stream; 
+    }
+
+    // }}}
     // {{{ protected function getPartitionCount()
 
     /**
@@ -284,7 +312,7 @@ class Partition implements \Iterator, \Countable
             $this->offset  = \Kafka\Protocol\Decoder::unpackInt64($offset);
 
             $this->key = $partitionId;
-            $this->current = new MessageSet($this->stream); 
+            $this->current = new MessageSet($this); 
         } catch (\Kafka\Exception $e) {
             return false;
         }

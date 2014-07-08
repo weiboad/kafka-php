@@ -80,6 +80,14 @@ class Offset
      */
     private $decoder = null;
 
+    /**
+     * streamKey 
+     * 
+     * @var string
+     * @access private
+     */
+    private $streamKey = '';
+
     // }}} 
     // {{{ functions
     // {{{ public function __construct()
@@ -99,8 +107,10 @@ class Offset
 
         $host   = $this->client->getHostByPartition($topicName, $partitionId);
         $stream = $this->client->getStream($host);
-        $this->encoder = new \Kafka\Protocol\Encoder($stream);
-        $this->decoder = new \Kafka\Protocol\Decoder($stream);
+        $conn   = $stream['stream'];
+        $this->streamKey = $stream['key'];
+        $this->encoder = new \Kafka\Protocol\Encoder($conn);
+        $this->decoder = new \Kafka\Protocol\Decoder($conn);
     }
 
     // }}}
@@ -124,7 +134,7 @@ class Offset
             'group_id' => $this->groupId,
             'data' => array(
                 array(
-                    'topic_name' => $this->groupId,
+                    'topic_name' => $this->topicName,
                     'partitions' => array(
                         array(
                             'partition_id' => $this->partitionId,
@@ -134,9 +144,13 @@ class Offset
                 ),
             ),
         );
+
+        $topicName = $this->topicName;
+        $partitionId = $this->partitionId;
    
         $this->encoder->commitOffsetRequest($data);
         $result = $this->decoder->commitOffsetResponse();
+        $this->client->freeStream($this->streamKey);
         if (!isset($result[$topicName][$partitionId]['errCode'])) {
             throw new \Kafka\Exception('commit topic offset failed.');
         }
@@ -161,7 +175,7 @@ class Offset
             'group_id' => $this->groupId,
             'data' => array(
                 array(
-                    'topic_name' => $this->groupId,
+                    'topic_name' => $this->topicName,
                     'partitions' => array(
                         array(
                             'partition_id' => $this->partitionId,
@@ -171,12 +185,15 @@ class Offset
             ),
         );
    
-        $this->encoder->fetchOffsetRequest($requestData);
+        $this->encoder->fetchOffsetRequest($data);
         $result = $this->decoder->fetchOffsetResponse();
+        $this->client->freeStream($this->streamKey);
+
+        $topicName = $this->topicName;
+        $partitionId = $this->partitionId;
         if (!isset($result[$topicName][$partitionId]['errCode'])) {
             throw new \Kafka\Exception('fetch topic offset failed.');
         }
-
         if ($result[$topicName][$partitionId]['errCode'] == 3) {
             if ($defaultOffset) {
                 $this->setOffset($defaultOffset);
@@ -202,6 +219,9 @@ class Offset
      */
     public function getProduceOffset()
     {
+        $topicName = $this->topicName;
+        $partitionId = $this->partitionId;
+
         $requestData = array(
             'data' => array(
                 array(
@@ -218,12 +238,13 @@ class Offset
         );
         $this->encoder->offsetRequest($requestData);
         $result = $this->decoder->offsetResponse();
+        $this->client->freeStream($this->streamKey);
         
         if (!isset($result[$topicName][$partitionId]['offset'])) {
             if (isset($result[$topicName][$partitionId]['errCode'])) {
                 throw new \Kafka\Exception(\Kafka\Protocol\Decoder::getError($result[$topicName][$partitionId]['errCode']));    
             } else {
-                throw new \Kafka\Exception('get offset failed. topic name:' . $topicName . ' partitionId: ' . $partitionId);    
+                throw new \Kafka\Exception('get offset failed. topic name:' . $this->topicName . ' partitionId: ' . $this->partitionId);    
             }
         }
 

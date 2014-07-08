@@ -207,7 +207,8 @@ class Produce
 
         $responseData = array();
         foreach ($data as $host => $requestData) {
-            $conn = $this->client->getStream($host);
+            $stream = $this->client->getStream($host);
+            $conn   = $stream['stream'];
             $encoder = new \Kafka\Protocol\Encoder($conn);     
             $encoder->produceRequest($requestData);
             if ((int) $this->requiredAck !== 0) { // get broker response
@@ -221,6 +222,8 @@ class Produce
                     }
                 }
             }
+
+            $this->client->freeStream($host, $stream['key']);
         }
 
         return $responseData;

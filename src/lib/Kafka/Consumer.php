@@ -57,6 +57,14 @@ class Consumer
     private $group = '';
 
     /**
+     * from offset 
+     * 
+     * @var mixed
+     * @access private
+     */
+    private $fromOffset = true;
+
+    /**
      * produce instance 
      * 
      * @var \Kafka\Produce
@@ -123,11 +131,34 @@ class Consumer
      * @access public
      * @return void
      */
-    public function setPartition($topicName, $partitionId = 0, $offset = 0)
+    public function setPartition($topicName, $partitionId = 0, $offset = null)
     {
+        if (is_null($offset)) {
+            if ($this->fromOffset) {
+                $offsetObject = new \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);  
+                $offset = $offsetObject->getOffset(0);
+            } else {
+                $offset = 0;    
+            }    
+        }
         $this->payload[$topicName][$partitionId] = $offset;    
         
         return $this; 
+    }
+
+    // }}}
+    // {{{ public function setFromOffset()
+
+    /**
+     * set whether starting offset fetch 
+     * 
+     * @param boolean $fromOffset 
+     * @access public
+     * @return void
+     */
+    public function setFromOffset($fromOffset)
+    {
+        $this->fromOffset = (boolean) $fromOffset; 
     }
 
     // }}}
@@ -165,13 +196,25 @@ class Consumer
         $responseData = array();
         $streams = array();
         foreach ($data as $host => $requestData) {
-            $conn = $this->client->getStream($host);
+            $connArr = $this->client->getStream($host);
+            $conn    = $connArr['stream'];
             $encoder = new \Kafka\Protocol\Encoder($conn);     
             $encoder->fetchRequest($requestData);
-            $streams[] = $conn;
+            $streams[$connArr['key']] = $conn;
         }
             
         $fetch = new \Kafka\Protocol\Fetch\Topic($streams);
+
+        // register fetch helper
+        $freeStream = new \Kafka\Protocol\Fetch\Helper\FreeStream($this->client);
+        $freeStream->setStreams($streams);
+        \Kafka\Protocol\Fetch\Helper\Helper::registerHelper('freeStream', $freeStream);
+
+        // register partition commit offset
+        $commitOffset = new \Kafka\Protocol\Fetch\Helper\CommitOffset($this->client);
+        $commitOffset->setGroup($this->group);
+        \Kafka\Protocol\Fetch\Helper\Helper::registerHelper('commitOffset', $commitOffset);
+
         return $fetch;
     }
 

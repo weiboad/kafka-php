@@ -70,6 +70,14 @@ class MessageSet implements \Iterator
      */
     private $valid = false;
 
+    /**
+     * partition object  
+     * 
+     * @var \Kafka\Protocol\Fetch\Partition
+     * @access private
+     */
+    private $partition = null;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -82,9 +90,10 @@ class MessageSet implements \Iterator
      * @access public
      * @return void
      */
-    public function __construct(\Kafka\Socket $stream)
+    public function __construct(\Kafka\Protocol\Fetch\Partition $partition)
     {
-        $this->stream = $stream;
+        $this->stream = $partition->getStream();
+        $this->partition = $partition;
         $this->messageSetSize = $this->getMessageSetSize();
     }
 
@@ -141,7 +150,12 @@ class MessageSet implements \Iterator
      */
     public function valid()
     {
-        return $this->valid && $this->validByteCount <= $this->messageSetSize;
+        if (!$this->valid) {
+            // one partition iterator end 
+            \Kafka\Protocol\Fetch\Helper\Helper::onPartitionEof($this->partition);
+        }
+
+        return $this->valid;
     }
 
     // }}}
@@ -209,6 +223,7 @@ class MessageSet implements \Iterator
         }
 
         $this->validByteCount += 8 + 4 + $messageSize;
+
         return true;
     }
 

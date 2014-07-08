@@ -145,15 +145,52 @@ class Client
      * @access private
      * @return void
      */
-    public function getStream($host)
+    public function getStream($host, $lockKey = null)
     {
-        if (!isset(self::$stream[$host])) {
-            list($hostname, $port) = explode(':', $host);
-            self::$stream[$host] = new \Kafka\Socket($hostname, $port);
-            self::$stream[$host]->connect();
+        if (!$lockKey) {
+            $lockKey = uniqid($host);    
         }
 
-        return self::$stream[$host];
+        list($hostname, $port) = explode(':', $host);
+        // find unlock stream
+        if (isset(self::$stream[$host])) {
+            foreach (self::$stream[$host] as $lockKey => $info) {
+                if ($info['locked']) {
+                    continue;    
+                } else {
+                    self::$stream[$host][$lockKey]['locked'] = true;
+                    return array('key' => $lockKey, 'stream' => $info['stream']);    
+                }
+            }    
+        }
+
+        // no idle stream
+        $stream = new \Kafka\Socket($hostname, $port);
+        $stream->connect();
+        self::$stream[$host][$lockKey] = array(
+            'locked' => true,
+            'stream' => $stream,
+        ); 
+        return array('key' => $lockKey, 'stream' => $stream); 
+    }
+
+    // }}}
+    // {{{ public function freeStream()
+
+    /**
+     * free stream pool 
+     * 
+     * @param string $key 
+     * @access public
+     * @return void
+     */
+    public function freeStream($key)
+    {
+        foreach (self::$stream as $host => $values) {
+            if (isset($values[$key])) {
+                self::$stream[$host][$key]['locked'] = false;    
+            }    
+        }
     }
 
     // }}}

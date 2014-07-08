@@ -55,6 +55,14 @@ class Topic implements \Iterator, \Countable
     private $currentStreamKey = 0;
 
     /**
+     * current lock key  
+     *  
+     * @var string
+     * @access private
+     */
+    private $currentStreamLockKey = '';
+
+    /**
      * currentStreamCount 
      * 
      * @var float
@@ -177,7 +185,7 @@ class Topic implements \Iterator, \Countable
      */
     public function valid()
     {
-        return $this->valid && ($this->validCount <= $this->topicCount);
+        return $this->valid;
     }
 
     // }}}
@@ -221,7 +229,7 @@ class Topic implements \Iterator, \Countable
     protected function getTopicCount()
     {
         $count = 0;
-        foreach ($this->streams as $key => $stream) {
+        foreach (array_values($this->streams) as $key => $stream) {
             // read topic count
             $stream->read(8, true);
             $data = $stream->read(4, true);
@@ -249,18 +257,23 @@ class Topic implements \Iterator, \Countable
     public function loadNextTopic()
     {
         if ($this->validCount >= $this->topicCount) {
+            \Kafka\Protocol\Fetch\Helper\Helper::onStreamEof($this->currentStreamLockKey);
             return false;
         } 
 
         if ($this->currentStreamCount >= $this->topicCounts[$this->currentStreamKey]) {
+            \Kafka\Protocol\Fetch\Helper\Helper::onStreamEof($this->currentStreamLockKey);
             $this->currentStreamKey++;    
         }
 
-        if (!isset($this->streams[$this->currentStreamKey])) {
+        $lockKeys = array_keys($this->streams);
+        $streams  = array_values($this->streams);
+        if (!isset($streams[$this->currentStreamKey])) {
             return false;    
         }
 
-        $stream = $this->streams[$this->currentStreamKey];
+        $stream = $streams[$this->currentStreamKey];
+        $this->currentStreamLockKey = $lockKeys[$this->currentStreamKey];
         
         try {
             $topicLen = $stream->read(2, true);
@@ -294,9 +307,11 @@ class Topic implements \Iterator, \Countable
      */
     public function getStream()
     {
-        return $this->streams[$this->currentStreamKey]; 
+        $streams = array_values($this->streams);
+        return $streams[$this->currentStreamKey]; 
     }
 
+    // }}}
     // }}}
     // }}}
 }
