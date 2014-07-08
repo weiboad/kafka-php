@@ -87,8 +87,6 @@ if ($run_as == 'groups') {
     foreach ($components as $component) {
         $component =   'KafkaTest/' . basename(str_replace('_', '/', $component));
         echo "$component:\n";
-        $cmd = "$phpunit_bin $phpunit_opts $phpunit_coverage " . escapeshellarg(__DIR__ . '/' . $component);
-        echo $cmd;
         system("$phpunit_bin $phpunit_opts $phpunit_coverage " . escapeshellarg(__DIR__ . '/' . $component), $c_result);
         echo "\n\n";
         if ($c_result) {

@@ -256,7 +256,7 @@ class Encoder extends Protocol
     public static function encodeArray(array $array, $func, $options = null)
     {
         if (!is_callable($func, false)) {
-            throw new \Kafka\Exception('encode array failed, given function is not callable.');
+            throw new \Kafka\Exception\Protocol('Encode array failed, given function is not callable.');
         }
 
         $arrayCount = count($array);
@@ -286,7 +286,7 @@ class Encoder extends Protocol
      * @access public
      * @return string
      */
-    public static function encodeMessageSet($messages, $compression)
+    public static function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
     {
         if (!is_array($messages)) {
             $messages = array($messages);
@@ -327,17 +327,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeMessage()
+    // {{{ protected static function _encodeMessage()
 
     /**
      * encode signal message
      *
      * @param string $message
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
+    protected static function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
     {
         // int8 -- magic  int8 -- attribute
         $data = pack('CC', self::MESSAGE_MAGIC, $compression);
@@ -357,24 +357,24 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeProcudePartion()
+    // {{{ protected static function _encodeProcudePartion()
 
     /**
      * encode signal part
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeProcudePartion($values, $compression)
+    protected static function _encodeProcudePartion($values, $compression)
     {
         if (!isset($values['partition_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
         }
 
         if (!isset($values['messages']) || empty($values['messages'])) {
-            throw new \Kafka\Exception('given procude data invalid. `messages` is undefined.');
+            throw new \Kafka\Exception\Protocol('given produce data invalid. `messages` is undefined.');
         }
 
         $data = pack('N', $values['partition_id']);
@@ -384,24 +384,24 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeProcudeTopic()
+    // {{{ protected static function _encodeProcudeTopic()
 
     /**
      * encode signal topic
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeProcudeTopic($values, $compression)
+    protected static function _encodeProcudeTopic($values, $compression)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given produce data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -411,17 +411,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeFetchPartion()
+    // {{{ protected static function _encodeFetchPartion()
 
     /**
      * encode signal part
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeFetchPartion($values)
+    protected static function _encodeFetchPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
@@ -443,17 +443,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeFetchTopic()
+    // {{{ protected static function _encodeFetchTopic()
 
     /**
      * encode signal topic
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeFetchTopic($values)
+    protected static function _encodeFetchTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
@@ -470,17 +470,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeOffsetPartion()
+    // {{{ protected static function _encodeOffsetPartion()
 
     /**
      * encode signal part
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeOffsetPartion($values)
+    protected static function _encodeOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
@@ -502,17 +502,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeOffsetTopic()
+    // {{{ protected static function _encodeOffsetTopic()
 
     /**
      * encode signal topic
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeOffsetTopic($values)
+    protected static function _encodeOffsetTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
@@ -529,17 +529,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeCommitOffsetPartion()
+    // {{{ protected static function _encodeCommitOffsetPartion()
 
     /**
      * encode signal part
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeCommitOffsetPartion($values)
+    protected static function _encodeCommitOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
@@ -566,17 +566,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeCommitOffset()
+    // {{{ protected static function _encodeCommitOffset()
 
     /**
      * encode signal topic
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeCommitOffset($values)
+    protected static function _encodeCommitOffset($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
@@ -593,17 +593,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeFetchOffsetPartion()
+    // {{{ protected static function _encodeFetchOffsetPartion()
 
     /**
      * encode signal part
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeFetchOffsetPartion($values)
+    protected static function _encodeFetchOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
@@ -615,17 +615,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ private static function _encodeFetchOffset()
+    // {{{ protected static function _encodeFetchOffset()
 
     /**
      * encode signal topic
      *
      * @param partions
      * @static
-     * @access private
+     * @access protected
      * @return string
      */
-    private static function _encodeFetchOffset($values)
+    protected static function _encodeFetchOffset($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');

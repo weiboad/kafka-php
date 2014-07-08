@@ -12,7 +12,9 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace KafkaTest\Produce;
+namespace KafkaMock\Protocol;
+
+use \Kafka\Protocol\Encoder as KEncoder;
 
 /**
 +------------------------------------------------------------------------------
@@ -26,23 +28,52 @@ namespace KafkaTest\Produce;
 +------------------------------------------------------------------------------
 */
 
-class ProduceTest extends \PHPUnit_Framework_TestCase
+class Encoder extends KEncoder
 {
     // {{{ consts
     // }}}
     // {{{ members
     // }}}
     // {{{ functions
-    // {{{ public function testSend()
+    // {{{ public static function encodeMessage()
 
     /**
-     * testSend
+     * encodeMessage
      *
      * @access public
      * @return void
      */
-    public function testSend()
+    public static function encodeMessage($message, $compression = self::COMPRESSION_NONE)
     {
+        return parent::_encodeMessage($message, $compression);
+    }
+
+    // }}}
+    // {{{ public static function encodeProcudePartion()
+
+    /**
+     * encodeProcudePartion
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeProcudePartion($values, $compression)
+    {
+        return parent::_encodeProcudePartion($values, $compression);
+    }
+
+    // }}}
+    // {{{ public static function encodeProcudeTopic()
+
+    /**
+     * encodeProcudeTopic
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeProcudeTopic($values, $compression)
+    {
+        return parent::_encodeProcudeTopic($values, $compression);
     }
 
     // }}}
