@@ -47,7 +47,7 @@
                 If there's a way of having this without the explicit component
                 list, please PR
             -->
-            <component-test component="Stdlib"/>
+            <component-test component="Produce"/>
             <check-cs/>
         </parallel>
     </target>
