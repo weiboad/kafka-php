@@ -1,0 +1,45 @@
+{
+    "name": "nmred/Kafka-php",
+    "description": "Kafka client for php",
+    "type": "library",
+    "keywords": [
+        "Client",
+        "Kafka"
+    ],
+    "homepage": "http://wwww.swanlinux.net",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "Kafka\\": "src/"
+        }
+    },
+	"repositories": [
+	{
+		"type": "package",
+		"package": {
+			"name": "sebastianbergmann/phpcov",
+			"version": "1.1.0",
+			"dist": {
+				"url": "https://github.com/sebastianbergmann/phpcov/archive/1.1.0.zip",
+				"type": "zip"
+			},
+			"source": {
+				"url": "https://github.com/sebastianbergmann/phpcov.git",
+				"type": "git",
+				"reference": "1.1.0"
+			},
+			"bin": [
+				"phpcov.php"
+				]
+		}
+	}
+	],
+	"require-dev": {
+		"satooshi/php-coveralls": "dev-master",
+		"sebastianbergmann/phpcov": "1.1.0",
+		"phpunit/PHPUnit": "3.7.*"
+	}
+}
