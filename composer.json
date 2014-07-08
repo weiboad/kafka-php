@@ -13,7 +13,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Kafka\\": "src/"
+            "Kafka\\": "src/",
+            "KafkaTest\\": "tests/"
         }
     },
 	"repositories": [

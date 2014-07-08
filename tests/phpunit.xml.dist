@@ -1,0 +1,19 @@
+<phpunit bootstrap="./Bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="KafkaTest client Test Suite">
+            <directory suffix=".php">./KafkaTest</directory>
+        </testsuite>
+    </testsuites>
+
+    <groups>
+        <exclude>
+            <group>disable</group>
+            <group>integration</group>
+            <group>integration-mysql</group>
+            <group>integration-postgres</group>
+            <group>integration-sqlserver</group>
+            <group>integration-ibm_db2</group>
+        </exclude>
+    </groups>
+
+</phpunit>

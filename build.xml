@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Kafka-php" default="build">
+<project name="KafkaTest-php" default="build">
     <target name="travis" depends="tests-parallel,show-test-results" />
     <target name="local" depends="tests-parallel-local,show-test-results" />
 
@@ -62,7 +62,7 @@
                 If there's a way of having this without the explicit component
                 list, please PR
             -->
-            <component-test component="Stdlib"/>
+            <component-test component="Produce"/>
             <check-cs/>
         </parallel>
     </target>
@@ -79,7 +79,7 @@
         <sequential>
             <echo output="${basedir}/build/test-results/@{component}.log" level="debug">
 
-                SwanTest/@{component}
+                KafkaTest/@{component}
 
             </echo>
             <exec
@@ -91,7 +91,7 @@
             >
                 <arg value="-c" />
                 <arg value="${basedir}/tests/phpunit.xml.dist" />
-                <arg value="${basedir}/tests/SwanTest/@{component}" />
+                <arg value="${basedir}/tests/KafkaTest/@{component}" />
             </exec>
         </sequential>
     </macrodef>
