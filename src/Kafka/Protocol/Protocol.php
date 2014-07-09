@@ -117,9 +117,9 @@ abstract class Protocol
     public static function packInt64($big)
     {
         if ($big == -1) { // -1L
-            $data = hex2bin('ffffffffffffffff');
+            $data = \hex2bin('ffffffffffffffff');
         } elseif ($big == -2) { // -2L
-            $data = hex2bin('fffffffffffffffe');
+            $data = \hex2bin('fffffffffffffffe');
         } else {
             $left  = 0xffffffff00000000;
             $right = 0x00000000ffffffff;
