@@ -77,5 +77,117 @@ class Encoder extends KEncoder
     }
 
     // }}}
+    // {{{ public static function encodeFetchPartion()
+
+    /**
+     * encodeFetchPartion
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeFetchPartion($values)
+    {
+        return parent::_encodeFetchPartion($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeFetchTopic()
+
+    /**
+     * encodeFetchTopic
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeFetchTopic($values)
+    {
+        return parent::_encodeFetchTopic($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeOffsetPartion()
+
+    /**
+     * encodeOffsetPartion
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeOffsetPartion($values)
+    {
+        return parent::_encodeOffsetPartion($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeOffsetTopic()
+
+    /**
+     * encodeOffsetTopic
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeOffsetTopic($values)
+    {
+        return parent::_encodeOffsetTopic($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeCommitOffsetPartion()
+
+    /**
+     * encodeCommitOffsetPartion
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeCommitOffsetPartion($values)
+    {
+        return parent::_encodeCommitOffsetPartion($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeCommitOffset()
+
+    /**
+     * encodeCommitOffset
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeCommitOffset($values)
+    {
+        return parent::_encodeCommitOffset($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeFetchOffsetPartion()
+
+    /**
+     * encodeFetchOffsetPartion
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeFetchOffsetPartion($values)
+    {
+        return parent::_encodeFetchOffsetPartion($values);
+    }
+
+    // }}}
+    // {{{ public static function encodeFetchOffset()
+
+    /**
+     * encodeFetchOffset
+     *
+     * @access public
+     * @return void
+     */
+    public static function encodeFetchOffset($values)
+    {
+        return parent::_encodeFetchOffset($values);
+    }
+
+    // }}}
     // }}}
 }

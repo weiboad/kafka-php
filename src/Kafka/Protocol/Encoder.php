@@ -42,7 +42,7 @@ class Encoder extends Protocol
     public function produceRequest($payloads, $compression = self::COMPRESSION_NONE)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given procude data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['required_ack'])) {
@@ -60,7 +60,7 @@ class Encoder extends Protocol
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeProcudeTopic'), $compression);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -81,7 +81,7 @@ class Encoder extends Protocol
 
         foreach ($topics as $topic) {
             if (!is_string($topic)) {
-                throw new \Kafka\Exception('in topic array have invalid value. ');
+                throw new \Kafka\Exception\Protocol('request metadata topic array have invalid value. ');
             }
         }
 
@@ -89,7 +89,7 @@ class Encoder extends Protocol
         $data   = self::encodeArray($topics, array(__CLASS__, 'encodeString'), self::PACK_INT16);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -105,7 +105,7 @@ class Encoder extends Protocol
     public function fetchRequest($payloads)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch kafka data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['replica_id'])) {
@@ -125,7 +125,7 @@ class Encoder extends Protocol
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -141,7 +141,7 @@ class Encoder extends Protocol
     public function offsetRequest($payloads)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['replica_id'])) {
@@ -153,7 +153,7 @@ class Encoder extends Protocol
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeOffsetTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -169,11 +169,11 @@ class Encoder extends Protocol
     public function commitOffsetRequest($payloads)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `group_id` is undefined.');
         }
 
         $header = self::requestHeader('kafka-php', 0, self::OFFSET_COMMIT_REQUEST);
@@ -181,7 +181,7 @@ class Encoder extends Protocol
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeCommitOffset'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -197,11 +197,11 @@ class Encoder extends Protocol
     public function fetchOffsetRequest($payloads)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception('given procude data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `group_id` is undefined.');
         }
 
         $header = self::requestHeader('kafka-php', 0, self::OFFSET_FETCH_REQUEST);
@@ -209,7 +209,7 @@ class Encoder extends Protocol
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchOffset'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        $this->stream->write($data);
+        return $this->stream->write($data);
     }
 
     // }}}
@@ -424,7 +424,7 @@ class Encoder extends Protocol
     protected static function _encodeFetchPartion($values)
     {
         if (!isset($values['partition_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch data invalid. `partition_id` is undefined.');
         }
 
         if (!isset($values['offset'])) {
@@ -456,11 +456,11 @@ class Encoder extends Protocol
     protected static function _encodeFetchTopic($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -483,7 +483,7 @@ class Encoder extends Protocol
     protected static function _encodeOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
         }
 
         if (!isset($values['time'])) {
@@ -515,11 +515,11 @@ class Encoder extends Protocol
     protected static function _encodeOffsetTopic($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -542,11 +542,11 @@ class Encoder extends Protocol
     protected static function _encodeCommitOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `partition_id` is undefined.');
         }
 
         if (!isset($values['offset'])) {
-            throw new \Kafka\Exception('given procude data invalid. `offset` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `offset` is undefined.');
         }
 
         if (!isset($values['time'])) {
@@ -579,11 +579,11 @@ class Encoder extends Protocol
     protected static function _encodeCommitOffset($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -606,7 +606,7 @@ class Encoder extends Protocol
     protected static function _encodeFetchOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partition_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partition_id` is undefined.');
         }
 
         $data = pack('N', $values['partition_id']);
@@ -628,11 +628,11 @@ class Encoder extends Protocol
     protected static function _encodeFetchOffset($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception('given procude data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception('given procude data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);

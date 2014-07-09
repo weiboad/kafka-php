@@ -92,8 +92,6 @@ class Decoder extends Protocol
      */
     public function fetchResponse()
     {
-        $result = array();
-
         return new \Kafka\Protocol\Fetch\Topic($this->stream);
     }
 
