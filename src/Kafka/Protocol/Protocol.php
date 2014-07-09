@@ -117,9 +117,9 @@ abstract class Protocol
     public static function packInt64($big)
     {
         if ($big == -1) { // -1L
-            $data = \hex2bin('ffffffffffffffff');
+            $data = self::_hex2bin('ffffffffffffffff');
         } elseif ($big == -2) { // -2L
-            $data = \hex2bin('fffffffffffffffe');
+            $data = self::_hex2bin('fffffffffffffffe');
         } else {
             $left  = 0xffffffff00000000;
             $right = 0x00000000ffffffff;
@@ -146,6 +146,32 @@ abstract class Protocol
     {
         $set = unpack('N2', $bytes);
         return $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
+    }
+
+    // }}}
+    // {{{ protected static function _hex2bin()
+
+    /**
+     * hex to bin
+     *
+     * @param string $string
+     * @static
+     * @access protected
+     * @return string (raw)
+     */
+    protected static function _hex2bin($string)
+    {
+        if (function_exists('\hex2bin')) {
+            return \hex2bin($string);
+        } else {
+            $bin = '';
+            $len = strlen($string);
+            for ($i = 0; $i < $len; $i += 2) {
+                $bin .= pack('H*', substr($string, $i, 2));
+            }
+
+            return $bin;
+        }
     }
 
     // }}}
