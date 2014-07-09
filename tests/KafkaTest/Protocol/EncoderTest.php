@@ -73,7 +73,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     {
         $this->stream->rewind();
         $data = $this->stream->read($len, true);
-        return bin2hex($data);
+        return \bin2hex($data);
     }
 
     // }}}
@@ -88,7 +88,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeMessage()
     {
         $test = Encoder::encodeMessage('test');
-        $this->assertEquals(bin2hex($test), 'dd007e170000000000000000000474657374');
+        $this->assertEquals(\bin2hex($test), 'dd007e170000000000000000000474657374');
     }
 
     // }}}
@@ -103,13 +103,13 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeString()
     {
         $expect = Encoder::encodeString('test', Encoder::PACK_INT32);
-        $this->assertEquals(bin2hex($expect), '000000474657374');
+        $this->assertEquals(\bin2hex($expect), '000000474657374');
 
         $expect = Encoder::encodeString('test', Encoder::PACK_INT16);
-        $this->assertEquals(bin2hex($expect), '000474657374');
+        $this->assertEquals(\bin2hex($expect), '000474657374');
 
         $expect = Encoder::encodeString('test', Encoder::PACK_INT32, Encoder::COMPRESSION_GZIP);
-        $this->assertEquals(bin2hex($expect), '000000181f8b08000000000000032b492d2e01000c7e7fd804000000');
+        $this->assertEquals(\bin2hex($expect), '000000181f8b08000000000000032b492d2e01000c7e7fd804000000');
 
         try {
             $expect = Encoder::encodeString('test', Encoder::PACK_INT32, Encoder::COMPRESSION_SNAPPY);
@@ -143,7 +143,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         }
 
         $actual = Encoder::encodeArray($array, array('\KafkaMock\Protocol\Encoder', 'encodeString'), Encoder::PACK_INT32);
-        $this->assertEquals('00000003000000057465737431000000057465737432000000057465737433', bin2hex($actual));
+        $this->assertEquals('00000003000000057465737431000000057465737432000000057465737433', \bin2hex($actual));
     }
 
     // }}}
@@ -159,14 +159,14 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     {
         $message = 'test';
         $actual = Encoder::encodeMessageSet($message);
-        $this->assertEquals('000000000000000000000012dd007e170000000000000000000474657374', bin2hex($actual));
+        $this->assertEquals('000000000000000000000012dd007e170000000000000000000474657374', \bin2hex($actual));
 
         $array = array(
             'test',
             'test1',
         );
         $actual = Encoder::encodeMessageSet($array);
-        $this->assertEquals('000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', bin2hex($actual));
+        $this->assertEquals('000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', \bin2hex($actual));
     }
 
     // }}}
@@ -181,7 +181,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     public function testRequestHeader()
     {
         $actual = Encoder::requestHeader('kafka-php', '0', 0);
-        $this->assertEquals('000000000000000000096b61666b612d706870', bin2hex($actual));
+        $this->assertEquals('000000000000000000096b61666b612d706870', \bin2hex($actual));
     }
 
     // }}}
@@ -203,7 +203,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeProcudePartion($data, Encoder::COMPRESSION_NONE);
-        $this->assertEquals('000000010000003d000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', bin2hex($actual));
+        $this->assertEquals('000000010000003d000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', \bin2hex($actual));
 
         $data = array(
             'messages' => array(
@@ -250,7 +250,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeProcudeTopic($data, Encoder::COMPRESSION_NONE);
-        $this->assertEquals('00047465737400000001000000000000003d000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', bin2hex($actual));
+        $this->assertEquals('00047465737400000001000000000000003d000000000000000000000012dd007e170000000000000000000474657374000000000000000000000013cb8eb9ab000000000000000000057465737431', \bin2hex($actual));
 
         $data = array(
             'partitions' => array(
@@ -295,7 +295,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             'offset' => 2,
         );
         $actual = Encoder::encodeFetchPartion($data);
-        $this->assertEquals('00000001000000000000000206400000', bin2hex($actual));
+        $this->assertEquals('00000001000000000000000206400000', \bin2hex($actual));
 
         $data = array(
         );
@@ -309,7 +309,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             'partition_id' => 0,
         );
         $actual = Encoder::encodeFetchPartion($data);
-        $this->assertEquals('00000000000000000000000006400000', bin2hex($actual));
+        $this->assertEquals('00000000000000000000000006400000', \bin2hex($actual));
     }
 
     // }}}
@@ -332,7 +332,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeFetchTopic($data);
-        $this->assertEquals('0004746573740000000100000000000000000000000006400000', bin2hex($actual));
+        $this->assertEquals('0004746573740000000100000000000000000000000006400000', \bin2hex($actual));
 
         $data = array(
             'partitions' => array(
@@ -372,7 +372,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             'partition_id' => 1,
         );
         $actual = Encoder::encodeOffsetPartion($data);
-        $this->assertEquals('00000001ffffffffffffffff000186a0', bin2hex($actual));
+        $this->assertEquals('00000001ffffffffffffffff000186a0', \bin2hex($actual));
 
         $data = array(
         );
@@ -403,7 +403,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeOffsetTopic($data);
-        $this->assertEquals('0004746573740000000100000000ffffffffffffffff000186a0', bin2hex($actual));
+        $this->assertEquals('0004746573740000000100000000ffffffffffffffff000186a0', \bin2hex($actual));
 
         $data = array(
             'partitions' => array(
@@ -444,7 +444,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             'offset' => 2,
         );
         $actual = Encoder::encodeCommitOffsetPartion($data);
-        $this->assertEquals('000000010000000000000002ffffffffffffffff00016d', bin2hex($actual));
+        $this->assertEquals('000000010000000000000002ffffffffffffffff00016d', \bin2hex($actual));
 
         $data = array(
             'partition_id' => 1,
@@ -486,7 +486,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeCommitOffset($data);
-        $this->assertEquals('00047465737400000001000000000000000000000002ffffffffffffffff00016d', bin2hex($actual));
+        $this->assertEquals('00047465737400000001000000000000000000000002ffffffffffffffff00016d', \bin2hex($actual));
 
         $data = array(
             'partitions' => array(
@@ -526,7 +526,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             'partition_id' => 1,
         );
         $actual = Encoder::encodeFetchOffsetPartion($data);
-        $this->assertEquals('00000001', bin2hex($actual));
+        $this->assertEquals('00000001', \bin2hex($actual));
 
         $data = array(
         );
@@ -558,7 +558,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
             ),
         );
         $actual = Encoder::encodeFetchOffset($data);
-        $this->assertEquals('0004746573740000000100000000', bin2hex($actual));
+        $this->assertEquals('0004746573740000000100000000', \bin2hex($actual));
 
         $data = array(
             'partitions' => array(
