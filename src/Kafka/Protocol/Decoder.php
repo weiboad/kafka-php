@@ -44,7 +44,7 @@ class Decoder extends Protocol
         $dataLen = unpack('N', $this->stream->read(4, true));
         $dataLen = array_shift($dataLen);
         if (!$dataLen) {
-            throw new \Kafka\Exception('produce response invalid.');
+            throw new \Kafka\Exception\Protocol('produce response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
 
@@ -113,7 +113,7 @@ class Decoder extends Protocol
         $dataLen = unpack('N', $this->stream->read(4, true));
         $dataLen = array_shift($dataLen);
         if (!$dataLen) {
-            throw new \Kafka\Exception('metaData response invalid.');
+            throw new \Kafka\Exception\Protocol('metaData response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;
@@ -212,7 +212,7 @@ class Decoder extends Protocol
         $dataLen = unpack('N', $this->stream->read(4, true));
         $dataLen = array_shift($dataLen);
         if (!$dataLen) {
-            throw new \Kafka\Exception('offset response invalid.');
+            throw new \Kafka\Exception\Protocol('offset response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;
@@ -267,7 +267,7 @@ class Decoder extends Protocol
         $dataLen = unpack('N', $this->stream->read(4, true));
         $dataLen = array_shift($dataLen);
         if (!$dataLen) {
-            throw new \Kafka\Exception('commit offset response invalid.');
+            throw new \Kafka\Exception\Protocol('commit offset response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;
@@ -313,7 +313,7 @@ class Decoder extends Protocol
         $dataLen = unpack('N', $this->stream->read(4, true));
         $dataLen = array_shift($dataLen);
         if (!$dataLen) {
-            throw new \Kafka\Exception('offset response invalid.');
+            throw new \Kafka\Exception\Protocol('fetch offset response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;

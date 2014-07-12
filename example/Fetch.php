@@ -10,14 +10,14 @@ $data = array(
 			'partitions' => array(
 				array(
 					'partition_id' => 0,
-                    'offset' => 0,
+                    'offset' => 97,
 				),
 			),
 		),
 	),
 );
 
-$conn = new \Kafka\Socket('localhost', '9092');
+$conn = new \Kafka\Socket('hadoop11', '9092');
 $conn->connect();
 
 $encoder = new \Kafka\Protocol\Encoder($conn);
