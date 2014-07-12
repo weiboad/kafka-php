@@ -84,9 +84,9 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchRequest()
     {
-        $this->setData(Decoder::Khex2bin('0000007200000000000000010004746573740000000100000000000000000000000000630000004e000000000000006100000020d4091dc7000000000000000000123332333231603160606060606060606060600000000000000062000000166338ddac000000000000000000086d65737361676532')); 
+        $this->setData(Decoder::Khex2bin('0000007200000000000000010004746573740000000100000000000000000000000000630000004e000000000000006100000020d4091dc7000000000000000000123332333231603160606060606060606060600000000000000062000000166338ddac000000000000000000086d65737361676532'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->fetchResponse(); 
+        $actual  = $decoder->fetchResponse();
         $this->assertInstanceOf('\Kafka\Protocol\Fetch\Topic', $actual);
 
         $this->assertEquals(1, count($actual));
@@ -96,16 +96,16 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testProduceResponse()
 
     /**
-     * testProduceResponse 
-     * 
+     * testProduceResponse
+     *
      * @access public
      * @return void
      */
     public function testProduceResponse()
     {
-        $this->setData(Decoder::Khex2bin('00000047000000000000000200057465737436000000020000000200000000000000000034000000050000000000000000002800047465737400000001000000000000000000000000005f')); 
+        $this->setData(Decoder::Khex2bin('00000047000000000000000200057465737436000000020000000200000000000000000034000000050000000000000000002800047465737400000001000000000000000000000000005f'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->produceResponse();        
+        $actual  = $decoder->produceResponse();
 
         $expect = array(
             'test6' => array(
@@ -132,19 +132,19 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testProduceResponseNotData()
 
     /**
-     * testProduceResponseNotData 
-     * 
+     * testProduceResponseNotData
+     *
      * @access public
      * @return void
      */
     public function testProduceResponseNotData()
     {
-        $this->setData(Decoder::Khex2bin('00000000')); 
+        $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->produceResponse();        
+            $actual  = $decoder->produceResponse();
         } catch (\Kafka\Exception\Protocol $e) {
-            $this->assertSame('produce response invalid.', $e->getMessage());    
+            $this->assertSame('produce response invalid.', $e->getMessage());
         }
     }
 
@@ -152,16 +152,16 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testMetadataResponse()
 
     /**
-     * testMetadataResponse 
-     * 
+     * testMetadataResponse
+     *
      * @access public
      * @return void
      */
     public function testMetadataResponse()
     {
-        $this->setData(Decoder::Khex2bin('0000007100000000000000030000000000086861646f6f703131000023840000000100086861646f6f703132000023840000000200086861646f6f70313300002384000000010000000574657374310000000100000000000000000002000000030000000000000001000000020000000100000002')); 
+        $this->setData(Decoder::Khex2bin('0000007100000000000000030000000000086861646f6f703131000023840000000100086861646f6f703132000023840000000200086861646f6f70313300002384000000010000000574657374310000000100000000000000000002000000030000000000000001000000020000000100000002'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->metadataResponse();        
+        $actual  = $decoder->metadataResponse();
 
         $expect = array(
             'brokers' => array(
@@ -199,19 +199,19 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testMetadataResponseNotData()
 
     /**
-     * testMetadataResponseNotData 
-     * 
+     * testMetadataResponseNotData
+     *
      * @access public
      * @return void
      */
     public function testMetadataResponseNotData()
     {
-        $this->setData(Decoder::Khex2bin('00000000')); 
+        $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->metadataResponse();        
+            $actual  = $decoder->metadataResponse();
         } catch (\Kafka\Exception\Protocol $e) {
-            $this->assertSame('metaData response invalid.', $e->getMessage());    
+            $this->assertSame('metaData response invalid.', $e->getMessage());
         }
     }
 
@@ -219,16 +219,16 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testOffsetResponse()
 
     /**
-     * testOffsetResponse 
-     * 
+     * testOffsetResponse
+     *
      * @access public
      * @return void
      */
     public function testOffsetResponse()
     {
-        $this->setData(Decoder::Khex2bin('00000024000000000000000100047465737400000001000000000000000000010000000000000063')); 
+        $this->setData(Decoder::Khex2bin('00000024000000000000000100047465737400000001000000000000000000010000000000000063'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->offsetResponse();        
+        $actual  = $decoder->offsetResponse();
 
         $expect = array(
             'test' => array(
@@ -245,19 +245,19 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testOffsetResponseNotData()
 
     /**
-     * testOffsetResponseNotData 
-     * 
+     * testOffsetResponseNotData
+     *
      * @access public
      * @return void
      */
     public function testOffsetResponseNotData()
     {
-        $this->setData(Decoder::Khex2bin('00000000')); 
+        $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->offsetResponse();        
+            $actual  = $decoder->offsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
-            $this->assertSame('offset response invalid.', $e->getMessage());    
+            $this->assertSame('offset response invalid.', $e->getMessage());
         }
     }
 
@@ -265,16 +265,16 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testCommitOffsetResponse()
 
     /**
-     * testCommitOffsetResponse 
-     * 
+     * testCommitOffsetResponse
+     *
      * @access public
      * @return void
      */
     public function testCommitOffsetResponse()
     {
-        $this->setData(Decoder::Khex2bin('0000001900000000000000010005746573743600000001000000020000')); 
+        $this->setData(Decoder::Khex2bin('0000001900000000000000010005746573743600000001000000020000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->commitOffsetResponse();        
+        $actual  = $decoder->commitOffsetResponse();
 
         $expect = array(
             'test6' => array(
@@ -290,19 +290,19 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testCommitOffsetResponseNotData()
 
     /**
-     * testCommitOffsetResponseNotData 
-     * 
+     * testCommitOffsetResponseNotData
+     *
      * @access public
      * @return void
      */
     public function testCommitOffsetResponseNotData()
     {
-        $this->setData(Decoder::Khex2bin('00000000')); 
+        $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->commitOffsetResponse();        
+            $actual  = $decoder->commitOffsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
-            $this->assertSame('commit offset response invalid.', $e->getMessage());    
+            $this->assertSame('commit offset response invalid.', $e->getMessage());
         }
     }
 
@@ -310,16 +310,16 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testFetchOffsetResponse()
 
     /**
-     * testFetchOffsetResponse 
-     * 
+     * testFetchOffsetResponse
+     *
      * @access public
      * @return void
      */
     public function testFetchOffsetResponse()
     {
-        $this->setData(Decoder::Khex2bin('000000230000000000000001000574657374360000000100000002000000000000000200000000')); 
+        $this->setData(Decoder::Khex2bin('000000230000000000000001000574657374360000000100000002000000000000000200000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
-        $actual  = $decoder->fetchOffsetResponse();        
+        $actual  = $decoder->fetchOffsetResponse();
 
         $expect = array(
             'test6' => array(
@@ -337,19 +337,19 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     //{{{ public function testFetchOffsetResponseNotData()
 
     /**
-     * testFetchOffsetResponseNotData 
-     * 
+     * testFetchOffsetResponseNotData
+     *
      * @access public
      * @return void
      */
     public function testFetchOffsetResponseNotData()
     {
-        $this->setData(Decoder::Khex2bin('00000000')); 
+        $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->fetchOffsetResponse();        
+            $actual  = $decoder->fetchOffsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
-            $this->assertSame('fetch offset response invalid.', $e->getMessage());    
+            $this->assertSame('fetch offset response invalid.', $e->getMessage());
         }
     }
 
@@ -357,8 +357,8 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     // {{{ public function testGetError()
 
     /**
-     * testGetError 
-     * 
+     * testGetError
+     *
      * @access public
      * @return void
      */
