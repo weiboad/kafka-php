@@ -238,7 +238,7 @@ class Topic implements \Iterator, \Countable
             $count += $topicCount;
             $this->topicCounts[$key] = $topicCount;
             if ($count <= 0) {
-                throw new \Kafka\Exception\OutOfRange($size . ' is not a valid topic count');
+                throw new \Kafka\Exception\OutOfRange($count . ' is not a valid topic count');
             }
         }
 
