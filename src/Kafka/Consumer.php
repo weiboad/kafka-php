@@ -126,14 +126,14 @@ class Consumer
     // {{{ public function clearPayload()
 
     /**
-     * clearPayload 
-     * 
+     * clearPayload
+     *
      * @access public
      * @return void
      */
     public function clearPayload()
     {
-        $this->payload = array(); 
+        $this->payload = array();
     }
 
     // }}}
