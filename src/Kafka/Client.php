@@ -154,12 +154,12 @@ class Client
         list($hostname, $port) = explode(':', $host);
         // find unlock stream
         if (isset(self::$stream[$host])) {
-            foreach (self::$stream[$host] as $lockKey => $info) {
+            foreach (self::$stream[$host] as $key => $info) {
                 if ($info['locked']) {
                     continue;
                 } else {
-                    self::$stream[$host][$lockKey]['locked'] = true;
-                    return array('key' => $lockKey, 'stream' => $info['stream']);
+                    self::$stream[$host][$key]['locked'] = true;
+                    return array('key' => $key, 'stream' => $info['stream']);
                 }
             }
         }

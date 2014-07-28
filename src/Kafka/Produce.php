@@ -226,6 +226,7 @@ class Produce
             $this->client->freeStream($host, $stream['key']);
         }
 
+        $this->payload = array();
         return $responseData;
     }
 
