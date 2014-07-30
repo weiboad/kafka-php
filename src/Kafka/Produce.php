@@ -223,7 +223,7 @@ class Produce
                 }
             }
 
-            $this->client->freeStream($host, $stream['key']);
+            $this->client->freeStream($stream['key']);
         }
 
         $this->payload = array();
