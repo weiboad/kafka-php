@@ -30,15 +30,15 @@ class Offset
 {
     // {{{ consts
 
-	/**
-	 * receive the latest offset
-	 */
-	const LAST_OFFSET = -1;
+    /**
+     * receive the latest offset
+     */
+    const LAST_OFFSET = -1;
 
-	/**
-	 *   receive the earliest available offset.
-	 */
-	const EARLIEST_OFFSET = -2;
+    /**
+     *   receive the earliest available offset.
+     */
+    const EARLIEST_OFFSET = -2;
 
     // }}}
     // {{{ members
@@ -211,14 +211,14 @@ class Offset
                 return $defaultOffset;
             }
         } elseif ($result[$topicName][$partitionId]['errCode'] == 0) {
-			$offset = $result[$topicName][$partitionId]['offset'];
-			$maxOffset = $this->getProduceOffset(self::LAST_OFFSET);
-			$minOffset = $this->getProduceOffset(self::EARLIEST_OFFSET);
-			if ($offset > $maxOffset || $offset < $minOffset) {
-				$offset = $maxOffset;
-			}
+            $offset = $result[$topicName][$partitionId]['offset'];
+            $maxOffset = $this->getProduceOffset(self::LAST_OFFSET);
+            $minOffset = $this->getProduceOffset(self::EARLIEST_OFFSET);
+            if ($offset > $maxOffset || $offset < $minOffset) {
+                $offset = $maxOffset;
+            }
 
-			return $offset;
+            return $offset;
         } else {
             throw new \Kafka\Exception(\Kafka\Protocol\Decoder::getError($result[$topicName][$partitionId]['errCode']));
         }
