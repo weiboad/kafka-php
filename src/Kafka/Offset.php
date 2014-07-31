@@ -29,6 +29,17 @@ namespace Kafka;
 class Offset
 {
     // {{{ consts
+
+	/**
+	 * receive the latest offset
+	 */
+	const LAST_OFFSET = -1;
+
+	/**
+	 *   receive the earliest available offset.
+	 */
+	const EARLIEST_OFFSET = -2;
+
     // }}}
     // {{{ members
 
@@ -200,7 +211,14 @@ class Offset
                 return $defaultOffset;
             }
         } elseif ($result[$topicName][$partitionId]['errCode'] == 0) {
-            return $result[$topicName][$partitionId]['offset'];
+			$offset = $result[$topicName][$partitionId]['offset'];
+			$maxOffset = $this->getProduceOffset(self::LAST_OFFSET);
+			$minOffset = $this->getProduceOffset(self::EARLIEST_OFFSET);
+			if ($offset > $maxOffset || $offset < $minOffset) {
+				$offset = $maxOffset;
+			}
+
+			return $offset;
         } else {
             throw new \Kafka\Exception(\Kafka\Protocol\Decoder::getError($result[$topicName][$partitionId]['errCode']));
         }
@@ -217,7 +235,7 @@ class Offset
      * @access public
      * @return int
      */
-    public function getProduceOffset()
+    public function getProduceOffset($timeLine = self::LAST_OFFSET)
     {
         $topicName = $this->topicName;
         $partitionId = $this->partitionId;
@@ -229,7 +247,7 @@ class Offset
                     'partitions' => array(
                         array(
                             'partition_id' => $this->partitionId,
-                            'time' => -1,
+                            'time' => $timeLine,
                             'max_offset' => 1,
                         ),
                     ),
