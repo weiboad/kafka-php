@@ -150,7 +150,7 @@ class Consumer
         if (is_null($offset)) {
             if ($this->fromOffset) {
                 $offsetObject = new \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
-                $offset = $offsetObject->getOffset(0);
+                $offset = $offsetObject->getOffset(\Kafka\Offset::DEFAULT_EARLY);
             } else {
                 $offset = 0;
             }
