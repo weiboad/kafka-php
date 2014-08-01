@@ -40,6 +40,16 @@ class Offset
      */
     const EARLIEST_OFFSET = -2;
 
+    /**
+     * function getOffset if read invalid value use latest offset instead of
+     */
+    const DEFAULT_LAST  = -2;
+
+    /**
+     * function getOffset if read invalid value use earliest offset instead of
+     */
+    const DEFAULT_EARLY = -1;
+
     // }}}
     // {{{ members
 
@@ -177,11 +187,15 @@ class Offset
      * get consumer offset
      *
      * @param integer $defaultOffset
+     *   if defaultOffset -1 instead of early offset
+     *   if defaultOffset -2 instead of last offset
      * @access public
      * @return void
      */
-    public function getOffset($defaultOffset = null)
+    public function getOffset($defaultOffset = self::DEFAULT_LAST)
     {
+        $maxOffset = $this->getProduceOffset(self::LAST_OFFSET);
+        $minOffset = $this->getProduceOffset(self::EARLIEST_OFFSET);
         $data = array(
             'group_id' => $this->groupId,
             'data' => array(
@@ -206,14 +220,21 @@ class Offset
             throw new \Kafka\Exception('fetch topic offset failed.');
         }
         if ($result[$topicName][$partitionId]['errCode'] == 3) {
+            switch ($defaultOffset) {
+                case self::DEFAULT_LAST:
+                    return $maxOffset;
+                case self::DEFAULT_EARLY:
+                    return $minOffset;
+                default:
+                    $this->setOffset($defaultOffset);
+                    return $defaultOffset;
+            }
             if ($defaultOffset) {
                 $this->setOffset($defaultOffset);
                 return $defaultOffset;
             }
         } elseif ($result[$topicName][$partitionId]['errCode'] == 0) {
             $offset = $result[$topicName][$partitionId]['offset'];
-            $maxOffset = $this->getProduceOffset(self::LAST_OFFSET);
-            $minOffset = $this->getProduceOffset(self::EARLIEST_OFFSET);
             if ($offset > $maxOffset || $offset < $minOffset) {
                 $offset = $maxOffset;
             }
