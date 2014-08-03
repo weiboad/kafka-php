@@ -29,6 +29,9 @@ namespace Kafka;
 class Socket
 {
     // {{{ consts
+
+    const READ_MAX_LEN = 5242880; // read socket max length 5MB
+
     // }}}
     // {{{ members
 
@@ -213,6 +216,10 @@ class Socket
      */
     public function read($len, $verifyExactLength = false)
     {
+        if ($len > self::READ_MAX_LEN) {
+            throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream, length too longer.');
+        }
+
         $null = null;
         $read = array($this->stream);
         $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
