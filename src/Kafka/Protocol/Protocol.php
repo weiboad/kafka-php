@@ -187,7 +187,7 @@ abstract class Protocol
             $data = pack($type, $data);
         }
 
-		return $data;
+        return $data;
     }
 
     // }}}
