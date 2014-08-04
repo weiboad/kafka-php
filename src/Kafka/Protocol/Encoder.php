@@ -57,7 +57,7 @@ class Encoder extends Protocol
 
         $header = self::requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
-		$data  .= self::pack(self::BIT_B32, $payloads['timeout']);
+        $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeProcudeTopic'), $compression);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -123,8 +123,8 @@ class Encoder extends Protocol
 
         $header = self::requestHeader('kafka-php', 0, self::FETCH_REQUEST);
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
-		$data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
-		$data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
+        $data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
+        $data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -322,8 +322,8 @@ class Encoder extends Protocol
     {
         // int16 -- apiKey int16 -- apiVersion int32 correlationId
         $binData  = self::pack(self::BIT_B16, $apiKey);
-		$binData .= self::pack(self::BIT_B16, self::API_VERSION);
-		$binData .= self::pack(self::BIT_B32, $correlationId);
+        $binData .= self::pack(self::BIT_B16, self::API_VERSION);
+        $binData .= self::pack(self::BIT_B32, $correlationId);
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
@@ -346,7 +346,7 @@ class Encoder extends Protocol
     {
         // int8 -- magic  int8 -- attribute
         $data  = self::pack(self::BIT_B8, self::MESSAGE_MAGIC);
-		$data .= self::pack(self::BIT_B8, $compression);
+        $data .= self::pack(self::BIT_B8, $compression);
 
         // message key
         $data .= self::encodeString('', self::PACK_INT32);
