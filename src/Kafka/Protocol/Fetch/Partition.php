@@ -14,6 +14,8 @@
 
 namespace Kafka\Protocol\Fetch;
 
+use \Kafka\Protocol\Decoder;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -276,7 +278,7 @@ class Partition implements \Iterator, \Countable
     {
         // read topic count
         $data = $this->stream->read(4, true);
-        $data = unpack('N', $data);
+        $data = Decoder::unpack(Decoder::BIT_B32, $data);
         $count = array_shift($data);
         if ($count <= 0) {
             throw new \Kafka\Exception\OutOfRange($size . ' is not a valid partition count');
@@ -302,14 +304,14 @@ class Partition implements \Iterator, \Countable
 
         try {
             $partitionId = $this->stream->read(4, true);
-            $partitionId = unpack('N', $partitionId);
+            $partitionId = Decoder::unpack(Decoder::BIT_B32, $partitionId);
             $partitionId = array_shift($partitionId);
 
             $errCode = $this->stream->read(2, true);
-            $errCode = unpack('n', $errCode);
+            $errCode = Decoder::unpack(Decoder::BIT_B16, $errCode);
             $this->errCode = array_shift($errCode);
             $offset = $this->stream->read(8, true);
-            $this->offset  = \Kafka\Protocol\Decoder::unpackInt64($offset);
+            $this->offset  = \Kafka\Protocol\Decoder::unpack(Decoder::BIT_B64, $offset);
 
             $this->key = $partitionId;
             $this->current = new MessageSet($this);

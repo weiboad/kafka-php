@@ -14,6 +14,8 @@
 
 namespace Kafka\Protocol\Fetch;
 
+use \Kafka\Protocol\Decoder;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -102,23 +104,23 @@ class Message
     public function __construct($msg)
     {
         $offset = 0;
-        $crc = unpack('N', substr($msg, $offset, 4));
+        $crc = Decoder::unpack(Decoder::BIT_B32, substr($msg, $offset, 4));
         $offset += 4;
         $this->crc = array_shift($crc);
-        $magic = unpack('C', substr($msg, $offset, 1));
+        $magic = Decoder::unpack(Decoder::BIT_B8, substr($msg, $offset, 1));
         $this->magic = array_shift($magic);
         $offset += 1;
-        $attr  = unpack('C', substr($msg, $offset, 1));
+        $attr  = Decoder::unpack(Decoder::BIT_B8, substr($msg, $offset, 1));
         $this->attribute = array_shift($attr);
         $offset += 1;
-        $keyLen = unpack('N', substr($msg, $offset, 4));
+        $keyLen = Decoder::unpack(Decoder::BIT_B32, substr($msg, $offset, 4));
         $keyLen = array_shift($keyLen);
         $offset += 4;
         if ($keyLen) {
             $this->key = substr($msg, $offset, $keyLen);
             $offset += $keyLen;
         }
-        $messageSize = unpack('N', substr($msg, $offset, 4));
+        $messageSize = Decoder::unpack(Decoder::BIT_B32, substr($msg, $offset, 4));
         $messageSize = array_shift($messageSize);
         $offset += 4;
         if ($messageSize) {

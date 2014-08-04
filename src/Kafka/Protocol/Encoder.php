@@ -56,7 +56,8 @@ class Encoder extends Protocol
         }
 
         $header = self::requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
-        $data   = pack('nN', $payloads['required_ack'], $payloads['timeout']);
+        $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
+		$data  .= self::pack(self::BIT_B32, $payloads['timeout']);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeProcudeTopic'), $compression);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -121,7 +122,9 @@ class Encoder extends Protocol
         }
 
         $header = self::requestHeader('kafka-php', 0, self::FETCH_REQUEST);
-        $data   = pack('NNN', $payloads['replica_id'], $payloads['max_wait_time'], $payloads['min_bytes']);
+        $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
+		$data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
+		$data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -149,7 +152,7 @@ class Encoder extends Protocol
         }
 
         $header = self::requestHeader('kafka-php', 0, self::OFFSET_REQUEST);
-        $data   = pack('N', $payloads['replica_id']);
+        $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeOffsetTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -226,7 +229,7 @@ class Encoder extends Protocol
      */
     public static function encodeString($string, $bytes, $compression = self::COMPRESSION_NONE)
     {
-        $packLen = ($bytes == self::PACK_INT32) ? 'N' : 'n';
+        $packLen = ($bytes == self::PACK_INT32) ? self::BIT_B32 : self::BIT_B16;
         switch ($compression) {
             case self::COMPRESSION_NONE:
                 break;
@@ -238,7 +241,7 @@ class Encoder extends Protocol
             default:
                 throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
         }
-        return pack($packLen, strlen($string)) . $string;
+        return self::pack($packLen, strlen($string)) . $string;
     }
 
     // }}}
@@ -270,7 +273,7 @@ class Encoder extends Protocol
             }
         }
 
-        return pack('N', $arrayCount) . $body;
+        return self::pack(self::BIT_B32, $arrayCount) . $body;
     }
 
     // }}}
@@ -297,7 +300,7 @@ class Encoder extends Protocol
             $tmpMessage = self::_encodeMessage($message, $compression);
 
             // int64 -- message offset     Message
-            $data .= self::packInt64(0) . self::encodeString($tmpMessage, self::PACK_INT32);
+            $data .= self::pack(self::BIT_B64, 0) . self::encodeString($tmpMessage, self::PACK_INT32);
         }
         return $data;
     }
@@ -318,7 +321,9 @@ class Encoder extends Protocol
     public static function requestHeader($clientId, $correlationId, $apiKey)
     {
         // int16 -- apiKey int16 -- apiVersion int32 correlationId
-        $binData = pack('nnN', $apiKey, self::API_VERSION, $correlationId);
+        $binData  = self::pack(self::BIT_B16, $apiKey);
+		$binData .= self::pack(self::BIT_B16, self::API_VERSION);
+		$binData .= self::pack(self::BIT_B32, $correlationId);
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
@@ -340,7 +345,8 @@ class Encoder extends Protocol
     protected static function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
     {
         // int8 -- magic  int8 -- attribute
-        $data = pack('CC', self::MESSAGE_MAGIC, $compression);
+        $data  = self::pack(self::BIT_B8, self::MESSAGE_MAGIC);
+		$data .= self::pack(self::BIT_B8, $compression);
 
         // message key
         $data .= self::encodeString('', self::PACK_INT32);
@@ -351,7 +357,7 @@ class Encoder extends Protocol
         $crc = crc32($data);
 
         // int32 -- crc code  string data
-        $message = pack('N', $crc) . $data;
+        $message = self::pack(self::BIT_B32, $crc) . $data;
 
         return $message;
     }
@@ -377,7 +383,7 @@ class Encoder extends Protocol
             throw new \Kafka\Exception\Protocol('given produce data invalid. `messages` is undefined.');
         }
 
-        $data = pack('N', $values['partition_id']);
+        $data = self::pack(self::BIT_B32, $values['partition_id']);
         $data .= self::encodeString(self::encodeMessageSet($values['messages'], $compression), self::PACK_INT32);
 
         return $data;
@@ -435,9 +441,9 @@ class Encoder extends Protocol
             $values['max_bytes'] = 100 * 1024 * 1024;
         }
 
-        $data = pack('N', $values['partition_id']);
-        $data .= self::packInt64($values['offset']);
-        $data .= pack('N', $values['max_bytes']);
+        $data = self::pack(self::BIT_B32, $values['partition_id']);
+        $data .= self::pack(self::BIT_B64, $values['offset']);
+        $data .= self::pack(self::BIT_B32, $values['max_bytes']);
 
         return $data;
     }
@@ -494,9 +500,9 @@ class Encoder extends Protocol
             $values['max_offset'] = 100000;
         }
 
-        $data = pack('N', $values['partition_id']);
-        $data .= self::packInt64($values['time']);
-        $data .= pack('N', $values['max_offset']);
+        $data = self::pack(self::BIT_B32, $values['partition_id']);
+        $data .= self::pack(self::BIT_B64, $values['time']);
+        $data .= self::pack(self::BIT_B32, $values['max_offset']);
 
         return $data;
     }
@@ -557,9 +563,9 @@ class Encoder extends Protocol
             $values['metadata'] = 'm';
         }
 
-        $data = pack('N', $values['partition_id']);
-        $data .= self::packInt64($values['offset']);
-        $data .= self::packInt64($values['time']);
+        $data = self::pack(self::BIT_B32, $values['partition_id']);
+        $data .= self::pack(self::BIT_B64, $values['offset']);
+        $data .= self::pack(self::BIT_B64, $values['time']);
         $data .= self::encodeString($values['metadata'], self::PACK_INT16);
 
         return $data;
@@ -609,7 +615,7 @@ class Encoder extends Protocol
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partition_id` is undefined.');
         }
 
-        $data = pack('N', $values['partition_id']);
+        $data = self::pack(self::BIT_B32, $values['partition_id']);
 
         return $data;
     }

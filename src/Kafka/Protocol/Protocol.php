@@ -77,6 +77,12 @@ abstract class Protocol
     const OFFSET_FETCH_REQUEST  = 9;
     const CONSUMER_METADATA_REQUEST = 10;
 
+    // unpack/pack bit
+    const BIT_B64 = 'N2';
+    const BIT_B32 = 'N';
+    const BIT_B16 = 'n';
+    const BIT_B8  = 'C';
+
     // }}}
     // {{{ members
 
@@ -105,50 +111,6 @@ abstract class Protocol
     }
 
     // }}}
-    // {{{ public static function packInt64()
-
-    /**
-     * Pack a 64bit integer as big endian long
-     *
-     * @static
-     * @access public
-     * @return integer
-     */
-    public static function packInt64($big)
-    {
-        if ($big == -1) { // -1L
-            $data = self::Khex2bin('ffffffffffffffff');
-        } elseif ($big == -2) { // -2L
-            $data = self::Khex2bin('fffffffffffffffe');
-        } else {
-            $left  = 0xffffffff00000000;
-            $right = 0x00000000ffffffff;
-
-            $l = ($big & $left) >> 32;
-            $r = $big & $right;
-            $data = pack('NN', $l, $r);
-        }
-
-        return $data;
-    }
-
-    // }}}
-    // {{{ public static function unpackInt64()
-
-    /**
-     * Unpack a 64bit integer as big endian long
-     *
-     * @static
-     * @access public
-     * @return integer
-     */
-    public static function unpackInt64($bytes)
-    {
-        $set = unpack('N2', $bytes);
-        return $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
-    }
-
-    // }}}
     // {{{ public static function Khex2bin()
 
     /**
@@ -171,6 +133,95 @@ abstract class Protocol
             }
 
             return $bin;
+        }
+    }
+
+    // }}}
+    // {{{ public static function unpack()
+
+    /**
+     * Unpack a bit integer as big endian long
+     *
+     * @static
+     * @access public
+     * @return integer
+     */
+    public static function unpack($type, $bytes)
+    {
+        self::checkLen($type, $bytes);
+        if ($type == self::BIT_B64) {
+            $set = unpack($type, $bytes);
+            $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
+            return $original;
+        } else {
+            return unpack($type, $bytes);
+        }
+    }
+
+    // }}}
+    // {{{ public static function pack()
+
+    /**
+     * pack a bit integer as big endian long
+     *
+     * @static
+     * @access public
+     * @return integer
+     */
+    public static function pack($type, $data)
+    {
+        if ($type == self::BIT_B64) {
+            if ($data == -1) { // -1L
+                $data = self::Khex2bin('ffffffffffffffff');
+            } elseif ($data == -2) { // -2L
+                $data = self::Khex2bin('fffffffffffffffe');
+            } else {
+                $left  = 0xffffffff00000000;
+                $right = 0x00000000ffffffff;
+
+                $l = ($data & $left) >> 32;
+                $r = $data & $right;
+                $data = pack($type, $l, $r);
+            }
+        } else {
+            $data = pack($type, $data);
+        }
+
+		return $data;
+    }
+
+    // }}}
+    // {{{ protected static function checkLen()
+
+    /**
+     * check unpack bit is valid
+     *
+     * @param string $type
+     * @param string(raw) $bytes
+     * @static
+     * @access protected
+     * @return void
+     */
+    protected static function checkLen($type, $bytes)
+    {
+        $len = 0;
+        switch($type) {
+            case self::BIT_B64:
+                $len = 8;
+                break;
+            case self::BIT_B32:
+                $len = 4;
+                break;
+            case self::BIT_B16:
+                $len = 2;
+                break;
+            case self::BIT_B8:
+                $len = 1;
+                break;
+        }
+
+        if (strlen($bytes) != $len) {
+            throw new \Kafka\Exception\Protocol('unpack failed. string(raw) length is ' . strlen($bytes) . ' , TO ' . $type);
         }
     }
 

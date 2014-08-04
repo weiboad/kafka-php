@@ -14,6 +14,8 @@
 
 namespace Kafka\Protocol\Fetch;
 
+use \Kafka\Protocol\Decoder;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -233,7 +235,7 @@ class Topic implements \Iterator, \Countable
             // read topic count
             $stream->read(8, true);
             $data = $stream->read(4, true);
-            $data = unpack('N', $data);
+            $data = Decoder::unpack(Decoder::BIT_B32, $data);
             $topicCount = array_shift($data);
             $count += $topicCount;
             $this->topicCounts[$key] = $topicCount;
@@ -277,7 +279,7 @@ class Topic implements \Iterator, \Countable
 
         try {
             $topicLen = $stream->read(2, true);
-            $topicLen = unpack('n', $topicLen);
+            $topicLen = Decoder::unpack(Decoder::BIT_B16, $topicLen);
             $topicLen = array_shift($topicLen);
             if ($topicLen <= 0) {
                 return false;
@@ -311,7 +313,6 @@ class Topic implements \Iterator, \Countable
         return $streams[$this->currentStreamKey];
     }
 
-    // }}}
     // }}}
     // }}}
 }
