@@ -22,7 +22,7 @@ $data = array(
 );
 echo $msg;
 
-$conn = new \Kafka\Socket('10.13.40.98', '9092');
+$conn = new \Kafka\Socket('192.168.1.115', '9092');
 $conn->connect();
 $encoder = new \Kafka\Protocol\Encoder($conn);
 $encoder->produceRequest($data);
