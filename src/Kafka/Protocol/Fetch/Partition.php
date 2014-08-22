@@ -90,6 +90,14 @@ class Partition implements \Iterator, \Countable
     private $offset = 0;
 
     /**
+     * partition current fetch offset
+     *
+     * @var float
+     * @access private
+     */
+    private $currentOffset = 0;
+
+    /**
      * valid
      *
      * @var mixed
@@ -105,6 +113,13 @@ class Partition implements \Iterator, \Countable
      */
     private $topicName = '';
 
+    /**
+     * request fetch context
+     *
+     * @var array
+     */
+    private $context = array();
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -117,10 +132,11 @@ class Partition implements \Iterator, \Countable
      * @access public
      * @return void
      */
-    public function __construct(\Kafka\Protocol\Fetch\Topic $topic)
+    public function __construct(\Kafka\Protocol\Fetch\Topic $topic, $context = array())
     {
         $this->stream    = $topic->getStream();
         $this->topicName = $topic->key();
+        $this->context   = $context;
         $this->partitionCount = $this->getPartitionCount();
     }
 
@@ -314,13 +330,40 @@ class Partition implements \Iterator, \Countable
             $this->offset  = \Kafka\Protocol\Decoder::unpack(Decoder::BIT_B64, $offset);
 
             $this->key = $partitionId;
-            $this->current = new MessageSet($this);
+            $this->current = new MessageSet($this, $this->context);
         } catch (\Kafka\Exception $e) {
             return false;
         }
 
         $this->validCount++;
         return true;
+    }
+
+    // }}}
+    // {{{ public function setMessageOffset()
+
+    /**
+     * set messageSet fetch offset current
+     *
+     * @param  intger $offset
+     * @return void
+     */
+    public function setMessageOffset($offset)
+    {
+        $this->currentOffset = $offset;
+    }
+
+    // }}}
+    // {{{ public function getMessageOffset()
+
+    /**
+     * get messageSet fetch offset current
+     *
+     * @return int
+     */
+    public function getMessageOffset()
+    {
+        return $this->currentOffset;
     }
 
     // }}}

@@ -114,8 +114,8 @@ class Topic implements \Iterator, \Countable
     private $valid = false;
 
     /**
-     * request fetch context 
-     * 
+     * request fetch context
+     *
      * @var array
      */
     private $context = array();
@@ -138,7 +138,26 @@ class Topic implements \Iterator, \Countable
             $streams = array($streams);
         }
         $this->streams = $streams;
-        $this->context = $context;
+        $topicInfos = array();
+        foreach ($context as $values) {
+            if (!isset($values['data'])) {
+                continue;
+            }
+
+            foreach ($values['data'] as $value) {
+                if (!isset($value['topic_name']) || !isset($value['partitions'])) {
+                    continue;
+                }
+
+                $topicName = $value['topic_name'];
+                foreach ($value['partitions'] as $part) {
+                    $topicInfos[$topicName][$part['partition_id']] = array(
+                        'offset' => $part['offset'],
+                    );
+                }
+            }
+        }
+        $this->context = $topicInfos;
         $this->topicCount = $this->getTopicCount();
     }
 

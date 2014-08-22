@@ -88,6 +88,13 @@ class Consumer
      */
     private $stream = array();
 
+    /**
+     * maxSize
+     *
+     * @var integer
+     */
+    private $maxSize = 1048576;
+
     // }}}
     // {{{ functions
     // {{{ public function static getInstance()
@@ -173,6 +180,21 @@ class Consumer
     public function setFromOffset($fromOffset)
     {
         $this->fromOffset = (boolean) $fromOffset;
+    }
+
+    // }}}
+    // {{{ public function setMaxBytes()
+
+    /**
+     * set fetch message max bytes
+     *
+     * @param int $maxSize
+     * @access public
+     * @return void
+     */
+    public function setMaxBytes($maxSize)
+    {
+        $this->maxSize = $maxSize;
     }
 
     // }}}
@@ -278,6 +300,7 @@ class Consumer
                     $partitionData[] = array(
                         'partition_id' => $partitionId,
                         'offset'       => $offset,
+                        'max_bytes'    => $this->maxSize,
                     );
                 }
                 $topicData[] = array(
