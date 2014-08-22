@@ -217,7 +217,7 @@ class Consumer
             $streams[$connArr['key']] = $conn;
         }
 
-        $fetch = new \Kafka\Protocol\Fetch\Topic($streams);
+        $fetch = new \Kafka\Protocol\Fetch\Topic($streams, $data);
 
         // register fetch helper
         $freeStream = new \Kafka\Protocol\Fetch\Helper\FreeStream($this->client);

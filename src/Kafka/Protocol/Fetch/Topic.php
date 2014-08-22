@@ -113,6 +113,13 @@ class Topic implements \Iterator, \Countable
      */
     private $valid = false;
 
+    /**
+     * request fetch context 
+     * 
+     * @var array
+     */
+    private $context = array();
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -125,12 +132,13 @@ class Topic implements \Iterator, \Countable
      * @access public
      * @return void
      */
-    public function __construct($streams)
+    public function __construct($streams, $context = array())
     {
         if (!is_array($streams)) {
             $streams = array($streams);
         }
         $this->streams = $streams;
+        $this->context = $context;
         $this->topicCount = $this->getTopicCount();
     }
 
@@ -287,7 +295,7 @@ class Topic implements \Iterator, \Countable
 
             // topic name
             $this->key = $stream->read($topicLen, true);
-            $this->current = new Partition($this);
+            $this->current = new Partition($this, $this->context);
         } catch (\Kafka\Exception $e) {
             return false;
         }

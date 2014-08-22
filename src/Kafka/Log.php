@@ -53,7 +53,7 @@ class Log
     public static function setLog($log)
     {
         if ($log) {
-            self::$log = $log
+            self::$log = $log;
         }
     }
 
