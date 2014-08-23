@@ -105,10 +105,10 @@ class Consumer
      * @access public
      * @return void
      */
-    public static function getInstance($host, $port)
+    public static function getInstance($hostList, $timeout = null)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($host, $port);
+            self::$instance = new self($hostList, $timeout);
         }
 
         return self::$instance;
