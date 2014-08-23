@@ -22,10 +22,10 @@ Add the lib directory to the PHP include_path and use an autoloader like the one
 
 ## Produce
 
-### \Kafka\Produce::getInstance($host, $port)
+### \Kafka\Produce::getInstance($hostList, $timeout)
 
-* `host` : zookeeper hostname
-* `port` : zookeeper port
+* `hostList` : zookeeper host list , example 127.0.0.1:2181,192.168.1.114:2181
+* `timeout`  : zookeeper timeout
 
 ### \Kafka\Produce::setRequireAck($ack = -1)
 
@@ -44,7 +44,7 @@ send message sets to the server.
 ### Example
 
 ``` php
-$produce = \Kafka\Produce::getInstance('localhost', '2181');
+$produce = \Kafka\Produce::getInstance('localhost:2181', 3000);
 
 $produce->setRequireAck(-1);
 $produce->setMessages('test', 0, array('test1111111'));
@@ -58,10 +58,10 @@ var_dump($result);
 
 ## Consumer
 
-### \Kafka\Consumer::getInstance($host, $port)
+### \Kafka\Consumer::getInstance($hostList, $timeout)
 
-* `host` : zookeeper hostname
-* `port` : zookeeper port
+* `hostList` : zookeeper host list , example 127.0.0.1:2181,192.168.1.114:2181
+* `timeout`  : zookeeper timeout
 
 ### \Kafka\Consumer::setGroup($groupName)
 
@@ -106,7 +106,7 @@ this object is iterator. `\Kafka\Protocol\Fetch\Message`
 ### Example
 
 ``` php
-$consumer = \Kafka\Consumer::getInstance('localhost', '2181');
+$consumer = \Kafka\Consumer::getInstance('localhost:2181');
 
 $consumer->setGroup('testgroup');
 $consumer->setPartition('test', 0);

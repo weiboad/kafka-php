@@ -116,9 +116,9 @@ class Produce
      * @access public
      * @return void
      */
-    private function __construct($host, $port)
+    private function __construct($hostList, $timeout)
     {
-        $zookeeper = new \Kafka\ZooKeeper($host, $port);
+        $zookeeper = new \Kafka\ZooKeeper($hostList, $timeout);
         $this->client = new \Kafka\Client($zookeeper);
     }
 

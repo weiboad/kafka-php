@@ -1,7 +1,7 @@
 <?php
 require 'autoloader.php';
 
-$zk = new \Kafka\ZooKeeper('hadoop11', 2181);
+$zk = new \Kafka\ZooKeeper('hadoop11:2181', 3000);
 $list = $zk->getConsumersPerTopic('testgroup');
 
 var_dump($list);

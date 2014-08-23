@@ -86,10 +86,13 @@ class ZooKeeper
      * @access public
      * @return void
      */
-    public function __construct($host, $port)
+    public function __construct($hostList, $timeout = null)
     {
-        $address = $host . ':' . $port;
-        $this->zookeeper = new \Zookeeper($address);
+		if (!is_null($timeout) && is_numeric($timeout)) {
+			$this->zookeeper = new \ZooKeeper($hostList, null, $timeout);
+		} else {
+			$this->zookeeper = new \Zookeeper($hostList);
+		}
     }
 
     // }}}
