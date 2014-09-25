@@ -116,7 +116,7 @@ class Message
         $keyLen = Decoder::unpack(Decoder::BIT_B32, substr($msg, $offset, 4));
         $keyLen = array_shift($keyLen);
         $offset += 4;
-        if ($keyLen) {
+        if ($keyLen > 0 && $keyLen != 0xFFFFFFFF) {
             $this->key = substr($msg, $offset, $keyLen);
             $offset += $keyLen;
         }
