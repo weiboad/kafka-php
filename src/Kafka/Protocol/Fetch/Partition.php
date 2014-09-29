@@ -322,10 +322,14 @@ class Partition implements \Iterator, \Countable
             $partitionId = $this->stream->read(4, true);
             $partitionId = Decoder::unpack(Decoder::BIT_B32, $partitionId);
             $partitionId = array_shift($partitionId);
+            \Kafka\Log::log("kafka client:fetch partition:" . $partitionId, LOG_INFO);
 
             $errCode = $this->stream->read(2, true);
             $errCode = Decoder::unpack(Decoder::BIT_B16, $errCode);
             $this->errCode = array_shift($errCode);
+            if ($this->errCode != 0) {
+                throw new \Kafka\Exception(\Kafka\Protocol\Decoder::getError($this->errCode));
+            }
             $offset = $this->stream->read(8, true);
             $this->offset  = \Kafka\Protocol\Decoder::unpack(Decoder::BIT_B64, $offset);
 

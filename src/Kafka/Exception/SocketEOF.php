@@ -28,6 +28,6 @@ use \Kafka\Exception;
 +------------------------------------------------------------------------------
 */
 
-class SocketEOF extends \Exception
+class SocketEOF extends Exception
 {
 }

@@ -159,6 +159,7 @@ class Client
                     continue;
                 } else {
                     self::$stream[$host][$key]['locked'] = true;
+                    $info['stream']->connect();
                     return array('key' => $key, 'stream' => $info['stream']);
                 }
             }

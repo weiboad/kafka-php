@@ -105,6 +105,7 @@ class MessageSet implements \Iterator
         $this->partition = $partition;
         $this->context   = $context;
         $this->messageSetSize = $this->getMessageSetSize();
+        \Kafka\Log::log("messageSetSize: {$this->messageSetSize}", LOG_INFO);
     }
 
     // }}}
@@ -222,19 +223,30 @@ class MessageSet implements \Iterator
         }
 
         try {
+            if ($this->validByteCount + 12 > $this->messageSetSize) {
+                // read socket buffer dirty data
+                $this->stream->read($this->messageSetSize - $this->validByteCount);
+                return false;
+            }
             $offset = $this->stream->read(8, true);
             $this->offset  = \Kafka\Protocol\Decoder::unpack(Decoder::BIT_B64, $offset);
             $messageSize = $this->stream->read(4, true);
             $messageSize = Decoder::unpack(Decoder::BIT_B32, $messageSize);
             $messageSize = array_shift($messageSize);
+            $this->validByteCount += 12;
+            if (($this->validByteCount + $messageSize) > $this->messageSetSize) {
+                // read socket buffer dirty data
+                $this->stream->read($this->messageSetSize - $this->validByteCount);
+                return false;
+            }
             $msg  = $this->stream->read($messageSize, true);
-
             $this->current = new Message($msg);
         } catch (\Kafka\Exception $e) {
+            \Kafka\Log::log("already fetch: {$this->validByteCount}, {$e->getMessage()}", LOG_INFO);
             return false;
         }
 
-        $this->validByteCount += 8 + 4 + $messageSize;
+        $this->validByteCount += $messageSize;
 
         return true;
     }

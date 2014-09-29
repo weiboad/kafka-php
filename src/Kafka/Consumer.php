@@ -158,6 +158,7 @@ class Consumer
             if ($this->fromOffset) {
                 $offsetObject = new \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
                 $offset = $offsetObject->getOffset(\Kafka\Offset::DEFAULT_EARLY);
+                \Kafka\Log::log('topic name:' . $topicName . ', part:' . $partitionId . 'get offset from kafka server, offet:' . $offset, LOG_DEBUG);
             } else {
                 $offset = 0;
             }

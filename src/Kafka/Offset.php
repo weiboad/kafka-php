@@ -241,7 +241,11 @@ class Offset
         } elseif ($result[$topicName][$partitionId]['errCode'] == 0) {
             $offset = $result[$topicName][$partitionId]['offset'];
             if ($offset > $maxOffset || $offset < $minOffset) {
-                $offset = $maxOffset;
+                if ($defaultOffset == self::DEFAULT_EARLY) {
+                    $offset = $minOffset;
+                } else {
+                    $offset = $maxOffset;
+                }
             }
             Log::log("topic name: $topicName, partitionId: $partitionId, get offset value is $offset.", LOG_INFO);
 
