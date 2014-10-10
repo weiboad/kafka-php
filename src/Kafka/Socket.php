@@ -165,7 +165,7 @@ class Socket
             throw new \Kafka\Exception('Cannot open without port.');
         }
 
-        $this->stream = fsockopen(
+        $this->stream = @fsockopen(
             $this->host,
             $this->port,
             $errno,
@@ -173,14 +173,14 @@ class Socket
             $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
         );
 
-        stream_set_blocking($this->stream, 0);
-
         if ($this->stream == false) {
             $error = 'Could not connect to '
                     . $this->host . ':' . $this->port
                     . ' ('.$errstr.' ['.$errno.'])';
             throw new \Kafka\Exception($error);
         }
+
+        stream_set_blocking($this->stream, 0);
     }
 
     // }}}
