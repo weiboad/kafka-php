@@ -135,7 +135,7 @@ class Produce
     {
         if (isset($this->payload[$topicName][$partitionId])) {
             $this->payload[$topicName][$partitionId] =
-                    array_merge($messages, $this->payload[$topicName][$partitionId]);
+                    array_merge($this->payload[$topicName][$partitionId], $messages);
         } else {
             $this->payload[$topicName][$partitionId] = $messages;
         }
