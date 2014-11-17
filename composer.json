@@ -36,11 +36,6 @@
 					"phpcov.php"
 					]
 			}
-		},
-		{ "packagist": false },
-		{
-			"type": "composer",
-			"url": "http://218.244.132.204/proxy/packagist"
 		}
 	],
 	"require-dev": {
