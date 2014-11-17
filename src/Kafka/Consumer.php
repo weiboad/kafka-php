@@ -144,6 +144,30 @@ class Consumer
     }
 
     // }}}
+    // {{{ public function setTopic()
+
+    /**
+     * set topic name
+     *
+     * @access public
+     * @return void
+     */
+    public function setTopic($topicName, $defaultOffset = null)
+    {
+        $parts = $this->client->getTopicDetail($topicName);
+        if (!isset($parts['partitions']) || empty($parts['partitions'])) {
+            // set topic fail.
+            return $this;
+        }
+
+        foreach ($parts['partitions'] as $partId => $info) {
+            $this->setPartition($topicName, $partId, $defaultOffset);
+        }
+
+        return $this;
+    }
+
+    // }}}
     // {{{ public function setPartition()
 
     /**
