@@ -203,7 +203,8 @@ class Client
      * @param  string $topicName
      * @return array
      */
-    public function getTopicDetail($topicName) {
+    public function getTopicDetail($topicName)
+    {
         return $this->zookeeper->getTopicDetail($topicName);
     }
 
