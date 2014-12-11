@@ -16,15 +16,15 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 class Exception extends \RuntimeException
 {

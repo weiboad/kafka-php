@@ -16,56 +16,56 @@ namespace Kafka\Protocol\Fetch\Helper;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 abstract class HelperAbstract
 {
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ abstract public function onStreamEof()
+  // {{{ members
+  // }}}
+  // {{{ functions
+  // {{{ abstract public function onStreamEof()
 
-    /**
-     * on stream eof
-     *
-     * @param string $streamKey
-     * @access public
-     * @return void
-     */
-    abstract public function onStreamEof($streamKey);
+  /**
+   * on stream eof
+   *
+   * @param string $streamKey
+   * @access public
+   * @return void
+   */
+  abstract public function onStreamEof($streamKey);
 
-    // }}}
-    // {{{ abstract public function onTopicEof()
+  // }}}
+  // {{{ abstract public function onTopicEof()
 
-    /**
-     * on topic eof
-     *
-     * @param string $topicName
-     * @access public
-     * @return void
-     */
-    abstract public function onTopicEof($topicName);
+  /**
+   * on topic eof
+   *
+   * @param string $topicName
+   * @access public
+   * @return void
+   */
+  abstract public function onTopicEof($topicName);
 
-    // }}}
-    // {{{ abstract public function onPartitionEof()
+  // }}}
+  // {{{ abstract public function onPartitionEof()
 
-    /**
-     * on partition eof
-     *
-     * @param \Kafka\Protocol\Fetch\Partition $partition
-     * @access public
-     * @return void
-     */
-    abstract public function onPartitionEof($partition);
+  /**
+   * on partition eof
+   *
+   * @param \Kafka\Protocol\Fetch\Partition $partition
+   * @access public
+   * @return void
+   */
+  abstract public function onPartitionEof($partition);
 
-    // }}}
-    // }}}
+  // }}}
+  // }}}
 }

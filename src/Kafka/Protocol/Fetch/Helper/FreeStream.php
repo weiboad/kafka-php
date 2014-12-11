@@ -16,102 +16,105 @@ namespace Kafka\Protocol\Fetch\Helper;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 class FreeStream extends HelperAbstract
 {
-    // {{{ members
+  // {{{ members
 
-    /**
-     * streams
-     *
-     * @var array
-     * @access protected
-     */
-    protected $streams = array();
+  /**
+   * streams
+   *
+   * @var array
+   * @access protected
+   */
+  protected $streams = array();
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
+  // }}}
+  // {{{ functions
+  // {{{ public function __construct()
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @return void
-     */
-    public function __construct($client)
+  /**
+   * __construct
+   *
+   * @access public
+   * @param $client
+   * @return \Kafka\Protocol\Fetch\Helper\FreeStream
+   */
+  public function __construct($client)
+  {
+    $this->client = $client;
+  }
+
+  // }}}
+  // {{{ public function setStreams()
+
+  /**
+   * set streams
+   *
+   * @access public
+   * @param $streams
+   * @return void
+   */
+  public function setStreams($streams)
+  {
+    $this->streams = $streams;
+  }
+
+  // }}}
+  // {{{ public function onStreamEof()
+
+  /**
+   * on stream eof call
+   *
+   * @param string $streamKey
+   * @access public
+   * @return void
+   */
+  public function onStreamEof($streamKey)
+  {
+    if (isset($this->streams[$streamKey]))
     {
-        $this->client = $client;
+      $this->client->freeStream($streamKey);
     }
+  }
 
-    // }}}
-    // {{{ public function setStreams()
+  // }}}
+  // {{{ public function onTopicEof()
 
-    /**
-     * set streams
-     *
-     * @access public
-     * @return void
-     */
-    public function setStreams($streams)
-    {
-        $this->streams = $streams;
-    }
+  /**
+   * on topic eof call
+   *
+   * @param string $topicName
+   * @access public
+   * @return void
+   */
+  public function onTopicEof($topicName)
+  {
+  }
 
-    // }}}
-    // {{{ public function onStreamEof()
+  // }}}
+  // {{{ public function onPartitionEof()
 
-    /**
-     * on stream eof call
-     *
-     * @param string $streamKey
-     * @access public
-     * @return void
-     */
-    public function onStreamEof($streamKey)
-    {
-        if (isset($this->streams[$streamKey])) {
-            $this->client->freeStream($streamKey);
-        }
-    }
+  /**
+   * on partition eof call
+   *
+   * @param \Kafka\Protocol\Fetch\Partition $partition
+   * @access public
+   * @return void
+   */
+  public function onPartitionEof($partition)
+  {
+  }
 
-    // }}}
-    // {{{ public function onTopicEof()
-
-    /**
-     * on topic eof call
-     *
-     * @param string $topicName
-     * @access public
-     * @return void
-     */
-    public function onTopicEof($topicName)
-    {
-    }
-
-    // }}}
-    // {{{ public function onPartitionEof()
-
-    /**
-     * on partition eof call
-     *
-     * @param \Kafka\Protocol\Fetch\Partition $partition
-     * @access public
-     * @return void
-     */
-    public function onPartitionEof($partition)
-    {
-    }
-
-    // }}}
-    // }}}
+  // }}}
+  // }}}
 }

@@ -16,145 +16,161 @@ namespace Kafka\Protocol\Fetch\Helper;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 class Helper
 {
-    // {{{ members
+  // {{{ members
 
-    /**
-     * helper object
-     */
-    private static $helpers = array();
+  /**
+   * helper object
+   */
+  private static $helpers = array();
 
-    // }}}
-    // {{{ functions
-    // {{{ public staitc function registerHelper()
+  // }}}
+  // {{{ functions
+  // {{{ public staitc function registerHelper()
 
-    /**
-     * register helper
-     *
-     * @param string $key
-     * @param \Kafka\Protocol\Fetch\Helper\HelperAbstract $helper
-     * @static
-     * @access public
-     * @return void
-     */
-    public static function registerHelper($key, $helper = null)
+  /**
+   * register helper
+   *
+   * @param string $key
+   * @param \Kafka\Protocol\Fetch\Helper\HelperAbstract $helper
+   * @throws \Kafka\Exception
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function registerHelper($key, $helper = null)
+  {
+    if (is_null($helper))
     {
-        if (is_null($helper)) {
-            $className = '\\Kafka\\Protocol\\Fetch\\Helper\\' . $key;
-            if (!class_exists($className)) {
-                throw new \Kafka\Exception('helper is not exists.');
-            }
-            $helper = new $className();
-        }
-
-        if ($helper instanceof \Kafka\Protocol\Fetch\Helper\HelperAbstract) {
-            self::$helpers[$key] = $helper;
-        } else {
-            throw new \Kafka\Exception('this helper not instance of `\Kafka\Protocol\Fetch\Helper\HelperAbstract`');
-        }
+      $className = '\\Kafka\\Protocol\\Fetch\\Helper\\' . $key;
+      if (!class_exists($className))
+      {
+        throw new \Kafka\Exception('helper is not exists.');
+      }
+      $helper = new $className();
     }
 
-    // }}}
-    // {{{ public staitc function unRegisterHelper()
-
-    /**
-     * unregister helper
-     *
-     * @param string $key
-     * @static
-     * @access public
-     * @return void
-     */
-    public static function unRegisterHelper($key)
+    if ($helper instanceof \Kafka\Protocol\Fetch\Helper\HelperAbstract)
     {
-        if (isset(self::$helpers[$key])) {
-            unset(self::$helpers[$key]);
-        }
+      self::$helpers[$key] = $helper;
+    }
+    else
+    {
+      throw new \Kafka\Exception('this helper not instance of `\Kafka\Protocol\Fetch\Helper\HelperAbstract`');
+    }
+  }
+
+  // }}}
+  // {{{ public staitc function unRegisterHelper()
+
+  /**
+   * unregister helper
+   *
+   * @param string $key
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function unRegisterHelper($key)
+  {
+    if (isset(self::$helpers[$key]))
+    {
+      unset(self::$helpers[$key]);
+    }
+  }
+
+  // }}}
+  // {{{ public static function onStreamEof()
+
+  /**
+   * on stream eof call
+   *
+   * @param string $streamKey
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function onStreamEof($streamKey)
+  {
+    if (empty(self::$helpers))
+    {
+      return false;
     }
 
-    // }}}
-    // {{{ public static function onStreamEof()
-
-    /**
-     * on stream eof call
-     *
-     * @param string $streamKey
-     * @static
-     * @access public
-     * @return void
-     */
-    public static function onStreamEof($streamKey)
+    foreach (self::$helpers as $key => $helper)
     {
-        if (empty(self::$helpers)) {
-            return false;
-        }
+      if (method_exists($helper, 'onStreamEof'))
+      {
+        $helper->onStreamEof($streamKey);
+      }
+    }
+  }
 
-        foreach (self::$helpers as $key => $helper) {
-            if (method_exists($helper, 'onStreamEof')) {
-                $helper->onStreamEof($streamKey);
-            }
-        }
+  // }}}
+  // {{{ public static function onTopicEof()
+
+  /**
+   * on topic eof call
+   *
+   * @param string $topicName
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function onTopicEof($topicName)
+  {
+    if (empty(self::$helpers))
+    {
+      return false;
     }
 
-    // }}}
-    // {{{ public static function onTopicEof()
-
-    /**
-     * on topic eof call
-     *
-     * @param string $topicName
-     * @static
-     * @access public
-     * @return void
-     */
-    public static function onTopicEof($topicName)
+    foreach (self::$helpers as $key => $helper)
     {
-        if (empty(self::$helpers)) {
-            return false;
-        }
+      if (method_exists($helper, 'onTopicEof'))
+      {
+        $helper->onStreamEof($topicName);
+      }
+    }
+  }
 
-        foreach (self::$helpers as $key => $helper) {
-            if (method_exists($helper, 'onTopicEof')) {
-                $helper->onStreamEof($topicName);
-            }
-        }
+  // }}}
+  // {{{ public static function onPartitionEof()
+
+  /**
+   * on partition eof call
+   *
+   * @param \Kafka\Protocol\Fetch\Partition $partition
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function onPartitionEof($partition)
+  {
+    if (empty(self::$helpers))
+    {
+      return false;
     }
 
-    // }}}
-    // {{{ public static function onPartitionEof()
-
-    /**
-     * on partition eof call
-     *
-     * @param \Kafka\Protocol\Fetch\Partition $partition
-     * @static
-     * @access public
-     * @return void
-     */
-    public static function onPartitionEof($partition)
+    foreach (self::$helpers as $key => $helper)
     {
-        if (empty(self::$helpers)) {
-            return false;
-        }
-
-        foreach (self::$helpers as $key => $helper) {
-            if (method_exists($helper, 'onPartitionEof')) {
-                $helper->onPartitionEof($partition);
-            }
-        }
+      if (method_exists($helper, 'onPartitionEof'))
+      {
+        $helper->onPartitionEof($partition);
+      }
     }
+  }
 
-    // }}}
-    // }}}
+  // }}}
+  // }}}
 }
