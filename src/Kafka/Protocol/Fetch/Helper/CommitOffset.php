@@ -16,104 +16,106 @@ namespace Kafka\Protocol\Fetch\Helper;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 class CommitOffset extends HelperAbstract
 {
-    // {{{ members
+  // {{{ members
 
-    /**
-     * consumer group
-     *
-     * @var string
-     * @access protected
-     */
-    protected $group = '';
+  /**
+   * consumer group
+   *
+   * @var string
+   * @access protected
+   */
+  protected $group = '';
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
+  // }}}
+  // {{{ functions
+  // {{{ public function __construct()
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @return void
-     */
-    public function __construct($client)
-    {
-        $this->client = $client;
-    }
+  /**
+   * __construct
+   *
+   * @access public
+   * @param $client
+   * @return \Kafka\Protocol\Fetch\Helper\CommitOffset
+   */
+  public function __construct($client)
+  {
+    $this->client = $client;
+  }
 
-    // }}}
-    // {{{ public function setGroup()
+  // }}}
+  // {{{ public function setGroup()
 
-    /**
-     * set consumer group
-     *
-     * @access public
-     * @return void
-     */
-    public function setGroup($group)
-    {
-        $this->group = $group;
-    }
+  /**
+   * set consumer group
+   *
+   * @access public
+   * @param $group
+   * @return void
+   */
+  public function setGroup($group)
+  {
+    $this->group = $group;
+  }
 
-    // }}}
-    // {{{ public function onStreamEof()
+  // }}}
+  // {{{ public function onStreamEof()
 
-    /**
-     * on stream eof call
-     *
-     * @param string $streamKey
-     * @access public
-     * @return void
-     */
-    public function onStreamEof($streamKey)
-    {
-    }
+  /**
+   * on stream eof call
+   *
+   * @param string $streamKey
+   * @access public
+   * @return void
+   */
+  public function onStreamEof($streamKey)
+  {
+  }
 
-    // }}}
-    // {{{ public function onTopicEof()
+  // }}}
+  // {{{ public function onTopicEof()
 
-    /**
-     * on topic eof call
-     *
-     * @param string $topicName
-     * @access public
-     * @return void
-     */
-    public function onTopicEof($topicName)
-    {
-    }
+  /**
+   * on topic eof call
+   *
+   * @param string $topicName
+   * @access public
+   * @return void
+   */
+  public function onTopicEof($topicName)
+  {
+  }
 
-    // }}}
-    // {{{ public function onPartitionEof()
+  // }}}
+  // {{{ public function onPartitionEof()
 
-    /**
-     * on partition eof call
-     *
-     * @param \Kafka\Protocol\Fetch\Partition $partition
-     * @access public
-     * @return void
-     */
-    public function onPartitionEof($partition)
-    {
-        $partitionId = $partition->key();
-        $topicName = $partition->getTopicName();
-        $offset    = $partition->getMessageOffset();
-        $offsetObject = new  \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
-        $offsetObject->setOffset($offset);
-    }
+  /**
+   * on partition eof call
+   *
+   * @param \Kafka\Protocol\Fetch\Partition $partition
+   * @access public
+   * @return void
+   */
+  public function onPartitionEof($partition)
+  {
+    $partitionId = $partition->key();
+    $topicName = $partition->getTopicName();
+    $offset = $partition->getMessageOffset();
+    $offsetObject = new  \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
+    $offsetObject->setOffset($offset);
+  }
 
-    // }}}
-    // }}}
+  // }}}
+  // }}}
 }

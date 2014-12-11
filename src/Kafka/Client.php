@@ -16,198 +16,216 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 class Client
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
+  // {{{ consts
+  // }}}
+  // {{{ members
 
-    /**
-     * zookeeper
-     *
-     * @var mixed
-     * @access private
-     */
-    private $zookeeper = null;
+  /**
+   * zookeeper
+   *
+   * @var mixed
+   * @access private
+   */
+  private $zookeeper = null;
 
-    /**
-     * broker host list
-     *
-     * @var array
-     * @access private
-     */
-    private $hostList = array();
+  /**
+   * broker host list
+   *
+   * @var array
+   * @access private
+   */
+  private $hostList = array();
 
-    /**
-     * save broker connection
-     *
-     * @var array
-     * @access private
-     */
-    private static $stream = array();
+  /**
+   * save broker connection
+   *
+   * @var array
+   * @access private
+   */
+  private static $stream = array();
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
+  // }}}
+  // {{{ functions
+  // {{{ public function __construct()
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @return void
-     */
-    public function __construct(\Kafka\ZooKeeper $zookeeper)
+  /**
+   * __construct
+   *
+   * @access public
+   * @param ZooKeeper $zookeeper
+   * @return \Kafka\Client
+   */
+  public function __construct(\Kafka\ZooKeeper $zookeeper)
+  {
+    $this->zookeeper = $zookeeper;
+  }
+
+  // }}}
+  // {{{ public function getBrokers()
+
+  /**
+   * get broker server
+   *
+   * @access public
+   * @return Client
+   */
+  public function getBrokers()
+  {
+    if (empty($this->hostList))
     {
-        $this->zookeeper = $zookeeper;
-    }
-
-    // }}}
-    // {{{ public function getBrokers()
-
-    /**
-     * get broker server
-     *
-     * @access public
-     * @return void
-     */
-    public function getBrokers()
-    {
-        if (empty($this->hostList)) {
-            $brokerList = $this->zookeeper->listBrokers();
-            foreach ($brokerList as $brokerId => $info) {
-                if (!isset($info['host']) || !isset($info['port'])) {
-                    continue;
-                }
-                $this->hostList[$brokerId] = $info['host'] . ':' . $info['port'];
-            }
+      $brokerList = $this->zookeeper->listBrokers();
+      foreach ($brokerList as $brokerId => $info)
+      {
+        if (!isset($info['host']) || !isset($info['port']))
+        {
+          continue;
         }
-
-        return $this->hostList;
+        $this->hostList[$brokerId] = $info['host'] . ':' . $info['port'];
+      }
     }
 
-    // }}}
-    // {{{ public function getHostByPartition()
+    return $this->hostList;
+  }
 
-    /**
-     * get broker host by topic partition
-     *
-     * @param string $topicName
-     * @param int $partitionId
-     * @access public
-     * @return string
-     */
-    public function getHostByPartition($topicName, $partitionId = 0)
+  // }}}
+  // {{{ public function getHostByPartition()
+
+  /**
+   * get broker host by topic partition
+   *
+   * @param string $topicName
+   * @param int $partitionId
+   * @throws Exception
+   * @access public
+   * @return string
+   */
+  public function getHostByPartition($topicName, $partitionId = 0)
+  {
+    $partitionInfo = $this->zookeeper->getPartitionState($topicName, $partitionId);
+    if (!$partitionInfo)
     {
-        $partitionInfo = $this->zookeeper->getPartitionState($topicName, $partitionId);
-        if (!$partitionInfo) {
-            throw new \Kafka\Exception('topic:' . $topicName . ', partition id: ' . $partitionId . ' is not exists.');
-        }
-
-        $hostList = $this->getBrokers();
-        if (isset($partitionInfo['leader']) && isset($hostList[$partitionInfo['leader']])) {
-            return $hostList[$partitionInfo['leader']];
-        } else {
-            throw new \Kafka\Exception('can\'t find broker host.');
-        }
+      throw new \Kafka\Exception('topic:' . $topicName . ', partition id: ' . $partitionId . ' is not exists.');
     }
 
-    // }}}
-    // {{{ public function getZooKeeper()
-
-    /**
-     * get kafka zookeeper object
-     *
-     * @access public
-     * @return \Kafka\ZooKeeper
-     */
-    public function getZooKeeper()
+    $hostList = $this->getBrokers();
+    if (isset($partitionInfo['leader']) && isset($hostList[$partitionInfo['leader']]))
     {
-        return $this->zookeeper;
+      return $hostList[$partitionInfo['leader']];
     }
-
-    // }}}
-    // {{{ public function getStream()
-
-    /**
-     * get broker broker connect
-     *
-     * @param string $host
-     * @access private
-     * @return void
-     */
-    public function getStream($host, $lockKey = null)
+    else
     {
-        if (!$lockKey) {
-            $lockKey = uniqid($host);
-        }
-
-        list($hostname, $port) = explode(':', $host);
-        // find unlock stream
-        if (isset(self::$stream[$host])) {
-            foreach (self::$stream[$host] as $key => $info) {
-                if ($info['locked']) {
-                    continue;
-                } else {
-                    self::$stream[$host][$key]['locked'] = true;
-                    $info['stream']->connect();
-                    return array('key' => $key, 'stream' => $info['stream']);
-                }
-            }
-        }
-
-        // no idle stream
-        $stream = new \Kafka\Socket($hostname, $port);
-        $stream->connect();
-        self::$stream[$host][$lockKey] = array(
-            'locked' => true,
-            'stream' => $stream,
-        );
-        return array('key' => $lockKey, 'stream' => $stream);
+      throw new \Kafka\Exception('can\'t find broker host.');
     }
+  }
 
-    // }}}
-    // {{{ public function freeStream()
+  // }}}
+  // {{{ public function getZooKeeper()
 
-    /**
-     * free stream pool
-     *
-     * @param string $key
-     * @access public
-     * @return void
-     */
-    public function freeStream($key)
+  /**
+   * get kafka zookeeper object
+   *
+   * @access public
+   * @return \Kafka\ZooKeeper
+   */
+  public function getZooKeeper()
+  {
+    return $this->zookeeper;
+  }
+
+  // }}}
+  // {{{ public function getStream()
+
+  /**
+   * get broker broker connect
+   *
+   * @param string $host
+   * @param null $lockKey
+   * @access private
+   * @return array
+   */
+  public function getStream($host, $lockKey = null)
+  {
+    if (!$lockKey)
     {
-        foreach (self::$stream as $host => $values) {
-            if (isset($values[$key])) {
-                self::$stream[$host][$key]['locked'] = false;
-            }
-        }
+      $lockKey = uniqid($host);
     }
 
-    // }}}
-    // {{{ public function getTopicDetail()
-
-    /**
-     * get topic detail info
-     *
-     * @param  string $topicName
-     * @return array
-     */
-    public function getTopicDetail($topicName)
+    list($hostname, $port) = explode(':', $host);
+    // find unlock stream
+    if (isset(self::$stream[$host]))
     {
-        return $this->zookeeper->getTopicDetail($topicName);
+      foreach (self::$stream[$host] as $key => $info)
+      {
+        if ($info['locked'])
+        {
+          continue;
+        }
+        else
+        {
+          self::$stream[$host][$key]['locked'] = true;
+          $info['stream']->connect();
+          return array('key' => $key, 'stream' => $info['stream']);
+        }
+      }
     }
 
-    // }}}
-    // }}}
+    // no idle stream
+    $stream = new \Kafka\Socket($hostname, $port);
+    $stream->connect();
+    self::$stream[$host][$lockKey] = array(
+      'locked' => true,
+      'stream' => $stream,
+    );
+    return array('key' => $lockKey, 'stream' => $stream);
+  }
+
+  // }}}
+  // {{{ public function freeStream()
+
+  /**
+   * free stream pool
+   *
+   * @param string $key
+   * @access public
+   * @return Client
+   */
+  public function freeStream($key)
+  {
+    foreach (self::$stream as $host => $values)
+    {
+      if (isset($values[$key]))
+      {
+        self::$stream[$host][$key]['locked'] = false;
+      }
+    }
+  }
+
+  // }}}
+  // {{{ public function getTopicDetail()
+
+  /**
+   * get topic detail info
+   *
+   * @param  string $topicName
+   * @return array
+   */
+  public function getTopicDetail($topicName)
+  {
+    return $this->zookeeper->getTopicDetail($topicName);
+  }
+
+  // }}}
+  // }}}
 }
