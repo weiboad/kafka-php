@@ -15,7 +15,7 @@ The Zookeeper integration does the following jobs:
 * Minimum PHP version: 5.3.3.
 * Apache Kafka 0.8.x
 * You need to have access to your Kafka instance and be able to connect through TCP. You can obtain a copy and instructions on how to setup kafka at https://github.com/kafka-dev/kafka [kafka-08-quick-start](https://cwiki.apache.org/KAFKA/kafka-08-quick-start.html)
-* The [PHP Zookeeper extension](https://github.com/andreiz/php-zookeeper) is required if you want to use the Zookeeper-based consumer.
+* The [PHP Zookeeper extension](https://github.com/andreiz/php-zookeeper)
 
 ## Installation
 Add the lib directory to the PHP include_path and use an autoloader like the one in the examples directory (the code follows the PEAR/Zend one-class-per-file convention).
