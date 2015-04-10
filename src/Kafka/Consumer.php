@@ -94,6 +94,12 @@ class Consumer
      * @var integer
      */
     private $maxSize = 1048576;
+    
+    /**
+     * offsetStrategy
+     * @var integer
+     */
+    private $offsetStrategy = \Kafka\Offset::DEFAULT_EARLY;
 
     // }}}
     // {{{ functions
@@ -181,7 +187,7 @@ class Consumer
         if (is_null($offset)) {
             if ($this->fromOffset) {
                 $offsetObject = new \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
-                $offset = $offsetObject->getOffset(\Kafka\Offset::DEFAULT_EARLY);
+                $offset = $offsetObject->getOffset($this->offsetStrategy);
                 \Kafka\Log::log('topic name:' . $topicName . ', part:' . $partitionId . 'get offset from kafka server, offet:' . $offset, LOG_DEBUG);
             } else {
                 $offset = 0;
@@ -275,7 +281,10 @@ class Consumer
         $commitOffset = new \Kafka\Protocol\Fetch\Helper\CommitOffset($this->client);
         $commitOffset->setGroup($this->group);
         \Kafka\Protocol\Fetch\Helper\Helper::registerHelper('commitOffset', $commitOffset);
-
+        
+        $updateConsumer = new \Kafka\Protocol\Fetch\Helper\Consumer($this);
+        \Kafka\Protocol\Fetch\Helper\Helper::registerHelper('updateConsumer', $updateConsumer);
+        
         return $fetch;
     }
 
@@ -340,8 +349,19 @@ class Consumer
         }
 
        return $requestData;
+    }     
+    
+    /**
+     * const LAST_OFFSET = -1;
+     * const EARLIEST_OFFSET = -2;
+     * const DEFAULT_LAST  = -2;
+     * const DEFAULT_EARLY = -1;     
+     * @param type $offsetStrategy
+     */
+    public function setOffsetStrategy($offsetStrategy) {
+        $this->offsetStrategy = $offsetStrategy;
     }
-
+    
     // }}}
     // }}}
 }
