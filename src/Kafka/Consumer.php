@@ -358,7 +358,8 @@ class Consumer
      * const DEFAULT_EARLY = -1;
      * @param type $offsetStrategy
      */
-    public function setOffsetStrategy($offsetStrategy) {
+    public function setOffsetStrategy($offsetStrategy)
+    {
         $this->offsetStrategy = $offsetStrategy;
     }
 

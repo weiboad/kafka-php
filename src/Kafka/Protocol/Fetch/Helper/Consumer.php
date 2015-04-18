@@ -5,14 +5,16 @@ namespace Kafka\Protocol\Fetch\Helper;
  *
  * @author daniel
  */
-class Consumer {
+class Consumer
+{
 
     protected $consumer;
 
     protected $offsetStrategy;
 
 
-    public function __construct(\Kafka\Consumer $consumer){
+    public function __construct(\Kafka\Consumer $consumer)
+    {
         $this->consumer = $consumer;
     }
 
