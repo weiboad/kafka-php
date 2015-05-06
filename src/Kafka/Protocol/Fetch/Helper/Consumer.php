@@ -6,7 +6,7 @@ namespace Kafka\Protocol\Fetch\Helper;
  *
  * @author daniel
  */
-class Consumer {
+class Consumer extends HelperAbstract{
     
     protected $consumer;
     
@@ -25,6 +25,14 @@ class Consumer {
         $offset    = $partition->getMessageOffset();       
         $this->consumer->setFromOffset(true);
         $this->consumer->setPartition($topicName, $partitionId, ($offset +1));
+    }
+
+    public function onStreamEof($streamKey) {
+        
+    }
+
+    public function onTopicEof($topicName) {
+        
     }
     
 }
