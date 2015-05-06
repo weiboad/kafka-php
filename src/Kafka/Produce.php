@@ -116,7 +116,7 @@ class Produce
      * @access public
      * @return void
      */
-    private function __construct($hostList, $timeout = null)
+    public function __construct($hostList, $timeout = null)
     {
         $zookeeper = new \Kafka\ZooKeeper($hostList, $timeout);
         $this->client = new \Kafka\Client($zookeeper);
@@ -228,6 +228,41 @@ class Produce
 
         $this->payload = array();
         return $responseData;
+    }
+
+    // }}}
+    // {{{ public function getClient()
+
+    /**
+     * get client object
+     *
+     * @access public
+     * @return void
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    // }}}
+    // {{{ public function getAvailablePartitions()
+
+    /**
+     * get available partition
+     *
+     * @access public
+     * @return array
+     */
+    public function getAvailablePartitions($topicName)
+    {
+        $topicDetail = $this->client->getTopicDetail($topicName);
+        if (is_array($topicDetail) && isset($topicDetail['partitions'])) {
+            $topicPartitiions = array_keys($topicDetail['partitions']);
+        } else {
+            $topicPartitiions = array();
+        }
+
+        return $topicPartitiions;
     }
 
     // }}}
