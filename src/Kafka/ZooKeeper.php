@@ -91,7 +91,7 @@ class ZooKeeper
         if (!is_null($timeout) && is_numeric($timeout)) {
             $this->zookeeper = new \ZooKeeper($hostList, null, $timeout);
         } else {
-            $this->zookeeper = new \Zookeeper($hostList);
+            $this->zookeeper = new \ZooKeeper($hostList);
         }
     }
 
