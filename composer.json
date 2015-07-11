@@ -13,34 +13,17 @@
     },
     "autoload": {
         "psr-0": {
-            "Kafka\\": "src/",
+            "Kafka\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
             "KafkaTest\\": "tests/"
         }
     },
-	"repositories": [
-		{
-			"type": "package",
-			"package": {
-				"name": "sebastianbergmann/phpcov",
-				"version": "1.1.0",
-				"dist": {
-					"url": "https://github.com/sebastianbergmann/phpcov/archive/1.1.0.zip",
-					"type": "zip"
-				},
-				"source": {
-					"url": "https://github.com/sebastianbergmann/phpcov.git",
-					"type": "git",
-					"reference": "1.1.0"
-				},
-				"bin": [
-					"phpcov.php"
-					]
-			}
-		}
-	],
-	"require-dev": {
-		"satooshi/php-coveralls": "dev-master",
-		"sebastianbergmann/phpcov": "1.1.0",
-		"phpunit/PHPUnit": "3.7.*"
-	}
+    "require-dev": {
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpcov": "*",
+        "phpunit/PHPUnit": "~4.0"
+    }
 }
