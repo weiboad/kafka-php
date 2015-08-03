@@ -33,12 +33,12 @@ class Client
     // {{{ members
 
     /**
-     * zookeeper
+     * cluster metadata
      *
-     * @var mixed
+     * @var \Kafka\ClusterMetaData
      * @access private
      */
-    private $zookeeper = null;
+    private $metadata = null;
 
     /**
      * broker host list
@@ -66,9 +66,12 @@ class Client
      * @access public
      * @return void
      */
-    public function __construct(\Kafka\ZooKeeper $zookeeper)
+    public function __construct(ClusterMetaData $metadata)
     {
-        $this->zookeeper = $zookeeper;
+        $this->metadata = $metadata;
+        if (method_exists($metadata, 'setClient')) {
+            $this->metadata->setClient($this);
+        }
     }
 
     // }}}
@@ -83,7 +86,7 @@ class Client
     public function getBrokers()
     {
         if (empty($this->hostList)) {
-            $brokerList = $this->zookeeper->listBrokers();
+            $brokerList = $this->metadata->listBrokers();
             foreach ($brokerList as $brokerId => $info) {
                 if (!isset($info['host']) || !isset($info['port'])) {
                     continue;
@@ -108,7 +111,7 @@ class Client
      */
     public function getHostByPartition($topicName, $partitionId = 0)
     {
-        $partitionInfo = $this->zookeeper->getPartitionState($topicName, $partitionId);
+        $partitionInfo = $this->metadata->getPartitionState($topicName, $partitionId);
         if (!$partitionInfo) {
             throw new \Kafka\Exception('topic:' . $topicName . ', partition id: ' . $partitionId . ' is not exists.');
         }
@@ -132,7 +135,11 @@ class Client
      */
     public function getZooKeeper()
     {
-        return $this->zookeeper;
+        if ($this->metadata instanceof \Kafka\ZooKeeper) {
+                return $this->metadata;
+        } else {
+                throw new \Kafka\Exception( 'ZooKeeper was not provided' );
+        }
     }
 
     // }}}
@@ -205,7 +212,7 @@ class Client
      */
     public function getTopicDetail($topicName)
     {
-        return $this->zookeeper->getTopicDetail($topicName);
+        return $this->metadata->getTopicDetail($topicName);
     }
 
     // }}}
