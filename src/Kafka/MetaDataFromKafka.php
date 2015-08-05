@@ -55,7 +55,7 @@ class MetaDataFromKafka implements ClusterMetaData
      * @var array
      * @access private
      */
-    private $brokers;
+    private $brokers = array();
 
     /**
      * List of all loaded topic metadata
@@ -75,7 +75,11 @@ class MetaDataFromKafka implements ClusterMetaData
      */
     public function __construct($hostList)
     {
-        $this->hostList = (array)$hostList;
+        if (is_string($hostList)) { // support host list 127.0.0.1:9092,192.168.2.11:9092 form
+            $this->hostList = explode(',', $hostList);
+        } else {
+            $this->hostList = (array)$hostList;
+        }
         // randomize the order of servers we collect metadata from
         shuffle($this->hostList);
     }
@@ -111,6 +115,8 @@ class MetaDataFromKafka implements ClusterMetaData
     }
 
     // }}}
+    // {{{ public function getPartitionState()
+
     public function getPartitionState($topicName, $partitionId = 0)
     {
         if (!isset( $this->topics[$topicName] ) ) {
@@ -168,7 +174,7 @@ class MetaDataFromKafka implements ClusterMetaData
             try {
                 $response = null;
                 $stream = $this->client->getStream($host);
-                $conn = $stream['conn'];
+                $conn = $stream['stream'];
                 $encoder = new \Kafka\Protocol\Encoder($conn);
                 $encoder->metadataRequest($topics);
                 $decoder = new \Kafka\Protocol\Decoder($conn);
@@ -180,8 +186,8 @@ class MetaDataFromKafka implements ClusterMetaData
             }
         }
         if ($response) {
-            $this->brokers = $response['brokers'] + $this->brokers;
-            $this->topics = $response['topics'] + $this->topics;
+            $this->brokers = array_merge($response['brokers'], $this->brokers);
+            $this->topics = array_merge($response['topics'], $this->topics);
         } else {
             throw new \Kafka\Exception('Could not connect to any kafka brokers');
         }

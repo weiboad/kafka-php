@@ -98,10 +98,10 @@ class Produce
      * @access public
      * @return void
      */
-    public static function getInstance($hostList, $timeout, $kafkaHostList)
+    public static function getInstance($hostList, $timeout, $kafkaHostList = null)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($hostList, $timeout,$kafkaHostList);
+            self::$instance = new self($hostList, $timeout, $kafkaHostList);
         }
 
         return self::$instance;
