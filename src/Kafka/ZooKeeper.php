@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class ZooKeeper
+class ZooKeeper implements \Kafka\ClusterMetaData
 {
     // {{{ consts
 

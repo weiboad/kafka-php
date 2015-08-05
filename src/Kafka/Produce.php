@@ -98,17 +98,17 @@ class Produce
      * @access public
      * @return void
      */
-    public static function getInstance($hostList, $timeout)
+    public static function getInstance($hostList, $timeout, $kafkaHostList)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($hostList, $timeout);
+            self::$instance = new self($hostList, $timeout,$kafkaHostList);
         }
 
         return self::$instance;
     }
 
     // }}}
-    // {{{ private function __construct()
+    // {{{ public function __construct()
 
     /**
      * __construct
@@ -116,10 +116,16 @@ class Produce
      * @access public
      * @return void
      */
-    public function __construct($hostList, $timeout = null)
+    public function __construct($hostList, $timeout = null, $kafkaHostList = null)
     {
-        $zookeeper = new \Kafka\ZooKeeper($hostList, $timeout);
-        $this->client = new \Kafka\Client($zookeeper);
+        if ($hostList instanceof \Kafka\ClusterMetaData) {
+            $metadata = $hostList;
+        } elseif ( $kafkaHostList !== null ) {
+            $metadata = new \Kafka\MetaDataFromKafka($kafkaHostList);
+        } else {
+            $metadata = new \Kafka\ZooKeeper($hostList, $timeout);
+        }
+        $this->client = new \Kafka\Client($metadata);
     }
 
     // }}}
