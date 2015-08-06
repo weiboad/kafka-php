@@ -186,7 +186,9 @@ class MetaDataFromKafka implements ClusterMetaData
             }
         }
         if ($response) {
-            $this->brokers = array_merge($response['brokers'], $this->brokers);
+            // Merge arrays using "+" operator to preserve key (which are broker IDs)
+            // instead of array_merge (which reindex numeric keys)
+            $this->brokers = $response['brokers'] + $this->brokers;
             $this->topics = array_merge($response['topics'], $this->topics);
         } else {
             throw new \Kafka\Exception('Could not connect to any kafka brokers');
