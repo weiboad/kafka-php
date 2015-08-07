@@ -6,7 +6,7 @@
         "Client",
         "Kafka"
     ],
-    "homepage": "http://wwww.swanlinux.net",
+    "homepage": "http://www.swanlinux.net",
     "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.3.3"
