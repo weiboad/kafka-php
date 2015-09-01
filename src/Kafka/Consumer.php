@@ -302,6 +302,16 @@ class Consumer
         return $this->client;
     }
 
+    /**
+     * passthru method to client for setting stream options
+     *
+     * @param array $options
+     */
+    public function setStreamOptions($options = array())
+    {
+        $this->client->setStreamOptions($options);
+    }
+
     // }}}
     // {{{ private function _formatPayload()
 

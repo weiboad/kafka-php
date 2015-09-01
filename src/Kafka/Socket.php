@@ -105,11 +105,45 @@ class Socket
     {
         $this->host = $host;
         $this->port = $port;
-        $this->recvTimeoutSec  = $recvTimeoutSec;
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-        $this->sendTimeoutSec  = $sendTimeoutSec;
+        $this->setRecvTimeoutSec($recvTimeoutSec);
+        $this->setRecvTimeoutUsec($recvTimeoutUsec);
+        $this->setSendTimeoutSec($sendTimeoutSec);
+        $this->setSendTimeoutUsec($sendTimeoutUsec);
+    }
+
+    /**
+     * @param float $sendTimeoutSec
+     */
+    public function setSendTimeoutSec($sendTimeoutSec)
+    {
+        $this->sendTimeoutSec = $sendTimeoutSec;
+    }
+
+    /**
+     * @param float $sendTimeoutUsec
+     */
+    public function setSendTimeoutUsec($sendTimeoutUsec)
+    {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
+
+    /**
+     * @param float $recvTimeoutSec
+     */
+    public function setRecvTimeoutSec($recvTimeoutSec)
+    {
+        $this->recvTimeoutSec = $recvTimeoutSec;
+    }
+
+    /**
+     * @param float $recvTimeoutUsec
+     */
+    public function setRecvTimeoutUsec($recvTimeoutUsec)
+    {
+        $this->recvTimeoutUsec = $recvTimeoutUsec;
+    }
+
+
 
     // }}}
     // {{{ public static function createFromStream()

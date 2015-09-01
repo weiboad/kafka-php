@@ -56,6 +56,19 @@ class Client
      */
     private static $stream = array();
 
+    /**
+     * default stream options
+     *
+     * @var array
+     * @access private
+     */
+    private $streamOptions = array(
+        'RecvTimeoutSec' => 0,
+        'RecvTimeoutUsec' => 750000,
+        'SendTimeoutSec' => 0,
+        'SendTimeoutUsec' => 100000,
+    );
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -71,6 +84,63 @@ class Client
         $this->metadata = $metadata;
         if (method_exists($metadata, 'setClient')) {
             $this->metadata->setClient($this);
+        }
+    }
+
+    /**
+     * update stream options
+     *
+     * @param array $options
+     */
+    public function setStreamOptions($options = array())
+    {
+        // Merge the arrays
+        $this->streamOptions = array_merge($this->streamOptions, $options);
+        $this->updateStreamOptions();
+    }
+
+    /**
+     * @access public
+     * @param $name - name of stream option
+     * @param $value - value for option
+     */
+    public function setStreamOption($name, $value)
+    {
+        $this->streamOptions[$name] = $value;
+        $this->updateStreamOptions();
+    }
+
+    /**
+     * @access public
+     * @param $name - name of option
+     * @return mixed
+     */
+    public function getStreamOption($name)
+    {
+        if (array_key_exists($name, $this->streamOptions)) {
+            return $this->streamOptions[$name];
+        }
+        return null;
+    }
+
+    /**
+     * @access private
+     */
+    private function updateStreamOptions()
+    {
+        // Loop thru each stream
+        foreach (self::$stream as $host => $streams) {
+            foreach ($streams as $key => $info) {
+                // Update options
+                if (isset($info['stream'])) {
+                    /** @var \Kafka\Socket $stream */
+                    $stream = $info['stream'];
+                    $stream->setRecvTimeoutSec($this->streamOptions['RecvTimeoutSec']);
+                    $stream->setRecvTimeoutUsec($this->streamOptions['SendTimeoutUsec']);
+                    $stream->setSendTimeoutSec($this->streamOptions['SendTimeoutSec']);
+                    $stream->setSendTimeoutUsec($this->streamOptions['SendTimeoutUsec']);
+                }
+            }
         }
     }
 
@@ -173,7 +243,7 @@ class Client
         }
 
         // no idle stream
-        $stream = new \Kafka\Socket($hostname, $port);
+        $stream = new \Kafka\Socket($hostname, $port, $this->getStreamOption('RecvTimeoutSec'), $this->getStreamOption('RecvTimeoutUsec'), $this->getStreamOption('SendTimeoutSec'), $this->getStreamOption('SendTimeoutUsec'));
         $stream->connect();
         self::$stream[$host][$lockKey] = array(
             'locked' => true,
