@@ -250,6 +250,17 @@ class Produce
         return $this->client;
     }
 
+    /**
+     * passthru method to client for setting stream options
+     *
+     * @access public
+     * @param array $options
+     */
+    public function setStreamOptions($options = array())
+    {
+        $this->client->setStreamOptions($options);
+    }
+
     // }}}
     // {{{ public function getAvailablePartitions()
 
