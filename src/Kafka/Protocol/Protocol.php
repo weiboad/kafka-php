@@ -81,6 +81,7 @@ abstract class Protocol
     const BIT_B64 = 'N2';
     const BIT_B32 = 'N';
     const BIT_B16 = 'n';
+    const BIT_B16_SIGNED = 's';
     const BIT_B8  = 'C';
 
     // }}}
