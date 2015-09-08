@@ -216,6 +216,9 @@ abstract class Protocol
             case self::BIT_B16:
                 $len = 2;
                 break;
+            case self::BIT_B16_SIGNED:
+                $len = 2;
+                break;
             case self::BIT_B8:
                 $len = 1;
                 break;
