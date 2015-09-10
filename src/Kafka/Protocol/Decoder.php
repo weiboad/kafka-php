@@ -66,7 +66,7 @@ class Decoder extends Protocol
             for ($j = 0; $j < $partitionCount; $j++) {
                 $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
                 $offset += 4;
-                $errCode = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+                $errCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
                 $offset += 2;
                 $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset += 8;
@@ -343,7 +343,7 @@ class Decoder extends Protocol
                     $metaData = substr($data, $offset, $metaLen);
                     $offset += $metaLen;
                 }
-                $errCode = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+                $errCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
                 $offset += 2;
                 $result[$topicName][$partitionId[1]] = array(
                     'offset'   => $partitionOffset,
