@@ -28,6 +28,6 @@ use \Kafka\Exception;
 +------------------------------------------------------------------------------
 */
 
-class NotSupported extends \Exception
+class NotSupported extends Exception
 {
 }

@@ -28,6 +28,6 @@ use \Kafka\Exception;
 +------------------------------------------------------------------------------
 */
 
-class Protocol extends \Exception
+class Protocol extends Exception
 {
 }
