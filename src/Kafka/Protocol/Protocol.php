@@ -95,6 +95,16 @@ abstract class Protocol
      */
     protected $stream = null;
 
+    /**
+     * isBigEndianSystem
+     *
+     * gets set to true if the computer this code is running is big endian.
+     *
+     * @var null|bool
+     * @access private
+     */
+    private static $isBigEndianSystem = null;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -154,6 +164,12 @@ abstract class Protocol
             $set = unpack($type, $bytes);
             $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
             return $original;
+        } elseif ($type == self::BIT_B16_SIGNED) {
+            $set = unpack($type, $bytes);
+            if (self::isSystemBigEndian()) {
+                $set = self::convertSignedShortFromBigEndianToLittleEndian($set);
+            }
+            return $set;
         } else {
             return unpack($type, $bytes);
         }
@@ -227,6 +243,52 @@ abstract class Protocol
         if (strlen($bytes) != $len) {
             throw new \Kafka\Exception\Protocol('unpack failed. string(raw) length is ' . strlen($bytes) . ' , TO ' . $type);
         }
+    }
+
+    // }}}
+    // {{{ public static function isSystemBigEndian()
+
+    /**
+     * Determines if the computer currently running this code is big endian or little endian.
+     *
+     * @access public
+     * @return bool - true if big endian, false if little endian
+     */
+    public static function isSystemBigEndian() {
+        // If we don't know if our system is big endian or not yet...
+        if (is_null(self::$isBigEndianSystem)) {
+            // Lets find out
+            list ($endiantest) = array_values (unpack ('L1L', pack ('V',1)));
+            if ($endiantest != 1) {
+                // This is a big endian system
+                self::$isBigEndianSystem = true;
+            } else {
+                self::$isBigEndianSystem = false;
+            }
+        }
+
+        return self::$isBigEndianSystem;
+    }
+
+    // }}}
+    // {{{ public static function convertSignedShortFromBigEndianToLittleEndian()
+
+    /**
+     * Converts a signed short (16 bits) from big endian to little endian.
+     *
+     * @param int[] $bits
+     * @access public
+     * @return array
+     */
+    public static function convertSignedShortFromBigEndianToLittleEndian($bits)
+    {
+        if (is_array($bits)) {
+            foreach ($bits as $index => $bit) {
+                $bits[$index] = ($bit >> 8);
+            }
+            return $bits;
+        }
+        return ( $bits >> 8 );
     }
 
     // }}}
