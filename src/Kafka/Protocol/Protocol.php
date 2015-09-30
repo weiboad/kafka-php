@@ -16,15 +16,15 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+ * Kafka protocol since Kafka v0.8
 +------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
-*/
+ */
 
 abstract class Protocol
 {
@@ -98,12 +98,13 @@ abstract class Protocol
     /**
      * isBigEndianSystem
      *
-     * gets set to true if the computer this code is running is big endian.
+     * gets set to true if the computer this code is running is little endian,
+     * gets set to false if the computer this code is running on is big endian.
      *
      * @var null|bool
      * @access private
      */
-    private static $isBigEndianSystem = null;
+    private static $isLittleEndianSystem = null;
 
     // }}}
     // {{{ functions
@@ -165,8 +166,13 @@ abstract class Protocol
             $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
             return $original;
         } elseif ($type == self::BIT_B16_SIGNED) {
+            // According to PHP docs: signed short (always 16 bit, machine byte order)
+            // So lets unpack it..
             $set = unpack($type, $bytes);
-            if (self::isSystemBigEndian()) {
+
+            // But if our system is little endian
+            if (self::isSystemLittleEndian()) {
+                // We need to flip the endianess because this really was in big endian
                 $set = self::convertSignedShortFromBigEndianToLittleEndian($set);
             }
             return $set;
@@ -252,22 +258,23 @@ abstract class Protocol
      * Determines if the computer currently running this code is big endian or little endian.
      *
      * @access public
-     * @return bool - true if big endian, false if little endian
+     * @return bool - false if big endian, true if little endian
      */
-    public static function isSystemBigEndian() {
+    public static function isSystemLittleEndian() {
         // If we don't know if our system is big endian or not yet...
-        if (is_null(self::$isBigEndianSystem)) {
+        if (is_null(self::$isLittleEndianSystem)) {
             // Lets find out
-            list ($endiantest) = array_values (unpack ('L1L', pack ('V',1)));
+            list ($endiantest) = array_values(unpack('L1L', pack('V', 1)));
             if ($endiantest != 1) {
                 // This is a big endian system
-                self::$isBigEndianSystem = true;
+                self::$isLittleEndianSystem = false;
             } else {
-                self::$isBigEndianSystem = false;
+                // This is a little endian system
+                self::$isLittleEndianSystem = true;
             }
         }
 
-        return self::$isBigEndianSystem;
+        return self::$isLittleEndianSystem;
     }
 
     // }}}
