@@ -173,7 +173,7 @@ abstract class Protocol
             // But if our system is little endian
             if (self::isSystemLittleEndian()) {
                 // We need to flip the endianess because this really was in big endian
-                $set = self::convertSignedShortFromBigEndianToLittleEndian($set);
+                $set = self::convertSignedShortFromLittleEndianToBigEndian($set);
             }
             return $set;
         } else {
@@ -278,16 +278,16 @@ abstract class Protocol
     }
 
     // }}}
-    // {{{ public static function convertSignedShortFromBigEndianToLittleEndian()
+    // {{{ public static function convertSignedShortFromLittleEndianToBigEndian()
 
     /**
-     * Converts a signed short (16 bits) from big endian to little endian.
+     * Converts a signed short (16 bits) from little endian to big endian.
      *
      * @param int[] $bits
      * @access public
      * @return array
      */
-    public static function convertSignedShortFromBigEndianToLittleEndian($bits)
+    public static function convertSignedShortFromLittleEndianToBigEndian($bits)
     {
         if (is_array($bits)) {
             foreach ($bits as $index => $bit) {
