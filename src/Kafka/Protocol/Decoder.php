@@ -419,7 +419,7 @@ class Decoder extends Protocol
                 $error = 'The broker returns this error code if it receives an offset fetch or commit request for a consumer group that it is not a coordinator for.';
                 break;
             default:
-                $error = 'Unknown error';
+                $error = 'Unknown error ['.$error.']';
         }
 
         return $error;
