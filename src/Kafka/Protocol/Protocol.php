@@ -252,7 +252,7 @@ abstract class Protocol
     }
 
     // }}}
-    // {{{ public static function isSystemBigEndian()
+    // {{{ public static function isSystemLittleEndian()
 
     /**
      * Determines if the computer currently running this code is big endian or little endian.
