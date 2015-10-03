@@ -291,11 +291,26 @@ abstract class Protocol
     {
         if (is_array($bits)) {
             foreach ($bits as $index => $bit) {
-                $bits[$index] = ($bit >> 8);
+                // get LSB
+                $lsb = $bit & 0xff;
+
+                // get MSB
+                $msb = $bit >> 8 & 0xff;
+
+                // swap bytes
+                $bits[$index] = $lsb<<8 | $msb;
             }
-            return $bits;
+        } else {
+            // get LSB
+            $lsb = $bits & 0xff;
+
+            // get MSB
+            $msb = $bits >> 8 & 0xff;
+
+            // swap bytes
+            $bits = $lsb << 8 | $msb;
         }
-        return ( $bits >> 8 );
+        return $bits;
     }
 
     // }}}
