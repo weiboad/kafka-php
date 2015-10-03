@@ -289,26 +289,21 @@ abstract class Protocol
      */
     public static function convertSignedShortFromLittleEndianToBigEndian($bits)
     {
-        if (is_array($bits)) {
-            foreach ($bits as $index => $bit) {
-                // get LSB
-                $lsb = $bit & 0xff;
+        foreach ($bits as $index => $bit) {
 
-                // get MSB
-                $msb = $bit >> 8 & 0xff;
-
-                // swap bytes
-                $bits[$index] = $lsb<<8 | $msb;
-            }
-        } else {
             // get LSB
-            $lsb = $bits & 0xff;
+            $lsb = $bit & 0xff;
 
             // get MSB
-            $msb = $bits >> 8 & 0xff;
+            $msb = $bit >> 8 & 0xff;
 
             // swap bytes
-            $bits = $lsb << 8 | $msb;
+            $bit = $lsb <<8 | $msb;
+
+            if ($bit >= 32768) {
+                $bit -= 65536;
+            }
+            $bits[$index] = $bit;
         }
         return $bits;
     }
