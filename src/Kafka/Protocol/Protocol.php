@@ -260,7 +260,8 @@ abstract class Protocol
      * @access public
      * @return bool - false if big endian, true if little endian
      */
-    public static function isSystemLittleEndian() {
+    public static function isSystemLittleEndian()
+    {
         // If we don't know if our system is big endian or not yet...
         if (is_null(self::$isLittleEndianSystem)) {
             // Lets find out
