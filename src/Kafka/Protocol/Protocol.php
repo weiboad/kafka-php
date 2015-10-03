@@ -166,13 +166,13 @@ abstract class Protocol
             $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
             return $original;
         } elseif ($type == self::BIT_B16_SIGNED) {
-            // According to PHP docs: signed short (always 16 bit, machine byte order)
+            // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
             // So lets unpack it..
             $set = unpack($type, $bytes);
 
             // But if our system is little endian
             if (self::isSystemLittleEndian()) {
-                // We need to flip the endianess because this really was in big endian
+                // We need to flip the endianess because coming from kafka it is big endian
                 $set = self::convertSignedShortFromLittleEndianToBigEndian($set);
             }
             return $set;
