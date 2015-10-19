@@ -334,6 +334,99 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     // }}}
+    //{{{ public function testFetchOffsetResponseErrorCode3()
+
+    public function testFetchOffsetResponseErrorCode3()
+    {
+        // 00000023  = data length = 35 bytes
+        // 00000000 = ??
+        // 00000001 = topic count: "1"
+        // 0005 = topic name length: 5 bytes
+        // 7465737436 = "test6"
+        // 00000001 = partition count: "1"
+        // 00000002 = partition id: "2"
+        // 0000000000000002 = partition offset: "2"
+        // 0000 = metadata length: "0"
+        // 0003 = error code = 3
+        $this->setData(Decoder::Khex2bin('000000230000000000000001000574657374360000000100000002000000000000000200000003'));
+        $decoder = new \Kafka\Protocol\Decoder($this->stream);
+        $actual  = $decoder->fetchOffsetResponse();
+
+        $expect = array(
+            'test6' => array(
+                2 => array(
+                    'offset'   => 2,
+                    'metadata' => '',
+                    'errCode'  => 3,
+                ),
+            ),
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
+    // }}}
+    //{{{ public function testFetchOffsetResponseErrorCode15()
+
+    public function testFetchOffsetResponseErrorCode15()
+    {
+        // 00000023  = data length = 35 bytes
+        // 00000000 = ??
+        // 00000001 = topic count: "1"
+        // 0005 = topic name length: 5 bytes
+        // 7465737436 = "test6"
+        // 00000001 = partition count: "1"
+        // 00000002 = partition id: "2"
+        // 0000000000000002 = partition offset: "2"
+        // 0000 = metadata length: "0"
+        // 000F = error code = 15
+        $this->setData(Decoder::Khex2bin('00000023000000000000000100057465737436000000010000000200000000000000020000000F'));
+        $decoder = new \Kafka\Protocol\Decoder($this->stream);
+        $actual  = $decoder->fetchOffsetResponse();
+
+        $expect = array(
+            'test6' => array(
+                2 => array(
+                    'offset'   => 2,
+                    'metadata' => '',
+                    'errCode'  => 15,
+                ),
+            ),
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
+    // }}}
+    //{{{ public function testFetchOffsetResponseUnexpectedErrorCode()
+
+    public function testFetchOffsetResponseUnexpectedErrorCode()
+    {
+        // 00000023  = data length = 35 bytes
+        // 00000000 = ??
+        // 00000001 = topic count: "1"
+        // 0005 = topic name length: 5 bytes
+        // 7465737436 = "test6"
+        // 00000001 = partition count: "1"
+        // 00000002 = partition id: "2"
+        // 0000000000000002 = partition offset: "2"
+        // 0000 = metadata length: "0"
+        // FFFF = error code = -1
+        $this->setData(Decoder::Khex2bin('00000023000000000000000100057465737436000000010000000200000000000000020000FFFF'));
+        $decoder = new \Kafka\Protocol\Decoder($this->stream);
+        $actual  = $decoder->fetchOffsetResponse();
+
+        $expect = array(
+            'test6' => array(
+                2 => array(
+                    'offset'   => 2,
+                    'metadata' => '',
+                    'errCode'  => -1,
+                ),
+            ),
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
+    // }}}
     //{{{ public function testFetchOffsetResponseNotData()
 
     /**

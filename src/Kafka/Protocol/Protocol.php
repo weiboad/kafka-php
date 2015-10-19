@@ -95,6 +95,17 @@ abstract class Protocol
      */
     protected $stream = null;
 
+    /**
+     * isBigEndianSystem
+     *
+     * gets set to true if the computer this code is running is little endian,
+     * gets set to false if the computer this code is running on is big endian.
+     *
+     * @var null|bool
+     * @access private
+     */
+    private static $isLittleEndianSystem = null;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -154,6 +165,17 @@ abstract class Protocol
             $set = unpack($type, $bytes);
             $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
             return $original;
+        } elseif ($type == self::BIT_B16_SIGNED) {
+            // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
+            // So lets unpack it..
+            $set = unpack($type, $bytes);
+
+            // But if our system is little endian
+            if (self::isSystemLittleEndian()) {
+                // We need to flip the endianess because coming from kafka it is big endian
+                $set = self::convertSignedShortFromLittleEndianToBigEndian($set);
+            }
+            return $set;
         } else {
             return unpack($type, $bytes);
         }
@@ -227,6 +249,64 @@ abstract class Protocol
         if (strlen($bytes) != $len) {
             throw new \Kafka\Exception\Protocol('unpack failed. string(raw) length is ' . strlen($bytes) . ' , TO ' . $type);
         }
+    }
+
+    // }}}
+    // {{{ public static function isSystemLittleEndian()
+
+    /**
+     * Determines if the computer currently running this code is big endian or little endian.
+     *
+     * @access public
+     * @return bool - false if big endian, true if little endian
+     */
+    public static function isSystemLittleEndian()
+    {
+        // If we don't know if our system is big endian or not yet...
+        if (is_null(self::$isLittleEndianSystem)) {
+            // Lets find out
+            list ($endiantest) = array_values(unpack('L1L', pack('V', 1)));
+            if ($endiantest != 1) {
+                // This is a big endian system
+                self::$isLittleEndianSystem = false;
+            } else {
+                // This is a little endian system
+                self::$isLittleEndianSystem = true;
+            }
+        }
+
+        return self::$isLittleEndianSystem;
+    }
+
+    // }}}
+    // {{{ public static function convertSignedShortFromLittleEndianToBigEndian()
+
+    /**
+     * Converts a signed short (16 bits) from little endian to big endian.
+     *
+     * @param int[] $bits
+     * @access public
+     * @return array
+     */
+    public static function convertSignedShortFromLittleEndianToBigEndian($bits)
+    {
+        foreach ($bits as $index => $bit) {
+
+            // get LSB
+            $lsb = $bit & 0xff;
+
+            // get MSB
+            $msb = $bit >> 8 & 0xff;
+
+            // swap bytes
+            $bit = $lsb <<8 | $msb;
+
+            if ($bit >= 32768) {
+                $bit -= 65536;
+            }
+            $bits[$index] = $bit;
+        }
+        return $bits;
     }
 
     // }}}
