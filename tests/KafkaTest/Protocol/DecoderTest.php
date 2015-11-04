@@ -149,6 +149,71 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     // }}}
+    //{{{ public function testProduceResponseWithErrorCodes()
+
+    /**
+     * testProduceResponseWithErrorCodes
+     *
+     * @access public
+     * @return void
+     */
+    public function testProduceResponseWithErrorCodes()
+    {
+        // Break down of our encoded data
+        // '00000047 00000000 00000002 0005 7465737436 00000002 00000002 000A 0000000000000034 00000005 FFFF 0000000000000028 0004 74657374 00000001 00000000 0000 000000000000005f'
+
+        // 00000047  = data length = 47 bytes
+        // 00000000 = ??
+        // 00000002 = topic count: "2"
+
+        // -- first topic --
+        // 0005 = topic name length: 5 bytes
+        // 7465737436 = "test6"
+        // 00000002 = partition count: "2"
+        // -- first topic - first partition --
+        // 00000002 = partition id: "2"
+        // 000A = error code: "10"
+        // 0000000000000034 = partition offset: "52"
+        // -- first topic - second partition --
+        // 00000005 = partition id: "5"
+        // 0000 = error code: "-1"
+        // 0000000000000028 = offset: "40"
+
+        // -- 2nd topic --
+        // 0004 = topic name length: 4 bytes
+        // 74657374 = "test"
+        // 00000001 = partition count: "1"
+        // -- 2nd topic - first partition --
+        // 00000000 = partition id: "0"
+        // 0000 = error code: "0"
+        // 000000000000005f = offset: "95"
+
+        $this->setData(Decoder::Khex2bin('000000470000000000000002000574657374360000000200000002000A000000000000003400000005FFFF000000000000002800047465737400000001000000000000000000000000005f'));
+        $decoder = new \Kafka\Protocol\Decoder($this->stream);
+        $actual  = $decoder->produceResponse();
+
+        $expect = array(
+            'test6' => array(
+                2 => array(
+                    'errCode' => 10,
+                    'offset'  => 52,
+                ),
+                5 => array(
+                    'errCode' => -1,
+                    'offset'  => 40,
+                ),
+            ),
+            'test' => array(
+                0 => array(
+                    'errCode' => 0,
+                    'offset'  => 95,
+                ),
+            ),
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
+    // }}}
     //{{{ public function testMetadataResponse()
 
     /**
