@@ -111,7 +111,7 @@ class CommitOffset extends HelperAbstract
         $topicName = $partition->getTopicName();
         $offset    = $partition->getMessageOffset();
         $offsetObject = new  \Kafka\Offset($this->client, $this->group, $topicName, $partitionId);
-        $offsetObject->setOffset($offset);
+        $offsetObject->setOffset($offset + 1);
     }
 
     // }}}
