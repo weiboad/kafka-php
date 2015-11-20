@@ -297,7 +297,7 @@ class Partition implements \Iterator, \Countable
         $data = Decoder::unpack(Decoder::BIT_B32, $data);
         $count = array_shift($data);
         if ($count <= 0) {
-            throw new \Kafka\Exception\OutOfRange($size . ' is not a valid partition count');
+            throw new \Kafka\Exception\OutOfRange($count . ' is not a valid partition count');
         }
 
         return $count;
