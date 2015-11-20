@@ -224,8 +224,8 @@ class Offset
         if ($result[$topicName][$partitionId]['errCode'] == 3) {
             switch ($defaultOffset) {
                 case self::DEFAULT_LAST:
-                    return $maxOffset;
                     Log::log("topic name: $topicName, partitionId: $partitionId, get offset value is default last.", LOG_INFO);
+                    return $maxOffset;
                 case self::DEFAULT_EARLY:
                     Log::log("topic name: $topicName, partitionId: $partitionId, get offset value is default early.", LOG_INFO);
                     return $minOffset;
@@ -233,10 +233,6 @@ class Offset
                     $this->setOffset($defaultOffset);
                     Log::log("topic name: $topicName, partitionId: $partitionId, get offset value is default $defaultOffset.", LOG_INFO);
                     return $defaultOffset;
-            }
-            if ($defaultOffset) {
-                $this->setOffset($defaultOffset);
-                return $defaultOffset;
             }
         } elseif ($result[$topicName][$partitionId]['errCode'] == 0) {
             $offset = $result[$topicName][$partitionId]['offset'];
