@@ -106,7 +106,7 @@ class Partition implements \Iterator, \Countable
     private $valid = false;
 
     /**
-     * cuerrent topic name
+     * current topic name
      *
      * @var string
      * @access private
@@ -130,7 +130,6 @@ class Partition implements \Iterator, \Countable
      * @param \Kafka\Protocol\Fetch\Topic $topic
      * @param int $initOffset
      * @access public
-     * @return void
      */
     public function __construct(\Kafka\Protocol\Fetch\Topic $topic, $context = array())
     {
@@ -147,7 +146,7 @@ class Partition implements \Iterator, \Countable
      * current
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     public function current()
     {
@@ -161,7 +160,7 @@ class Partition implements \Iterator, \Countable
      * key
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function key()
     {
@@ -203,7 +202,7 @@ class Partition implements \Iterator, \Countable
      * implements Iterator function
      *
      * @access public
-     * @return integer
+     * @return void
      */
     public function next()
     {
@@ -231,7 +230,7 @@ class Partition implements \Iterator, \Countable
      * get partition errcode
      *
      * @access public
-     * @return void
+     * @return float
      */
     public function getErrCode()
     {
@@ -245,7 +244,7 @@ class Partition implements \Iterator, \Countable
      * get partition high offset
      *
      * @access public
-     * @return void
+     * @return float
      */
     public function getHighOffset()
     {
@@ -259,7 +258,7 @@ class Partition implements \Iterator, \Countable
      * get partition topic name
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function getTopicName()
     {
@@ -310,7 +309,7 @@ class Partition implements \Iterator, \Countable
      * load next partition
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function loadNextPartition()
     {
@@ -349,7 +348,7 @@ class Partition implements \Iterator, \Countable
     /**
      * set messageSet fetch offset current
      *
-     * @param  intger $offset
+     * @param int $offset
      * @return void
      */
     public function setMessageOffset($offset)
