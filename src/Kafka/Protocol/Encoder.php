@@ -316,7 +316,7 @@ class Encoder extends Protocol
      * @param integer $apiKey
      * @static
      * @access public
-     * @return void
+     * @return string
      */
     public static function requestHeader($clientId, $correlationId, $apiKey)
     {
