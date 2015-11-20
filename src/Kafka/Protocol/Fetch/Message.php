@@ -163,7 +163,7 @@ class Message
      * __toString
      *
      * @access public
-     * @return void
+     * @return string (raw)
      */
     public function __toString()
     {
