@@ -98,6 +98,10 @@ if ($run_as == 'groups') {
 exit($result);
 
 // Functions
+/**
+ * @param $phpunit_conf
+ * @return array
+ */
 function getAll($phpunit_conf)
 {
     $components = array();

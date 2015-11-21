@@ -77,7 +77,7 @@ class Client
      * __construct
      *
      * @access public
-     * @return void
+     * @param ClusterMetaData $metadata
      */
     public function __construct(ClusterMetaData $metadata)
     {
@@ -219,8 +219,9 @@ class Client
      * get broker broker connect
      *
      * @param string $host
-     * @access private
+     * @param null $lockKey
      * @return array
+     * @access private
      */
     public function getStream($host, $lockKey = null)
     {

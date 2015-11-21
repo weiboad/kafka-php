@@ -96,6 +96,9 @@ class Produce
      * set send messages
      *
      * @access public
+     * @param $hostList
+     * @param $timeout
+     * @param null $kafkaHostList
      * @return Produce
      */
     public static function getInstance($hostList, $timeout, $kafkaHostList = null)
@@ -114,6 +117,9 @@ class Produce
      * __construct
      *
      * @access public
+     * @param $hostList
+     * @param null $timeout
+     * @param null $kafkaHostList
      */
     public function __construct($hostList, $timeout = null, $kafkaHostList = null)
     {
@@ -134,6 +140,9 @@ class Produce
      * set send messages
      *
      * @access public
+     * @param $topicName
+     * @param int $partitionId
+     * @param array $messages
      * @return Produce
      */
     public function setMessages($topicName, $partitionId = 0, $messages = array())
@@ -267,6 +276,7 @@ class Produce
      * get available partition
      *
      * @access public
+     * @param $topicName
      * @return array
      */
     public function getAvailablePartitions($topicName)

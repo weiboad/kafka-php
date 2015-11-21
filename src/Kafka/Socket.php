@@ -99,7 +99,12 @@ class Socket
      * __construct
      *
      * @access public
-     * @return void
+     * @param $host
+     * @param $port
+     * @param int $recvTimeoutSec
+     * @param int $recvTimeoutUsec
+     * @param int $sendTimeoutSec
+     * @param int $sendTimeoutUsec
      */
     public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
     {
@@ -153,6 +158,7 @@ class Socket
      *
      * @static
      * @access public
+     * @param $stream
      * @return Socket
      */
     public static function createFromStream($stream)

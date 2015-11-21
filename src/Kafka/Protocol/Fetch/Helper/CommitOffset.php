@@ -46,7 +46,7 @@ class CommitOffset extends HelperAbstract
      * __construct
      *
      * @access public
-     * @return void
+     * @param $client
      */
     public function __construct($client)
     {
@@ -60,7 +60,7 @@ class CommitOffset extends HelperAbstract
      * set consumer group
      *
      * @access public
-     * @return void
+     * @param $group
      */
     public function setGroup($group)
     {

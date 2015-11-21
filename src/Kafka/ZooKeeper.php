@@ -84,7 +84,8 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      * __construct
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param null $timeout
      */
     public function __construct($hostList, $timeout = null)
     {
@@ -204,10 +205,10 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * register consumer
      *
-     * @param string $topicName
-     * @param integer $partitionId
+     * @param $groupId
+     * @param integer $consumerId
+     * @param array $topics
      * @access public
-     * @return void
      */
     public function registerConsumer($groupId, $consumerId, $topics = array())
     {

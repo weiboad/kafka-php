@@ -67,6 +67,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
      * getData
      *
      * @access public
+     * @param $len
      * @return string
      */
     public function getData($len)
@@ -112,13 +113,13 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(\bin2hex($expect), '000000181f8b08000000000000032b492d2e01000c7e7fd804000000');
 
         try {
-            $expect = Encoder::encodeString('test', Encoder::PACK_INT32, Encoder::COMPRESSION_SNAPPY);
+            Encoder::encodeString('test', Encoder::PACK_INT32, Encoder::COMPRESSION_SNAPPY);
         } catch (\Kafka\Exception\NotSupported $e) {
             $this->assertSame('SNAPPY compression not yet implemented', $e->getMessage());
         }
 
         try {
-            $expect = Encoder::encodeString('test', Encoder::PACK_INT32, 4);
+            Encoder::encodeString('test', Encoder::PACK_INT32, 4);
         } catch (\Kafka\Exception\NotSupported $e) {
             $this->assertSame('Unknown compression flag: 4', $e->getMessage());
         }
@@ -635,7 +636,6 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
     {
         $encoder = new \Kafka\Protocol\Encoder($this->stream);
 
-        $data = array();
         try {
             $encoder->metadataRequest(null);
         } catch (\Kafka\Exception\Protocol $e) {

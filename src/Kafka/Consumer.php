@@ -109,6 +109,8 @@ class Consumer
      * set send messages
      *
      * @access public
+     * @param $hostList
+     * @param null $timeout
      * @return Consumer
      */
     public static function getInstance($hostList, $timeout = null)
@@ -127,6 +129,8 @@ class Consumer
      * __construct
      *
      * @access public
+     * @param $hostList
+     * @param null $timeout
      */
     private function __construct($hostList, $timeout = null)
     {
@@ -155,6 +159,8 @@ class Consumer
      * set topic name
      *
      * @access public
+     * @param $topicName
+     * @param null $defaultOffset
      * @return Consumer
      */
     public function setTopic($topicName, $defaultOffset = null)
@@ -179,6 +185,9 @@ class Consumer
      * set topic partition
      *
      * @access public
+     * @param $topicName
+     * @param int $partitionId
+     * @param null $offset
      * @return Consumer
      */
     public function setPartition($topicName, $partitionId = 0, $offset = null)
@@ -259,7 +268,6 @@ class Consumer
             return false;
         }
 
-        $responseData = array();
         $streams = array();
         foreach ($data as $host => $requestData) {
             $connArr = $this->client->getStream($host);

@@ -64,7 +64,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
      * getData
      *
      * @access public
-     * @return void
+     * @param $data
      */
     public function setData($data)
     {
@@ -142,7 +142,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->produceResponse();
+            $decoder->produceResponse();
         } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('produce response invalid.', $e->getMessage());
         }
@@ -209,7 +209,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->metadataResponse();
+            $decoder->metadataResponse();
         } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('metaData response invalid.', $e->getMessage());
         }
@@ -255,7 +255,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->offsetResponse();
+            $decoder->offsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('offset response invalid.', $e->getMessage());
         }
@@ -300,7 +300,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->commitOffsetResponse();
+            $decoder->commitOffsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('commit offset response invalid.', $e->getMessage());
         }
@@ -440,7 +440,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
         $this->setData(Decoder::Khex2bin('00000000'));
         $decoder = new \Kafka\Protocol\Decoder($this->stream);
         try {
-            $actual  = $decoder->fetchOffsetResponse();
+            $decoder->fetchOffsetResponse();
         } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('fetch offset response invalid.', $e->getMessage());
         }

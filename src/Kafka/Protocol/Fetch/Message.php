@@ -99,7 +99,6 @@ class Message
      *
      * @param string(raw) $msg
      * @access public
-     * @return void
      */
     public function __construct($msg)
     {

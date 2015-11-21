@@ -34,7 +34,6 @@ class Decoder extends Protocol
     /**
      * decode produce response
      *
-     * @param string $data
      * @access public
      * @return array
      */
@@ -86,9 +85,8 @@ class Decoder extends Protocol
     /**
      * decode fetch response
      *
-     * @param string $data
      * @access public
-     * @return Iterator
+     * @return \Iterator
      */
     public function fetchResponse()
     {
@@ -101,13 +99,11 @@ class Decoder extends Protocol
     /**
      * decode metadata response
      *
-     * @param string $data
      * @access public
      * @return array
      */
     public function metadataResponse()
     {
-        $result = array();
         $broker = array();
         $topic = array();
         $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
@@ -202,7 +198,6 @@ class Decoder extends Protocol
     /**
      * decode offset response
      *
-     * @param string $data
      * @access public
      * @return array
      */
@@ -257,7 +252,6 @@ class Decoder extends Protocol
     /**
      * decode commit offset response
      *
-     * @param string $data
      * @access public
      * @return array
      */
@@ -303,7 +297,6 @@ class Decoder extends Protocol
     /**
      * decode fetch offset response
      *
-     * @param string $data
      * @access public
      * @return array
      */
@@ -368,7 +361,6 @@ class Decoder extends Protocol
      */
     public static function getError($errCode)
     {
-        $error = '';
         switch($errCode) {
             case 0:
                 $error = 'No error--it worked!';
