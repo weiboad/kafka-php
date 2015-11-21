@@ -128,7 +128,7 @@ class Topic implements \Iterator, \Countable
      * __construct
      *
      * @param \Kafka\Socket|array $streams
-     * @param array context
+     * @param array $context
      * @access public
      */
     public function __construct($streams, $context = array())
