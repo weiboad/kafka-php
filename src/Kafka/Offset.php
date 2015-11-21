@@ -192,7 +192,7 @@ class Offset
      *   if defaultOffset -1 instead of early offset
      *   if defaultOffset -2 instead of last offset
      * @access public
-     * @return void
+     * @return int
      */
     public function getOffset($defaultOffset = self::DEFAULT_LAST)
     {

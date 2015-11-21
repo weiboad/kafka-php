@@ -153,7 +153,7 @@ class Socket
      *
      * @static
      * @access public
-     * @return void
+     * @return Socket
      */
     public static function createFromStream($stream)
     {
@@ -184,7 +184,7 @@ class Socket
      * Connects the socket
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function connect()
     {
@@ -246,7 +246,7 @@ class Socket
      * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
      *
      * @return string Binary data
-     * @throws Kafka_Exception_Socket
+     * @throws \Kafka\Exception\SocketEOF
      */
     public function read($len, $verifyExactLength = false)
     {
@@ -311,7 +311,7 @@ class Socket
      * @param string $buf The data to write
      *
      * @return integer
-     * @throws Kafka_Exception_Socket
+     * @throws \Kafka\Exception\SocketEOF
      */
     public function write($buf)
     {

@@ -151,7 +151,7 @@ class Client
      * get broker server
      *
      * @access public
-     * @return void
+     * @return array
      */
     public function getBrokers()
     {
@@ -220,7 +220,7 @@ class Client
      *
      * @param string $host
      * @access private
-     * @return void
+     * @return array
      */
     public function getStream($host, $lockKey = null)
     {

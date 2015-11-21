@@ -67,7 +67,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
      * getData
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function getData($len)
     {

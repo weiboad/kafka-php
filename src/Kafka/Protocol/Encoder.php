@@ -37,7 +37,7 @@ class Encoder extends Protocol
      * @param array $payloads
      * @static
      * @access public
-     * @return void
+     * @return int
      */
     public function produceRequest($payloads, $compression = self::COMPRESSION_NONE)
     {
