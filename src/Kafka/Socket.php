@@ -190,12 +190,12 @@ class Socket
      * Connects the socket
      *
      * @access public
-     * @return bool
+     * @return void
      */
     public function connect()
     {
         if (is_resource($this->stream)) {
-            return false;
+            return;
         }
 
         if (empty($this->host)) {

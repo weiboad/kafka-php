@@ -97,7 +97,7 @@ class Helper
     public static function onStreamEof($streamKey)
     {
         if (empty(self::$helpers)) {
-            return false;
+            return;
         }
 
         foreach (self::$helpers as $key => $helper) {
@@ -121,7 +121,7 @@ class Helper
     public static function onTopicEof($topicName)
     {
         if (empty(self::$helpers)) {
-            return false;
+            return;
         }
 
         foreach (self::$helpers as $key => $helper) {
@@ -145,7 +145,7 @@ class Helper
     public static function onPartitionEof($partition)
     {
         if (empty(self::$helpers)) {
-            return false;
+            return;
         }
 
         foreach (self::$helpers as $key => $helper) {
