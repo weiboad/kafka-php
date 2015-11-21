@@ -20,8 +20,7 @@ class Consumer extends HelperAbstract
         $this->consumer = $consumer;
     }
 
-
-	/**
+    /**
      * @param \Kafka\Protocol\Fetch\Partition $partition
      */
     public function onPartitionEof($partition)
@@ -33,7 +32,7 @@ class Consumer extends HelperAbstract
         $this->consumer->setPartition($topicName, $partitionId, ($offset +1));
     }
 
-	/**
+    /**
      * @param string $streamKey
      */
     public function onStreamEof($streamKey)
@@ -41,7 +40,7 @@ class Consumer extends HelperAbstract
 
     }
 
-	/**
+    /**
      * @param string $topicName
      */
     public function onTopicEof($topicName)

@@ -117,7 +117,7 @@ class MetaDataFromKafka implements ClusterMetaData
     // }}}
     // {{{ public function getPartitionState()
 
-	/**
+    /**
      * @param string $topicName
      * @param int $partitionId
      * @return null
