@@ -46,7 +46,7 @@ class FreeStream extends HelperAbstract
      * __construct
      *
      * @access public
-     * @return void
+     * @param $client
      */
     public function __construct($client)
     {
@@ -60,7 +60,7 @@ class FreeStream extends HelperAbstract
      * set streams
      *
      * @access public
-     * @return void
+     * @param $streams
      */
     public function setStreams($streams)
     {

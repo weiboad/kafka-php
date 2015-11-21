@@ -41,6 +41,8 @@ class Encoder extends KEncoder
      * encodeMessage
      *
      * @access public
+     * @param $message
+     * @param int $compression
      * @return string
      */
     public static function encodeMessage($message, $compression = self::COMPRESSION_NONE)
@@ -55,6 +57,8 @@ class Encoder extends KEncoder
      * encodeProcudePartion
      *
      * @access public
+     * @param $values
+     * @param $compression
      * @return string
      */
     public static function encodeProcudePartion($values, $compression)
@@ -69,6 +73,8 @@ class Encoder extends KEncoder
      * encodeProcudeTopic
      *
      * @access public
+     * @param $values
+     * @param $compression
      * @return string
      */
     public static function encodeProcudeTopic($values, $compression)
@@ -83,6 +89,7 @@ class Encoder extends KEncoder
      * encodeFetchPartion
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeFetchPartion($values)
@@ -97,6 +104,7 @@ class Encoder extends KEncoder
      * encodeFetchTopic
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeFetchTopic($values)
@@ -111,6 +119,7 @@ class Encoder extends KEncoder
      * encodeOffsetPartion
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeOffsetPartion($values)
@@ -125,6 +134,7 @@ class Encoder extends KEncoder
      * encodeOffsetTopic
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeOffsetTopic($values)
@@ -139,6 +149,7 @@ class Encoder extends KEncoder
      * encodeCommitOffsetPartion
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeCommitOffsetPartion($values)
@@ -153,6 +164,7 @@ class Encoder extends KEncoder
      * encodeCommitOffset
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeCommitOffset($values)
@@ -167,6 +179,7 @@ class Encoder extends KEncoder
      * encodeFetchOffsetPartion
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeFetchOffsetPartion($values)
@@ -181,6 +194,7 @@ class Encoder extends KEncoder
      * encodeFetchOffset
      *
      * @access public
+     * @param $values
      * @return string
      */
     public static function encodeFetchOffset($values)

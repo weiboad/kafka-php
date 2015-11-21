@@ -14,8 +14,6 @@
 
 namespace Kafka;
 
-use \Kafka\Log;
-
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -119,7 +117,10 @@ class Offset
      * __construct
      *
      * @access public
-     * @return void
+     * @param $client
+     * @param $groupId
+     * @param $topicName
+     * @param int $partitionId
      */
     public function __construct($client, $groupId, $topicName, $partitionId = 0)
     {
@@ -257,8 +258,7 @@ class Offset
     /**
      * get produce server offset
      *
-     * @param string $topicName
-     * @param integer $partitionId
+     * @param integer $timeLine
      * @access public
      * @return int
      */

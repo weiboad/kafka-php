@@ -48,7 +48,7 @@ class Log
      * setLog
      *
      * @access public
-     * @return void
+     * @param $log
      */
     public static function setLog($log)
     {
@@ -64,7 +64,8 @@ class Log
      * log
      *
      * @access public
-     * @return void
+     * @param $message
+     * @param int $level
      */
     public static function log($message, $level = LOG_DEBUG)
     {

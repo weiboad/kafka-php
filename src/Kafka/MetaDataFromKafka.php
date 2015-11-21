@@ -117,6 +117,11 @@ class MetaDataFromKafka implements ClusterMetaData
     // }}}
     // {{{ public function getPartitionState()
 
+    /**
+     * @param string $topicName
+     * @param int $partitionId
+     * @return null
+     */
     public function getPartitionState($topicName, $partitionId = 0)
     {
         if (!isset( $this->topics[$topicName] ) ) {
@@ -164,6 +169,9 @@ class MetaDataFromKafka implements ClusterMetaData
     // }}}
     // {{{ private function loadTopicDetail()
 
+    /**
+     * @param array $topics
+     */
     private function loadTopicDetail(array $topics)
     {
         if ($this->client === null) {

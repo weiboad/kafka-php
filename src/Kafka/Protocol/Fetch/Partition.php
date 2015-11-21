@@ -128,7 +128,7 @@ class Partition implements \Iterator, \Countable
      * __construct
      *
      * @param \Kafka\Protocol\Fetch\Topic $topic
-     * @param int $initOffset
+     * @param array $context
      * @access public
      */
     public function __construct(\Kafka\Protocol\Fetch\Topic $topic, $context = array())
