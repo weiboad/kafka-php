@@ -33,22 +33,6 @@ class Message
     // {{{ members
 
     /**
-     * init read bytes
-     *
-     * @var float
-     * @access private
-     */
-    private $initOffset = 0;
-
-    /**
-     * validByteCount
-     *
-     * @var float
-     * @access private
-     */
-    private $validByteCount = 0;
-
-    /**
      * crc32 code
      *
      * @var float

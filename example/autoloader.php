@@ -23,6 +23,7 @@ spl_autoload_register(function($className)
 	if (function_exists('stream_resolve_include_path')) {
 		$file = stream_resolve_include_path($classFile);
 	} else {
+		$file = false;
 		foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {
 			if (file_exists($path . '/' . $classFile)) {
 				$file = $path . '/' . $classFile;

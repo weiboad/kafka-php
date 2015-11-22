@@ -73,22 +73,6 @@ class Consumer
     private static $instance = null;
 
     /**
-     * broker host list
-     *
-     * @var array
-     * @access private
-     */
-    private $hostList = array();
-
-    /**
-     * save broker connection
-     *
-     * @var array
-     * @access private
-     */
-    private $stream = array();
-
-    /**
      * maxSize
      *
      * @var integer
