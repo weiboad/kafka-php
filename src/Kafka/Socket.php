@@ -32,6 +32,13 @@ class Socket
 
     const READ_MAX_LEN = 5242880; // read socket max length 5MB
 
+    /**
+     * max write socket buffer
+     * fixed:send of 8192 bytes failed with errno=11 Resource temporarily
+     * unavailable error info
+     */
+    const MAX_WRITE_BUFFER = 4096;
+
     // }}}
     // {{{ members
 
@@ -332,8 +339,12 @@ class Socket
             // wait for stream to become available for writing
             $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
             if ($writable > 0) {
-                // write remaining buffer bytes to stream
-                $wrote = fwrite($this->stream, substr($buf, $written));
+                if ($buflen - $written > self::MAX_WRITE_BUFFER) {
+                    $wrote = fwrite($this->stream, substr($buf, $written, self::MAX_WRITE_BUFFER));
+                } else {
+                    // write remaining buffer bytes to stream
+                    $wrote = fwrite($this->stream, substr($buf, $written));
+                }
                 if ($wrote === -1 || $wrote === false) {
                     throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
                 }
