@@ -340,6 +340,7 @@ class Socket
             $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
             if ($writable > 0) {
                 if ($buflen - $written > self::MAX_WRITE_BUFFER) {
+                    // write max buffer size
                     $wrote = fwrite($this->stream, substr($buf, $written, self::MAX_WRITE_BUFFER));
                 } else {
                     // write remaining buffer bytes to stream
