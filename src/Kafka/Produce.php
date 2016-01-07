@@ -72,22 +72,6 @@ class Produce
      */
     private static $instance = null;
 
-    /**
-     * broker host list
-     *
-     * @var array
-     * @access private
-     */
-    private $hostList = array();
-
-    /**
-     * save broker connection
-     *
-     * @var array
-     * @access private
-     */
-    private $stream = array();
-
     // }}}
     // {{{ functions
     // {{{ public function static getInstance()
@@ -96,7 +80,10 @@ class Produce
      * set send messages
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param $timeout
+     * @param null $kafkaHostList
+     * @return Produce
      */
     public static function getInstance($hostList, $timeout, $kafkaHostList = null)
     {
@@ -114,7 +101,9 @@ class Produce
      * __construct
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param null $timeout
+     * @param null $kafkaHostList
      */
     public function __construct($hostList, $timeout = null, $kafkaHostList = null)
     {
@@ -135,7 +124,10 @@ class Produce
      * set send messages
      *
      * @access public
-     * @return void
+     * @param $topicName
+     * @param int $partitionId
+     * @param array $messages
+     * @return Produce
      */
     public function setMessages($topicName, $partitionId = 0, $messages = array())
     {
@@ -166,7 +158,7 @@ class Produce
      *
      * @param int $ack
      * @access public
-     * @return void
+     * @return Produce
      */
     public function setRequireAck($ack = 0)
     {
@@ -185,7 +177,7 @@ class Produce
      *
      * @param int $timeout
      * @access public
-     * @return void
+     * @return Produce
      */
     public function setTimeOut($timeout = 100)
     {
@@ -202,7 +194,7 @@ class Produce
      * send message to broker
      *
      * @access public
-     * @return void
+     * @return bool|array
      */
     public function send()
     {
@@ -243,7 +235,7 @@ class Produce
      * get client object
      *
      * @access public
-     * @return void
+     * @return Client
      */
     public function getClient()
     {
@@ -268,6 +260,7 @@ class Produce
      * get available partition
      *
      * @access public
+     * @param $topicName
      * @return array
      */
     public function getAvailablePartitions($topicName)

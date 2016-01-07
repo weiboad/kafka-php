@@ -84,7 +84,8 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      * __construct
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param null $timeout
      */
     public function __construct($hostList, $timeout = null)
     {
@@ -129,7 +130,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      *
      * @param integer $brokerId
      * @access public
-     * @return void
+     * @return string|bool
      */
     public function getBrokerDetail($brokerId)
     {
@@ -155,7 +156,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      *
      * @param string $topicName
      * @access public
-     * @return void
+     * @return string|bool
      */
     public function getTopicDetail($topicName)
     {
@@ -181,7 +182,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      * @param string $topicName
      * @param integer $partitionId
      * @access public
-     * @return void
+     * @return string|bool
      */
     public function getPartitionState($topicName, $partitionId = 0)
     {
@@ -204,15 +205,15 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * register consumer
      *
-     * @param string $topicName
-     * @param integer $partitionId
+     * @param $groupId
+     * @param integer $consumerId
+     * @param array $topics
      * @access public
-     * @return void
      */
     public function registerConsumer($groupId, $consumerId, $topics = array())
     {
         if (empty($topics)) {
-            return true;
+            return;
         }
 
         $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
@@ -241,7 +242,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      *
      * @param string $groupId
      * @access public
-     * @return void
+     * @return array
      */
     public function listConsumer($groupId)
     {

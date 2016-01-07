@@ -32,6 +32,13 @@ class Socket
 
     const READ_MAX_LEN = 5242880; // read socket max length 5MB
 
+    /**
+     * max write socket buffer
+     * fixed:send of 8192 bytes failed with errno=11 Resource temporarily
+     * unavailable error info
+     */
+    const MAX_WRITE_BUFFER = 4096;
+
     // }}}
     // {{{ members
 
@@ -99,7 +106,12 @@ class Socket
      * __construct
      *
      * @access public
-     * @return void
+     * @param $host
+     * @param $port
+     * @param int $recvTimeoutSec
+     * @param int $recvTimeoutUsec
+     * @param int $sendTimeoutSec
+     * @param int $sendTimeoutUsec
      */
     public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
     {
@@ -153,7 +165,8 @@ class Socket
      *
      * @static
      * @access public
-     * @return void
+     * @param $stream
+     * @return Socket
      */
     public static function createFromStream($stream)
     {
@@ -189,7 +202,7 @@ class Socket
     public function connect()
     {
         if (is_resource($this->stream)) {
-            return false;
+            return;
         }
 
         if (empty($this->host)) {
@@ -246,7 +259,7 @@ class Socket
      * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
      *
      * @return string Binary data
-     * @throws Kafka_Exception_Socket
+     * @throws \Kafka\Exception\SocketEOF
      */
     public function read($len, $verifyExactLength = false)
     {
@@ -311,7 +324,7 @@ class Socket
      * @param string $buf The data to write
      *
      * @return integer
-     * @throws Kafka_Exception_Socket
+     * @throws \Kafka\Exception\SocketEOF
      */
     public function write($buf)
     {
@@ -326,8 +339,13 @@ class Socket
             // wait for stream to become available for writing
             $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
             if ($writable > 0) {
-                // write remaining buffer bytes to stream
-                $wrote = fwrite($this->stream, substr($buf, $written));
+                if ($buflen - $written > self::MAX_WRITE_BUFFER) {
+                    // write max buffer size
+                    $wrote = fwrite($this->stream, substr($buf, $written, self::MAX_WRITE_BUFFER));
+                } else {
+                    // write remaining buffer bytes to stream
+                    $wrote = fwrite($this->stream, substr($buf, $written));
+                }
                 if ($wrote === -1 || $wrote === false) {
                     throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
                 }

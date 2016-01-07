@@ -127,10 +127,9 @@ class Topic implements \Iterator, \Countable
     /**
      * __construct
      *
-     * @param \Kafka\Socket $stream
-     * @param int $initOffset
+     * @param \Kafka\Socket|array $streams
+     * @param array $context
      * @access public
-     * @return void
      */
     public function __construct($streams, $context = array())
     {
@@ -168,7 +167,7 @@ class Topic implements \Iterator, \Countable
      * current
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     public function current()
     {
@@ -182,7 +181,7 @@ class Topic implements \Iterator, \Countable
      * key
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function key()
     {
@@ -196,7 +195,7 @@ class Topic implements \Iterator, \Countable
      * implements Iterator function
      *
      * @access public
-     * @return integer
+     * @return void
      */
     public function rewind()
     {
@@ -224,7 +223,7 @@ class Topic implements \Iterator, \Countable
      * implements Iterator function
      *
      * @access public
-     * @return integer
+     * @return void
      */
     public function next()
     {
@@ -281,7 +280,7 @@ class Topic implements \Iterator, \Countable
      * load next topic
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function loadNextTopic()
     {

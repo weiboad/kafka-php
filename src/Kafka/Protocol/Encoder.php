@@ -35,9 +35,9 @@ class Encoder extends Protocol
      * produce request
      *
      * @param array $payloads
-     * @static
+     * @param int $compression
+     * @return int
      * @access public
-     * @return void
      */
     public function produceRequest($payloads, $compression = self::COMPRESSION_NONE)
     {
@@ -222,10 +222,11 @@ class Encoder extends Protocol
      * encode pack string type
      *
      * @param string $string
-     * @param int $bytes   self::PACK_INT32: int32 big endian order. self::PACK_INT16: int16 big endian order.
+     * @param int $bytes self::PACK_INT32: int32 big endian order. self::PACK_INT16: int16 big endian order.
+     * @param int $compression
+     * @return string
      * @static
      * @access public
-     * @return string
      */
     public static function encodeString($string, $bytes, $compression = self::COMPRESSION_NONE)
     {
@@ -252,9 +253,10 @@ class Encoder extends Protocol
      *
      * @param array $array
      * @param Callable $func
+     * @param null $options
+     * @return string
      * @static
      * @access public
-     * @return string
      */
     public static function encodeArray(array $array, $func, $options = null)
     {
@@ -285,9 +287,10 @@ class Encoder extends Protocol
      * in the protocol.
      *
      * @param array $messages
+     * @param int $compression
+     * @return string
      * @static
      * @access public
-     * @return string
      */
     public static function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
     {
@@ -316,7 +319,7 @@ class Encoder extends Protocol
      * @param integer $apiKey
      * @static
      * @access public
-     * @return void
+     * @return string
      */
     public static function requestHeader($clientId, $correlationId, $apiKey)
     {
@@ -338,9 +341,10 @@ class Encoder extends Protocol
      * encode signal message
      *
      * @param string $message
+     * @param int $compression
+     * @return string
      * @static
      * @access protected
-     * @return string
      */
     protected static function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
     {
@@ -368,10 +372,12 @@ class Encoder extends Protocol
     /**
      * encode signal part
      *
-     * @param partions
+     * @param $values
+     * @param $compression
+     * @return string
+     * @internal param $partions
      * @static
      * @access protected
-     * @return string
      */
     protected static function _encodeProcudePartion($values, $compression)
     {
@@ -395,10 +401,12 @@ class Encoder extends Protocol
     /**
      * encode signal topic
      *
-     * @param partions
+     * @param $values
+     * @param $compression
+     * @return string
+     * @internal param $partions
      * @static
      * @access protected
-     * @return string
      */
     protected static function _encodeProcudeTopic($values, $compression)
     {

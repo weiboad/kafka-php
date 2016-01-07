@@ -35,7 +35,7 @@ class Consumer
     /**
      * client
      *
-     * @var mixed
+     * @var Client
      * @access private
      */
     private $client = null;
@@ -73,22 +73,6 @@ class Consumer
     private static $instance = null;
 
     /**
-     * broker host list
-     *
-     * @var array
-     * @access private
-     */
-    private $hostList = array();
-
-    /**
-     * save broker connection
-     *
-     * @var array
-     * @access private
-     */
-    private $stream = array();
-
-    /**
      * maxSize
      *
      * @var integer
@@ -109,7 +93,9 @@ class Consumer
      * set send messages
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param null $timeout
+     * @return Consumer
      */
     public static function getInstance($hostList, $timeout = null)
     {
@@ -127,7 +113,8 @@ class Consumer
      * __construct
      *
      * @access public
-     * @return void
+     * @param $hostList
+     * @param null $timeout
      */
     private function __construct($hostList, $timeout = null)
     {
@@ -156,7 +143,9 @@ class Consumer
      * set topic name
      *
      * @access public
-     * @return void
+     * @param $topicName
+     * @param null $defaultOffset
+     * @return Consumer
      */
     public function setTopic($topicName, $defaultOffset = null)
     {
@@ -180,7 +169,10 @@ class Consumer
      * set topic partition
      *
      * @access public
-     * @return void
+     * @param $topicName
+     * @param int $partitionId
+     * @param null $offset
+     * @return Consumer
      */
     public function setPartition($topicName, $partitionId = 0, $offset = null)
     {
@@ -236,7 +228,7 @@ class Consumer
      *
      * @param string $group
      * @access public
-     * @return void
+     * @return Consumer
      */
     public function setGroup($group)
     {
@@ -251,7 +243,7 @@ class Consumer
      * fetch message to broker
      *
      * @access public
-     * @return void
+     * @return \Kafka\Protocol\Fetch\Topic|bool
      */
     public function fetch()
     {
@@ -260,7 +252,6 @@ class Consumer
             return false;
         }
 
-        $responseData = array();
         $streams = array();
         foreach ($data as $host => $requestData) {
             $connArr = $this->client->getStream($host);
@@ -295,7 +286,7 @@ class Consumer
      * get client object
      *
      * @access public
-     * @return void
+     * @return Client
      */
     public function getClient()
     {
@@ -366,7 +357,7 @@ class Consumer
      * const EARLIEST_OFFSET = -2;
      * const DEFAULT_LAST  = -2;
      * const DEFAULT_EARLY = -1;
-     * @param type $offsetStrategy
+     * @param int $offsetStrategy
      */
     public function setOffsetStrategy($offsetStrategy)
     {

@@ -26,6 +26,10 @@
 include_once __DIR__ . '/../vendor/autoload.php';
 
 spl_autoload_register('autoload');
+/**
+ * @param $className
+ * @return bool
+ */
 function autoload($className)
 {
     $basePath = dirname(dirname(__FILE__)) . '/tests/';

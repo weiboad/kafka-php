@@ -33,22 +33,6 @@ class Message
     // {{{ members
 
     /**
-     * init read bytes
-     *
-     * @var float
-     * @access private
-     */
-    private $initOffset = 0;
-
-    /**
-     * validByteCount
-     *
-     * @var float
-     * @access private
-     */
-    private $validByteCount = 0;
-
-    /**
      * crc32 code
      *
      * @var float
@@ -99,7 +83,6 @@ class Message
      *
      * @param string(raw) $msg
      * @access public
-     * @return void
      */
     public function __construct($msg)
     {
@@ -163,7 +146,7 @@ class Message
      * __toString
      *
      * @access public
-     * @return void
+     * @return string (raw)
      */
     public function __toString()
     {

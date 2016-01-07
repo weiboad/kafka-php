@@ -87,6 +87,11 @@ class MessageSet implements \Iterator
      */
     private $context = array();
 
+    /**
+     * @var Message
+     */
+    private $current = null;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -94,10 +99,9 @@ class MessageSet implements \Iterator
     /**
      * __construct
      *
-     * @param \Kafka\Socket $stream
-     * @param int $initOffset
+     * @param Partition $partition
+     * @param array $context
      * @access public
-     * @return void
      */
     public function __construct(\Kafka\Protocol\Fetch\Partition $partition, $context = array())
     {
@@ -115,7 +119,7 @@ class MessageSet implements \Iterator
      * current
      *
      * @access public
-     * @return void
+     * @return Message
      */
     public function current()
     {
@@ -129,7 +133,7 @@ class MessageSet implements \Iterator
      * key
      *
      * @access public
-     * @return void
+     * @return float
      */
     public function key()
     {
@@ -178,7 +182,7 @@ class MessageSet implements \Iterator
      * implements Iterator function
      *
      * @access public
-     * @return integer
+     * @return void
      */
     public function next()
     {
@@ -214,7 +218,7 @@ class MessageSet implements \Iterator
      * load next message
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function loadNextMessage()
     {
@@ -257,7 +261,7 @@ class MessageSet implements \Iterator
     /**
      * current message offset in producer
      *
-     * @return void
+     * @return float
      */
     public function messageOffset()
     {
