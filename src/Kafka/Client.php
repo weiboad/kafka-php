@@ -183,7 +183,7 @@ class Client
             $hostList = $this->getBrokers();
             if (isset($partitionInfo['leader']) && isset($hostList[$partitionInfo['leader']])) {
                 return $hostList[$partitionInfo['leader']];
-            } else if ($retryAttempts == 0) {
+            } elseif ($retryAttempts == 0) {
                 // Its possible a broker dropped out of the cluster during the lifetime of our process
                 // We should refresh our cached metadata and retry once.
                 $this->metadata->refreshMetadata();
