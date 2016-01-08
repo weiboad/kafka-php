@@ -108,7 +108,7 @@ class MetaDataFromKafka implements ClusterMetaData
      */
     public function listBrokers()
     {
-        if (count($this->brokers) == 0) {
+        if ($this->brokers === null || count($this->brokers) == 0) {
             $this->loadBrokers();
         }
         return $this->brokers;
