@@ -165,7 +165,7 @@ class MessageSet implements \Iterator
      */
     public function valid()
     {
-        if (!$this->valid) {
+        if (!$this->valid && $this->messageSetSize != 0) {
             $this->partition->setMessageOffset($this->offset);
 
             // one partition iterator end
@@ -204,7 +204,7 @@ class MessageSet implements \Iterator
         $data = $this->stream->read(4, true);
         $data = Decoder::unpack(Decoder::BIT_B32, $data);
         $size = array_shift($data);
-        if ($size <= 0) {
+        if ($size < 0) {
             throw new \Kafka\Exception\OutOfRange($size . ' is not a valid message size');
         }
 
