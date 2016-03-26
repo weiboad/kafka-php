@@ -32,6 +32,7 @@
                 <env key="COMPOSER_ROOT_VERSION" value="dev-master"/>
                 <arg value="install" />
                 <arg value="--prefer-source" />
+                <arg value="--disable-tls" />
             </exec>
         </sequential>
     </target>
