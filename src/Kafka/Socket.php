@@ -98,6 +98,13 @@ class Socket
      */
     private $port = -1;
 
+    /**
+     * Max Write Attempts
+     * @var int
+     * @access private
+     */
+    private $maxWriteAttempts = 3;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -155,7 +162,13 @@ class Socket
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
 
-
+    /**
+     * @param int $number
+     */
+    public function setMaxWriteAttempts($number)
+    {
+        $this->maxWriteAttempts = $number;
+    }
 
     // }}}
     // {{{ public static function createFromStream()
@@ -333,6 +346,7 @@ class Socket
 
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
+        $failedWriteAttempts = 0;
         $written = 0;
         $buflen = strlen($buf);
         while ( $written < $buflen ) {
@@ -348,7 +362,16 @@ class Socket
                 }
                 if ($wrote === -1 || $wrote === false) {
                     throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
+                } elseif ($wrote === 0) {
+                    // Increment the number of times we have failed
+                    $failedWriteAttempts++;
+                if ($failedWriteAttempts > $this->maxWriteAttempts) {
+                    throw new \Kafka\Exception\Socket('After ' . $failedWriteAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
                 }
+            } else {
+                // If we wrote something, reset our failed attempt counter
+                $failedWriteAttempts = 0;
+            }
                 $written += $wrote;
                 continue;
             }
