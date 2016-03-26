@@ -50,7 +50,7 @@ class MetaDataFromKafka implements ClusterMetaData
     private $hostList;
 
     /**
-     * List of all kafka brokers
+     * Cached list of all kafka brokers
      *
      * @var array
      * @access private
@@ -58,7 +58,7 @@ class MetaDataFromKafka implements ClusterMetaData
     private $brokers = array();
 
     /**
-     * List of all loaded topic metadata
+     * Cached list of all loaded topic metadata
      *
      * @var array
      * @access private
@@ -108,7 +108,7 @@ class MetaDataFromKafka implements ClusterMetaData
      */
     public function listBrokers()
     {
-        if ($this->brokers === null) {
+        if ($this->brokers === null || count($this->brokers) == 0) {
             $this->loadBrokers();
         }
         return $this->brokers;
@@ -201,6 +201,19 @@ class MetaDataFromKafka implements ClusterMetaData
         } else {
             throw new \Kafka\Exception('Could not connect to any kafka brokers');
         }
+    }
+
+    // }}}
+    // {{{ public function refreshMetadata()
+
+    /**
+     * Clear internal caches
+     * @return null
+     */
+    public function refreshMetadata()
+    {
+        $this->brokers = array();
+        $this->topics = array();
     }
 
     // }}}

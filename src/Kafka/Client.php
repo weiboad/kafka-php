@@ -41,14 +41,6 @@ class Client
     private $metadata = null;
 
     /**
-     * broker host list
-     *
-     * @var array
-     * @access private
-     */
-    private $hostList = array();
-
-    /**
      * save broker connection
      *
      * @var array
@@ -155,17 +147,17 @@ class Client
      */
     public function getBrokers()
     {
-        if (empty($this->hostList)) {
-            $brokerList = $this->metadata->listBrokers();
-            foreach ($brokerList as $brokerId => $info) {
-                if (!isset($info['host']) || !isset($info['port'])) {
-                    continue;
-                }
-                $this->hostList[$brokerId] = $info['host'] . ':' . $info['port'];
-            }
-        }
+        $hostList = array();
 
-        return $this->hostList;
+        // Get broker list from metadata
+        $brokerList = $this->metadata->listBrokers();
+        foreach ($brokerList as $brokerId => $info) {
+            if (!isset($info['host']) || !isset($info['port'])) {
+                continue;
+            }
+            $hostList[$brokerId] = $info['host'] . ':' . $info['port'];
+        }
+        return $hostList;
     }
 
     // }}}
@@ -181,17 +173,25 @@ class Client
      */
     public function getHostByPartition($topicName, $partitionId = 0)
     {
-        $partitionInfo = $this->metadata->getPartitionState($topicName, $partitionId);
-        if (!$partitionInfo) {
-            throw new \Kafka\Exception('topic:' . $topicName . ', partition id: ' . $partitionId . ' is not exists.');
-        }
+        $retryAttempts = 0;
+        do {
+            $partitionInfo = $this->metadata->getPartitionState($topicName, $partitionId);
+            if (!$partitionInfo) {
+                throw new \Kafka\Exception('topic:' . $topicName . ', partition id: ' . $partitionId . ' is not exists.');
+            }
 
-        $hostList = $this->getBrokers();
-        if (isset($partitionInfo['leader']) && isset($hostList[$partitionInfo['leader']])) {
-            return $hostList[$partitionInfo['leader']];
-        } else {
-            throw new \Kafka\Exception('can\'t find broker host.');
-        }
+            $hostList = $this->getBrokers();
+            if (isset($partitionInfo['leader']) && isset($hostList[$partitionInfo['leader']])) {
+                return $hostList[$partitionInfo['leader']];
+            } elseif ($retryAttempts == 0) {
+                // Its possible a broker dropped out of the cluster during the lifetime of our process
+                // We should refresh our cached metadata and retry once.
+                $this->metadata->refreshMetadata();
+                $retryAttempts++;
+            } else {
+                throw new \Kafka\Exception('can\'t find broker host for topic '.$topicName.' partitionId '.$partitionId);
+            }
+        } while ($retryAttempts <= 1);
     }
 
     // }}}

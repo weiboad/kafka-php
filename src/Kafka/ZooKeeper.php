@@ -81,6 +81,14 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     // {{{ public function __construct()
 
     /**
+     * Cached list of all kafka brokers
+     *
+     * @var array
+     * @access private
+     */
+    private $brokers = array();
+
+    /**
      * __construct
      *
      * @access public
@@ -107,19 +115,23 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      */
     public function listBrokers()
     {
-        $result = array();
-        $lists = $this->zookeeper->getChildren(self::BROKER_PATH);
-        if (!empty($lists)) {
-            foreach ($lists as $brokerId) {
-                $brokerDetail = $this->getBrokerDetail($brokerId);
-                if (!$brokerDetail) {
-                    continue;
+        // If broker cache hasn't been populated
+        if (count($this->brokers) == 0) {
+            // Populate broker cache
+            $result = array();
+            $lists = $this->zookeeper->getChildren(self::BROKER_PATH);
+            if (!empty($lists)) {
+                foreach ($lists as $brokerId) {
+                    $brokerDetail = $this->getBrokerDetail($brokerId);
+                    if (!$brokerDetail) {
+                        continue;
+                    }
+                    $result[$brokerId] = $brokerDetail;
                 }
-                $result[$brokerId] = $brokerDetail;
             }
+            $this->brokers = $result;
         }
-
-        return $result;
+        return $this->brokers;
     }
 
     // }}}
@@ -358,6 +370,18 @@ class ZooKeeper implements \Kafka\ClusterMetaData
             )
         );
         return $this->zookeeper->create($path, $value, $params);
+    }
+
+    // }}}
+    // {{{ public function refreshMetadata()
+
+    /**
+     * Clear internal caches
+     * @return null
+     */
+    public function refreshMetadata()
+    {
+        $this->brokers = array();
     }
 
     // }}}

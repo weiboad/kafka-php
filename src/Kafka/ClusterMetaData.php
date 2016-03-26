@@ -50,4 +50,9 @@ interface ClusterMetaData
      * @return array
      */
     public function getTopicDetail($topicName);
+
+    /**
+     * @return null
+     */
+    public function refreshMetadata();
 }
