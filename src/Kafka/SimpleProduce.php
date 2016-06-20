@@ -203,7 +203,7 @@ class SimpleProduce
         }
         $requestData = $this->_formatPayload($messages);
         $this->encoder->produceRequest($requestData);
-        $response = [];
+        $response = array();
         if ((int) $this->requiredAck !== 0) { // get broker response
             $response = $this->decoder->produceResponse();
         }
