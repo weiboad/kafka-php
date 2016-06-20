@@ -11,9 +11,7 @@
 // +---------------------------------------------------------------------------
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
-
 namespace Kafka;
-
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -25,13 +23,11 @@ namespace Kafka;
 * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
 */
-
 class SimpleProduce
 {
     // {{{ consts
     // }}}
     // {{{ members
-
     /**
      * client
      *
@@ -39,7 +35,6 @@ class SimpleProduce
      * @access private
      */
     private $client = null;
-
     /**
      * encoder
      *
@@ -47,7 +42,6 @@ class SimpleProduce
      * @access private
      */
     private $encoder = null;
-    
     /**
      * decoder
      *
@@ -55,7 +49,6 @@ class SimpleProduce
      * @access private
      */
     private $decoder = null;
-
     /**
      * topic
      *
@@ -63,7 +56,6 @@ class SimpleProduce
      * @access private
      */
     private $topic = '';
-
     /**
      * partition
      *
@@ -71,8 +63,6 @@ class SimpleProduce
      * @access private
      */
     private $partition = '';
-
-
     /**
      * default the server will not send any response
      *
@@ -80,7 +70,6 @@ class SimpleProduce
      * @access private
      */
     private $requiredAck = 0;
-
     /**
      * default timeout is 100ms
      *
@@ -88,7 +77,6 @@ class SimpleProduce
      * @access private
      */
     private $timeout = 100;
-
     /**
      * produce instance
      *
@@ -96,11 +84,9 @@ class SimpleProduce
      * @access private
      */
     private static $instance = null;
-
     // }}}
     // {{{ functions
     // {{{ public function static getInstance()
-
     /**
      * set send messages
      *
@@ -115,13 +101,10 @@ class SimpleProduce
         if (is_null(self::$instance)) {
             self::$instance = new self($hostList, $timeout, $kafkaHostList);
         }
-
         return self::$instance;
     }
-
     // }}}
     // {{{ public function __construct()
-
     /**
      * __construct
      *
@@ -141,10 +124,8 @@ class SimpleProduce
         }
         $this->client = new \Kafka\Client($metadata);
     }
-
     // }}}
     // {{{ public function setTopic()
-
     /**
      * set topic
      *
@@ -166,10 +147,8 @@ class SimpleProduce
         }
         return $this;
     }
-
     // }}}
     // {{{ public function setRequireAck()
-
     /**
      * set request mode
      * This field indicates how many acknowledgements the servers should receive
@@ -191,13 +170,10 @@ class SimpleProduce
         if ($ack >= -1) {
             $this->requiredAck = (int) $ack;
         }
-
         return $this;
     }
-
     // }}}
     // {{{ public function setTimeOut()
-
     /**
      * set request timeout
      *
@@ -212,10 +188,8 @@ class SimpleProduce
         }
         return $this;
     }
-
     // }}}
     // {{{ public function send()
-
     /**
      * send message to broker
      *
@@ -235,10 +209,8 @@ class SimpleProduce
         }
         return $response;
     }
-
     // }}}
     // {{{ public function getClient()
-
     /**
      * get client object
      *
@@ -249,7 +221,6 @@ class SimpleProduce
     {
         return $this->client;
     }
-
     /**
      * passthru method to client for setting stream options
      *
@@ -260,10 +231,8 @@ class SimpleProduce
     {
         $this->client->setStreamOptions($options);
     }
-
     // }}}
     // {{{ public function getAvailablePartitions()
-
     /**
      * get available partition
      *
@@ -282,13 +251,10 @@ class SimpleProduce
         } else {
             $topicPartitiions = array();
         }
-
         return $topicPartitiions;
     }
-
     // }}}
     // {{{ private function _formatPayload()
-
     /**
      * format payload array
      *
@@ -307,16 +273,13 @@ class SimpleProduce
             'topic_name' => $this->topic,
             'partitions' => $partitionData,
         );
-
         $requestData = array(
             'required_ack' => $this->requiredAck,
             'timeout'      => $this->timeout,
             'data' => $topicData,
         );
-
        return $requestData;
     }
-
     // }}}
     // }}}
 }
