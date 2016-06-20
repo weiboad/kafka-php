@@ -271,9 +271,12 @@ class SimpleProduce
      * @param $topicName
      * @return array
      */
-    public function getAvailablePartitions($topicName)
+    public function getAvailablePartitions()
     {
-        $topicDetail = $this->client->getTopicDetail($topicName);
+        if (empty($this->topic)) {
+            return array();
+        }
+        $topicDetail = $this->client->getTopicDetail($this->topic);
         if (is_array($topicDetail) && isset($topicDetail['partitions'])) {
             $topicPartitiions = array_keys($topicDetail['partitions']);
         } else {

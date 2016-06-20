@@ -1,11 +1,11 @@
 <?php
 /**************************************************************
 
-  WITH SWOOLE[http://www.swoole.com] connection pool
+  WITH connection pool (SWOOLE[http://www.swoole.com] )
 
-  USE CLASS Produce TPS: 400message/s
+  CLASS Produce TPS: 400message/s
 
-  USE CLASS SIMPLEPRODUCE TPS: 4000message/s
+  CLASS SIMPLEPRODUCE TPS: 4000message/s
 
 
 **************************************************************/
