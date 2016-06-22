@@ -24,6 +24,6 @@
     "require-dev": {
         "satooshi/php-coveralls": "dev-master",
         "phpunit/phpcov": "*",
-        "phpunit/PHPUnit": "*"
+        "phpunit/PHPUnit": "~4.0"
     }
 }
