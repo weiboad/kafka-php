@@ -2,7 +2,8 @@
 require 'autoloader.php';
 
 while (1) {
-    $produce = \Kafka\Produce::getInstance(null, null, '192.168.1.115:9092');
+	$hostList = getenv('KAFKA_LIST_V0_8');
+    $produce = \Kafka\Produce::getInstance(null, null, $hostList);
 
     // get available partitions
     $partitions = $produce->getAvailablePartitions('test');

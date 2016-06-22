@@ -235,7 +235,7 @@ class Encoder extends Protocol
             case self::COMPRESSION_NONE:
                 break;
             case self::COMPRESSION_GZIP:
-                $string = gzencode($string);
+                $string = \gzencode($string);
                 break;
             case self::COMPRESSION_SNAPPY:
                 throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');

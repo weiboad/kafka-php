@@ -4,7 +4,7 @@ require 'autoloader.php';
 $zookeeperList = getenv('ZOOKEEPER_LIST');
 $zk = new \Kafka\ZooKeeper($zookeeperList, 3000);
 $groupId = 'testgroup';
-$consumerId = 1;
+$consumerId = 2;
 $topics = array(
 	'recom_page',				
 );
@@ -22,6 +22,7 @@ $list = $zk->getConsumersPerTopic('testgroup');
 
 var_dump($list);
 //$zk = new \Zookeeper('hadoop11:2181');
+
 
 
 while (1) {

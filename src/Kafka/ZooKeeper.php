@@ -53,7 +53,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * register consumer
      */
-    const REG_CONSUMER = '/consumers/%s/ids/%s';
+    const REG_CONSUMER = '/consumers/%s/ids';
 
     /**
      * list consumer
@@ -63,7 +63,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * partition owner
      */
-    const PARTITION_OWNER = '/consumers/%s/owners/%s/%d';
+    const PARTITION_OWNER = '/consumers/%s/owners/%s';
 
     // }}}
     // {{{ members
@@ -75,6 +75,11 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      * @access private
      */
     private $zookeeper = null;
+
+    /**
+     * @var Callback container
+     */
+    private $callback = array();
 
     // }}}
     // {{{ functions
@@ -228,7 +233,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
             return;
         }
 
-        $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
+        $path = sprintf(self::REG_CONSUMER, (string) $groupId);
         $subData = array();
         foreach ($topics as $topic) {
             $subData[$topic] = 1;
@@ -240,10 +245,15 @@ class ZooKeeper implements \Kafka\ClusterMetaData
         );
         if (!$this->zookeeper->exists($path)) {
             $this->makeZkPath($path);
-            $this->makeZkNode($path, json_encode($data));
-        } else {
-            $this->zookeeper->set($path, json_encode($data));
         }
+        $consumerPath = $path . '/' . $consumerId;
+        if (!$this->zookeeper->exists($consumerPath)) {
+            $this->makeZkPath($consumerPath);
+            $this->makeZkNode($consumerPath, json_encode($data), \ZooKeeper::EPHEMERAL);
+        } else {
+            $this->zookeeper->set($consumerPath, json_encode($data));
+        }
+//var_dump($this->zookeeper->getChildren($path));
     }
 
     // }}}
@@ -259,11 +269,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     public function listConsumer($groupId)
     {
         $path = sprintf(self::LIST_CONSUMER, (string) $groupId);
-        if (!$this->zookeeper->exists($path)) {
-            return array();
-        } else {
-            return $this->zookeeper->getChildren($path);
-        }
+        return $this->zookeeper->getChildren($path);
     }
 
     // }}}
@@ -285,7 +291,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
 
         $topics = array();
         foreach ($consumers as $consumerId) {
-            $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
+            $path = sprintf(self::REG_CONSUMER, (string) $groupId) . '/' . $consumerId;
             if (!$this->zookeeper->exists($path)) {
                 continue;
             }
@@ -316,13 +322,17 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      */
     public function addPartitionOwner($groupId, $topicName, $partitionId, $consumerId)
     {
-        $path = sprintf(self::PARTITION_OWNER, (string) $groupId, $topicName, (string) $partitionId);
+        $path = sprintf(self::PARTITION_OWNER, (string) $groupId, $topicName);
         if (!$this->zookeeper->exists($path)) {
             $this->makeZkPath($path);
-            $this->makeZkNode($path, $consumerId);
-        } else {
-            $this->zookeeper->set($path, $consumerId);
         }
+        $partitionPath = $path . '/' . $partitionId;
+        if (!$this->zookeeper->exists($partitionPath)) {
+            $this->makeZkPath($partitionPath);
+            $this->makeZkNode($partitionPath, $consumerId, \ZooKeeper::EPHEMERAL);
+        }
+
+        // if exists path other comsumer
     }
 
     // }}}
@@ -360,7 +370,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      *
      * @return bool
      */
-    protected function makeZkNode($path, $value)
+    protected function makeZkNode($path, $value, $flag = null)
     {
         $params = array(
             array(
@@ -369,7 +379,85 @@ class ZooKeeper implements \Kafka\ClusterMetaData
                 'id'     => 'anyone',
             )
         );
-        return $this->zookeeper->create($path, $value, $params);
+        return $this->zookeeper->create($path, $value, $params, $flag);
+    }
+
+    // }}}
+    // {{{ public function watch()
+
+    /**
+     * Wath a given path
+     * @param string $path the path to node
+     * @param callable $callback callback function
+     * @return string|null
+     */
+    public function watch($path, $callback)
+    {
+        if (!is_callable($callback)) {
+            return null;
+        }
+
+        if ($this->zookeeper->exists($path)) {
+            if (!isset($this->callback[$path])) {
+                $this->callback[$path] = array();
+            }
+            if (!in_array($callback, $this->callback[$path])) {
+                $this->callback[$path][] = $callback;
+                return $this->zookeeper->getChildren($path, array($this, 'watchCallback'));
+            }
+        }
+    }
+
+    // }}}
+    // {{{ public function watchCallback()
+
+    /**
+     * Wath event callback warper
+     * @param int $event_type
+     * @param int $stat
+     * @param string $path
+     * @return the return of the callback or null
+     */
+    public function watchCallback($event_type, $stat, $path)
+    {
+        if (!isset($this->callback[$path])) {
+            return null;
+        }
+
+        foreach ($this->callback[$path] as $callback) {
+            $this->zookeeper->getChildren($path, array($this, 'watchCallback'));
+            return call_user_func($callback);
+        }
+    }
+
+    // }}}
+    // {{{ public function cancelWatch()
+
+    /**
+     * Delete watch callback on a node, delete all callback when $callback is null
+     * @param string $path
+     * @param callable $callback
+     * @return boolean|NULL
+     */
+    public function cancelWatch($path, $callback = null)
+    {
+        if (isset($this->callback[$path])) {
+            if (empty($callback)) {
+                unset($this->callback[$path]);
+                $this->zookeeper->get($path); //reset the callback
+                return true;
+            } else {
+                $key = array_search($callback, $this->callback[$path]);
+                if ($key !== false) {
+                    unset($this->callback[$path][$key]);
+                    return true;
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return null;
+        }
     }
 
     // }}}

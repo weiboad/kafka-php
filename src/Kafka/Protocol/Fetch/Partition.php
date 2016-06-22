@@ -103,7 +103,7 @@ class Partition implements \Iterator, \Countable
      * @var mixed
      * @access private
      */
-    private $valid = false;
+    private $valid = true;
 
     /**
      * current topic name
@@ -335,6 +335,7 @@ class Partition implements \Iterator, \Countable
             $this->key = $partitionId;
             $this->current = new MessageSet($this, $this->context);
         } catch (\Kafka\Exception $e) {
+            \Kafka\Log::log($e->getMessage(), LOG_ERR);
             return false;
         }
 
