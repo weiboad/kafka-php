@@ -259,6 +259,17 @@ class Socket
         }
     }
 
+    /**
+     * checks if the socket is a valid resource
+     *
+     * @access public
+     * @return boolean
+     */
+    public function isResource()
+    {
+        return is_resource($this->stream);
+    }
+
     // }}}
     // {{{ public function read()
 
