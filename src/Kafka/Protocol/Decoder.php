@@ -392,6 +392,9 @@ class Decoder extends Protocol
             case 8:
                 $error = 'This is not a client facing error and is used only internally by intra-cluster broker communication.';
                 break;
+            case 9:
+                $error = 'The replica is not available for the requested topic-partition';
+                break;
             case 10:
                 $error = 'The server has a configurable maximum message size to avoid unbounded memory allocation. This error is thrown if the client attempt to produce a message larger than this maximum.';
                 break;
@@ -401,6 +404,9 @@ class Decoder extends Protocol
             case 12:
                 $error = 'If you specify a string larger than configured maximum for offset metadata';
                 break;
+            case 13:
+                $error = 'The server disconnected before a response was received.';
+                break;
             case 14:
                 $error = 'The broker returns this error code for an offset fetch request if it is still loading offsets (after a leader change for that offsets topic partition).';
                 break;
@@ -409,6 +415,63 @@ class Decoder extends Protocol
                 break;
             case 16:
                 $error = 'The broker returns this error code if it receives an offset fetch or commit request for a consumer group that it is not a coordinator for.';
+                break;
+            case 17:
+                $error = 'The request attempted to perform an operation on an invalid topic.';
+                break;
+            case 18:
+                $error = 'The request included message batch larger than the configured segment size on the server.';
+                break;
+            case 19:
+                $error = 'Messages are rejected since there are fewer in-sync replicas than required.';
+                break;
+            case 20:
+                $error = 'Messages are written to the log, but to fewer in-sync replicas than required.';
+                break;
+            case 21:
+                $error = 'Produce request specified an invalid value for required acks.';
+                break;
+            case 22:
+                $error = 'Specified group generation id is not valid.';
+                break;
+            case 23:
+                $error = 'The group member\'s supported protocols are incompatible with those of existing members.';
+                break;
+            case 24:
+                $error = 'The configured groupId is invalid';
+                break;
+            case 25:
+                $error = 'The coordinator is not aware of this member.';
+                break;
+            case 26:
+                $error = 'The session timeout is not within the range allowed by the broker (as configured by group.min.session.timeout.ms and group.max.session.timeout.ms).';
+                break;
+            case 27:
+                $error = 'The group is rebalancing, so a rejoin is needed.';
+                break;
+            case 28:
+                $error = 'The committing offset data size is not valid';
+                break;
+            case 29:
+                $error = 'Topic authorization failed.';
+                break;
+            case 30:
+                $error = 'Group authorization failed.';
+                break;
+            case 31:
+                $error = 'Cluster authorization failed.';
+                break;
+            case 32:
+                $error = 'The timestamp of the message is out of acceptable range.';
+                break;
+            case 33:
+                $error = 'The broker does not support the requested SASL mechanism.';
+                break;
+            case 34:
+                $error = 'Request is not valid given the current SASL state.';
+                break;
+            case 35:
+                $error = 'The version of API is not supported.';
                 break;
             default:
                 $error = 'Unknown error';
