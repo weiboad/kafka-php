@@ -522,7 +522,7 @@ class DecoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetError()
     {
-        $this->assertEquals('Unknown error', Decoder::getError(19));
+        $this->assertEquals('Unknown error', Decoder::getError(36));
     }
 
     // }}}
