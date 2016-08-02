@@ -351,7 +351,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
         $parts = explode('/', $path);
         $parts = array_filter($parts);
         $subpath = '';
-        while (count($parts) > 1) {
+        while (count($parts) >= 1) {
             $subpath .= '/' . array_shift($parts);
             if (!$this->zookeeper->exists($subpath)) {
                 $this->makeZkNode($subpath, $value);
