@@ -105,6 +105,14 @@ class Socket
      */
     private $maxWriteAttempts = 3;
 
+    /**
+     * Socket persistent
+     *
+     * @var boolean
+     * @access private
+     */
+    private $persistent = false;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -120,10 +128,11 @@ class Socket
      * @param int $sendTimeoutSec
      * @param int $sendTimeoutUsec
      */
-    public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
+    public function __construct($host, $port, $persistent, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
     {
         $this->host = $host;
         $this->port = $port;
+        $this->persistent = $persistent;
         $this->setRecvTimeoutSec($recvTimeoutSec);
         $this->setRecvTimeoutUsec($recvTimeoutUsec);
         $this->setSendTimeoutSec($sendTimeoutSec);
@@ -225,14 +234,24 @@ class Socket
             throw new \Kafka\Exception('Cannot open without port.');
         }
 
-        $this->stream = @fsockopen(
-            $this->host,
-            $this->port,
-            $errno,
-            $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
-        );
+        if($this->persistent){
+            $this->stream = @pfsockopen(
+                $this->host,
+                $this->port,
+                $errno,
+                $errstr,
+                $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
+            );
 
+        }else{
+            $this->stream = @fsockopen(
+                $this->host,
+                $this->port,
+                $errno,
+                $errstr,
+                $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
+            );
+        }
         if ($this->stream == false) {
             $error = 'Could not connect to '
                     . $this->host . ':' . $this->port
