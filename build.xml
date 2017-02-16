@@ -13,7 +13,7 @@
     </target>
 
     <target name="get-cs-fixer" depends="clean" description="Get coding standards fixer">
-        <get src="http://cs.sensiolabs.org/get/php-cs-fixer.phar" dest="${basedir}/php-cs-fixer.phar"/>
+        <get src="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.1.0/php-cs-fixer.phar" dest="${basedir}/php-cs-fixer.phar"/>
     </target>
 
     <target name="get-cs-fixer-local" depends="clean" description="Get coding standards fixer" unless="fixer-exists">
