@@ -12,6 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 namespace Kafka;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -117,7 +118,7 @@ class SimpleProduce
     {
         if ($hostList instanceof \Kafka\ClusterMetaData) {
             $metadata = $hostList;
-        } elseif ( $kafkaHostList !== null ) {
+        } elseif ($kafkaHostList !== null) {
             $metadata = new \Kafka\MetaDataFromKafka($kafkaHostList);
         } else {
             $metadata = new \Kafka\ZooKeeper($hostList, $timeout);
@@ -278,7 +279,7 @@ class SimpleProduce
             'timeout'      => $this->timeout,
             'data' => $topicData,
         );
-       return $requestData;
+        return $requestData;
     }
     // }}}
     // }}}

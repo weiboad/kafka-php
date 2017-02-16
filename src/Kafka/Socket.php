@@ -336,7 +336,6 @@ class Socket
         }
         $this->close();
         throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (not readable)');
-
     }
 
     // }}}
@@ -360,7 +359,7 @@ class Socket
         $failedWriteAttempts = 0;
         $written = 0;
         $buflen = strlen($buf);
-        while ( $written < $buflen ) {
+        while ($written < $buflen) {
             // wait for stream to become available for writing
             $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
             if ($writable > 0) {
@@ -376,13 +375,13 @@ class Socket
                 } elseif ($wrote === 0) {
                     // Increment the number of times we have failed
                     $failedWriteAttempts++;
-                if ($failedWriteAttempts > $this->maxWriteAttempts) {
-                    throw new \Kafka\Exception\Socket('After ' . $failedWriteAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
-                }
-            } else {
-                // If we wrote something, reset our failed attempt counter
+                    if ($failedWriteAttempts > $this->maxWriteAttempts) {
+                        throw new \Kafka\Exception\Socket('After ' . $failedWriteAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
+                    }
+                } else {
+                    // If we wrote something, reset our failed attempt counter
                 $failedWriteAttempts = 0;
-            }
+                }
                 $written += $wrote;
                 continue;
             }

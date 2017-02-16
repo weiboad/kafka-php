@@ -124,10 +124,10 @@ class MetaDataFromKafka implements ClusterMetaData
      */
     public function getPartitionState($topicName, $partitionId = 0)
     {
-        if (!isset( $this->topics[$topicName] ) ) {
+        if (!isset($this->topics[$topicName])) {
             $this->loadTopicDetail(array($topicName));
         }
-        if ( isset( $this->topics[$topicName]['partitions'][$partitionId] ) ) {
+        if (isset($this->topics[$topicName]['partitions'][$partitionId])) {
             return $this->topics[$topicName]['partitions'][$partitionId];
         } else {
             return null;
@@ -145,10 +145,10 @@ class MetaDataFromKafka implements ClusterMetaData
      */
     public function getTopicDetail($topicName)
     {
-        if (!isset( $this->topics[$topicName] ) ) {
+        if (!isset($this->topics[$topicName])) {
             $this->loadTopicDetail(array($topicName));
         }
-        if (isset( $this->topics[$topicName] ) ) {
+        if (isset($this->topics[$topicName])) {
             return $this->topics[$topicName];
         } else {
             return array();

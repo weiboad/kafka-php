@@ -206,9 +206,9 @@ class Client
     public function getZooKeeper()
     {
         if ($this->metadata instanceof \Kafka\ZooKeeper) {
-                return $this->metadata;
+            return $this->metadata;
         } else {
-                throw new \Kafka\Exception( 'ZooKeeper was not provided' );
+            throw new \Kafka\Exception('ZooKeeper was not provided');
         }
     }
 

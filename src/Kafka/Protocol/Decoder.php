@@ -361,7 +361,7 @@ class Decoder extends Protocol
      */
     public static function getError($errCode)
     {
-        switch($errCode) {
+        switch ($errCode) {
             case 0:
                 $error = 'No error--it worked!';
                 break;

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-libraryCS=$(php php-cs-fixer.phar fix -v --dry-run --level=psr2 ./src)
-testsCS=$(php php-cs-fixer.phar fix -v --dry-run --level=psr2 ./tests)
+libraryCS=$(php php-cs-fixer.phar fix ./src --diff)
+testsCS=$(php php-cs-fixer.phar fix ./tests --diff)
 
 if [[ "$libraryCS" || "$testsCS"  ]];
 then

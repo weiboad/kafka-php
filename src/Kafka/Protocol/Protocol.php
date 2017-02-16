@@ -231,7 +231,7 @@ abstract class Protocol
     protected static function checkLen($type, $bytes)
     {
         $len = 0;
-        switch($type) {
+        switch ($type) {
             case self::BIT_B64:
                 $len = 8;
                 break;
@@ -268,7 +268,7 @@ abstract class Protocol
         // If we don't know if our system is big endian or not yet...
         if (is_null(self::$isLittleEndianSystem)) {
             // Lets find out
-            list ($endiantest) = array_values(unpack('L1L', pack('V', 1)));
+            list($endiantest) = array_values(unpack('L1L', pack('V', 1)));
             if ($endiantest != 1) {
                 // This is a big endian system
                 self::$isLittleEndianSystem = false;

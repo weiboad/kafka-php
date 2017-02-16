@@ -349,7 +349,7 @@ class Consumer
             );
         }
 
-       return $requestData;
+        return $requestData;
     }
 
     /**

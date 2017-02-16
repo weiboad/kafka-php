@@ -109,7 +109,7 @@ class Produce
     {
         if ($hostList instanceof \Kafka\ClusterMetaData) {
             $metadata = $hostList;
-        } elseif ( $kafkaHostList !== null ) {
+        } elseif ($kafkaHostList !== null) {
             $metadata = new \Kafka\MetaDataFromKafka($kafkaHostList);
         } else {
             $metadata = new \Kafka\ZooKeeper($hostList, $timeout);
@@ -322,7 +322,7 @@ class Produce
             );
         }
 
-       return $requestData;
+        return $requestData;
     }
 
     // }}}

@@ -1,5 +1,6 @@
 <?php
 namespace Kafka\Protocol\Fetch\Helper;
+
 /**
  * Description of Consumer
  *
@@ -37,7 +38,6 @@ class Consumer extends HelperAbstract
      */
     public function onStreamEof($streamKey)
     {
-
     }
 
     /**
@@ -45,6 +45,5 @@ class Consumer extends HelperAbstract
      */
     public function onTopicEof($topicName)
     {
-
     }
 }
