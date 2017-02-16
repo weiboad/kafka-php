@@ -1,7 +1,14 @@
 Kafka-php
 ==========
 
-[![Build Status](https://travis-ci.org/nmred/kafka-php.svg?branch=master)](https://travis-ci.org/nmred/Kafka-php)
+[![Build Status](https://travis-ci.org/weiboad/kafka-php.svg?branch=master)](https://travis-ci.org/weiboad/kafka-php)
+[![Packagist](https://img.shields.io/packagist/dm/nmred/kafka-php.svg?style=plastic)]()
+[![Packagist](https://img.shields.io/packagist/dd/nmred/kafka-php.svg?style=plastic)]()
+[![Packagist](https://img.shields.io/packagist/dt/nmred/kafka-php.svg?style=plastic)]()
+[![GitHub issues](https://img.shields.io/github/issues/weiboad/kafka-php.svg?style=plastic)](https://github.com/weiboad/kafka-php/issues)
+[![GitHub forks](https://img.shields.io/github/forks/weiboad/kafka-php.svg?style=plastic)](https://github.com/weiboad/kafka-php/network)
+[![GitHub stars](https://img.shields.io/github/stars/weiboad/kafka-php.svg?style=plastic)](https://github.com/weiboad/kafka-php/stargazers)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg?style=plastic)](https://raw.githubusercontent.com/weiboad/kafka-php/master/LICENSE)
 
 Kafka-php is a php client with Zookeeper integration for apache Kafka. It only supports the latest version of Kafka 0.8 which is still under development, so this module is _not production ready_ so far.
 
