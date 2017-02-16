@@ -213,7 +213,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeProcudePartion($data, Encoder::COMPRESSION_NONE);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given produce data invalid. `partition_id` is undefined.', $e->getMessage());
         }
 
@@ -222,7 +222,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeProcudePartion($data, Encoder::COMPRESSION_NONE);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given produce data invalid. `messages` is undefined.', $e->getMessage());
         }
     }
@@ -302,7 +302,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeFetchPartion($data);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given fetch data invalid. `partition_id` is undefined.', $e->getMessage());
         }
 
@@ -379,7 +379,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeOffsetPartion($data);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given offset data invalid. `partition_id` is undefined.', $e->getMessage());
         }
     }
@@ -452,7 +452,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeCommitOffsetPartion($data);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given commit offset data invalid. `offset` is undefined.', $e->getMessage());
         }
 
@@ -461,7 +461,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeCommitOffsetPartion($data);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given commit offset data invalid. `partition_id` is undefined.', $e->getMessage());
         }
     }
@@ -533,7 +533,7 @@ class EncoderTest extends \PHPUnit_Framework_TestCase
         );
         try {
             Encoder::encodeFetchOffsetPartion($data);
-        } catch(\Kafka\Exception\Protocol $e) {
+        } catch (\Kafka\Exception\Protocol $e) {
             $this->assertSame('given fetch offset data invalid. `partition_id` is undefined.', $e->getMessage());
         }
     }

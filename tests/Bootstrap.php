@@ -23,7 +23,7 @@
 * @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
 */
-error_reporting( E_ALL | E_STRICT );
+error_reporting(E_ALL | E_STRICT);
 
 if (class_exists('PHPUnit_Runner_Version', true)) {
     $phpUnitVersion = PHPUnit_Runner_Version::id();

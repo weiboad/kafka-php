@@ -12,3 +12,4 @@ nbproject
 tmp/
 php-cs-fixer.phar
 vendor/*
+.php_cs.cache
