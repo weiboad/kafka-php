@@ -259,6 +259,7 @@ class Consumer
             $encoder = new \Kafka\Protocol\Encoder($conn);
             $encoder->fetchRequest($requestData);
             $streams[$connArr['key']] = $conn;
+            $this->client->freeStream($connArr['key']);
         }
 
         $fetch = new \Kafka\Protocol\Fetch\Topic($streams, $data);
