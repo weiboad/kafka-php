@@ -39,9 +39,70 @@ class State extends \Kafka\Singleton
     const REQUEST_FETCH_OFFSET = 7;
     const REQUEST_COMMIT_OFFSET = 8;
 
-    const STATUS_STOP = 0;
-    const STATUS_START = 1;
-    const STATUS_PROCESS = 2;
+    const STATUS_INIT  = 0;
+    const STATUS_STOP  = 1;
+    const STATUS_START = 2;
+    const STATUS_LOOP    = 4;
+    const STATUS_PROCESS = 8;
+    const STATUS_FINISH  = 16;
+
+
+    init
+    REQUEST_METADATA =>  STATUS_LOOP 
+    REQUEST_GETGROUP =>  STATUS_START
+    REQUEST_JOINGROUP =>  STATUS_START
+    REQUEST_SYNCGROUP =>  STATUS_START
+    REQUEST_HEARTGROUP =>  STATUS_LOOP
+    REQUEST_OFFSET =>  STATUS_LOOP
+    REQUEST_FETCH =>  STATUS_LOOP
+    REQUEST_FETCH_OFFSET => STATUS_LOOP
+    REQUEST_COMMIT_OFFSET =>  STATUS_LOOP
+    instance => empty
+
+    run condition
+    REQUEST_METADATA => (STATUS_LOOP) && !STATUS_PROCESS
+        (run)  => status->STATUS_LOOP|STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH
+            (change) recover
+        (fail) => exit
+    REQUEST_GETGROUP => (STATUS_START) && (REQUEST_METADATA^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_STOP|STATUS_FINISH
+        (fail) => recover
+    REQUEST_JOINGROUP => (STATUS_START) && (REQUEST_GETGROUP^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_STOP|STATUS_FINISH
+        (fail) => recover
+    REQUEST_SYNCGROUP => (STATUS_START) && (REQUEST_JOINGROUP^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_STOP|STATUS_FINISH
+        (fail) => recover
+    REQUEST_HEARTGROUP => (STATUS_LOOP) && (REQUEST_SYNCGROUP^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH
+        (fail) => 
+                27 => if !REQUEST_JOINGROUP^STATUS_PROCESS -> modify(REQUEST_JOINGROUP init)
+                25 => if !REQUEST_JOINGROUP^STATUS_PROCESS -> modify(REQUEST_JOINGROUP init) empty member_id
+    
+    REQUEST_OFFSET => (STATUS_LOOP) && (REQUEST_METADATA^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH 
+        (fail) => recover
+
+    REQUEST_FETCH_OFFSET => (STATUS_LOOP) && (REQUEST_SYNCGROUP^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH 
+        (fail) => recover
+
+    REQUEST_FETCH => (STATUS_LOOP) && (REQUEST_FETCH_OFFSET^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH 
+        (fail) => recover
+
+    REQUEST_COMMIT_OFFSET => (STATUS_LOOP) && (REQUEST_FETCH^STATUS_FINISH)
+        (run)  => status->STATUS_PROCESS
+        (succ) => status->STATUS_LOOP|STATUS_FINISH 
+        (fail) => recover
 
     // }}}
     // {{{ members
