@@ -42,10 +42,11 @@ Simply add a dependency on nmred/kafka-php to your project's composer.json file 
 
 ## Produce
 
-### \Kafka\Produce::getInstance($hostList, $timeout)
+### \Kafka\Produce::getInstance($hostList, $timeout , $persistent)
 
 * `hostList` : zookeeper host list , example 127.0.0.1:2181,192.168.1.114:2181
 * `timeout`  : zookeeper timeout
+* `persistent`  : kafka connection persistent, example true ( The default value is false)
 
 ### \Kafka\Produce::setRequireAck($ack = -1)
 
@@ -78,10 +79,11 @@ var_dump($result);
 
 ## Consumer
 
-### \Kafka\Consumer::getInstance($hostList, $timeout)
+### \Kafka\Consumer::getInstance($hostList, $timeout , $persistent)
 
 * `hostList` : zookeeper host list , example 127.0.0.1:2181,192.168.1.114:2181
 * `timeout`  : zookeeper timeout
+* `persistent`  : kafka connection persistent
 
 ### \Kafka\Consumer::setGroup($groupName)
 

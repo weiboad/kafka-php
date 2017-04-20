@@ -95,12 +95,13 @@ class Consumer
      * @access public
      * @param $hostList
      * @param null $timeout
+     * @param boolean $persistent
      * @return Consumer
      */
-    public static function getInstance($hostList, $timeout = null)
+    public static function getInstance($hostList, $timeout = null , $persistent = false)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($hostList, $timeout);
+            self::$instance = new self($hostList, $timeout,$persistent);
         }
 
         return self::$instance;
@@ -115,11 +116,12 @@ class Consumer
      * @access public
      * @param $hostList
      * @param null $timeout
+     * @param boolean $persistent
      */
-    private function __construct($hostList, $timeout = null)
+    private function __construct($hostList, $timeout = null , $persistent = false)
     {
         $zookeeper = new \Kafka\ZooKeeper($hostList, $timeout);
-        $this->client = new \Kafka\Client($zookeeper);
+        $this->client = new \Kafka\Client($zookeeper, $persistent);
     }
 
     // }}}

@@ -41,6 +41,14 @@ class Client
     private $metadata = null;
 
     /**
+     * persistent state
+     *
+     * @var $persistent
+     * @access private
+     */
+    private $persistent = false;
+
+    /**
      * save broker connection
      *
      * @var array
@@ -70,10 +78,15 @@ class Client
      *
      * @access public
      * @param ClusterMetaData $metadata
+     * @param boolean $persistent
      */
-    public function __construct(ClusterMetaData $metadata)
+    public function __construct(ClusterMetaData $metadata, $persistent)
     {
         $this->metadata = $metadata;
+
+        if($persistent == true){
+            $this->persistent = true;
+        }
         if (method_exists($metadata, 'setClient')) {
             $this->metadata->setClient($this);
         }
@@ -104,6 +117,29 @@ class Client
 
     /**
      * @access public
+     * @param $persistent - state of persistent
+     *
+     */
+    public function setPersistent($persistent)
+    {
+        $this->persistent = $persistent;
+
+    }
+
+
+    /**
+     * @access public
+     * @return boolean
+     *
+     */
+    public function getPersistent()
+    {
+        return $this->persistent;
+
+    }
+
+    /**
+     * @access public
      * @param $name - name of option
      * @return mixed
      */
@@ -114,6 +150,8 @@ class Client
         }
         return null;
     }
+
+
 
     /**
      * @access private
@@ -244,7 +282,7 @@ class Client
         }
 
         // no idle stream
-        $stream = new \Kafka\Socket($hostname, $port, $this->getStreamOption('RecvTimeoutSec'), $this->getStreamOption('RecvTimeoutUsec'), $this->getStreamOption('SendTimeoutSec'), $this->getStreamOption('SendTimeoutUsec'));
+        $stream = new \Kafka\Socket($hostname, $port,$this->getPersistent(), $this->getStreamOption('RecvTimeoutSec'), $this->getStreamOption('RecvTimeoutUsec'), $this->getStreamOption('SendTimeoutSec'), $this->getStreamOption('SendTimeoutUsec'));
         $stream->connect();
         self::$stream[$host][$lockKey] = array(
             'locked' => true,

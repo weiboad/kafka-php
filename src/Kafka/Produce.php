@@ -15,16 +15,16 @@
 namespace Kafka;
 
 /**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
+ * +------------------------------------------------------------------------------
+ * Kafka protocol since Kafka v0.8
+ * +------------------------------------------------------------------------------
+ *
+ * @package
+ * @version $_SWANBR_VERSION_$
+ * @copyright Copyleft
+ * @author $_SWANBR_AUTHOR_$
+ * +------------------------------------------------------------------------------
+ */
 
 class Produce
 {
@@ -82,13 +82,14 @@ class Produce
      * @access public
      * @param $hostList
      * @param $timeout
+     * @param $persistent
      * @param null $kafkaHostList
      * @return Produce
      */
-    public static function getInstance($hostList, $timeout, $kafkaHostList = null)
+    public static function getInstance($hostList, $timeout, $persistent = false, $kafkaHostList = null)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($hostList, $timeout, $kafkaHostList);
+            self::$instance = new self($hostList, $timeout, $persistent, $kafkaHostList);
         }
 
         return self::$instance;
@@ -103,9 +104,10 @@ class Produce
      * @access public
      * @param $hostList
      * @param null $timeout
+     * @param false $persistent
      * @param null $kafkaHostList
      */
-    public function __construct($hostList, $timeout = null, $kafkaHostList = null)
+    public function __construct($hostList, $timeout = null, $persistent = false, $kafkaHostList = null)
     {
         if ($hostList instanceof \Kafka\ClusterMetaData) {
             $metadata = $hostList;
@@ -114,7 +116,8 @@ class Produce
         } else {
             $metadata = new \Kafka\ZooKeeper($hostList, $timeout);
         }
-        $this->client = new \Kafka\Client($metadata);
+
+        $this->client = new \Kafka\Client($metadata,$persistent);
     }
 
     // }}}
@@ -133,7 +136,7 @@ class Produce
     {
         if (isset($this->payload[$topicName][$partitionId])) {
             $this->payload[$topicName][$partitionId] =
-                    array_merge($this->payload[$topicName][$partitionId], $messages);
+                array_merge($this->payload[$topicName][$partitionId], $messages);
         } else {
             $this->payload[$topicName][$partitionId] = $messages;
         }
@@ -163,7 +166,7 @@ class Produce
     public function setRequireAck($ack = 0)
     {
         if ($ack >= -1) {
-            $this->requiredAck = (int) $ack;
+            $this->requiredAck = (int)$ack;
         }
 
         return $this;
@@ -181,8 +184,8 @@ class Produce
      */
     public function setTimeOut($timeout = 100)
     {
-        if ((int) $timeout) {
-            $this->timeout = (int) $timeout;
+        if ((int)$timeout) {
+            $this->timeout = (int)$timeout;
         }
         return $this;
     }
@@ -206,10 +209,10 @@ class Produce
         $responseData = array();
         foreach ($data as $host => $requestData) {
             $stream = $this->client->getStream($host);
-            $conn   = $stream['stream'];
+            $conn = $stream['stream'];
             $encoder = new \Kafka\Protocol\Encoder($conn);
             $encoder->produceRequest($requestData);
-            if ((int) $this->requiredAck !== 0) { // get broker response
+            if ((int)$this->requiredAck !== 0) { // get broker response
                 $decoder = new \Kafka\Protocol\Decoder($conn);
                 $response = $decoder->produceResponse();
                 foreach ($response as $topicName => $info) {
@@ -306,7 +309,7 @@ class Produce
                 foreach ($partitions as $partitionId => $messages) {
                     $partitionData[] = array(
                         'partition_id' => $partitionId,
-                        'messages'     => $messages,
+                        'messages' => $messages,
                     );
                 }
                 $topicData[] = array(
@@ -317,7 +320,7 @@ class Produce
 
             $requestData[$host] = array(
                 'required_ack' => $this->requiredAck,
-                'timeout'      => $this->timeout,
+                'timeout' => $this->timeout,
                 'data' => $topicData,
             );
         }
