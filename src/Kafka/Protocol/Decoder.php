@@ -41,7 +41,6 @@ class Decoder extends Protocol
     {
         $result = array();
         $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
-        $dataLen = array_shift($dataLen);
         if (!$dataLen) {
             throw new \Kafka\Exception\Protocol('produce response invalid.');
         }
@@ -49,48 +48,14 @@ class Decoder extends Protocol
 
         // parse data struct
         $offset = 4;
-        $topicCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $topicCount = array_shift($topicCount);
-        $offset += 4;
-        for ($i = 0; $i < $topicCount; $i++) {
-            $topicLen = self::unpack(self::BIT_B16, substr($data, $offset, 2)); // int16 topic name length
-            $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;
-            $offset += 2;
-            $topicName = substr($data, $offset, $topicLen);
-            $offset += $topicLen;
-            $partitionCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
-            $offset += 4;
-            $result[$topicName] = array();
-            for ($j = 0; $j < $partitionCount; $j++) {
-                $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $errCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-                $offset += 2;
-                $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-                $offset += 8;
-                $result[$topicName][$partitionId[1]] = array(
-                    'errCode' => $errCode[1],
-                    'offset'  => $partitionOffset
-                );
-            }
+        $version = $this->getApiVersion(self::PRODUCE_REQUEST);
+        $ret = $this->decodeArray(substr($data, $offset), array($this, 'produceTopicPair'), $version);
+        $offset += $ret['length'];
+        $throttleTime = 0;
+        if ($version == self::API_VERSION2) {
+            $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         }
-
-        return $result;
-    }
-
-    // }}}
-    // {{{ public function fetchResponse()
-
-    /**
-     * decode fetch response
-     *
-     * @access public
-     * @return \Iterator
-     */
-    public function fetchResponse()
-    {
-        return new \Kafka\Protocol\Fetch\Topic($this->stream);
+        return array('throttleTime' => $throttleTime, 'data' => $ret['data']);
     }
 
     // }}}
@@ -107,89 +72,60 @@ class Decoder extends Protocol
         $broker = array();
         $topic = array();
         $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
-        $dataLen = array_shift($dataLen);
         if (!$dataLen) {
             throw new \Kafka\Exception\Protocol('metaData response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;
-        $brokerCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $brokerCount = isset($brokerCount[1]) ? $brokerCount[1] : 0;
-        for ($i = 0; $i < $brokerCount; $i++) {
-            $nodeId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $nodeId = $nodeId[1];
-            $offset += 4;
-            $hostNameLen = self::unpack(self::BIT_B16, substr($data, $offset, 2)); // int16 host name length
-            $hostNameLen = isset($hostNameLen[1]) ? $hostNameLen[1] : 0;
-            $offset += 2;
-            $hostName = substr($data, $offset, $hostNameLen);
-            $offset += $hostNameLen;
-            $port = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $offset += 4;
-            $broker[$nodeId] = array(
-                'host' => $hostName,
-                'port' => $port[1],
-            );
-        }
 
-        $topicMetaCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $topicMetaCount = isset($topicMetaCount[1]) ? $topicMetaCount[1] : 0;
-        for ($i = 0; $i < $topicMetaCount; $i++) {
-            $topicErrCode = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-            $offset += 2;
-            $topicLen = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-            $offset += 2;
-            $topicName = substr($data, $offset, $topicLen[1]);
-            $offset += $topicLen[1];
-            $partitionCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $offset += 4;
-            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
-            $topic[$topicName]['errCode'] = $topicErrCode[1];
-            $partitions = array();
-            for ($j = 0; $j < $partitionCount; $j++) {
-                $partitionErrCode = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-                $offset += 2;
-                $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $partitionId = isset($partitionId[1]) ? $partitionId[1] : 0;
-                $offset += 4;
-                $leaderId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $repliasCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $repliasCount = isset($repliasCount[1]) ? $repliasCount[1] : 0;
-                $replias = array();
-                for ($z = 0; $z < $repliasCount; $z++) {
-                    $repliaId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                    $offset += 4;
-                    $replias[] = $repliaId[1];
-                }
-                $isrCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $isrCount = isset($isrCount[1]) ? $isrCount[1] : 0;
-                $isrs = array();
-                for ($z = 0; $z < $isrCount; $z++) {
-                    $isrId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                    $offset += 4;
-                    $isrs[] = $isrId[1];
-                }
-
-                $partitions[$partitionId] = array(
-                    'errCode'  => $partitionErrCode[1],
-                    'leader'   => $leaderId[1],
-                    'replicas' => $replias,
-                    'isr'      => $isrs,
-                );
-            }
-            $topic[$topicName]['partitions'] = $partitions;
-        }
+        $version = $this->getApiVersion(self::METADATA_REQUEST);
+        $brokerRet = $this->decodeArray(substr($data, $offset), array($this, 'metaBroker'), $version);
+        $offset += $brokerRet['length'];
+        $topicMetaRet = $this->decodeArray(substr($data, $offset), array($this, 'metaTopicMetaData'), $version);
+        $offset += $topicMetaRet['length'];
 
         $result = array(
-            'brokers' => $broker,
-            'topics'  => $topic,
+            'brokers' => $brokerRet['data'],
+            'topics'  => $topicMetaRet['data'],
         );
         return $result;
+    }
+
+    // }}}
+    // {{{ public function fetchResponse()
+
+    /**
+     * decode fetch response
+     *
+     * @access public
+     * @return \Iterator
+     */
+    public function fetchResponse()
+    {
+        $result = array();
+        $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
+        if (!$dataLen) {
+            throw new \Kafka\Exception\Protocol('produce response invalid.');
+        }
+        $data = $this->stream->read($dataLen, true);
+
+        // parse data struct
+        $offset = 4;
+        $version = $this->getApiVersion(self::FETCH_REQUEST);
+
+        $throttleTime = 0;
+        if ($version != self::API_VERSION0) {
+            $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+            $offset += 4;
+        }
+
+        $topics = $this->decodeArray(substr($data, $offset), array($this, 'fetchTopic'), $version);
+        $offset += $topics['length'];
+
+        return array(
+            'throttleTime' => $throttleTime,
+            'topics' => $topics['data'],
+        );
     }
 
     // }}}
@@ -205,48 +141,142 @@ class Decoder extends Protocol
     {
         $result = array();
         $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
-        $dataLen = array_shift($dataLen);
         if (!$dataLen) {
             throw new \Kafka\Exception\Protocol('offset response invalid.');
         }
         $data = $this->stream->read($dataLen, true);
         $offset = 4;
-        $topicCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $topicCount = array_shift($topicCount);
-        for ($i = 0; $i < $topicCount; $i++) {
-            $topicLen = self::unpack(self::BIT_B16, substr($data, $offset, 2)); // int16 topic name length
-            $topicLen = isset($topicLen[1]) ? $topicLen[1] : 0;
-            $offset += 2;
-            $topicName = substr($data, $offset, $topicLen);
-            $offset += $topicLen;
-            $partitionCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $partitionCount = isset($partitionCount[1]) ? $partitionCount[1] : 0;
-            $offset += 4;
-            $result[$topicName] = array();
-            for ($j = 0; $j < $partitionCount; $j++) {
-                $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $errCode     = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-                $offset += 2;
-                $offsetCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
-                $offsetCount = array_shift($offsetCount);
-                $offsetArr = array();
-                for ($z = 0; $z < $offsetCount; $z++) {
-                    $offsetArr[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-                    $offset += 8;
-                }
-                $result[$topicName][$partitionId[1]] = array(
-                    'errCode' => $errCode[1],
-                    'offset'  => $offsetArr
-                );
-            }
-        }
-        return $result;
+
+        $version = $this->getApiVersion(self::OFFSET_REQUEST);
+        $topics = $this->decodeArray(substr($data, $offset), array($this, 'offsetTopic'), $version);
+        $offset += $topics['length'];
+        
+        return $topics['data'];
     }
 
     // }}}
+    // {{{ public function groupResponse()
+
+    /**
+     * decode group response
+     *
+     * @access public
+     * @return array
+     */
+    public function groupResponse()
+    {
+        $result = array();
+        $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
+        if (!$dataLen) {
+            throw new \Kafka\Exception\Protocol('offset response invalid.');
+        }
+        $data = $this->stream->read($dataLen, true);
+        $offset = 4;
+
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2; 
+        $coordinatorId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4; 
+        $hosts = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $hosts['length'];
+        $coordinatorPort = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        return array(
+            'errorCode' => $errorCode,
+            'coordinatorId' => $coordinatorId,
+            'coordinatorHost' => $hosts['data'],
+            'coordinatorPort' => $coordinatorPort
+        );
+    }
+
+    // }}}
+    // {{{ public function joinGroupResponse()
+
+    /**
+     * decode join group response
+     *
+     * @access public
+     * @return array
+     */
+    public function joinGroupResponse()
+    {
+        $result = array();
+        $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
+        if (!$dataLen) {
+            throw new \Kafka\Exception\Protocol('offset response invalid.');
+        }
+        $data = $this->stream->read($dataLen, true);
+        $offset = 4;
+
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2; 
+        $generationId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4; 
+        $groupProtocol = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $groupProtocol['length'];
+        $leaderId = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $leaderId['length'];
+        $memberId = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $memberId['length'];
+
+        $members = $this->decodeArray(substr($data, $offset), array($this, 'joinGroupMember'));
+        $offset += $memberId['length'];
+
+        return array(
+            'errorCode' => $errorCode,
+            'generationId' => $generationId,
+            'groupProtocol' => $groupProtocol['data'],
+            'leaderId' => $leaderId['data'],
+            'memberId' => $memberId['data'],
+            'members' => $members['data'],
+        );
+    }
+
+    // }}}
+    // {{{ public function syncGroupResponse()
+
+    /**
+     * decode sync group response
+     *
+     * @access public
+     * @return array
+     */
+    public function syncGroupResponse()
+    {
+        $result = array();
+        $dataLen = self::unpack(self::BIT_B32, $this->stream->read(4, true));
+        if (!$dataLen) {
+            throw new \Kafka\Exception\Protocol('offset response invalid.');
+        }
+        $data = $this->stream->read($dataLen, true);
+        $offset = 4;
+
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2; 
+
+        $memberAssignments = $this->decodeString(substr($data, $offset), self::BIT_B32);
+        $offset += $memberAssignments['length']; 
+
+        $memberAssignment = $memberAssignments['data'];
+        $memberAssignmentOffset = 0;
+        $version = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
+        $memberAssignmentOffset += 2; 
+        $partitionAssignments = $this->decodeArray(substr($memberAssignment, $memberAssignmentOffset),
+                                array($this, 'syncGroupResponsePartition'));
+        $memberAssignmentOffset += $partitionAssignments['length'];
+        $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
+        
+        return array(
+            'errorCode' => $errorCode,
+            'partitionAssignments' => $partitionAssignments['data'],
+            'version' => $version,
+            'userData' => $userData['data'],
+        );
+    }
+
+    // }}}
+    
     // {{{ public function commitOffsetResponse()
 
     /**
@@ -478,6 +508,611 @@ class Decoder extends Protocol
         }
 
         return $error;
+    }
+
+    // }}}
+    
+    // {{{ protected function produceTopicPair()
+
+    /**
+     * decode produce topic pair response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function produceTopicPair($data, $version)
+    {
+        $offset = 0;
+        $topicInfo = $this->decodeString($data, self::BIT_B16);
+        $offset += $topicInfo['length'];
+        $ret = $this->decodeArray(substr($data, $offset), array($this, 'producePartitionPair'), $version);
+        $offset += $ret['length'];
+
+        return array('length' => $offset, 'data' => array(
+            'topicName' => $topicInfo['data'],
+            'partitions'=> $ret['data'],
+        ));
+    }
+
+    // }}}
+    // {{{ protected function producePartitionPair()
+
+    /**
+     * decode produce partition pair response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function producePartitionPair($data, $version)
+    {
+        $offset = 0;
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+        $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $offset += 8;
+        $timestamp = 0;
+        if ($version == self::API_VERSION2) {
+            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+            $offset += 8;
+        }
+
+        return array(
+            'length' => $offset, 
+            'data'   => array(
+                'partition' => $partitionId,
+                'errorCode' => $errorCode,
+                'offset' => $offset,
+                'timestamp' => $timestamp,
+            )
+        );
+    }
+
+    // }}}
+    
+    // {{{ protected function metaBroker()
+
+    /**
+     * decode meta broker response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function metaBroker($data, $version)
+    {
+        $offset = 0;
+        $nodeId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $hostNameInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $hostNameInfo['length'];
+        $port = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'host' => $hostNameInfo['data'], 
+                'port' => $port, 
+                'nodeId' => $nodeId
+            )
+        );
+    }
+
+    // }}}
+    // {{{ protected function metaTopicMetaData()
+
+    /**
+     * decode meta topic meta data response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function metaTopicMetaData($data, $version)
+    {
+        $offset = 0;
+        $topicErrCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $topicInfo['length'];
+        $partionsMetaRet = $this->decodeArray(substr($data, $offset), array($this, 'metaPartitionMetaData'), $version);
+        $offset += $partionsMetaRet['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'topicName' => $topicInfo['data'], 
+                'errorCode' => $topicErrCode, 
+                'partitions' => $partionsMetaRet['data'],
+            )
+        );
+    }
+
+    // }}}
+    // {{{ protected function metaPartitionMetaData()
+
+    /**
+     * decode meta partition meta data response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function metaPartitionMetaData($data, $version)
+    {
+        $offset = 0;
+        $errcode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+        $partId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $leader = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $replicas = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $offset += $replicas['length'];
+        $isr = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $offset += $isr['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'partitionId' => $partId, 
+                'errorCode' => $errcode, 
+                'replicas' => $replicas['data'],
+                'leader' => $leader,
+                'isr' => $isr['data'],
+            )
+        );
+    }
+
+    // }}}
+
+    // {{{ protected function fetchTopic()
+
+    /**
+     * decode fetch topic response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function fetchTopic($data, $version)
+    {
+        $offset = 0;
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $topicInfo['length'];
+
+        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'fetchPartition'), $version);
+        $offset += $partitions['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'topicName' => $topicInfo['data'], 
+                'partitions'  => $partitions['data'], 
+            )
+        );
+    }
+
+    // }}}
+    // {{{ protected function fetchPartition()
+
+    /**
+     * decode fetch partition response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function fetchPartition($data, $version)
+    {
+        $offset = 0;
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+        $highwaterMarkOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $offset += 8;
+
+        $messageSetSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        if ($offset < strlen($data)) {
+            $messages = $this->decodeMessageSetArray(substr($data, $offset), array($this, 'decodeMessageSet'), $messageSetSize);
+            $offset += $messages['length'];
+        }
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'partition' => $partitionId, 
+                'errorCode' => $errorCode, 
+                'highwaterMarkOffset' => $highwaterMarkOffset, 
+                'messageSetSize' => $messageSetSize,
+                'messages' => isset($messages['data']) ? $messages['data'] : array(),
+            )
+        );
+    }
+
+    // }}}
+    
+    // {{{ protected function offsetTopic()
+
+    /**
+     * decode offset topic response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function offsetTopic($data, $version)
+    {
+        $offset = 0;
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $topicInfo['length'];
+
+        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'offsetPartition'), $version);
+        $offset += $partitions['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'topicName' => $topicInfo['data'], 
+                'partitions'  => $partitions['data'], 
+            )
+        );
+    }
+
+    // }}}
+    // {{{ protected function offsetPartition()
+
+    /**
+     * decode offset partition response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function offsetPartition($data, $version)
+    {
+        $offset = 0;
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+        $timestamp = 0;
+        if ($version != self::API_VERSION0) {
+            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+            $offset += 8;
+        }
+        $offsets = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B64);
+        $offset += $offsets['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'partition' => $partitionId, 
+                'errorCode' => $errorCode, 
+                'timestamp' => $timestamp, 
+                'offsets' => $offsets['data'],
+            )
+        );
+    }
+
+    // }}}
+    
+    // {{{ protected function joinGroupMember()
+
+    /**
+     * decode join group member response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function joinGroupMember($data)
+    {
+        $offset = 0;
+        $memberId = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $memberId['length'];
+        $memberMeta = $this->decodeString(substr($data, $offset), self::BIT_B32);
+        $offset += $memberMeta['length'];
+
+        $metaData = $memberMeta['data'];
+        $metaOffset = 0;
+        $version = self::unpack(self::BIT_B16, substr($metaData, $metaOffset, 2));
+        $metaOffset += 2;
+        $topics = $this->decodeArray(substr($metaData, $metaOffset), array($this, 'decodeString'), self::BIT_B16);
+        $metaOffset += $topics['length'];
+        $userData = $this->decodeString(substr($metaData, $metaOffset), self::BIT_B32);
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'memberId' => $memberId['data'], 
+                'memberMeta' => array(
+                    'version' => $version,
+                    'topics'  => $topics['data'],
+                    'userData' => $userData['data'],
+                ),
+            )
+        );
+    }
+
+    // }}}
+    
+    // {{{ protected function syncGroupResponsePartition()
+
+    /**
+     * decode sync group partition response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function syncGroupResponsePartition($data)
+    {
+        $offset = 0;
+        $topicName = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $topicName['length'];
+        $partitions = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $offset += $partions['length'];
+
+        return array(
+            'length' => $offset, 
+            'data' => array(
+                'topicName' => $topicName['data'], 
+                'partitions' => $partitions['data'],
+            )
+        );
+    }
+
+    // }}}
+    // {{{ public function decodeString()
+
+    /**
+     * decode unpack string type
+     *
+     * @param bytes $data
+     * @param int $bytes self::BIT_B32: int32 big endian order. self::BIT_B16: int16 big endian order.
+     * @param int $compression
+     * @return string
+     * @access public
+     */
+    public function decodeString($data, $bytes, $compression = self::COMPRESSION_NONE)
+    {
+        $offset = ($bytes == self::BIT_B32) ? 4 : 2;
+        $packLen = self::unpack($bytes, substr($data, 0, $offset)); // int16 topic name length
+        $data = substr($data, $offset, $packLen);
+        $offset += $packLen;
+
+        switch ($compression) {
+            case self::COMPRESSION_NONE:
+                break;
+            case self::COMPRESSION_GZIP:
+                $data = \gzdecode($data);
+                break;
+            case self::COMPRESSION_SNAPPY:
+                // todo
+                throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+            default:
+                throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        }
+        return array('length' => $offset, 'data' => $data);
+    }
+
+    // }}}
+    // {{{ public function decodeArray()
+
+    /**
+     * decode key array
+     *
+     * @param array $array
+     * @param Callable $func
+     * @param null $options
+     * @return string
+     * @access public
+     */
+    public function decodeArray($data, $func, $options = null)
+    {
+        $offset = 0;
+        $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        if (!is_callable($func, false)) {
+            throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
+        }
+
+        $result = array();
+        for ($i = 0; $i < $arrayCount; $i++) {
+            $value = substr($data, $offset);
+            if (!is_null($options)) {
+                $ret = call_user_func($func, $value, $options);
+            } else {
+                $ret = call_user_func($func, $value);
+            }
+
+            if (!is_array($ret) && $ret === false) {
+                break;
+            }
+
+            if (!isset($ret['length']) || !isset($ret['data'])) {
+                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
+            }
+            if ($ret['length'] == 0) {
+                continue;
+            }
+
+            $offset += $ret['length'];
+            $result[] = $ret['data'];
+        }
+
+        return array('length' => $offset, 'data' => $result);
+    }
+
+    // }}}
+    // {{{ public function decodePrimitiveArray()
+
+    /**
+     * decode primitive type array
+     *
+     * @param bytes[] $data
+     * @param bites $bites
+     * @return array
+     * @access public
+     */
+    public function decodePrimitiveArray($data, $bites)
+    {
+        $offset = 0;
+        $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        $result = array();
+        for ($i = 0; $i < $arrayCount; $i++) {
+            if ($bites == self::BIT_B64) {
+                $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+                $offset += 8;
+            } else if ($bites == self::BIT_B32) {
+                $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+                $offset += 4;
+            } else if (in_array($bites, array(self::BIT_B16, self::BIT_B16_SIGNED))) {
+                $result[] = self::unpack($bites, substr($data, $offset, 2));
+                $offset += 2;
+            } else if ($bites == self::BIT_B8) {
+                $result[] = self::unpack($bites, substr($data, $offset, 1));
+                $offset += 1;
+            }
+        }
+
+        return array('length' => $offset, 'data' => $result);
+    }
+
+    // }}}
+    
+    // {{{ public function decodeMessageSetArray()
+
+    /**
+     * decode message Set
+     *
+     * @param array $array
+     * @param Callable $func
+     * @param null $options
+     * @return string
+     * @access public
+     */
+    public function decodeMessageSetArray($data, $func, $options = null)
+    {
+        $offset = 0;
+        if (!is_callable($func, false)) {
+            throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
+        }
+
+        $result = array();
+        while ($offset < strlen($data)) {
+            $value = substr($data, $offset);
+            if (!is_null($options)) {
+                $ret = call_user_func($func, $value, $options);
+            } else {
+                $ret = call_user_func($func, $value);
+            }
+
+            if (!is_array($ret) && $ret === false) {
+                break;
+            }
+
+            if (!isset($ret['length']) || !isset($ret['data'])) {
+                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
+            }
+            if ($ret['length'] == 0) {
+                continue;
+            }
+
+            $offset += $ret['length'];
+            $result[] = $ret['data'];
+        
+        }
+
+        return array('length' => $offset, 'data' => $result);
+    }
+
+    // }}}
+    // {{{ public function decodeMessageSet()
+
+    /**
+     * decode message set
+     * N.B., MessageSets are not preceded by an int32 like other array elements
+     * in the protocol.
+     *
+     * @param array $messages
+     * @param int $compression
+     * @return string
+     * @access public
+     */
+    protected function decodeMessageSet($data, $length)
+    {
+        if (strlen($data) <= 12) {
+            return false;
+        }
+        $offset = 0;
+        $roffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $offset += 8;
+        $messageSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $ret = $this->decodeMessage(substr($data, $offset), $messageSize);
+        if (!is_array($ret) && $ret == false) {
+            return false;
+        }
+        $offset += $ret['length'];
+
+        return array(
+            'length' => $offset,
+            'data' => array(
+                'offset' => $roffset,
+                'size'   => $messageSize,
+                'message' => $ret['data'],
+            )
+        );
+    }
+
+    // }}}
+    // {{{ public function decodeMessage()
+
+    /**
+     * decode message 
+     * N.B., MessageSets are not preceded by an int32 like other array elements
+     * in the protocol.
+     *
+     * @param array $messages
+     * @param int $compression
+     * @return string
+     * @access public
+     */
+    protected function decodeMessage($data, $messageSize)
+    {
+        if (strlen($data) < $messageSize) {
+            return false;
+        }
+
+        $offset = 0;
+        $crc = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+        $magic = self::unpack(self::BIT_B8, substr($data, $offset, 1));
+        $offset += 1;
+        $attr  = self::unpack(self::BIT_B8, substr($data, $offset, 1));
+        $offset += 1;
+        $timestamp = 0;
+        $version = $this->getApiVersion(self::FETCH_REQUEST);
+        if ($version == self::API_VERSION2) {
+            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+            $offset += 8;
+        }
+        $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+        $offset += $keyRet['length'];
+        $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+        $offset += $valueRet['length'];
+
+        return array(
+            'length' => $offset,
+            'data'   => array(
+                'crc' => $crc,
+                'magic' => $magic,
+                'attr' => $attr,
+                'timestamp' => $timestamp,
+                'key' => $keyRet['data'],
+                'value' => $valueRet['data'],
+            )
+        );
     }
 
     // }}}

@@ -28,18 +28,42 @@ namespace Kafka\Protocol;
 
 abstract class Protocol
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+
     // {{{ consts
 
     /**
-     *  Kafka server protocol version
+     *  Default kafka broker verion
      */
-    const API_VERSION = 0;
+    const DEFAULT_BROKER_VERION = '0.10.1.0';
+
+    /**
+     *  Kafka server protocol version0
+     */
+    const API_VERSION0 = 0;
+
+    /**
+     *  Kafka server protocol version 1
+     */
+    const API_VERSION1 = 1;
+
+    /**
+     *  Kafka server protocol version 2
+     */
+    const API_VERSION2 = 2;
 
     /**
      * use encode message, This is a version id used to allow backwards
      * compatible evolution of the message binary format.
      */
-    const MESSAGE_MAGIC = 0;
+    const MESSAGE_MAGIC_VERSION0 = 0;
+
+    /**
+     * use encode message, This is a version id used to allow backwards
+     * compatible evolution of the message binary format.
+     */
+    const MESSAGE_MAGIC_VERSION1 = 1;
 
     /**
      * message no compression
@@ -75,7 +99,13 @@ abstract class Protocol
     const METADATA_REQUEST      = 3;
     const OFFSET_COMMIT_REQUEST = 8;
     const OFFSET_FETCH_REQUEST  = 9;
-    const CONSUMER_METADATA_REQUEST = 10;
+    const GROUP_COORDINATOR_REQUEST = 10;
+    const JOIN_GROUP_REQUEST  = 11;
+    const HEART_BEAT_REQUEST  = 12;
+    const LEAVE_GROUP_REQUEST = 13;
+    const SYNC_GROUP_REQUEST  = 14;
+    const DESCRIBE_GROUPS_REQUEST = 15;
+    const LIST_GROUPS_REQUEST     = 16;
 
     // unpack/pack bit
     const BIT_B64 = 'N2';
@@ -94,6 +124,14 @@ abstract class Protocol
      * @access protected
      */
     protected $stream = null;
+
+    /**
+     * kafka broker version
+     *
+     * @var mixed
+     * @access protected
+     */
+    protected $version = self::DEFAULT_BROKER_VERION;
 
     /**
      * isBigEndianSystem
@@ -116,9 +154,10 @@ abstract class Protocol
      * @param \Kafka\Socket $stream
      * @access public
      */
-    public function __construct(\Kafka\Socket $stream)
+    public function __construct(\Kafka\Socket $stream, $version = self::DEFAULT_BROKER_VERION)
     {
         $this->stream = $stream;
+        $this->version = $version;
     }
 
     // }}}
@@ -161,11 +200,11 @@ abstract class Protocol
      */
     public static function unpack($type, $bytes)
     {
+        $result = array();
         self::checkLen($type, $bytes);
         if ($type == self::BIT_B64) {
             $set = unpack($type, $bytes);
-            $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
-            return $original;
+            $result = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
         } elseif ($type == self::BIT_B16_SIGNED) {
             // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
             // So lets unpack it..
@@ -176,10 +215,12 @@ abstract class Protocol
                 // We need to flip the endianess because coming from kafka it is big endian
                 $set = self::convertSignedShortFromLittleEndianToBigEndian($set);
             }
-            return $set;
+            $result = $set;
         } else {
-            return unpack($type, $bytes);
+            $result = unpack($type, $bytes);
         }
+
+        return is_array($result) ? array_shift($result) : $result;
     }
 
     // }}}
@@ -310,6 +351,113 @@ abstract class Protocol
             $bits[$index] = $bit;
         }
         return $bits;
+    }
+
+    // }}}
+    // {{{ public function getApiVersion()
+
+    /**
+     * Get kafka api version according to specifiy kafka broker version
+     *
+     * @param int kafka api key
+     * @access public
+     * @return int
+     */
+    public function getApiVersion($apikey)
+    {
+        switch ($apikey) {
+            case self::METADATA_REQUEST:
+                return self::API_VERSION0;
+            case self::PRODUCE_REQUEST:
+                if (version_compare($this->version, '0.10.0') >= 0) {
+                    return self::API_VERSION2;
+                } else if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1; 
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::FETCH_REQUEST:
+                if (version_compare($this->version, '0.10.0') >= 0) {
+                    return self::API_VERSION2;
+                } else if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1; 
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::OFFSET_REQUEST:
+                // todo
+                return self::API_VERSION0;
+                if (version_compare($this->version, '0.10.1.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::GROUP_COORDINATOR_REQUEST:
+                return self::API_VERSION0;
+            case self::OFFSET_COMMIT_REQUEST:
+                if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION2;
+                } else if (version_compare($this->version, '0.8.2') >= 0) {
+                    return self::API_VERSION1; 
+                } else {
+                    return self::API_VERSION0; // supported in 0.8.1 or later
+                }
+            case self::OFFSET_FETCH_REQUEST:
+                if (version_compare($this->version, '0.8.2') >= 0) {
+                    return self::API_VERSION1; // Offset Fetch Request v1 will fetch offset from Kafka
+                } else {
+                    return self::API_VERSION0;//Offset Fetch Request v0 will fetch offset from zookeeper
+                }
+            case self::JOIN_GROUP_REQUEST:
+                if (version_compare($this->version, '0.10.1.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0; // supported in 0.9.0.0 and greater
+                }
+            case self::SYNC_GROUP_REQUEST:
+                return self::API_VERSION0;
+            case self::HEART_BEAT_REQUEST:
+                return self::API_VERSION0;
+            case self::LEAVE_GROUP_REQUEST:
+                return self::API_VERSION0;
+            case self::LIST_GROUPS_REQUEST:
+                return self::API_VERSION0;
+            case self::DESCRIBE_GROUPS_REQUEST:
+                return self::API_VERSION0;
+        }
+
+        // default
+        return self::API_VERSION0;
+    }
+
+    // }}}
+    // {{{ public static function getApiText()
+
+    /**
+     * Get kafka api text
+     *
+     * @param int kafka api key
+     * @access public
+     * @return string
+     */
+    public static function getApiText($apikey)
+    {
+        $apis = array(
+            self::PRODUCE_REQUEST => 'ProduceRequest',
+            self::FETCH_REQUEST   => 'FetchRequest',
+            self::OFFSET_REQUEST  => 'OffsetRequest',
+            self::METADATA_REQUEST => 'MetadataRequest',
+            self::OFFSET_COMMIT_REQUEST => 'OffsetCommitRequest',
+            self::OFFSET_FETCH_REQUEST  => 'OffsetFetchRequest',
+            self::GROUP_COORDINATOR_REQUEST => 'GroupCoordinatorRequest',
+            self::JOIN_GROUP_REQUEST => 'JoinGroupRequest',
+            self::HEART_BEAT_REQUEST => 'HeartbeatRequest',
+            self::LEAVE_GROUP_REQUEST => 'LeaveGroupRequest',
+            self::SYNC_GROUP_REQUEST  => 'SyncGroupRequest',
+            self::DESCRIBE_GROUPS_REQUEST => 'DescribeGroupsRequest',
+            self::LIST_GROUPS_REQUEST => 'ListGroupsRequest',
+        ); 
+        return $apis[$apikey];
     }
 
     // }}}

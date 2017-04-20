@@ -55,10 +55,10 @@ class Encoder extends Protocol
             $payloads['timeout'] = 100; // default timeout 100ms
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
         $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeProcudeTopic'), $compression);
+        $data  .= self::encodeArray($payloads['data'], array($this, '_encodeProcudeTopic'), $compression);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $this->stream->write($data);
@@ -86,7 +86,7 @@ class Encoder extends Protocol
             }
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::METADATA_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::METADATA_REQUEST);
         $data   = self::encodeArray($topics, array(__CLASS__, 'encodeString'), self::PACK_INT16);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -121,7 +121,7 @@ class Encoder extends Protocol
             $payloads['min_bytes'] = 64 * 1024; // 64k
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::FETCH_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::FETCH_REQUEST);
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
         $data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
         $data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
@@ -151,15 +151,120 @@ class Encoder extends Protocol
             $payloads['replica_id'] = -1;
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::OFFSET_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::OFFSET_REQUEST);
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
-        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeOffsetTopic'));
+        $data  .= self::encodeArray($payloads['data'], array($this, '_encodeOffsetTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $this->stream->write($data);
     }
 
     // }}}
+    // {{{ public function groupRequest()
+
+    /**
+     * build group request
+     *
+     * @param array $payloads
+     * @access public
+     * @return string
+     */
+    public function groupRequest($payloads)
+    {
+        if (!isset($payloads['group_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+        }
+
+        $header = $this->requestHeader('kafka-php', 0, self::GROUP_COORDINATOR_REQUEST);
+        $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data   = self::encodeString($header . $data, self::PACK_INT32);
+
+        return $this->stream->write($data);
+    }
+
+    // }}}
+    // {{{ public function joinGroupRequest()
+
+    /**
+     * build join group request
+     *
+     * @param array $payloads
+     * @access public
+     * @return string
+     */
+    public function joinGroupRequest($payloads)
+    {
+        if (!isset($payloads['group_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+        }
+        if (!isset($payloads['session_timeout'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `session_timeout` is undefined.');
+        }
+        if (!isset($payloads['member_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `member_id` is undefined.');
+        }
+        if (!isset($payloads['data'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+        }
+        if (!isset($payloads['protocol_type'])) {
+            $payloads['protocol_type'] = 'consumer';
+        }
+        if (!isset($payloads['rebalance_timeout'])) {
+            $payloads['rebalance_timeout'] = $payloads['session_timeout'];
+        }
+
+        $header = $this->requestHeader('kafka-php', 0, self::JOIN_GROUP_REQUEST);
+        $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data   .= self::pack(self::BIT_B32, $payloads['session_timeout']);
+        if ($this->getApiVersion(self::JOIN_GROUP_REQUEST) == self::API_VERSION1) {
+            $data .= self::pack(self::BIT_B32, $payloads['rebalance_timeout']);
+        }
+        $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
+        $data .= self::encodeString($payloads['protocol_type'], self::PACK_INT16);
+        $data .= self::encodeArray($payloads['data'], array($this, '_encodeGroupProtocol'));
+        $data = self::encodeString($header . $data, self::PACK_INT32);
+
+        return $this->stream->write($data);
+    }
+
+    // }}}
+    // {{{ public function syncGroupRequest()
+
+    /**
+     * build sync group request
+     *
+     * @param array $payloads
+     * @access public
+     * @return string
+     */
+    public function syncGroupRequest($payloads)
+    {
+        if (!isset($payloads['group_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+        }
+        if (!isset($payloads['generation_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `generation_id` is undefined.');
+        }
+        if (!isset($payloads['member_id'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `member_id` is undefined.');
+        }
+        if (!isset($payloads['data'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+        }
+
+        $header = $this->requestHeader('kafka-php', 0, self::SYNC_GROUP_REQUEST);
+        $data  = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
+        $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
+        $data .= self::encodeArray($payloads['data'], array($this, '_encodeGroupAssignment'));
+
+        $data = self::encodeString($header . $data, self::PACK_INT32);
+
+        return $this->stream->write($data);
+    }
+
+    // }}}
+    
     // {{{ public function commitOffsetRequest()
 
     /**
@@ -179,7 +284,7 @@ class Encoder extends Protocol
             throw new \Kafka\Exception\Protocol('given commit offset data invalid. `group_id` is undefined.');
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::OFFSET_COMMIT_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::OFFSET_COMMIT_REQUEST);
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeCommitOffset'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
@@ -207,7 +312,7 @@ class Encoder extends Protocol
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `group_id` is undefined.');
         }
 
-        $header = self::requestHeader('kafka-php', 0, self::OFFSET_FETCH_REQUEST);
+        $header = $this->requestHeader('kafka-php', 0, self::OFFSET_FETCH_REQUEST);
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
         $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchOffset'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
@@ -238,6 +343,7 @@ class Encoder extends Protocol
                 $string = \gzencode($string);
                 break;
             case self::COMPRESSION_SNAPPY:
+                // todo
                 throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
             default:
                 throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
@@ -292,24 +398,27 @@ class Encoder extends Protocol
      * @static
      * @access public
      */
-    public static function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
+    public function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
     {
         if (!is_array($messages)) {
             $messages = array($messages);
         }
 
         $data = '';
+        $next = 0;
         foreach ($messages as $message) {
-            $tmpMessage = self::_encodeMessage($message, $compression);
+            $tmpMessage = $this->_encodeMessage($message, $compression);
 
             // int64 -- message offset     Message
-            $data .= self::pack(self::BIT_B64, 0) . self::encodeString($tmpMessage, self::PACK_INT32);
+            //This is the offset used in kafka as the log sequence number. When the producer is sending non compressed messages, it can set the offsets to anything. When the producer is sending compressed messages, to avoid server side recompression, each compressed message should have offset starting from 0 and increasing by one for each inner message in the compressed message. (see more details about compressed messages in Kafka below)
+            $data .= self::pack(self::BIT_B64, $next) . self::encodeString($tmpMessage, self::PACK_INT32);
+            $next++;
         }
         return $data;
     }
 
     // }}}
-    // {{{ public static function requestHeader()
+    // {{{ public function requestHeader()
 
     /**
      * get request header
@@ -317,25 +426,26 @@ class Encoder extends Protocol
      * @param string $clientId
      * @param integer $correlationId
      * @param integer $apiKey
-     * @static
      * @access public
      * @return string
      */
-    public static function requestHeader($clientId, $correlationId, $apiKey)
+    public function requestHeader($clientId, $correlationId, $apiKey)
     {
         // int16 -- apiKey int16 -- apiVersion int32 correlationId
         $binData  = self::pack(self::BIT_B16, $apiKey);
-        $binData .= self::pack(self::BIT_B16, self::API_VERSION);
+        $binData .= self::pack(self::BIT_B16, $this->getApiVersion($apiKey));
         $binData .= self::pack(self::BIT_B32, $correlationId);
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
+        $msg = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
+        $this->debug('Start Request ' . $msg);
 
         return $binData;
     }
 
     // }}}
-    // {{{ protected static function _encodeMessage()
+    // {{{ protected function _encodeMessage()
 
     /**
      * encode signal message
@@ -346,10 +456,12 @@ class Encoder extends Protocol
      * @static
      * @access protected
      */
-    protected static function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
+    protected function _encodeMessage($message, $compression = self::COMPRESSION_NONE)
     {
         // int8 -- magic  int8 -- attribute
-        $data  = self::pack(self::BIT_B8, self::MESSAGE_MAGIC);
+        $version = $this->getApiVersion(self::PRODUCE_REQUEST);
+        $magic = ($version == self::API_VERSION2) ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
+        $data  = self::pack(self::BIT_B8, $magic);
         $data .= self::pack(self::BIT_B8, $compression);
 
         // message key
@@ -379,7 +491,7 @@ class Encoder extends Protocol
      * @static
      * @access protected
      */
-    protected static function _encodeProcudePartion($values, $compression)
+    protected function _encodeProcudePartion($values, $compression)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
@@ -390,7 +502,7 @@ class Encoder extends Protocol
         }
 
         $data = self::pack(self::BIT_B32, $values['partition_id']);
-        $data .= self::encodeString(self::encodeMessageSet($values['messages'], $compression), self::PACK_INT32);
+        $data .= self::encodeString($this->encodeMessageSet($values['messages'], $compression), self::PACK_INT32);
 
         return $data;
     }
@@ -408,7 +520,7 @@ class Encoder extends Protocol
      * @static
      * @access protected
      */
-    protected static function _encodeProcudeTopic($values, $compression)
+    protected function _encodeProcudeTopic($values, $compression)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');
@@ -419,7 +531,7 @@ class Encoder extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeProcudePartion'), $compression);
+        $partitions = self::encodeArray($values['partitions'], array($this, '_encodeProcudePartion'), $compression);
 
         return $topic . $partitions;
     }
@@ -446,7 +558,7 @@ class Encoder extends Protocol
         }
 
         if (!isset($values['max_bytes'])) {
-            $values['max_bytes'] = 100 * 1024 * 1024;
+            $values['max_bytes'] = 2 * 1024 * 1024;
         }
 
         $data = self::pack(self::BIT_B32, $values['partition_id']);
@@ -484,17 +596,17 @@ class Encoder extends Protocol
     }
 
     // }}}
-    // {{{ protected static function _encodeOffsetPartion()
+
+    // {{{ protected function _encodeOffsetPartion()
 
     /**
      * encode signal part
      *
      * @param partions
-     * @static
      * @access protected
      * @return string
      */
-    protected static function _encodeOffsetPartion($values)
+    protected function _encodeOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
@@ -510,23 +622,25 @@ class Encoder extends Protocol
 
         $data = self::pack(self::BIT_B32, $values['partition_id']);
         $data .= self::pack(self::BIT_B64, $values['time']);
-        $data .= self::pack(self::BIT_B32, $values['max_offset']);
+
+        if ($this->getApiVersion(self::OFFSET_REQUEST) == self::API_VERSION0) {
+            $data .= self::pack(self::BIT_B32, $values['max_offset']);
+        }
 
         return $data;
     }
 
     // }}}
-    // {{{ protected static function _encodeOffsetTopic()
+    // {{{ protected function _encodeOffsetTopic()
 
     /**
      * encode signal topic
      *
      * @param partions
-     * @static
      * @access protected
      * @return string
      */
-    protected static function _encodeOffsetTopic($values)
+    protected function _encodeOffsetTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
@@ -537,12 +651,143 @@ class Encoder extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeOffsetPartion'));
+        $partitions = self::encodeArray($values['partitions'], array($this, '_encodeOffsetPartion'));
 
         return $topic . $partitions;
     }
 
     // }}}
+    
+    // {{{ protected function _encodeGroupProtocol()
+
+    /**
+     * encode group protocol
+     *
+     * @param partions
+     * @access protected
+     * @return string
+     */
+    protected function _encodeGroupProtocol($values)
+    {
+        if (!isset($values['protocol_name'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `protocol_name` is undefined.');
+        }
+
+        $protocolName = self::encodeString($values['protocol_name'], self::PACK_INT16);
+
+        if (!isset($values['version'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
+        }
+
+        if (!isset($values['subscription']) || empty($values['subscription'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `subscription` is undefined.');
+        }
+        if (!isset($values['user_data'])) {
+            $values['user_data'] = '';
+        }
+
+        $data = self::pack(self::BIT_B16, 0);
+        $data .= self::encodeArray($values['subscription'], array($this, '_encodeGroupProtocolMetaTopic'));
+        $data .= self::encodeString($values['user_data'], self::PACK_INT32);
+
+        return $protocolName . self::encodeString($data, self::PACK_INT32);
+    }
+
+    // }}}
+    // {{{ protected function _encodeGroupProtocolMetaTopic()
+
+    /**
+     * encode group protocol metadata topic
+     *
+     * @param partions
+     * @access protected
+     * @return string
+     */
+    protected function _encodeGroupProtocolMetaTopic($values)
+    {
+        $topic = self::encodeString($values, self::PACK_INT16);
+        return $topic;
+    }
+
+    // }}}
+
+    // {{{ protected function _encodeGroupAssignment()
+
+    /**
+     * encode group assignment protocol
+     *
+     * @param partions
+     * @access protected
+     * @return string
+     */
+    protected function _encodeGroupAssignment($values)
+    {
+        if (!isset($values['version'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
+        }
+        if (!isset($values['member_id'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `member_id` is undefined.');
+        }
+
+        if (!isset($values['assignments']) || empty($values['assignments'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `assignments` is undefined.');
+        }
+        if (!isset($values['user_data'])) {
+            $values['user_data'] = '';
+        }
+
+        $memberId = self::encodeString($values['member_id'], self::PACK_INT16);
+
+        $data = self::pack(self::BIT_B16, 0);
+        $data .= self::encodeArray($values['assignments'], array($this, '_encodeGroupAssignmentTopic'));
+        $data .= self::encodeString($values['user_data'], self::PACK_INT32);
+
+        return $memberId . self::encodeString($data, self::PACK_INT32);
+    }
+
+    // }}}
+    // {{{ protected function _encodeGroupAssignmentTopic()
+
+    /**
+     * encode group assignment topic protocol
+     *
+     * @param partions
+     * @access protected
+     * @return string
+     */
+    protected function _encodeGroupAssignmentTopic($values)
+    {
+        if (!isset($values['topic_name'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `topic_name` is undefined.');
+        }
+        if (!isset($values['partitions'])) {
+            throw new \Kafka\Exception\Protocol('given data invalid. `partitions` is undefined.');
+        }
+
+        $topicName = self::encodeString($values['member_id'], self::PACK_INT16);
+
+        $partitions .= self::encodeArray($values['partitions'], array($this, '_encodeGroupAssignmentTopicPartition'));
+
+        return $topicName . $partitions;
+    }
+
+    // }}}
+    // {{{ protected function _encodeGroupAssignmentTopicPartition()
+
+    /**
+     * encode group assignment topic protocol
+     *
+     * @param partions
+     * @access protected
+     * @return string
+     */
+    protected function _encodeGroupAssignmentTopicPartition($values)
+    {
+        return self::pack(self::BIT_B32, $values);
+    }
+
+    // }}}
+
     // {{{ protected static function _encodeCommitOffsetPartion()
 
     /**
