@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka;
+namespace Kafka\Consumer;
 
 /**
 +------------------------------------------------------------------------------
@@ -26,52 +26,82 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Log
+class Broker
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+
     // {{{ consts
     // }}}
     // {{{ members
+    
+    private static $instance = null;
 
-    /**
-     * log
-     *
-     * @var mixed
-     * @access private
-     */
-    private static $log = null;
+    private $groupBrokerId = null;
+
+    private $topics = array();
 
     // }}}
     // {{{ functions
-    // {{{ public static function setLog()
+    // {{{ public function static getInstance()
 
     /**
-     * setLog
+     * set send messages
      *
      * @access public
-     * @param $log
+     * @param $hostList
+     * @param null $timeout
+     * @return Consumer
      */
-    public static function setLog($log)
+    public static function getInstance()
     {
-        if ($log) {
-            self::$log = $log;
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
         }
+
+        return self::$instance;
     }
 
     // }}}
-    // {{{ public static function log()
+    // {{{ private function __construct()
 
     /**
-     * log
+     * __construct
      *
      * @access public
-     * @param $message
-     * @param int $level
+     * @param $hostList
+     * @param null $timeout
      */
-    public static function log($message, $level = LOG_DEBUG)
+    private function __construct()
     {
-        if (self::$log && method_exists(self::$log, 'log')) {
-            self::$log->log($message, $level);
-        }
+    }
+
+    // }}}
+    // {{{ public function setGroupBrokerId()
+
+    public function setGroupBrokerId($brokerId) {
+        $this->groupBrokerId = $brokerId;
+    }
+
+    // }}}
+    // {{{ public function getGroupBrokerId()
+
+    public function getGroupBrokerId() {
+        return $this->groupBrokerId;
+    }
+
+    // }}}
+    // {{{ public function setTopics()
+
+    public function setTopics($topics) {
+        $this->topics = $topics;
+    }
+
+    // }}}
+    // {{{ public function getTopics()
+
+    public function getTopics() {
+        return $this->topics;
     }
 
     // }}}

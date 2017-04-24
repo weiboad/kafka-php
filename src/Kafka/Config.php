@@ -26,50 +26,54 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Consumer
+abstract class Config
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
+
+    private $options = array();
+
+    private static $defaults = array(
+        'clientId' => 'kafka-php',
+        'brokerVersion' => '0.10.1.0',
+        'metadataBrokerList' => '',
+        'messageMaxBytes' => '1000000',
+        'metadataRequestTimeoutMs' => '60000',
+        'metadataRefreshIntervalMs' => '300000',
+        'metadataMaxAgeMs' => -1,
+    );
+
     // }}}
     // {{{ functions
-    // {{{ public function __construct()
+    // {{{ public function __call()
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    public function __construct()
+    public function __call($name, $args)
     {
-    }
+        if (strpos($name, 'get') === 0) {
+            $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
+            if (isset($this->options[$option])) {
+                return $this->options[$option]; 
+            }
 
-    // }}}
-    // {{{ public function start()
-
-    /**
-     * start consumer 
-     *
-     * @access public
-     * @return void
-     */
-    public function start(\Closure $consumer = null, $isBlock = true)
-    {
-        $process = new \Kafka\Consumer\Process($consumer);
-        if ($this->logger) {
-            $process->setLogger($this->logger);
+            if (isset(self::$defaults[$option])) {
+                return self::$defaults[$option];
+            }
+            if (isset(static::$defaults[$option])) {
+                return static::$defaults[$option];
+            }
         }
-        $process->init();
-        if ($isBlock) {
-            \Amp\run();
-        } 
+
+        if (strpos($name, 'set') === 0) {
+            if (count($args) != 1) {
+                return false;
+            }
+            $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
+            $this->options[$option] = $args[0];
+            // check todo
+            return true;
+        }
     }
 
-    // }}}
     // }}}
 }

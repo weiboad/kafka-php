@@ -26,17 +26,44 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Consumer
+class ConsumerConfig extends Config
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
+
+    private static $instance = null;
+
+    protected static $defaults = array(
+        'groupId' => '',
+        'sessionTimeout' => 6000,
+        'rebalanceTimeout' => 4000,
+        'topics' => array(),
+    );
+
     // }}}
     // {{{ functions
-    // {{{ public function __construct()
+    // {{{ public function static getInstance()
+
+    /**
+     * set send messages
+     *
+     * @access public
+     * @param $hostList
+     * @param null $timeout
+     * @return Consumer
+     */
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    // }}}
+    // {{{ private function __construct()
 
     /**
      * __construct
@@ -45,29 +72,8 @@ class Consumer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct()
+    private function __construct()
     {
-    }
-
-    // }}}
-    // {{{ public function start()
-
-    /**
-     * start consumer 
-     *
-     * @access public
-     * @return void
-     */
-    public function start(\Closure $consumer = null, $isBlock = true)
-    {
-        $process = new \Kafka\Consumer\Process($consumer);
-        if ($this->logger) {
-            $process->setLogger($this->logger);
-        }
-        $process->init();
-        if ($isBlock) {
-            \Amp\run();
-        } 
     }
 
     // }}}

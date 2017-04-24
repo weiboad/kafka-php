@@ -155,11 +155,11 @@ trait LoggerTrait
      *
      * @return void
      */
-	public function log($level, $message, array $context = array())
-	{
-		if ($this->logger == null) {
-			$this->logger = new NullLogger();	
-		}
-		$this->logger->log($level, $message, $context);
-	}
+    public function log($level, $message, array $context = array())
+    {
+        if ($this->logger == null) {
+            $this->logger = new NullLogger();
+        }
+        $this->logger->log($level, $message, $context);
+    }
 }

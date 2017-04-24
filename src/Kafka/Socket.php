@@ -204,6 +204,20 @@ class Socket
     }
 
     // }}}
+    // {{{ public function SetOnReadable()
+
+    /**
+     * set on readable callback function
+     *
+     * @access public
+     * @return void
+     */
+    public function SetOnReadable(\Closure $read)
+    {
+        $this->onReadable = $read;
+    }
+
+    // }}}
     // {{{ public function connect()
 
     /**
@@ -285,57 +299,12 @@ class Socket
      * @return string Binary data
      * @throws \Kafka\Exception\SocketEOF
      */
-    public function read($len, $verifyExactLength = false)
+    public function read()
     {
-        if ($len > self::READ_MAX_LEN) {
-            throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream, length too longer.');
-        }
-
-        $null = null;
-        $read = array($this->stream);
-        $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-        if ($readable > 0) {
-            $remainingBytes = $len;
-            $data = $chunk = '';
-            while ($remainingBytes > 0) {
-                $chunk = fread($this->stream, $remainingBytes);
-                if ($chunk === false) {
-                    $this->close();
-                    throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (no data)');
-                }
-                if (strlen($chunk) === 0) {
-                    // Zero bytes because of EOF?
-                    if (feof($this->stream)) {
-                        $this->close();
-                        throw new \Kafka\Exception\SocketEOF('Unexpected EOF while reading '.$len.' bytes from stream (no data)');
-                    }
-                    // Otherwise wait for bytes
-                    $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-                    if ($readable !== 1) {
-                        throw new \Kafka\Exception\SocketTimeout('Timed out reading socket while reading ' . $len . ' bytes with ' . $remainingBytes . ' bytes to go');
-                    }
-                    continue; // attempt another read
-                }
-                $data .= $chunk;
-                $remainingBytes -= strlen($chunk);
-            }
-            if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
-                // couldn't read anything at all OR reached EOF sooner than expected
-                $this->close();
-                throw new \Kafka\Exception\SocketEOF('Read ' . strlen($data) . ' bytes instead of the requested ' . $len . ' bytes');
-            }
-
-            return $data;
-        }
-        if (false !== $readable) {
-            $res = stream_get_meta_data($this->stream);
-            if (!empty($res['timed_out'])) {
-                $this->close();
-                throw new \Kafka\Exception\SocketTimeout('Timed out reading '.$len.' bytes from stream');
-            }
-        }
-        $this->close();
-        throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (not readable)');
+        $len = $this->doRead(4);
+        $dataLen = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $len);
+        $data = $this->doRead($dataLen);
+        call_user_func($this->onReadable, $data);
     }
 
     // }}}
@@ -409,6 +378,74 @@ class Socket
         if (is_resource($this->stream)) {
             rewind($this->stream);
         }
+    }
+
+    // }}}
+    // {{{ protected function doRead()
+
+    /**
+     * Read from the socket at most $len bytes.
+     *
+     * This method will not wait for all the requested data, it will return as
+     * soon as any data is received.
+     *
+     * @param integer $len               Maximum number of bytes to read.
+     * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
+     *
+     * @return string Binary data
+     * @throws \Kafka\Exception\SocketEOF
+     */
+    protected function doRead($len, $verifyExactLength = false)
+    {
+        if ($len > self::READ_MAX_LEN) {
+            throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream, length too longer.');
+        }
+
+        $null = null;
+        $read = array($this->stream);
+        $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        if ($readable > 0) {
+            $remainingBytes = $len;
+            $data = $chunk = '';
+            while ($remainingBytes > 0) {
+                $chunk = fread($this->stream, $remainingBytes);
+                if ($chunk === false) {
+                    $this->close();
+                    throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (no data)');
+                }
+                if (strlen($chunk) === 0) {
+                    // Zero bytes because of EOF?
+                    if (feof($this->stream)) {
+                        $this->close();
+                        throw new \Kafka\Exception\SocketEOF('Unexpected EOF while reading '.$len.' bytes from stream (no data)');
+                    }
+                    // Otherwise wait for bytes
+                    $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+                    if ($readable !== 1) {
+                        throw new \Kafka\Exception\SocketTimeout('Timed out reading socket while reading ' . $len . ' bytes with ' . $remainingBytes . ' bytes to go');
+                    }
+                    continue; // attempt another read
+                }
+                $data .= $chunk;
+                $remainingBytes -= strlen($chunk);
+            }
+            if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
+                // couldn't read anything at all OR reached EOF sooner than expected
+                $this->close();
+                throw new \Kafka\Exception\SocketEOF('Read ' . strlen($data) . ' bytes instead of the requested ' . $len . ' bytes');
+            }
+
+            return $data;
+        }
+        if (false !== $readable) {
+            $res = stream_get_meta_data($this->stream);
+            if (!empty($res['timed_out'])) {
+                $this->close();
+                throw new \Kafka\Exception\SocketTimeout('Timed out reading '.$len.' bytes from stream');
+            }
+        }
+        $this->close();
+        throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (not readable)');
     }
 
     // }}}
