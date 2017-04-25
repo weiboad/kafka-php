@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka;
+namespace Kafka\Consumer;
 
 /**
 +------------------------------------------------------------------------------
@@ -26,21 +26,20 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class ConsumerConfig extends Config
+class Fetch
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+
     // {{{ consts
     // }}}
     // {{{ members
-
+    
     private static $instance = null;
 
-    protected static $defaults = array(
-        'groupId' => '',
-        'sessionTimeout' => 6000,
-        'rebalanceTimeout' => 4000,
-        'topics' => array(),
-        'offsetReset' => 'latest', // earliest
-    );
+    private $consumer = null;
+
+    private $messages = array();
 
     // }}}
     // {{{ functions
@@ -75,6 +74,45 @@ class ConsumerConfig extends Config
      */
     private function __construct()
     {
+    }
+
+    // }}}
+    // {{{ public function setConsumer()
+
+    public function setConsumer(\Closure $consumer = null) {
+        $this->consumer = $consumer;
+    }
+
+    // }}}
+    // {{{ public function start()
+
+    public function start()
+    { 
+
+    }
+
+    // }}}
+    // {{{ public function onCommit()
+
+    public function onCommit()
+    { 
+
+    }
+
+    // }}}
+    // {{{ public function onConsumer()
+
+    public function onConsumer()
+    { 
+
+    }
+
+    // }}}
+    // {{{ public function stop()
+
+    public function stop()
+    {
+    
     }
 
     // }}}

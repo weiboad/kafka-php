@@ -38,9 +38,18 @@ class Assignment
     private static $instance = null;
 
     private $memberId = '';
+
     private $generationId = '';
 
     private $assignments = array();
+
+    private $topics = array();
+
+    private $offsets = array();
+
+    private $fetchOffsets = array();
+
+    private $consumerOffsets = array();
 
     // }}}
     // {{{ functions
@@ -151,6 +160,69 @@ class Assignment
             $data[] = $item;
         }
         $this->assignments = $data;
+    }
+
+    // }}}
+    // {{{ public function setTopics()
+
+    public function setTopics($topics) {
+        $this->topics = $topics;
+    }
+
+    // }}}
+    // {{{ public function getTopics()
+
+    public function getTopics() {
+        return $this->topics;
+    }
+
+    // }}}
+    // {{{ public function setOffsets()
+
+    public function setOffsets($offsets) {
+        $this->offsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getOffsets()
+
+    public function getOffsets() {
+        return $this->offsets;
+    }
+
+    // }}}
+    // {{{ public function setFetchOffsets()
+
+    public function setFetchOffsets($offsets) {
+        $this->fetchOffsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getFetchOffsets()
+
+    public function getFetchOffsets() {
+        return $this->fetchOffsets;
+    }
+
+    // }}}
+    // {{{ public function setConsumerOffsets()
+
+    public function setConsumerOffsets($offsets) {
+        $this->consumerOffsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getConsumerOffsets()
+
+    public function getConsumerOffsets() {
+        return $this->consumerOffsets;
+    }
+
+    // }}}
+    // {{{ public function setConsumerOffset()
+
+    public function setConsumerOffset($topic, $part, $offset) {
+        $this->consumerOffsets[$topic][$part] = $offset;
     }
 
     // }}}

@@ -690,6 +690,9 @@ abstract class Protocol
     {
         $offset = ($bytes == self::BIT_B32) ? 4 : 2;
         $packLen = self::unpack($bytes, substr($data, 0, $offset)); // int16 topic name length
+        if ($packLen == 4294967295) { // uint32(4294967295) is int32 (-1)
+            $packLen = 0; 
+        }
         $data = substr($data, $offset, $packLen);
         $offset += $packLen;
 

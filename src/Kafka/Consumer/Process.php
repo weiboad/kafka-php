@@ -157,6 +157,23 @@ class Process
                 $this->state->failHeartbeat($result['errorCode']);
             }
             break;
+        case \Kafka\Protocol\Protocol::OFFSET_REQUEST:
+            $offset = new \Kafka\Protocol\Offset(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
+            $result = $offset->decode(substr($data, 4));
+            $this->state->succOffset($result);
+            break;
+        case \Kafka\Protocol\Protocol::OFFSET_FETCH_REQUEST:
+            $offset = new \Kafka\Protocol\FetchOffset(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
+            $result = $offset->decode(substr($data, 4));
+            $this->state->succFetchOffset($result);
+            break;
+        case \Kafka\Protocol\Protocol::FETCH_REQUEST:
+            $fetch = new \Kafka\Protocol\Fetch(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
+            $result = $fetch->decode(substr($data, 4));
+            $this->state->succFetch($result);
+            break;
+        default:
+            var_dump($correlationId);
         }
     }
 
