@@ -67,15 +67,15 @@ class CommitOffset extends Protocol
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
         if ($version == self::API_VERSION1) {
             $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
-            $data .= self::encodeString($payloads['member_id'], self::BIT_B16);
+            $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         }
         if ($version == self::API_VERSION2) {
             $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
-            $data .= self::encodeString($payloads['member_id'], self::BIT_B16);
+            $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
             $data .= self::pack(self::BIT_B64, $payloads['retention_time']);
         }
 
-        $data .= self::encodeArray($payloads['data'], array(__CLASS__, 'encodeTopic'));
+        $data .= self::encodeArray($payloads['data'], array($this, 'encodeTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -93,20 +93,113 @@ class CommitOffset extends Protocol
     public function decode($data)
     {
         $offset = 0;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
-        $coordinatorId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $hosts = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $hosts['length'];
-        $coordinatorPort = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $version = $this->getApiVersion(self::OFFSET_REQUEST);
+        $topics = $this->decodeArray(substr($data, $offset), array($this, 'decodeTopic'), $version);
+        $offset += $topics['length'];
+        
+        return $topics['data'];
+    }
+
+    // }}}
+    // {{{ protected function encodeTopic()
+
+    protected function encodeTopic($values) 
+    {
+        if (!isset($values['topic_name'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
+        }
+        if (!isset($values['partitions'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
+        }
+    
+        $data  = self::encodeString($values['topic_name'], self::PACK_INT16);
+        $data .= self::encodeArray($values['partitions'], array($this, 'encodePartition'));
+        
+        return $data;
+    }
+
+    // }}}
+    // {{{ protected function encodePartition()
+
+    protected function encodePartition($values) 
+    {
+        if (!isset($values['partition'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `partition` is undefined.');
+        }
+        if (!isset($values['offset'])) {
+            throw new \Kafka\Exception\Protocol('given offset data invalid. `offset` is undefined.');
+        }
+        if (!isset($values['metadata'])) {
+            $values['metadata'] = '';
+        }
+        if (!isset($values['timestamp'])) {
+            $values['timestamp'] = time() * 1000;
+        }
+        $version = $this->getApiVersion(self::OFFSET_COMMIT_REQUEST);
+
+        $data  = self::pack(self::BIT_B32, $values['partition']);
+        $data .= self::pack(self::BIT_B64, $values['offset']);
+        if ($version == self::API_VERSION1) {
+            $data .= self::pack(self::BIT_B64, $values['timestamp']);
+        }
+        $data .= self::encodeString($values['metadata'], self::PACK_INT16);
+        
+        return $data;
+    }
+
+    // }}}
+    // {{{ protected function decodeTopic()
+
+    /**
+     * decode commit offset topic response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function decodeTopic($data, $version)
+    {
+        $offset = 0;
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset += $topicInfo['length'];
+
+        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'decodePartition'), $version);
+        $offset += $partitions['length'];
 
         return array(
-            'errorCode' => $errorCode,
-            'coordinatorId' => $coordinatorId,
-            'coordinatorHost' => $hosts['data'],
-            'coordinatorPort' => $coordinatorPort
+            'length' => $offset,
+            'data' => array(
+                'topicName' => $topicInfo['data'],
+                'partitions'  => $partitions['data'],
+            )
+        );
+    }
+
+    // }}}
+    // {{{ protected function decodePartition()
+
+    /**
+     * decode commit offset partition response
+     *
+     * @access protected
+     * @return array
+     */
+    protected function decodePartition($data, $version)
+    {
+        $offset = 0;
+
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset += 2;
+
+
+        return array(
+            'length' => $offset,
+            'data' => array(
+                'partition' => $partitionId,
+                'errorCode' => $errorCode,
+            )
         );
     }
 

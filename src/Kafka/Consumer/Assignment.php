@@ -51,6 +51,10 @@ class Assignment
 
     private $consumerOffsets = array();
 
+    private $commitOffsets = array();
+
+    private $precommitOffsets = array();
+
     // }}}
     // {{{ functions
     // {{{ public function static getInstance()
@@ -223,6 +227,55 @@ class Assignment
 
     public function setConsumerOffset($topic, $part, $offset) {
         $this->consumerOffsets[$topic][$part] = $offset;
+    }
+
+    // }}}
+    // {{{ public function getConsumerOffset()
+
+    public function getConsumerOffset($topic, $part) {
+        return $this->consumerOffsets[$topic][$part];
+    }
+
+    // }}}
+    // {{{ public function setCommitOffsets()
+
+    public function setCommitOffsets($offsets) {
+        $this->commitOffsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getCommitOffsets()
+
+    public function getCommitOffsets() {
+        return $this->commitOffsets;
+    }
+
+    // }}}
+    // {{{ public function setCommitOffset()
+
+    public function setCommitOffset($topic, $part, $offset) {
+        $this->commitOffsets[$topic][$part] = $offset;
+    }
+
+    // }}}
+    // {{{ public function setPrecommitOffsets()
+
+    public function setPrecommitOffsets($offsets) {
+        $this->precommitOffsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getPrecommitOffsets()
+
+    public function getPrecommitOffsets() {
+        return $this->precommitOffsets;
+    }
+
+    // }}}
+    // {{{ public function setPrecommitOffset()
+
+    public function setPrecommitOffset($topic, $part, $offset) {
+        $this->precommitOffsets[$topic][$part] = $offset;
     }
 
     // }}}

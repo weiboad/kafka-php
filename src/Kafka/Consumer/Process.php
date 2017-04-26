@@ -62,6 +62,7 @@ class Process
         if ($this->logger) {
             $this->state->setLogger($this->logger);
         }
+        $this->state->setOnConsumer($this->consumer);
         // init process request
         $connections = \Kafka\Consumer\Connection::getInstance();
         $connections->setProcess(function($data) {
@@ -171,6 +172,11 @@ class Process
             $fetch = new \Kafka\Protocol\Fetch(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
             $result = $fetch->decode(substr($data, 4));
             $this->state->succFetch($result);
+            break;
+        case \Kafka\Protocol\Protocol::OFFSET_COMMIT_REQUEST:
+            $commit = new \Kafka\Protocol\CommitOffset(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
+            $result = $commit->decode(substr($data, 4));
+            $this->state->succCommit($result);
             break;
         default:
             var_dump($correlationId);

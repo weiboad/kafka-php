@@ -40,6 +40,7 @@ class State
     const REQUEST_OFFSET = 5;
     const REQUEST_FETCH = 6;
     const REQUEST_FETCH_OFFSET = 7;
+    const REQUEST_COMMIT_OFFSET = 8;
 
     const STATUS_STOP = 0;
     const STATUS_START = 1;
@@ -79,12 +80,17 @@ class State
             'interval' => 2000,
         ),
         self::REQUEST_FETCH => array(
-            'interval' => 1000,
+            'interval' => 100,
         ),
         self::REQUEST_FETCH_OFFSET => array(
             'interval' => 2000,
         ),
+        self::REQUEST_COMMIT_OFFSET => array(
+            'interval' => 2000,
+        ),
     );
+
+    private $consumer = null;
 
     // }}}
     // {{{ functions
@@ -119,6 +125,15 @@ class State
      */
     private function __construct()
     {
+    }
+
+    // }}}
+    
+    // {{{ public function setOnConsumer()
+
+    public function setOnConsumer($consumer)
+    {
+        $this->consumer = $consumer; 
     }
 
     // }}}
@@ -480,7 +495,8 @@ class State
 
     public function succFetch($result)
     {
-        $this->debug('Fetch success, result:' . json_encode($result));
+        $assign = \Kafka\Consumer\Assignment::getInstance();
+        //$this->debug('Fetch success, result:' . json_encode($result));
         foreach ($result['topics'] as $topic) {
             foreach ($topic['partitions'] as $part) {
                 $context = array(
@@ -492,12 +508,73 @@ class State
                     continue;
                 }
 
+                $offset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
                 foreach ($part['messages'] as $message) {
-                    var_dump($message);
+                    if ($this->consumer != null) {
+                        call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
+                    }
+                    $offset = $message['offset'];
                 }
+                $assign->setConsumerOffset($topic['topicName'], $part['partition'], $offset + 1);
+                $assign->setCommitOffset($topic['topicName'], $part['partition'], $offset);
             }
-        } 
+        }
         $this->restartItem(self::REQUEST_FETCH);
+    }
+
+    // }}}
+    
+    // {{{ protected function commit()
+
+    protected function commit()
+    {
+        $groupBrokerId = \Kafka\Consumer\Broker::getInstance()->getGroupBrokerId();
+        $connections = \Kafka\Consumer\Connection::getInstance();
+        $connect = $connections->getMetaConnect($groupBrokerId);
+        if (!$connect) {
+            return;
+        }
+
+        $commit = new \Kafka\Protocol\CommitOffset(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
+        $commitOffsets = \Kafka\Consumer\Assignment::getInstance()->getCommitOffsets();
+        $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
+        \Kafka\Consumer\Assignment::getInstance()->setPrecommitOffsets($commitOffsets);
+        $data = array();
+        foreach ($topics as $brokerId => $topicList) {
+            foreach ($topicList as $topic) {
+                $partitions = array();
+                if (isset($data[$topic['topic_name']]['partitions'])) {
+                    $partitions = $data[$topic['topic_name']]['partitions'];
+                }
+                foreach ($topic['partitions'] as $partId) {
+                    if ($commitOffsets[$topic['topic_name']][$partId] == -1) {
+                        continue;
+                    }
+                    $partitions[$partId]['partition'] = $partId;
+                    $partitions[$partId]['offset'] = $commitOffsets[$topic['topic_name']][$partId];
+                }
+                $data[$topic['topic_name']]['partitions'] = $partitions;
+                $data[$topic['topic_name']]['topic_name'] = $topic['topic_name'];
+            }
+        }
+        $params = array(
+            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'generation_id' => \Kafka\Consumer\Assignment::getInstance()->getGenerationId(),
+            'member_id' => \Kafka\Consumer\Assignment::getInstance()->getMemberId(),
+            'data' => $data,
+        );
+        $this->debug("Commit current fetch offset start, params:" . json_encode($params));
+        $requestData = $commit->encode($params);
+        $connect->write($requestData);
+    }
+
+    // }}}
+    // {{{ public function succCommit()
+
+    public function succCommit($result)
+    {
+        $this->debug('Commit success, result:' . json_encode($result));
+        $this->restartItem(self::REQUEST_COMMIT_OFFSET);
     }
 
     // }}}
@@ -626,8 +703,10 @@ class State
         $consumerOffsets = $assign->getConsumerOffsets();
         if (empty($consumerOffsets)) {
             $assign->setConsumerOffsets($assign->getFetchOffsets());
+            $assign->setCommitOffsets($assign->getFetchOffsets());
             // first start fetch request , must in fetch offset request after
             $this->runItem(self::REQUEST_FETCH);
+            $this->runItem(self::REQUEST_COMMIT_OFFSET);
         }
 
         $this->restartItem(self::REQUEST_FETCH_OFFSET);
@@ -742,6 +821,9 @@ class State
         };
         $this->callStatus[self::REQUEST_FETCH]['func'] = function() {
             $this->fetch();
+        };
+        $this->callStatus[self::REQUEST_COMMIT_OFFSET]['func'] = function() {
+            $this->commit();
         };
     }
 

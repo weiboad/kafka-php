@@ -17,4 +17,6 @@ $config->setTopics(array('test'));
 //$config->setOffsetReset('earliest');
 $consumer = new \Kafka\Consumer();
 $consumer->setLogger($logger);
-$consumer->start();
+$consumer->start(function($topic, $part, $message) {
+	var_dump($message);
+});
