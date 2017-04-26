@@ -20,7 +20,8 @@
     },
     "autoload-dev": {
         "psr-0": {
-            "KafkaTest\\": "tests/"
+            "KafkaTest\\": "tests/",
+            "KafkaExample\\": "example/"
         }
     },
     "require-dev": {

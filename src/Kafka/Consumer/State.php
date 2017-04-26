@@ -26,11 +26,8 @@ namespace Kafka\Consumer;
 +------------------------------------------------------------------------------
 */
 
-class State
+class State extends \Kafka\Singleton
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
 
     const REQUEST_GETGROUP  = 1;
@@ -46,30 +43,19 @@ class State
     const STATUS_START = 1;
     const STATUS_PROCESS = 2;
 
-    const OFFSET_OUT_OF_RANGE = 1;
-    const UNKNOWN_TOPIC_OR_PARTITION = 3;
-    const NOT_LEADER_FOR_PARTITION = 6;
-    const GROUP_LOAD_IN_PROGRESS = 14;
-    const GROUP_COORDINATOR_NOT_AVAILABLE = 15;
-    const NOT_COORDINATOR_FOR_GROUP = 16;
-    const ILLEGAL_GENERATION = 22;
-    const INCONSISTENT_GROUP_PROTOCOL = 23;
-    const INVALID_GROUP_ID_CODE = 24;
-    const UNKNOWN_MEMBER_ID = 25; 
-    const REBALANCE_IN_PROGRESS = 27;
-    const INVALID_SESSION_TIMEOUT = 26;
-    const INVALID_COMMIT_OFFSET_SIZE = 28;
-    const TOPIC_AUTHORIZATION_FAILED = 29;
-    const GROUP_AUTHORIZATION_FAILED = 30;
-    const UNSUPPORTED_FOR_MESSAGE_FORMAT = 43;
-    const UNKNOWN = -1;
-
     // }}}
     // {{{ members
     
-    private static $instance = null;
-
-    private $callStatus = array();
+    private $callStatus = array(
+        's11' => array(
+            'status' => self::STATUS_STOP,
+            'startTime' => xxx
+            'context' => array(
+                fd=> xxxx
+                fd1=> xxx 
+            ),
+        )
+    );
     
     private $requests  = array(
         self::REQUEST_GETGROUP => array(),
@@ -94,82 +80,60 @@ class State
 
     // }}}
     // {{{ functions
-    // {{{ public function static getInstance()
+    // {{{ public function checkRun()
 
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return Consumer
-     */
-    public static function getInstance()
+    public function checkRun($key)
     {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
+        if (!isset($this->callStatus[$key])) {
+            return false;
         }
 
-        return self::$instance;
+        return $this->callStatus[$key] == self::STATUS_START;
     }
 
     // }}}
-    // {{{ private function __construct()
+    // {{{ public function trigerItem()
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    private function __construct()
+    public function trigerItem($key)
     {
+        $this->callStatus[$key]['status'] = self::STATUS_START;
+    }
+
+    // }}}
+    // {{{ public function setItem()
+
+    public function setItem($key, $fd)
+    {
+        $this->callStatus[$key]['status'] = self::STATUS_PROCESS;
+        $this->callStatus[$key]['time'] = microtime(true);
+        $this->callStatus[$key]['context'][$fd] = self::STATUS_PROCESS;
+    }
+
+    // }}}
+    // {{{ public function stopItem()
+
+    public function stopItem($key)
+    {
+        $this->callStatus[$key]['status'] = self::STATUS_STOP;
+    }
+
+    // }}}
+    // {{{ public function finishItem()
+
+    public function finishItem($key, $fd)
+    {
+        $context = $this->callStatus[$key]['context'];
+        if (isset($context[$fd])) {
+            unset($this->callStatus[$key]['context'][$fd]);
+        }
+
+        if (empty($this->callStatus[$key]['context'])) {// all request connect is finish
+            $this->callStatus[$key]['status'] = self::STATUS_START; // next request continue;
+        }
     }
 
     // }}}
     
-    // {{{ public function setOnConsumer()
-
-    public function setOnConsumer($consumer)
-    {
-        $this->consumer = $consumer; 
-    }
-
-    // }}}
-    
-    // {{{ public function waitSyncMeta()
-
-    public function waitSyncMeta()
-    {
-        $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList());
-        $brokerHost = array();
-        foreach ($brokerList as $key => $val) {
-            if (trim($val)) {
-                $brokerHost[] = $val;
-            }
-        }
-        if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
-        }
-        shuffle($brokerHost);
-        $connections = \Kafka\Consumer\Connection::getInstance();
-        foreach ($brokerHost as $host) {
-            $socket = $connections->getMetaConnect($host);
-            if ($socket) {
-                $meta = new \Kafka\Protocol\Metadata(\Kafka\ConsumerConfig::getInstance()->getBrokerVersion());
-                $topics = \Kafka\ConsumerConfig::getInstance()->getTopics();
-                $requestData = $meta->encode($topics);
-                $this->debug('Start sync metadata request params:' . json_encode($topics));
-                $socket->write($requestData);
-                return;
-            }
-        }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
-    }
-
-    // }}}
     // {{{ public function failSyncMeta()
 
     public function failSyncMeta()
@@ -180,42 +144,13 @@ class State
     // }}}
     // {{{ public function succSyncMeta()
 
-    public function succSyncMeta($brokerResult, $topics)
+    public function succSyncMeta($brokers, $topics)
     {
-        $brokers = array();
-        $connections = \Kafka\Consumer\Connection::getInstance();
-        foreach ($brokerResult as $value) {
-            $key = $value['nodeId'];
-            $hostname = $value['host'] . ':' . $value['port'];
-            $brokers[$key] = $hostname;
-        }
+        $broker = \Kafka\Broker::getInstance();
+        $isChange = $broker->setData($topics, $brokers);
 
-        $oldBrokers = $connections->getBrokers();
-        $needChange = false;
-        if (serialize($oldBrokers) != serialize($brokers)) {
-            $needChange = true;
-        }
-
-        $broker = \Kafka\Consumer\Broker::getInstance();
-        $oldTopics = $broker->getTopics();
-        $newTopics = array();
-        foreach ($topics as $topic) {
-            if ($topic['errorCode'] != 0) {
-                continue;
-            }
-            $item = array();
-            foreach ($topic['partitions']  as $part) {
-                $item[$part['partitionId']] = $part['leader'];
-            }
-            $newTopics[$topic['topicName']] = $item;
-        }
-        if (serialize($oldTopics) != serialize($newTopics)) {
-            $broker->setTopics($newTopics);
-            $needChange = true;
-        }
-
-        if ($needChange) {
-            $this->onBrokerChange($brokers);
+        if ($isChange) {
+            $this->onBrokerChange();
         }
     }
 
@@ -716,11 +651,9 @@ class State
     
     // {{{ protected function onBrokerChange()
 
-    protected function onBrokerChange($brokers)
+    protected function onBrokerChange()
     {
         $this->stop();
-        $connections = \Kafka\Consumer\Connection::getInstance();
-        $connections->setBrokers($brokers);
         $this->init();
         $this->start();
         $this->error('Broker is change, kafka consumer will resume...');

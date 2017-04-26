@@ -26,16 +26,11 @@ namespace Kafka\Consumer;
 +------------------------------------------------------------------------------
 */
 
-class Broker
+class Broker extends \Kafka\Singleton
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
-    
-    private static $instance = null;
 
     private $groupBrokerId = null;
 
@@ -43,64 +38,34 @@ class Broker
 
     // }}}
     // {{{ functions
-    // {{{ public function static getInstance()
-
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return Consumer
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    // }}}
-    // {{{ private function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    private function __construct()
-    {
-    }
-
-    // }}}
     // {{{ public function setGroupBrokerId()
 
-    public function setGroupBrokerId($brokerId) {
+    public function setGroupBrokerId($brokerId)
+    {
         $this->groupBrokerId = $brokerId;
     }
 
     // }}}
     // {{{ public function getGroupBrokerId()
 
-    public function getGroupBrokerId() {
+    public function getGroupBrokerId()
+    {
         return $this->groupBrokerId;
     }
 
     // }}}
     // {{{ public function setTopics()
 
-    public function setTopics($topics) {
+    public function setTopics($topics)
+    {
         $this->topics = $topics;
     }
 
     // }}}
     // {{{ public function getTopics()
 
-    public function getTopics() {
+    public function getTopics()
+    {
         return $this->topics;
     }
 

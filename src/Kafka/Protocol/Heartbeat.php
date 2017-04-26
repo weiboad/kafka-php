@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for group coordinator api 
+* Kafka protocol for heart beat api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -41,13 +41,13 @@ class Heartbeat extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `group_id` is undefined.');
         }
         if (!isset($payloads['generation_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `generation_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `generation_id` is undefined.');
         }
         if (!isset($payloads['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `member_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `member_id` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::HEART_BEAT_REQUEST, self::HEART_BEAT_REQUEST);
@@ -64,7 +64,7 @@ class Heartbeat extends Protocol
     // {{{ public function decode()
 
     /**
-     * decode group response
+     * decode heart beat response
      *
      * @access public
      * @return array

@@ -275,6 +275,20 @@ class SocketAsyn
     }
 
     // }}}
+    // {{{ public function getSocket()
+
+    /**
+     * get the socket
+     *
+     * @access public
+     * @return void
+     */
+    public function getSocket()
+    {
+        return $this->stream;
+    }
+
+    // }}}
     // {{{ public function SetOnReadable()
 
     /**
@@ -355,7 +369,7 @@ class SocketAsyn
 
             $this->readBuffer = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
-            call_user_func($this->onReadable, $data);
+            call_user_func($this->onReadable, $data, (int)$this->stream);
         } while(strlen($this->readBuffer));
     }
 

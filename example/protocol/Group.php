@@ -1,12 +1,5 @@
 <?php
 require '../../vendor/autoload.php';
-date_default_timezone_set('PRC');
-use Monolog\Logger;
-use Monolog\Handler\StdoutHandler;
-// Create the logger
-$logger = new Logger('my_logger');
-// Now add some handlers
-$logger->pushHandler(new StdoutHandler());
 
 $data = array(
 	'group_id' => 'test',

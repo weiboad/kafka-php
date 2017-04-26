@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for meta data api 
+* Kafka protocol for meta data api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -51,7 +51,7 @@ class Metadata extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::METADATA_REQUEST, self::METADATA_REQUEST);
-        $data   = self::encodeArray($topics, array(__CLASS__, 'encodeString'), self::PACK_INT16);
+        $data   = self::encodeArray($topics, array($this, 'encodeString'), self::PACK_INT16);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;

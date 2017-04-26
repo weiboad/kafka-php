@@ -58,26 +58,77 @@ class Process
      */
     public function init()
     {
+        // init protocol
+        $config = \Kafka\ConsumerConfig::getInstance();
+        \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
+
+        // init process request
+        $broker = \Kafka\Broker::getInstance();
+        $broker->setProcess(function($data) {
+            $this->processRequest($data);
+        });
+
+        // init state
         $this->state = \Kafka\Consumer\State::getInstance();
         if ($this->logger) {
             $this->state->setLogger($this->logger);
         }
-        $this->state->setOnConsumer($this->consumer);
+
+        //$this->state->setOnConsumer($this->consumer);
+
+        //$this->state->waitSyncMeta();
+
+        //// repeat get update meta info
+        //\Amp\repeat(function ($watcherId) {
+        //    $this->state->waitSyncMeta();
+        //    if (!$this->isRunning) {
+        //        \Amp\cancel($watcherId);
+        //    }
+        //}, $msInterval = \Kafka\ConsumerConfig::getInstance()->getMetadataRefreshIntervalMs());
+    }
+
+    // }}}
+    // {{{ public function start()
+
+    /**
+     * start consumer 
+     *
+     * @access public
+     * @return void
+     */
+    public function start()
+    {
+        $this->init();
+
+        // init protocol
+        $config = \Kafka\ConsumerConfig::getInstance();
+        \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
+
         // init process request
-        $connections = \Kafka\Consumer\Connection::getInstance();
-        $connections->setProcess(function($data) {
+        $broker = \Kafka\Broker::getInstance();
+        $broker->setProcess(function($data) {
             $this->processRequest($data);
         });
 
-        $this->state->waitSyncMeta();
+        // init state
+        $this->state = \Kafka\Consumer\State::getInstance();
+        if ($this->logger) {
+            $this->state->setLogger($this->logger);
+        }
 
-        // repeat get update meta info
-        \Amp\repeat(function ($watcherId) {
-            $this->state->waitSyncMeta();
-            if (!$this->isRunning) {
-                \Amp\cancel($watcherId);
-            }
-        }, $msInterval = \Kafka\ConsumerConfig::getInstance()->getMetadataRefreshIntervalMs());
+        $this->state->start();
+
+        //$this->state->setOnConsumer($this->consumer);
+
+        //$this->state->waitSyncMeta();
+
+        //// repeat get update meta info
+        //\Amp\repeat(function ($watcherId) {
+        //    $this->state->waitSyncMeta();
+        //    if (!$this->isRunning) {
+        //        \Amp\cancel($watcherId);
+        //    }
+        //}, $msInterval = \Kafka\ConsumerConfig::getInstance()->getMetadataRefreshIntervalMs());
     }
 
     // }}}
@@ -103,7 +154,7 @@ class Process
      * @access public
      * @return void
      */
-    protected function processRequest($data)
+    protected function processRequest($data, $fd)
     {
         $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         $connections = \Kafka\Consumer\Connection::getInstance();
@@ -181,6 +232,37 @@ class Process
         default:
             var_dump($correlationId);
         }
+    }
+
+    // }}}
+    // {{{ protected function syncMeta()
+
+    protected function syncMeta()
+    {
+        $this->debug('Start sync metadata request');
+        $brokerList = explode(',', \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList());
+        $brokerHost = array();
+        foreach ($brokerList as $key => $val) {
+            if (trim($val)) {
+                $brokerHost[] = $val;
+            }
+        }
+        if (count($brokerHost) == 0) {
+            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+        }
+        shuffle($brokerHost);
+        $broker = \Kafka\Broker::getInstance();
+        foreach ($brokerHost as $host) {
+            $socket = $broker->getMetaConnect($host);
+            if ($socket) {
+                $params = \Kafka\ConsumerConfig::getInstance()->getTopics();
+                $this->debug('Start sync metadata request params:' . json_encode($params));
+                $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
+                $socket->write($requestData);
+                return;
+            }
+        }
+        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
     }
 
     // }}}

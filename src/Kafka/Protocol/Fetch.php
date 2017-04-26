@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for consumer fetch api 
+* Kafka protocol for consumer fetch api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -60,7 +60,7 @@ class Fetch extends Protocol
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
         $data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
         $data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
-        $data  .= self::encodeArray($payloads['data'], array(__CLASS__, '_encodeFetchTopic'));
+        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeFetchTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -161,7 +161,7 @@ class Fetch extends Protocol
     }
 
     // }}}
-    // {{{ public function decodeMessageSetArray()
+    // {{{ protected function decodeMessageSetArray()
 
     /**
      * decode message Set
@@ -170,9 +170,9 @@ class Fetch extends Protocol
      * @param Callable $func
      * @param null $options
      * @return string
-     * @access public
+     * @access protected
      */
-    public function decodeMessageSetArray($data, $func, $options = null)
+    protected function decodeMessageSetArray($data, $func, $options = null)
     {
         $offset = 0;
         if (!is_callable($func, false)) {
@@ -207,7 +207,7 @@ class Fetch extends Protocol
     }
 
     // }}}
-    // {{{ public function decodeMessageSet()
+    // {{{ protected function decodeMessageSet()
 
     /**
      * decode message set
@@ -217,7 +217,7 @@ class Fetch extends Protocol
      * @param array $messages
      * @param int $compression
      * @return string
-     * @access public
+     * @access protected
      */
     protected function decodeMessageSet($data)
     {
@@ -246,7 +246,7 @@ class Fetch extends Protocol
     }
 
     // }}}
-    // {{{ public function decodeMessage()
+    // {{{ protected function decodeMessage()
 
     /**
      * decode message
@@ -256,7 +256,7 @@ class Fetch extends Protocol
      * @param array $messages
      * @param int $compression
      * @return string
-     * @access public
+     * @access protected
      */
     protected function decodeMessage($data, $messageSize)
     {
@@ -296,17 +296,16 @@ class Fetch extends Protocol
     }
 
     // }}}
-    // {{{ protected static function _encodeFetchPartion()
+    // {{{ protected function encodeFetchPartion()
 
     /**
      * encode signal part
      *
      * @param partions
-     * @static
      * @access protected
      * @return string
      */
-    protected static function _encodeFetchPartion($values)
+    protected function encodeFetchPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `partition_id` is undefined.');
@@ -328,17 +327,16 @@ class Fetch extends Protocol
     }
 
     // }}}
-    // {{{ protected static function _encodeFetchTopic()
+    // {{{ protected function encodeFetchTopic()
 
     /**
      * encode signal topic
      *
      * @param partions
-     * @static
      * @access protected
      * @return string
      */
-    protected static function _encodeFetchTopic($values)
+    protected function encodeFetchTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `topic_name` is undefined.');
@@ -349,7 +347,7 @@ class Fetch extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array(__CLASS__, '_encodeFetchPartion'));
+        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeFetchPartion'));
 
         return $topic . $partitions;
     }

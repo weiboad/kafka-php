@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for group coordinator api 
+* Kafka protocol for sync group api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -32,7 +32,7 @@ class SyncGroup extends Protocol
     // {{{ public function encode()
 
     /**
-     * group coordinator request encode
+     * sync group request encode
      *
      * @param array $payloads
      * @access public
@@ -41,23 +41,23 @@ class SyncGroup extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given sync group data invalid. `group_id` is undefined.');
         }
         if (!isset($payloads['generation_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `generation_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given sync group data invalid. `generation_id` is undefined.');
         }
         if (!isset($payloads['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `member_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given sync group data invalid. `member_id` is undefined.');
         }
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given sync group data invalid. `data` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::SYNC_GROUP_REQUEST, self::SYNC_GROUP_REQUEST);
         $data  = self::encodeString($payloads['group_id'], self::PACK_INT16);
         $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
         $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
-        $data .= self::encodeArray($payloads['data'], array($this, '_encodeGroupAssignment'));
+        $data .= self::encodeArray($payloads['data'], array($this, 'encodeGroupAssignment'));
 
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -94,9 +94,9 @@ class SyncGroup extends Protocol
         } else {
             return array(
                 'errorCode' => $errorCode,
-            ); 
+            );
         }
-        
+
         return array(
             'errorCode' => $errorCode,
             'partitionAssignments' => $partitionAssignments['data'],
@@ -106,7 +106,7 @@ class SyncGroup extends Protocol
     }
 
     // }}}
-    // {{{ protected function _encodeGroupAssignment()
+    // {{{ protected function encodeGroupAssignment()
 
     /**
      * encode group assignment protocol
@@ -115,7 +115,7 @@ class SyncGroup extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeGroupAssignment($values)
+    protected function encodeGroupAssignment($values)
     {
         if (!isset($values['version'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
@@ -134,14 +134,14 @@ class SyncGroup extends Protocol
         $memberId = self::encodeString($values['member_id'], self::PACK_INT16);
 
         $data = self::pack(self::BIT_B16, 0);
-        $data .= self::encodeArray($values['assignments'], array($this, '_encodeGroupAssignmentTopic'));
+        $data .= self::encodeArray($values['assignments'], array($this, 'encodeGroupAssignmentTopic'));
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
         return $memberId . self::encodeString($data, self::PACK_INT32);
     }
 
     // }}}
-    // {{{ protected function _encodeGroupAssignmentTopic()
+    // {{{ protected function encodeGroupAssignmentTopic()
 
     /**
      * encode group assignment topic protocol
@@ -150,7 +150,7 @@ class SyncGroup extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeGroupAssignmentTopic($values)
+    protected function encodeGroupAssignmentTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `topic_name` is undefined.');
@@ -161,13 +161,13 @@ class SyncGroup extends Protocol
 
         $topicName = self::encodeString($values['topic_name'], self::PACK_INT16);
 
-        $partitions .= self::encodeArray($values['partitions'], array($this, '_encodeGroupAssignmentTopicPartition'));
+        $partitions .= self::encodeArray($values['partitions'], array($this, 'encodeGroupAssignmentTopicPartition'));
 
         return $topicName . $partitions;
     }
 
     // }}}
-    // {{{ protected function _encodeGroupAssignmentTopicPartition()
+    // {{{ protected function encodeGroupAssignmentTopicPartition()
 
     /**
      * encode group assignment topic protocol
@@ -176,7 +176,7 @@ class SyncGroup extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeGroupAssignmentTopicPartition($values)
+    protected function encodeGroupAssignmentTopicPartition($values)
     {
         return self::pack(self::BIT_B32, $values);
     }

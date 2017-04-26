@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for fetch offset api 
+* Kafka protocol for fetch offset api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -41,7 +41,7 @@ class FetchOffset extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `data` is undefined.');
         }
 
         if (!isset($payloads['group_id'])) {
@@ -50,7 +50,7 @@ class FetchOffset extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_FETCH_REQUEST, self::OFFSET_FETCH_REQUEST);
         $data = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data  .= self::encodeArray($payloads['data'], array($this, '_encodeOffsetTopic'));
+        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeOffsetTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -62,6 +62,7 @@ class FetchOffset extends Protocol
     /**
      * decode group response
      *
+     * @param byte[] $data
      * @access public
      * @return array
      */
@@ -71,27 +72,27 @@ class FetchOffset extends Protocol
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
         $topics = $this->decodeArray(substr($data, $offset), array($this, 'offsetTopic'), $version);
         $offset += $topics['length'];
-        
+
         return $topics['data'];
     }
 
     // }}}
-    // {{{ protected function _encodeOffsetPartion()
+    // {{{ protected function encodeOffsetPartion()
 
     /**
      * encode signal part
      *
-     * @param partions
+     * @param byte[] values partions data
      * @access protected
      * @return string
      */
-    protected function _encodeOffsetPartion($values)
+    protected function encodeOffsetPartion($values)
     {
         return self::pack(self::BIT_B32, $values);
     }
 
     // }}}
-    // {{{ protected function _encodeOffsetTopic()
+    // {{{ protected function encodeOffsetTopic()
 
     /**
      * encode signal topic
@@ -100,18 +101,18 @@ class FetchOffset extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeOffsetTopic($values)
+    protected function encodeOffsetTopic($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `topic_name` is undefined.');
         }
 
         if (!isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partitions` is undefined.');
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, '_encodeOffsetPartion'));
+        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeOffsetPartion'));
 
         return $topic . $partitions;
     }

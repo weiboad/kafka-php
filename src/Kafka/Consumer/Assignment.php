@@ -28,15 +28,10 @@ namespace Kafka\Consumer;
 
 class Assignment
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
     
-    private static $instance = null;
-
     private $memberId = '';
 
     private $generationId = '';
@@ -57,40 +52,6 @@ class Assignment
 
     // }}}
     // {{{ functions
-    // {{{ public function static getInstance()
-
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return Consumer
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    // }}}
-    // {{{ private function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    private function __construct()
-    {
-    }
-
-    // }}}
     // {{{ public function setMemberId()
 
     public function setMemberId($memberId) {

@@ -32,8 +32,6 @@ class ConsumerConfig extends Config
     // }}}
     // {{{ members
 
-    private static $instance = null;
-
     protected static $defaults = array(
         'groupId' => '',
         'sessionTimeout' => 6000,
@@ -44,39 +42,5 @@ class ConsumerConfig extends Config
 
     // }}}
     // {{{ functions
-    // {{{ public function static getInstance()
-
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return Consumer
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    // }}}
-    // {{{ private function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    private function __construct()
-    {
-    }
-
-    // }}}
     // }}}
 }

@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for commit offset api 
+* Kafka protocol for commit offset api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -41,7 +41,7 @@ class CommitOffset extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `group_id` is undefined.');
         }
 
         if (!isset($payloads['data'])) {
@@ -96,38 +96,52 @@ class CommitOffset extends Protocol
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
         $topics = $this->decodeArray(substr($data, $offset), array($this, 'decodeTopic'), $version);
         $offset += $topics['length'];
-        
+
         return $topics['data'];
     }
 
     // }}}
     // {{{ protected function encodeTopic()
 
-    protected function encodeTopic($values) 
+    /**
+     * encode commit offset topic array
+     *
+     * @param array $values
+     * @access public
+     * @return array
+     */
+    protected function encodeTopic($values)
     {
         if (!isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `topic_name` is undefined.');
         }
         if (!isset($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `partitions` is undefined.');
         }
-    
+
         $data  = self::encodeString($values['topic_name'], self::PACK_INT16);
         $data .= self::encodeArray($values['partitions'], array($this, 'encodePartition'));
-        
+
         return $data;
     }
 
     // }}}
     // {{{ protected function encodePartition()
 
-    protected function encodePartition($values) 
+    /**
+     * encode commit offset partition array
+     *
+     * @param array $values
+     * @access public
+     * @return array
+     */
+    protected function encodePartition($values)
     {
         if (!isset($values['partition'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `partition` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `partition` is undefined.');
         }
         if (!isset($values['offset'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `offset` is undefined.');
+            throw new \Kafka\Exception\Protocol('given commit offset data invalid. `offset` is undefined.');
         }
         if (!isset($values['metadata'])) {
             $values['metadata'] = '';
@@ -143,7 +157,7 @@ class CommitOffset extends Protocol
             $data .= self::pack(self::BIT_B64, $values['timestamp']);
         }
         $data .= self::encodeString($values['metadata'], self::PACK_INT16);
-        
+
         return $data;
     }
 
@@ -153,6 +167,8 @@ class CommitOffset extends Protocol
     /**
      * decode commit offset topic response
      *
+     * @param byte[] $data
+     * @param string $version
      * @access protected
      * @return array
      */
@@ -180,6 +196,8 @@ class CommitOffset extends Protocol
     /**
      * decode commit offset partition response
      *
+     * @param byte[] $data
+     * @param string $version
      * @access protected
      * @return array
      */

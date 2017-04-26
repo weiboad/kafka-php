@@ -34,6 +34,9 @@ class Consumer
     // {{{ consts
     // }}}
     // {{{ members
+    
+    private static $isRunning = false;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -60,11 +63,16 @@ class Consumer
      */
     public function start(\Closure $consumer = null, $isBlock = true)
     {
+        if ($this->isRunning) {
+            $this->error('Has start consumer');
+            return;
+        }
         $process = new \Kafka\Consumer\Process($consumer);
         if ($this->logger) {
             $process->setLogger($this->logger);
         }
         $process->init();
+        $this->isRunning = true;
         if ($isBlock) {
             \Amp\run();
         } 

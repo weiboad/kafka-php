@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for join group api 
+* Kafka protocol for join group api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -41,16 +41,16 @@ class JoinGroup extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given join group data invalid. `group_id` is undefined.');
         }
         if (!isset($payloads['session_timeout'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `session_timeout` is undefined.');
+            throw new \Kafka\Exception\Protocol('given join group data invalid. `session_timeout` is undefined.');
         }
         if (!isset($payloads['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `member_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given join group data invalid. `member_id` is undefined.');
         }
         if (!isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+            throw new \Kafka\Exception\Protocol('given join group data invalid. `data` is undefined.');
         }
         if (!isset($payloads['protocol_type'])) {
             $payloads['protocol_type'] = 'consumer';
@@ -67,7 +67,7 @@ class JoinGroup extends Protocol
         }
         $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         $data .= self::encodeString($payloads['protocol_type'], self::PACK_INT16);
-        $data .= self::encodeArray($payloads['data'], array($this, '_encodeGroupProtocol'));
+        $data .= self::encodeArray($payloads['data'], array($this, 'encodeGroupProtocol'));
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -110,7 +110,7 @@ class JoinGroup extends Protocol
     }
 
     // }}}
-    // {{{ protected function _encodeGroupProtocol()
+    // {{{ protected function encodeGroupProtocol()
 
     /**
      * encode group protocol
@@ -119,10 +119,10 @@ class JoinGroup extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeGroupProtocol($values)
+    protected function encodeGroupProtocol($values)
     {
         if (!isset($values['protocol_name'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `protocol_name` is undefined.');
+            throw new \Kafka\Exception\Protocol('given join group data invalid. `protocol_name` is undefined.');
         }
 
         $protocolName = self::encodeString($values['protocol_name'], self::PACK_INT16);
@@ -139,14 +139,14 @@ class JoinGroup extends Protocol
         }
 
         $data = self::pack(self::BIT_B16, 0);
-        $data .= self::encodeArray($values['subscription'], array($this, '_encodeGroupProtocolMetaTopic'));
+        $data .= self::encodeArray($values['subscription'], array($this, 'encodeGroupProtocolMetaTopic'));
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
         return $protocolName . self::encodeString($data, self::PACK_INT32);
     }
 
     // }}}
-    // {{{ protected function _encodeGroupProtocolMetaTopic()
+    // {{{ protected function encodeGroupProtocolMetaTopic()
 
     /**
      * encode group protocol metadata topic
@@ -155,7 +155,7 @@ class JoinGroup extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeGroupProtocolMetaTopic($values)
+    protected function encodeGroupProtocolMetaTopic($values)
     {
         $topic = self::encodeString($values, self::PACK_INT16);
         return $topic;

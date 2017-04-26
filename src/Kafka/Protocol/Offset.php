@@ -50,7 +50,7 @@ class Offset extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_REQUEST, self::OFFSET_REQUEST);
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
-        $data  .= self::encodeArray($payloads['data'], array($this, '_encodeOffsetTopic'));
+        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeOffsetTopic'));
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -77,7 +77,7 @@ class Offset extends Protocol
     }
 
     // }}}
-    // {{{ protected function _encodeOffsetPartion()
+    // {{{ protected function encodeOffsetPartion()
 
     /**
      * encode signal part
@@ -86,7 +86,7 @@ class Offset extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeOffsetPartion($values)
+    protected function encodeOffsetPartion($values)
     {
         if (!isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
@@ -111,7 +111,7 @@ class Offset extends Protocol
     }
 
     // }}}
-    // {{{ protected function _encodeOffsetTopic()
+    // {{{ protected function encodeOffsetTopic()
 
     /**
      * encode signal topic
@@ -120,7 +120,7 @@ class Offset extends Protocol
      * @access protected
      * @return string
      */
-    protected function _encodeOffsetTopic($values)
+    protected function encodeOffsetTopic($values)
     {
         if (!isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');

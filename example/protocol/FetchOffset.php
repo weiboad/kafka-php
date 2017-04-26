@@ -50,20 +50,18 @@ class TestFetchOffset {
 				$socket->SetonReadable(function($data) use($offset) {
 					$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
 					var_dump($offset->decode(substr($data, 4)));
+					Amp\stop();
 				});
 				$socket->connect();
 				$socket->write($requestData);
-
 				Amp\cancel($watcherId);
 			}
-		}, $msInterval = 1000);
+		}, $msInterval = 10);
 	}
 }
 
-
 $offset = new TestFetchOffset();
 $offset->run();
-
 
 Amp\run(function () use ($socket, $requestData) {
 });

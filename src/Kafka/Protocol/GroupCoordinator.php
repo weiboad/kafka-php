@@ -16,7 +16,7 @@ namespace Kafka\Protocol;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for group coordinator api 
+* Kafka protocol for group coordinator api
 +------------------------------------------------------------------------------
 *
 * @package
@@ -41,7 +41,7 @@ class GroupCoordinator extends Protocol
     public function encode($payloads)
     {
         if (!isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `group_id` is undefined.');
+            throw new \Kafka\Exception\Protocol('given group coordinator invalid. `group_id` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::GROUP_COORDINATOR_REQUEST, self::GROUP_COORDINATOR_REQUEST);

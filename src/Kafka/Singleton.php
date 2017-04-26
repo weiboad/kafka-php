@@ -16,43 +16,60 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Metadata about the kafka cluster
+* Kafka Singleton  
 +------------------------------------------------------------------------------
 *
 * @package
 * @version $_SWANBR_VERSION_$
 * @copyright Copyleft
-* @author ebernhardson@wikimedia.org
+* @author $_SWANBR_AUTHOR_$
 +------------------------------------------------------------------------------
 */
 
-interface ClusterMetaData
+abstract class Singleton 
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+    // {{{ consts
+    // }}}
+    // {{{ members
+
+    protected static $instance = null;
+
+    // }}}
+    // {{{ functions
+    // {{{ public function static getInstance()
+
     /**
-     * get broker list from kafka metadata
+     * set send messages
      *
      * @access public
-     * @return array
+     * @param $hostList
+     * @param null $timeout
+     * @return Consumer
      */
-    public function listBrokers();
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    // }}}
+    // {{{ private function __construct()
 
     /**
-     * @param string $topicName
-     * @param integer $partitionId
+     * __construct
+     *
      * @access public
-     * @return array
+     * @param $hostList
+     * @param null $timeout
      */
-    public function getPartitionState($topicName, $partitionId = 0);
+    private function __construct()
+    {
+    }
 
-    /**
-     * @param string $topicName
-     * @access public
-     * @return array
-     */
-    public function getTopicDetail($topicName);
-
-    /**
-     * @return null
-     */
-    public function refreshMetadata();
+    // }}}
 }

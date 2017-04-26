@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-abstract class Config
+abstract class Config extends Singleton 
 {
     // {{{ consts
     // }}}
@@ -75,5 +75,6 @@ abstract class Config
         }
     }
 
+    // }}}
     // }}}
 }
