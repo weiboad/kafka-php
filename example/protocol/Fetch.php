@@ -8,7 +8,7 @@ $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$data = json_decode('{"max_wait_time":100,"replica_id":-1,"min_bytes":"1000","data":[{"topic_name":"test","partitions":[{"partition_id":5,"offset":0,"max_bytes":2097152},{"partition_id":0,"offset":1825736,"max_bytes":2097152}]}]}', true);
+$data = json_decode('{"max_wait_time":100,"replica_id":-1,"min_bytes":"1000","data":[{"topic_name":"test","partitions":[{"partition_id":5,"offset":0,"max_bytes":2097152},{"partition_id":0,"offset":1855510,"max_bytes":2097152}]}]}', true);
 var_dump($data);
 
 

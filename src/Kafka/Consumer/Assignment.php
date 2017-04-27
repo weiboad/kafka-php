@@ -28,6 +28,7 @@ namespace Kafka\Consumer;
 
 class Assignment
 {
+    use \Kafka\SingletonTrait;
     // {{{ consts
     // }}}
     // {{{ members
@@ -90,7 +91,7 @@ class Assignment
     // {{{ public function assign()
 
     public function assign($result) {
-        $broker = \Kafka\Consumer\Broker::getInstance();
+        $broker = \Kafka\Broker::getInstance();
         $topics = $broker->getTopics();
 
         $memberCount = count($result);

@@ -109,7 +109,7 @@ class Protocol
             //\Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => '',
         );
 
-        $namspace = '\\Kafka\\Protocol\\';
+        $namespace = '\\Kafka\\Protocol\\';
         foreach ($class as $key => $className) {
             $class = $namespace . $className;
             self::$objects[$key] = new $class($version);
@@ -154,7 +154,7 @@ class Protocol
             throw new \Kafka\Exception('Not support api key, key:' . $key);
         }
 
-        return self::$objects[$key]->decode($payloads);
+        return self::$objects[$key]->decode($data);
     }
 
     // }}}

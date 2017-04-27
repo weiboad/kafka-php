@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-abstract class Singleton 
+trait SingletonTrait
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;

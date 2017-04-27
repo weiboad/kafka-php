@@ -71,7 +71,7 @@ class Consumer
         if ($this->logger) {
             $process->setLogger($this->logger);
         }
-        $process->init();
+        $process->start();
         $this->isRunning = true;
         if ($isBlock) {
             \Amp\run();

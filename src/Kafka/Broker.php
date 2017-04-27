@@ -26,8 +26,9 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Broker extends \Kafka\Singleton
+class Broker 
 {
+    use SingletonTrait;
     // {{{ consts
     // }}}
     // {{{ members
@@ -72,10 +73,10 @@ class Broker extends \Kafka\Singleton
     // }}}
     // {{{ public function setData()
 
-    public function setData($topics, $brokers)
+    public function setData($topics, $brokersResult)
     {
         $brokers = array();
-        foreach ($data as $value) {
+        foreach ($brokersResult as $value) {
             $key = $value['nodeId'];
             $hostname = $value['host'] . ':' . $value['port'];
             $brokers[$key] = $hostname;

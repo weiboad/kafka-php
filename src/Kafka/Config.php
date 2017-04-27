@@ -26,8 +26,9 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-abstract class Config extends Singleton 
+abstract class Config
 {
+    use SingletonTrait;
     // {{{ consts
     // }}}
     // {{{ members

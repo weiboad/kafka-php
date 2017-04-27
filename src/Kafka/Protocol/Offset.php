@@ -131,7 +131,7 @@ class Offset extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, '_encodeOffsetPartion'));
+        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeOffsetPartion'));
 
         return $topic . $partitions;
     }
