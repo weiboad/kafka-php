@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka\Consumer;
+namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
@@ -26,47 +26,56 @@ namespace Kafka\Consumer;
 +------------------------------------------------------------------------------
 */
 
-class Broker extends \Kafka\Singleton
+class Producer
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+
     // {{{ consts
     // }}}
     // {{{ members
-
-    private $groupBrokerId = null;
-
-    private $topics = array();
+    
+    private static $isRunning = false;
 
     // }}}
     // {{{ functions
-    // {{{ public function setGroupBrokerId()
+    // {{{ public function __construct()
 
-    public function setGroupBrokerId($brokerId)
+    /**
+     * __construct
+     *
+     * @access public
+     * @param $hostList
+     * @param null $timeout
+     */
+    public function __construct()
     {
-        $this->groupBrokerId = $brokerId;
     }
 
     // }}}
-    // {{{ public function getGroupBrokerId()
+    // {{{ public function start()
 
-    public function getGroupBrokerId()
+    /**
+     * start producer 
+     *
+     * @access public
+     * @return void
+     */
+    public function start(\Closure $consumer = null, $isBlock = true)
     {
-        return $this->groupBrokerId;
-    }
-
-    // }}}
-    // {{{ public function setTopics()
-
-    public function setTopics($topics)
-    {
-        $this->topics = $topics;
-    }
-
-    // }}}
-    // {{{ public function getTopics()
-
-    public function getTopics()
-    {
-        return $this->topics;
+        if ($this->isRunning) {
+            $this->error('Has start producer');
+            return;
+        }
+        $process = new \Kafka\Producer\Process($consumer);
+        if ($this->logger) {
+            $process->setLogger($this->logger);
+        }
+        $process->start();
+        $this->isRunning = true;
+        if ($isBlock) {
+            \Amp\run();
+        } 
     }
 
     // }}}

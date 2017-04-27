@@ -12,7 +12,7 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka\Consumer;
+namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
@@ -26,66 +26,18 @@ namespace Kafka\Consumer;
 +------------------------------------------------------------------------------
 */
 
-class Connection
+class ProducerConfig extends Config
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
-    
-    private static $instance = null;
 
-    private $metaSockets = array();
-    private $dataSockets = array();
-
-    private $process;
-
-    private $brokerMap;
+    protected static $defaults = array(
+        'requiredAck' => 0,
+        'timeout' => 100,
+    );
 
     // }}}
     // {{{ functions
-    // {{{ public function static getInstance()
-
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return Consumer
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    // }}}
-    // {{{ private function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
-    private function __construct()
-    {
-    }
-
-    // }}}
-    // {{{ public function setProcess()
-
-    public function setProcess(\Closure $process) {
-        $this->process = $process; 
-    }
-
-    // }}}
     // }}}
 }
