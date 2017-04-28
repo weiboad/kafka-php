@@ -1,7 +1,7 @@
 Kafka-php
 ==========
 
-[中文文档](README_CN.md)
+[English Document](README.md)
 
 [![Build Status](https://travis-ci.org/weiboad/kafka-php.svg?branch=master)](https://travis-ci.org/weiboad/kafka-php)
 [![Packagist](https://img.shields.io/packagist/dm/nmred/kafka-php.svg?style=plastic)]()
@@ -12,21 +12,19 @@ Kafka-php
 [![GitHub stars](https://img.shields.io/github/stars/weiboad/kafka-php.svg?style=plastic)](https://github.com/weiboad/kafka-php/stargazers)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg?style=plastic)](https://raw.githubusercontent.com/weiboad/kafka-php/master/LICENSE)
 
-Kafka-php is a pure PHP kafka client that currently supports more than 0.8.x version of Kafka, this project v0.2.x and v0.1.x are incompatible if using the original v0.1.x You can refer to the document [Kafka PHP v0.1.x Document] (https://github.com/weiboad/kafka-php/blob/v0.1.6/README.md), but it is recommended to switch to v0.2.x . v0.2.x use PHP asynchronous implementation and kafka broker interaction, more stable than v0.1.x efficient, because the use of PHP language so do not compile any expansion can be used to reduce the access and maintenance costs
+Kafka-php 使用纯粹的PHP 编写的 kafka 客户端，目前支持 0.8.x 以上版本的 Kafka，该项目 v0.2.x 和 v0.1.x 不兼容，如果使用原有的 v0.1.x 的可以参照文档 [Kafka PHP v0.1.x Document](https://github.com/weiboad/kafka-php/blob/v0.1.6/README.md), 不过建议切换到 v0.2.x 上。v0.2.x 使用 PHP 异步执行的方式来和kafka broker 交互，较 v0.1.x 更加稳定高效, 由于使用 PHP 语言编写所以不用编译任何的扩展就可以使用，降低了接入与维护成本
 
-## Requirements
+## 安装环境要求
 
-* Minimum PHP version: 5.5
-* Kafka version greater than 0.8
-* The consumer module needs kafka broker version  greater than 0.9.0
+* PHP 版本大于 5.5
+* Kafka Server 版本大于 0.8.0
+* 消费模块 Kafka Server 版本需要大于 0.9.0
 
 ## Installation
 
-Add the lib directory to the PHP include_path and use an autoloader like the one in the examples directory (the code follows the PEAR/Zend one-class-per-file convention).
+## 使用 Composer 安装
 
-## Composer Install
-
-Simply add a dependency on nmred/kafka-php to your project's composer.json file if you use Composer to manage the dependencies of your project. Here is a minimal example of a composer.json file :
+添加 composer 依赖 `nmred/kafka-php` 到项目的 `composer.json` 文件中即可，如：
 
 ```
 {
@@ -58,20 +56,20 @@ $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
 $producer = new \Kafka\Producer(function() {
-		return array(
-				array(
-							'topic' => 'test',
-										'value' => 'test....message.',
-													'key' => 'testkey',
-															),
-																);
+	return array(
+		array(
+			'topic' => 'test',
+			'value' => 'test....message.',
+			'key' => 'testkey',
+		),
+	);
 });
 $producer->setLogger($logger);
 $producer->success(function($result) {
-		var_dump($result);
+	var_dump($result);
 });
 $producer->error(function($errorCode, $context) {
-		var_dump($errorCode);
+	var_dump($errorCode);
 });
 $producer->send();
 ```
@@ -99,10 +97,10 @@ $config->setTopics(array('test'));
 $consumer = new \Kafka\Consumer();
 $consumer->setLogger($logger);
 $consumer->start(function($topic, $part, $message) {
-		var_dump($message);
+	var_dump($message);
 });
 ```
 
-## Low-Level API
+## Basic Protocol
 
-Refer [Example](https://github.com/weiboad/kafka-php/tree/master/example)
+基础协议 API 调用方式见 [Example](https://github.com/weiboad/kafka-php/tree/master/example)
