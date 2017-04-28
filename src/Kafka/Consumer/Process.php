@@ -210,7 +210,7 @@ class Process
             $this->succCommit($result);
             break;
         default:
-            var_dump($correlationId);
+            $this->error('Error request, correlationId:' . $correlationId);
         }
     }
 
@@ -734,8 +734,6 @@ class Process
         if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE == $errorCode) {
             $assign = \Kafka\Consumer\Assignment::getInstance();
             $offsets = $assign->getOffsets();
-            var_dump($offsets);
-            var_dump($context);
             list($topic, $partId) = $context;
             if (isset($offsets[$topic][$partId])) {
                 $assign->setConsumerOffset($topic, $partId, $offsets[$topic][$partId]);

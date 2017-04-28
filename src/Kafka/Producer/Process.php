@@ -189,7 +189,7 @@ class Process
             $this->succProduce($result, $fd);
             break;
         default:
-            var_dump($correlationId);
+            $this->error('Error request, correlationId:' . $correlationId);
         }
     }
 
