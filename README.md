@@ -1,7 +1,7 @@
 Kafka-php
 ==========
 
-[中文文档](README_CN.md)
+[中文文档](README_CH.md)
 
 [![Build Status](https://travis-ci.org/weiboad/kafka-php.svg?branch=master)](https://travis-ci.org/weiboad/kafka-php)
 [![Packagist](https://img.shields.io/packagist/dm/nmred/kafka-php.svg?style=plastic)]()
@@ -59,12 +59,12 @@ $config->setIsAsyn(false);
 $config->setProduceInterval(500);
 $producer = new \Kafka\Producer(function() {
 		return array(
-				array(
-							'topic' => 'test',
-										'value' => 'test....message.',
-													'key' => 'testkey',
-															),
-																);
+			array(
+				'topic' => 'test',
+				'value' => 'test....message.',
+				'key' => 'testkey',
+				),
+		);
 });
 $producer->setLogger($logger);
 $producer->success(function($result) {
