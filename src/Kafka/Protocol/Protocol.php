@@ -28,18 +28,42 @@ namespace Kafka\Protocol;
 
 abstract class Protocol
 {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Kafka\LoggerTrait;
+
     // {{{ consts
 
     /**
-     *  Kafka server protocol version
+     *  Default kafka broker verion
      */
-    const API_VERSION = 0;
+    const DEFAULT_BROKER_VERION = '0.9.0.0';
+
+    /**
+     *  Kafka server protocol version0
+     */
+    const API_VERSION0 = 0;
+
+    /**
+     *  Kafka server protocol version 1
+     */
+    const API_VERSION1 = 1;
+
+    /**
+     *  Kafka server protocol version 2
+     */
+    const API_VERSION2 = 2;
 
     /**
      * use encode message, This is a version id used to allow backwards
      * compatible evolution of the message binary format.
      */
-    const MESSAGE_MAGIC = 0;
+    const MESSAGE_MAGIC_VERSION0 = 0;
+
+    /**
+     * use encode message, This is a version id used to allow backwards
+     * compatible evolution of the message binary format.
+     */
+    const MESSAGE_MAGIC_VERSION1 = 1;
 
     /**
      * message no compression
@@ -75,7 +99,13 @@ abstract class Protocol
     const METADATA_REQUEST      = 3;
     const OFFSET_COMMIT_REQUEST = 8;
     const OFFSET_FETCH_REQUEST  = 9;
-    const CONSUMER_METADATA_REQUEST = 10;
+    const GROUP_COORDINATOR_REQUEST = 10;
+    const JOIN_GROUP_REQUEST  = 11;
+    const HEART_BEAT_REQUEST  = 12;
+    const LEAVE_GROUP_REQUEST = 13;
+    const SYNC_GROUP_REQUEST  = 14;
+    const DESCRIBE_GROUPS_REQUEST = 15;
+    const LIST_GROUPS_REQUEST     = 16;
 
     // unpack/pack bit
     const BIT_B64 = 'N2';
@@ -88,12 +118,12 @@ abstract class Protocol
     // {{{ members
 
     /**
-     * stream
+     * kafka broker version
      *
      * @var mixed
      * @access protected
      */
-    protected $stream = null;
+    protected $version = self::DEFAULT_BROKER_VERION;
 
     /**
      * isBigEndianSystem
@@ -113,12 +143,12 @@ abstract class Protocol
     /**
      * __construct
      *
-     * @param \Kafka\Socket $stream
+     * @param string version
      * @access public
      */
-    public function __construct(\Kafka\Socket $stream)
+    public function __construct($version = self::DEFAULT_BROKER_VERION)
     {
-        $this->stream = $stream;
+        $this->version = $version;
     }
 
     // }}}
@@ -161,11 +191,11 @@ abstract class Protocol
      */
     public static function unpack($type, $bytes)
     {
+        $result = array();
         self::checkLen($type, $bytes);
         if ($type == self::BIT_B64) {
             $set = unpack($type, $bytes);
-            $original = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
-            return $original;
+            $result = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
         } elseif ($type == self::BIT_B16_SIGNED) {
             // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
             // So lets unpack it..
@@ -176,10 +206,12 @@ abstract class Protocol
                 // We need to flip the endianess because coming from kafka it is big endian
                 $set = self::convertSignedShortFromLittleEndianToBigEndian($set);
             }
-            return $set;
+            $result = $set;
         } else {
-            return unpack($type, $bytes);
+            $result = unpack($type, $bytes);
         }
+
+        return is_array($result) ? array_shift($result) : $result;
     }
 
     // }}}
@@ -310,6 +342,327 @@ abstract class Protocol
             $bits[$index] = $bit;
         }
         return $bits;
+    }
+
+    // }}}
+    // {{{ public function getApiVersion()
+
+    /**
+     * Get kafka api version according to specifiy kafka broker version
+     *
+     * @param int kafka api key
+     * @access public
+     * @return int
+     */
+    public function getApiVersion($apikey)
+    {
+        switch ($apikey) {
+            case self::METADATA_REQUEST:
+                return self::API_VERSION0;
+            case self::PRODUCE_REQUEST:
+                if (version_compare($this->version, '0.10.0') >= 0) {
+                    return self::API_VERSION2;
+                } elseif (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::FETCH_REQUEST:
+                if (version_compare($this->version, '0.10.0') >= 0) {
+                    return self::API_VERSION2;
+                } elseif (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::OFFSET_REQUEST:
+                // todo
+                return self::API_VERSION0;
+                if (version_compare($this->version, '0.10.1.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0;
+                }
+            case self::GROUP_COORDINATOR_REQUEST:
+                return self::API_VERSION0;
+            case self::OFFSET_COMMIT_REQUEST:
+                if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION2;
+                } elseif (version_compare($this->version, '0.8.2') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0; // supported in 0.8.1 or later
+                }
+            case self::OFFSET_FETCH_REQUEST:
+                if (version_compare($this->version, '0.8.2') >= 0) {
+                    return self::API_VERSION1; // Offset Fetch Request v1 will fetch offset from Kafka
+                } else {
+                    return self::API_VERSION0;//Offset Fetch Request v0 will fetch offset from zookeeper
+                }
+            case self::JOIN_GROUP_REQUEST:
+                if (version_compare($this->version, '0.10.1.0') >= 0) {
+                    return self::API_VERSION1;
+                } else {
+                    return self::API_VERSION0; // supported in 0.9.0.0 and greater
+                }
+            case self::SYNC_GROUP_REQUEST:
+                return self::API_VERSION0;
+            case self::HEART_BEAT_REQUEST:
+                return self::API_VERSION0;
+            case self::LEAVE_GROUP_REQUEST:
+                return self::API_VERSION0;
+            case self::LIST_GROUPS_REQUEST:
+                return self::API_VERSION0;
+            case self::DESCRIBE_GROUPS_REQUEST:
+                return self::API_VERSION0;
+        }
+
+        // default
+        return self::API_VERSION0;
+    }
+
+    // }}}
+    // {{{ public static function getApiText()
+
+    /**
+     * Get kafka api text
+     *
+     * @param int kafka api key
+     * @access public
+     * @return string
+     */
+    public static function getApiText($apikey)
+    {
+        $apis = array(
+            self::PRODUCE_REQUEST => 'ProduceRequest',
+            self::FETCH_REQUEST   => 'FetchRequest',
+            self::OFFSET_REQUEST  => 'OffsetRequest',
+            self::METADATA_REQUEST => 'MetadataRequest',
+            self::OFFSET_COMMIT_REQUEST => 'OffsetCommitRequest',
+            self::OFFSET_FETCH_REQUEST  => 'OffsetFetchRequest',
+            self::GROUP_COORDINATOR_REQUEST => 'GroupCoordinatorRequest',
+            self::JOIN_GROUP_REQUEST => 'JoinGroupRequest',
+            self::HEART_BEAT_REQUEST => 'HeartbeatRequest',
+            self::LEAVE_GROUP_REQUEST => 'LeaveGroupRequest',
+            self::SYNC_GROUP_REQUEST  => 'SyncGroupRequest',
+            self::DESCRIBE_GROUPS_REQUEST => 'DescribeGroupsRequest',
+            self::LIST_GROUPS_REQUEST => 'ListGroupsRequest',
+        );
+        return $apis[$apikey];
+    }
+
+    // }}}
+    // {{{ public function requestHeader()
+
+    /**
+     * get request header
+     *
+     * @param string $clientId
+     * @param integer $correlationId
+     * @param integer $apiKey
+     * @access public
+     * @return string
+     */
+    public function requestHeader($clientId, $correlationId, $apiKey)
+    {
+        // int16 -- apiKey int16 -- apiVersion int32 correlationId
+        $binData  = self::pack(self::BIT_B16, $apiKey);
+        $binData .= self::pack(self::BIT_B16, $this->getApiVersion($apiKey));
+        $binData .= self::pack(self::BIT_B32, $correlationId);
+
+        // concat client id
+        $binData .= self::encodeString($clientId, self::PACK_INT16);
+        $msg = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
+        $this->debug('Start Request ' . $msg);
+
+        return $binData;
+    }
+
+    // }}}
+    // {{{ public static function encodeString()
+
+    /**
+     * encode pack string type
+     *
+     * @param string $string
+     * @param int $bytes self::PACK_INT32: int32 big endian order. self::PACK_INT16: int16 big endian order.
+     * @param int $compression
+     * @return string
+     * @static
+     * @access public
+     */
+    public static function encodeString($string, $bytes, $compression = self::COMPRESSION_NONE)
+    {
+        $packLen = ($bytes == self::PACK_INT32) ? self::BIT_B32 : self::BIT_B16;
+        switch ($compression) {
+            case self::COMPRESSION_NONE:
+                break;
+            case self::COMPRESSION_GZIP:
+                $string = \gzencode($string);
+                break;
+            case self::COMPRESSION_SNAPPY:
+                // todo
+                throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+            default:
+                throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        }
+        return self::pack($packLen, strlen($string)) . $string;
+    }
+
+    // }}}
+    // {{{ public static function encodeArray()
+
+    /**
+     * encode key array
+     *
+     * @param array $array
+     * @param Callable $func
+     * @param null $options
+     * @return string
+     * @static
+     * @access public
+     */
+    public static function encodeArray(array $array, $func, $options = null)
+    {
+        if (!is_callable($func, false)) {
+            throw new \Kafka\Exception\Protocol('Encode array failed, given function is not callable.');
+        }
+
+        $arrayCount = count($array);
+
+        $body = '';
+        foreach ($array as $value) {
+            if (!is_null($options)) {
+                $body .= call_user_func($func, $value, $options);
+            } else {
+                $body .= call_user_func($func, $value);
+            }
+        }
+
+        return self::pack(self::BIT_B32, $arrayCount) . $body;
+    }
+
+    // }}}
+    // {{{ public function decodeString()
+
+    /**
+     * decode unpack string type
+     *
+     * @param bytes $data
+     * @param int $bytes self::BIT_B32: int32 big endian order. self::BIT_B16: int16 big endian order.
+     * @param int $compression
+     * @return string
+     * @access public
+     */
+    public function decodeString($data, $bytes, $compression = self::COMPRESSION_NONE)
+    {
+        $offset = ($bytes == self::BIT_B32) ? 4 : 2;
+        $packLen = self::unpack($bytes, substr($data, 0, $offset)); // int16 topic name length
+        if ($packLen == 4294967295) { // uint32(4294967295) is int32 (-1)
+            $packLen = 0;
+        }
+        $data = substr($data, $offset, $packLen);
+        $offset += $packLen;
+
+        switch ($compression) {
+            case self::COMPRESSION_NONE:
+                break;
+            case self::COMPRESSION_GZIP:
+                $data = \gzdecode($data);
+                break;
+            case self::COMPRESSION_SNAPPY:
+                // todo
+                throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+            default:
+                throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        }
+        return array('length' => $offset, 'data' => $data);
+    }
+
+    // }}}
+    // {{{ public function decodeArray()
+
+    /**
+     * decode key array
+     *
+     * @param array $array
+     * @param Callable $func
+     * @param null $options
+     * @return string
+     * @access public
+     */
+    public function decodeArray($data, $func, $options = null)
+    {
+        $offset = 0;
+        $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        if (!is_callable($func, false)) {
+            throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
+        }
+
+        $result = array();
+        for ($i = 0; $i < $arrayCount; $i++) {
+            $value = substr($data, $offset);
+            if (!is_null($options)) {
+                $ret = call_user_func($func, $value, $options);
+            } else {
+                $ret = call_user_func($func, $value);
+            }
+
+            if (!is_array($ret) && $ret === false) {
+                break;
+            }
+
+            if (!isset($ret['length']) || !isset($ret['data'])) {
+                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
+            }
+            if ($ret['length'] == 0) {
+                continue;
+            }
+
+            $offset += $ret['length'];
+            $result[] = $ret['data'];
+        }
+
+        return array('length' => $offset, 'data' => $result);
+    }
+
+    // }}}
+    // {{{ public function decodePrimitiveArray()
+
+    /**
+     * decode primitive type array
+     *
+     * @param bytes[] $data
+     * @param bites $bites
+     * @return array
+     * @access public
+     */
+    public function decodePrimitiveArray($data, $bites)
+    {
+        $offset = 0;
+        $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset += 4;
+
+        $result = array();
+        for ($i = 0; $i < $arrayCount; $i++) {
+            if ($bites == self::BIT_B64) {
+                $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+                $offset += 8;
+            } elseif ($bites == self::BIT_B32) {
+                $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+                $offset += 4;
+            } elseif (in_array($bites, array(self::BIT_B16, self::BIT_B16_SIGNED))) {
+                $result[] = self::unpack($bites, substr($data, $offset, 2));
+                $offset += 2;
+            } elseif ($bites == self::BIT_B8) {
+                $result[] = self::unpack($bites, substr($data, $offset, 1));
+                $offset += 1;
+            }
+        }
+
+        return array('length' => $offset, 'data' => $result);
     }
 
     // }}}

@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Consumer
+class Producer
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
@@ -35,7 +35,7 @@ class Consumer
     // }}}
     // {{{ members
     
-    private static $isRunning = false;
+    private $process = null;
 
     // }}}
     // {{{ functions
@@ -48,34 +48,57 @@ class Consumer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct()
+    public function __construct(\Closure $producer)
     {
+        $this->process = new \Kafka\Producer\Process($producer);
     }
 
     // }}}
-    // {{{ public function start()
+    // {{{ public function send()
 
     /**
-     * start consumer
+     * start producer
      *
      * @access public
      * @return void
      */
-    public function start(\Closure $consumer = null, $isBlock = true)
+    public function send($isBlock = true)
     {
-        if ($this->isRunning) {
-            $this->error('Has start consumer');
-            return;
-        }
-        $process = new \Kafka\Consumer\Process($consumer);
         if ($this->logger) {
-            $process->setLogger($this->logger);
+            $this->process->setLogger($this->logger);
         }
-        $process->start();
-        $this->isRunning = true;
+        $this->process->start();
         if ($isBlock) {
             \Amp\run();
         }
+    }
+
+    // }}}
+    // {{{ public function success()
+
+    /**
+     * producer success
+     *
+     * @access public
+     * @return void
+     */
+    public function success(\Closure $success = null)
+    {
+        $this->process->setSuccess($success);
+    }
+
+    // }}}
+    // {{{ public function error()
+
+    /**
+     * producer error
+     *
+     * @access public
+     * @return void
+     */
+    public function error(\Closure $error = null)
+    {
+        $this->process->setError($error);
     }
 
     // }}}

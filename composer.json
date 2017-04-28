@@ -9,7 +9,9 @@
     "homepage": "http://www.swanlinux.net",
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5",
+		"psr/log" : "1.0.2",
+		"amphp/amp": "v1.2.2"
     },
     "autoload": {
         "psr-0": {
@@ -18,12 +20,15 @@
     },
     "autoload-dev": {
         "psr-0": {
-            "KafkaTest\\": "tests/"
+            "KafkaTest\\": "tests/",
+            "KafkaExample\\": "example/"
         }
     },
     "require-dev": {
         "satooshi/php-coveralls": "dev-master",
         "phpunit/phpcov": "*",
+		"monolog/monolog" : "1.22.1",
+		"kmelia/monolog-stdout-handler" : "1.2.1",
         "phpunit/PHPUnit": "~4.0"
     }
 }

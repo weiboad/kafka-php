@@ -1,30 +1,22 @@
 <?php
-require 'autoloader.php';
+require '../vendor/autoload.php';
+date_default_timezone_set('PRC');
+use Monolog\Logger;
+use Monolog\Handler\StdoutHandler;
+// Create the logger
+$logger = new Logger('my_logger');
+// Now add some handlers
+$logger->pushHandler(new StdoutHandler());
 
-class LogWriter {
-	public function log($message, $level) {
-		echo $message, PHP_EOL;
-	}
-}
-
-$log = new LogWriter;
-\Kafka\Log::setLog($log);
-
-$zookeeperList = getenv('ZOOKEEPER_LIST'); 
-$consumer = \Kafka\Consumer::getInstance($zookeeperList);
-$group = 'testgroup1';
-$consumer->setGroup($group);
-$consumer->setFromOffset(true);
-//$consumer->setPartition('recom_page', 0);
-$consumer->setTopic('recom_page');
-$consumer->setMaxBytes(102400);
-$result = $consumer->fetch();
-foreach ($result as $topicName => $partition) {
-    foreach ($partition as $partId => $messageSet) {
-	var_dump($partition->getHighOffset());
-        foreach ($messageSet as $message) {
-            var_dump((string)$message);    
-        }
-	var_dump($partition->getMessageOffset());
-    }
-}
+$config = \Kafka\ConsumerConfig::getInstance();
+$config->setMetadataRefreshIntervalMs(10000);
+$config->setMetadataBrokerList('10.13.4.159:9192');
+$config->setGroupId('test');
+$config->setBrokerVersion('0.9.0.1');
+$config->setTopics(array('test'));
+//$config->setOffsetReset('earliest');
+$consumer = new \Kafka\Consumer();
+$consumer->setLogger($logger);
+$consumer->start(function($topic, $part, $message) {
+	var_dump($message);
+});

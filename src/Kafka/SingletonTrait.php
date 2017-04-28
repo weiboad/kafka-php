@@ -16,7 +16,7 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+* Kafka Singleton
 +------------------------------------------------------------------------------
 *
 * @package
@@ -26,20 +26,39 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Consumer
+trait SingletonTrait
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
-
     // {{{ consts
     // }}}
     // {{{ members
-    
-    private static $isRunning = false;
+
+    protected static $instance = null;
 
     // }}}
     // {{{ functions
-    // {{{ public function __construct()
+    // {{{ public function static getInstance()
+
+    /**
+     * set send messages
+     *
+     * @access public
+     * @param $hostList
+     * @param null $timeout
+     * @return Consumer
+     */
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    // }}}
+    // {{{ private function __construct()
 
     /**
      * __construct
@@ -48,36 +67,9 @@ class Consumer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct()
+    private function __construct()
     {
     }
 
-    // }}}
-    // {{{ public function start()
-
-    /**
-     * start consumer
-     *
-     * @access public
-     * @return void
-     */
-    public function start(\Closure $consumer = null, $isBlock = true)
-    {
-        if ($this->isRunning) {
-            $this->error('Has start consumer');
-            return;
-        }
-        $process = new \Kafka\Consumer\Process($consumer);
-        if ($this->logger) {
-            $process->setLogger($this->logger);
-        }
-        $process->start();
-        $this->isRunning = true;
-        if ($isBlock) {
-            \Amp\run();
-        }
-    }
-
-    // }}}
     // }}}
 }

@@ -40,9 +40,9 @@
             <!--
                 If there's a way of having this without the explicit component
                 list, please PR
-            -->
             <component-test component="Produce"/>
             <component-test component="Protocol"/>
+            -->
             <check-cs/>
         </parallel>
     </target>
@@ -56,9 +56,9 @@
             <!--
                 If there's a way of having this without the explicit component
                 list, please PR
-            -->
             <component-test component="Produce"/>
             <component-test component="Protocol"/>
+            -->
             <check-cs/>
         </parallel>
     </target>

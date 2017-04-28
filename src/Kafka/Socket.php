@@ -16,7 +16,7 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+* Kafka broker socket
 +------------------------------------------------------------------------------
 *
 * @package
@@ -105,6 +105,41 @@ class Socket
      */
     private $maxWriteAttempts = 3;
 
+    /**
+     * Reader watcher
+     * @var int
+     * @access private
+     */
+    private $readWatcher = 0;
+
+    /**
+     * Write watcher
+     * @var int
+     * @access private
+     */
+    private $writeWatcher = 0;
+
+    /**
+     * Write watcher
+     * @var int
+     * @access private
+     */
+    private $writeBuffer = '';
+
+    /**
+     * Reader buffer
+     * @var int
+     * @access private
+     */
+    private $readBuffer = '';
+
+    /**
+     * Reader need buffer length
+     * @var int
+     * @access private
+     */
+    private $readNeedLength = 0;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -171,39 +206,6 @@ class Socket
     }
 
     // }}}
-    // {{{ public static function createFromStream()
-
-    /**
-     * Optional method to set the internal stream handle
-     *
-     * @static
-     * @access public
-     * @param $stream
-     * @return Socket
-     */
-    public static function createFromStream($stream)
-    {
-        $socket = new self('localhost', 0);
-        $socket->setStream($stream);
-        return $socket;
-    }
-
-    // }}}
-    // {{{ public function setStream()
-
-    /**
-     * Optional method to set the internal stream handle
-     *
-     * @param mixed $stream
-     * @access public
-     * @return void
-     */
-    public function setStream($stream)
-    {
-        $this->stream = $stream;
-    }
-
-    // }}}
     // {{{ public function connect()
 
     /**
@@ -214,7 +216,7 @@ class Socket
      */
     public function connect()
     {
-        if (is_resource($this->stream)) {
+        if (!$this->isSocketDead()) {
             return;
         }
 
@@ -241,6 +243,63 @@ class Socket
         }
 
         stream_set_blocking($this->stream, 0);
+        stream_set_read_buffer($this->stream, 0);
+
+        $this->readWatcher = \Amp\onReadable($this->stream, function () {
+            do {
+                $newData = @fread($this->stream, self::READ_MAX_LEN);
+                if ($newData) {
+                    $this->read($newData);
+                }
+            } while ($newData);
+        });
+
+        $this->writeWatcher = \Amp\onWritable($this->stream, function () {
+            $this->write();
+        }, array('enable' => false)); // <-- let's initialize the watcher as "disabled"
+    }
+
+    // }}}
+    // {{{ public function reconnect()
+
+    /**
+     * reconnect the socket
+     *
+     * @access public
+     * @return void
+     */
+    public function reconnect()
+    {
+        $this->close();
+        $this->connect();
+    }
+
+    // }}}
+    // {{{ public function getSocket()
+
+    /**
+     * get the socket
+     *
+     * @access public
+     * @return void
+     */
+    public function getSocket()
+    {
+        return $this->stream;
+    }
+
+    // }}}
+    // {{{ public function SetOnReadable()
+
+    /**
+     * set on readable callback function
+     *
+     * @access public
+     * @return void
+     */
+    public function SetOnReadable(\Closure $read)
+    {
+        $this->onReadable = $read;
     }
 
     // }}}
@@ -254,9 +313,14 @@ class Socket
      */
     public function close()
     {
+        \Amp\cancel($this->readWatcher);
+        \Amp\cancel($this->writeWatcher);
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
+        $this->readBuffer = '';
+        $this->writeBuffer = '';
+        $this->readNeedLength = 0;
     }
 
     /**
@@ -285,57 +349,28 @@ class Socket
      * @return string Binary data
      * @throws \Kafka\Exception\SocketEOF
      */
-    public function read($len, $verifyExactLength = false)
+    public function read($data)
     {
-        if ($len > self::READ_MAX_LEN) {
-            throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream, length too longer.');
-        }
-
-        $null = null;
-        $read = array($this->stream);
-        $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-        if ($readable > 0) {
-            $remainingBytes = $len;
-            $data = $chunk = '';
-            while ($remainingBytes > 0) {
-                $chunk = fread($this->stream, $remainingBytes);
-                if ($chunk === false) {
-                    $this->close();
-                    throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (no data)');
+        $this->readBuffer .= $data;
+        do {
+            if ($this->readNeedLength == 0) { // response start
+                if (strlen($this->readBuffer) < 4) {
+                    return;
                 }
-                if (strlen($chunk) === 0) {
-                    // Zero bytes because of EOF?
-                    if (feof($this->stream)) {
-                        $this->close();
-                        throw new \Kafka\Exception\SocketEOF('Unexpected EOF while reading '.$len.' bytes from stream (no data)');
-                    }
-                    // Otherwise wait for bytes
-                    $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-                    if ($readable !== 1) {
-                        throw new \Kafka\Exception\SocketTimeout('Timed out reading socket while reading ' . $len . ' bytes with ' . $remainingBytes . ' bytes to go');
-                    }
-                    continue; // attempt another read
-                }
-                $data .= $chunk;
-                $remainingBytes -= strlen($chunk);
-            }
-            if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
-                // couldn't read anything at all OR reached EOF sooner than expected
-                $this->close();
-                throw new \Kafka\Exception\SocketEOF('Read ' . strlen($data) . ' bytes instead of the requested ' . $len . ' bytes');
+                $dataLen = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
+                $this->readNeedLength = $dataLen;
+                $this->readBuffer = substr($this->readBuffer, 4);
             }
 
-            return $data;
-        }
-        if (false !== $readable) {
-            $res = stream_get_meta_data($this->stream);
-            if (!empty($res['timed_out'])) {
-                $this->close();
-                throw new \Kafka\Exception\SocketTimeout('Timed out reading '.$len.' bytes from stream');
+            if (strlen($this->readBuffer) < $this->readNeedLength) {
+                return;
             }
-        }
-        $this->close();
-        throw new \Kafka\Exception\SocketEOF('Could not read '.$len.' bytes from stream (not readable)');
+            $data = substr($this->readBuffer, 0, $this->readNeedLength);
+
+            $this->readBuffer = substr($this->readBuffer, $this->readNeedLength);
+            $this->readNeedLength = 0;
+            call_user_func($this->onReadable, $data, (int)$this->stream);
+        } while (strlen($this->readBuffer));
     }
 
     // }}}
@@ -349,66 +384,35 @@ class Socket
      * @return integer
      * @throws \Kafka\Exception\SocketEOF
      */
-    public function write($buf)
+    public function write($data = null)
     {
-        $null = null;
-        $write = array($this->stream);
-
-        // fwrite to a socket may be partial, so loop until we
-        // are done with the entire buffer
-        $failedWriteAttempts = 0;
-        $written = 0;
-        $buflen = strlen($buf);
-        while ($written < $buflen) {
-            // wait for stream to become available for writing
-            $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
-            if ($writable > 0) {
-                if ($buflen - $written > self::MAX_WRITE_BUFFER) {
-                    // write max buffer size
-                    $wrote = fwrite($this->stream, substr($buf, $written, self::MAX_WRITE_BUFFER));
-                } else {
-                    // write remaining buffer bytes to stream
-                    $wrote = fwrite($this->stream, substr($buf, $written));
-                }
-                if ($wrote === -1 || $wrote === false) {
-                    throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
-                } elseif ($wrote === 0) {
-                    // Increment the number of times we have failed
-                    $failedWriteAttempts++;
-                    if ($failedWriteAttempts > $this->maxWriteAttempts) {
-                        throw new \Kafka\Exception\Socket('After ' . $failedWriteAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
-                    }
-                } else {
-                    // If we wrote something, reset our failed attempt counter
-                $failedWriteAttempts = 0;
-                }
-                $written += $wrote;
-                continue;
-            }
-            if (false !== $writable) {
-                $res = stream_get_meta_data($this->stream);
-                if (!empty($res['timed_out'])) {
-                    throw new \Kafka\Exception\SocketTimeout('Timed out writing ' . strlen($buf) . ' bytes to stream after writing ' . $written . ' bytes');
-                }
-            }
-            throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream');
+        if ($data != null) {
+            $this->writeBuffer .= $data;
         }
-        return $written;
+        $bytesToWrite = strlen($this->writeBuffer);
+        $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
+
+        if ($bytesToWrite === $bytesWritten) {
+            \Amp\disable($this->writeWatcher);
+        } elseif ($bytesWritten >= 0) {
+            \Amp\enable($this->writeWatcher);
+        } elseif ($this->isSocketDead($this->stream)) {
+            $this->reconnet();
+        }
+        $this->writeBuffer = substr($client->writeBuffer, $bytesWritten);
     }
 
     // }}}
-    // {{{ public function rewind()
-
+    // {{{ protected function isSocketDead()
+    
     /**
-     * Rewind the stream
+     * check the stream is close
      *
-     * @return void
+     * @return bool
      */
-    public function rewind()
+    protected function isSocketDead()
     {
-        if (is_resource($this->stream)) {
-            rewind($this->stream);
-        }
+        return !is_resource($socket) || @feof($socket);
     }
 
     // }}}
