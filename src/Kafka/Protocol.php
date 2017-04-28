@@ -16,7 +16,7 @@ namespace Kafka;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol for container 
+* Kafka protocol for container
 +------------------------------------------------------------------------------
 *
 * @package
@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Protocol 
+class Protocol
 {
     // {{{ consts
 
@@ -73,7 +73,7 @@ class Protocol
     const ILLEGAL_GENERATION = 22;
     const INCONSISTENT_GROUP_PROTOCOL = 23;
     const INVALID_GROUP_ID = 24;
-    const UNKNOWN_MEMBER_ID = 25; 
+    const UNKNOWN_MEMBER_ID = 25;
     const INVALID_SESSION_TIMEOUT = 26;
     const REBALANCE_IN_PROGRESS = 27;
     const INVALID_COMMIT_OFFSET_SIZE = 28;
@@ -89,7 +89,7 @@ class Protocol
 
     // }}}
     // {{{ functions
-    // {{{ public static function init() 
+    // {{{ public static function init()
     
     public static function init($version, $logger = null)
     {

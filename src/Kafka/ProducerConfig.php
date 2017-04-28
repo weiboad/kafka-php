@@ -35,6 +35,9 @@ class ProducerConfig extends Config
     protected static $defaults = array(
         'requiredAck' => 0,
         'timeout' => 100,
+        'isAsyn' => false,
+        'requestTimeout' => 1000,
+        'produceInterval' => 100,
     );
 
     // }}}

@@ -26,7 +26,7 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class Broker 
+class Broker
 {
     use SingletonTrait;
     // {{{ consts
@@ -51,7 +51,7 @@ class Broker
 
     public function setProcess(\Closure $process)
     {
-        $this->process = $process; 
+        $this->process = $process;
     }
 
     // }}}
@@ -126,39 +126,39 @@ class Broker
     }
 
     // }}}
-    // {{{ public function getMetaConnect()  
+    // {{{ public function getMetaConnect()
 
     public function getMetaConnect($key)
-    { 
+    {
         return $this->getConnect($key, 'metaSockets');
     }
 
     // }}}
-    // {{{ public function getRandConnect()  
+    // {{{ public function getRandConnect()
 
     public function getRandConnect()
-    { 
+    {
         $nodeIds = array_keys($this->brokers);
         shuffle($nodeIds);
         if (!isset($nodeIds[0])) {
-            return false; 
+            return false;
         }
         return $this->getMetaConnect($nodeIds[0]);
     }
 
     // }}}
-    // {{{ public function getDataConnect()  
+    // {{{ public function getDataConnect()
     
     public function getDataConnect($key)
-    { 
+    {
         return $this->getConnect($key, 'dataSockets');
     }
 
     // }}}
-    // {{{ public function getConnect()  
+    // {{{ public function getConnect()
 
     public function getConnect($key, $type)
-    { 
+    {
         if (isset($this->{$type}[$key])) {
             return $this->{$type}[$key];
         }
@@ -183,7 +183,7 @@ class Broker
 
         if ($host && $port) {
             try {
-                $socket = new \Kafka\SocketAsyn($host, $port);
+                $socket = new \Kafka\Socket($host, $port);
                 $socket->SetonReadable($this->process);
                 $socket->connect();
                 $this->{$type}[$key] = $socket;

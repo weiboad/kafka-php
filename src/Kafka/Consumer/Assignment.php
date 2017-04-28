@@ -55,42 +55,48 @@ class Assignment
     // {{{ functions
     // {{{ public function setMemberId()
 
-    public function setMemberId($memberId) {
+    public function setMemberId($memberId)
+    {
         $this->memberId = $memberId;
     }
 
     // }}}
     // {{{ public function getMemberId()
 
-    public function getMemberId() {
+    public function getMemberId()
+    {
         return $this->memberId;
     }
 
     // }}}
     // {{{ public function setGenerationId()
 
-    public function setGenerationId($generationId) {
+    public function setGenerationId($generationId)
+    {
         $this->generationId = $generationId;
     }
 
     // }}}
     // {{{ public function getGenerationId()
 
-    public function getGenerationId() {
+    public function getGenerationId()
+    {
         return $this->generationId;
     }
 
     // }}}
     // {{{ public function getAssignments()
 
-    public function getAssignments() {
+    public function getAssignments()
+    {
         return $this->assignments;
     }
 
     // }}}
     // {{{ public function assign()
 
-    public function assign($result) {
+    public function assign($result)
+    {
         $broker = \Kafka\Broker::getInstance();
         $topics = $broker->getTopics();
 
@@ -109,11 +115,11 @@ class Assignment
                 }
                 $members[$memberNum][$topicName]['topic_name'] = $topicName;
                 if (!isset($members[$memberNum][$topicName]['partitions'])) {
-                    $members[$memberNum][$topicName]['partitions'] = array(); 
+                    $members[$memberNum][$topicName]['partitions'] = array();
                 }
                 $members[$memberNum][$topicName]['partitions'][] = $partId;
-                $count++;  
-            } 
+                $count++;
+            }
         }
 
         $data = array();
@@ -131,112 +137,128 @@ class Assignment
     // }}}
     // {{{ public function setTopics()
 
-    public function setTopics($topics) {
+    public function setTopics($topics)
+    {
         $this->topics = $topics;
     }
 
     // }}}
     // {{{ public function getTopics()
 
-    public function getTopics() {
+    public function getTopics()
+    {
         return $this->topics;
     }
 
     // }}}
     // {{{ public function setOffsets()
 
-    public function setOffsets($offsets) {
+    public function setOffsets($offsets)
+    {
         $this->offsets = $offsets;
     }
 
     // }}}
     // {{{ public function getOffsets()
 
-    public function getOffsets() {
+    public function getOffsets()
+    {
         return $this->offsets;
     }
 
     // }}}
     // {{{ public function setFetchOffsets()
 
-    public function setFetchOffsets($offsets) {
+    public function setFetchOffsets($offsets)
+    {
         $this->fetchOffsets = $offsets;
     }
 
     // }}}
     // {{{ public function getFetchOffsets()
 
-    public function getFetchOffsets() {
+    public function getFetchOffsets()
+    {
         return $this->fetchOffsets;
     }
 
     // }}}
     // {{{ public function setConsumerOffsets()
 
-    public function setConsumerOffsets($offsets) {
+    public function setConsumerOffsets($offsets)
+    {
         $this->consumerOffsets = $offsets;
     }
 
     // }}}
     // {{{ public function getConsumerOffsets()
 
-    public function getConsumerOffsets() {
+    public function getConsumerOffsets()
+    {
         return $this->consumerOffsets;
     }
 
     // }}}
     // {{{ public function setConsumerOffset()
 
-    public function setConsumerOffset($topic, $part, $offset) {
+    public function setConsumerOffset($topic, $part, $offset)
+    {
         $this->consumerOffsets[$topic][$part] = $offset;
     }
 
     // }}}
     // {{{ public function getConsumerOffset()
 
-    public function getConsumerOffset($topic, $part) {
+    public function getConsumerOffset($topic, $part)
+    {
         return $this->consumerOffsets[$topic][$part];
     }
 
     // }}}
     // {{{ public function setCommitOffsets()
 
-    public function setCommitOffsets($offsets) {
+    public function setCommitOffsets($offsets)
+    {
         $this->commitOffsets = $offsets;
     }
 
     // }}}
     // {{{ public function getCommitOffsets()
 
-    public function getCommitOffsets() {
+    public function getCommitOffsets()
+    {
         return $this->commitOffsets;
     }
 
     // }}}
     // {{{ public function setCommitOffset()
 
-    public function setCommitOffset($topic, $part, $offset) {
+    public function setCommitOffset($topic, $part, $offset)
+    {
         $this->commitOffsets[$topic][$part] = $offset;
     }
 
     // }}}
     // {{{ public function setPrecommitOffsets()
 
-    public function setPrecommitOffsets($offsets) {
+    public function setPrecommitOffsets($offsets)
+    {
         $this->precommitOffsets = $offsets;
     }
 
     // }}}
     // {{{ public function getPrecommitOffsets()
 
-    public function getPrecommitOffsets() {
+    public function getPrecommitOffsets()
+    {
         return $this->precommitOffsets;
     }
 
     // }}}
     // {{{ public function setPrecommitOffset()
 
-    public function setPrecommitOffset($topic, $part, $offset) {
+    public function setPrecommitOffset($topic, $part, $offset)
+    {
         $this->precommitOffsets[$topic][$part] = $offset;
     }
 

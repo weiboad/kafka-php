@@ -26,7 +26,7 @@ namespace Kafka\Consumer;
 +------------------------------------------------------------------------------
 */
 
-class State 
+class State
 {
     use \Kafka\SingletonTrait;
     // {{{ consts
@@ -114,24 +114,24 @@ class State
         // init requests
         $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
-            switch($request) {
+            switch ($request) {
             case self::REQUEST_METADATA:
                 $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
                 break;
             default:
                 $this->requests[$request]['interval'] = 1000;
-            } 
+            }
         }
     }
 
     // }}}
     // {{{ public function start()
 
-    public function start() 
+    public function start()
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            \Amp\repeat(function ($watcherId) use($request, $option) {
+            \Amp\repeat(function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -159,7 +159,7 @@ class State
             return false;
         }
 
-        switch($key) {
+        switch ($key) {
             case self::REQUEST_METADATA:
                 $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                 if ($context) { // if kafka broker is change
@@ -196,7 +196,7 @@ class State
             return false;
         }
 
-        switch($key) {
+        switch ($key) {
             case self::REQUEST_METADATA:
                 $this->callStatus[$key]['status'] = self::STATUS_LOOP;
                 break;
@@ -211,7 +211,7 @@ class State
     // }}}
     // {{{ public function setCallback()
 
-    public function setCallback($callbacks) 
+    public function setCallback($callbacks)
     {
         foreach ($callbacks as $request => $callback) {
             $this->requests[$request]['func'] = $callback;
@@ -225,7 +225,7 @@ class State
     {
         $joinGroupStatus = $this->callStatus[self::REQUEST_JOINGROUP]['status'];
         if (($joinGroupStatus & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
-            return;    
+            return;
         }
 
         $this->callStatus = array(
@@ -253,7 +253,6 @@ class State
                 'status'=> self::STATUS_LOOP,
             ),
         );
-
     }
 
     // }}}
@@ -300,7 +299,7 @@ class State
         }
 
         $status = $this->callStatus[$key]['status'];
-        switch($key) {
+        switch ($key) {
             case self::REQUEST_METADATA:
                 if ($status & self::STATUS_PROCESS == self::STATUS_PROCESS) {
                     return false;
@@ -386,7 +385,7 @@ class State
 
         // set process start time
         $this->callStatus[$key]['time'] = microtime(true);
-        switch($key) {
+        switch ($key) {
             case self::REQUEST_METADATA:
             case self::REQUEST_GETGROUP:
             case self::REQUEST_JOINGROUP:
@@ -401,7 +400,7 @@ class State
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
                 $contextStatus = array();
                 foreach ($context as $fd) {
-                    $contextStatus[$fd] = self::STATUS_PROCESS; 
+                    $contextStatus[$fd] = self::STATUS_PROCESS;
                 }
                 $this->callStatus[$key]['context'] = $contextStatus;
                 break;

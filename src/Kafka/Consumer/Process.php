@@ -43,15 +43,16 @@ class Process
     // {{{ functions
     // {{{ public function __construct()
 
-    public function __construct(\Closure $consumer = null) {
-        $this->consumer = $consumer; 
+    public function __construct(\Closure $consumer = null)
+    {
+        $this->consumer = $consumer;
     }
 
     // }}}
     // {{{ public function init()
 
     /**
-     * start consumer 
+     * start consumer
      *
      * @access public
      * @return void
@@ -64,7 +65,7 @@ class Process
 
         // init process request
         $broker = \Kafka\Broker::getInstance();
-        $broker->setProcess(function($data, $fd) {
+        $broker->setProcess(function ($data, $fd) {
             $this->processRequest($data, $fd);
         });
 
@@ -74,32 +75,32 @@ class Process
             $this->state->setLogger($this->logger);
         }
         $this->state->setCallback(array(
-            \Kafka\Consumer\State::REQUEST_METADATA => function() {
+            \Kafka\Consumer\State::REQUEST_METADATA => function () {
                 return $this->syncMeta();
             },
-            \Kafka\Consumer\State::REQUEST_GETGROUP => function() {
-                return $this->getGroupBrokerId(); 
+            \Kafka\Consumer\State::REQUEST_GETGROUP => function () {
+                return $this->getGroupBrokerId();
             },
-            \Kafka\Consumer\State::REQUEST_JOINGROUP => function() {
-                return $this->joinGroup(); 
+            \Kafka\Consumer\State::REQUEST_JOINGROUP => function () {
+                return $this->joinGroup();
             },
-            \Kafka\Consumer\State::REQUEST_SYNCGROUP => function() {
-                return $this->syncGroup(); 
+            \Kafka\Consumer\State::REQUEST_SYNCGROUP => function () {
+                return $this->syncGroup();
             },
-            \Kafka\Consumer\State::REQUEST_HEARTGROUP => function() {
-                return $this->heartbeat(); 
+            \Kafka\Consumer\State::REQUEST_HEARTGROUP => function () {
+                return $this->heartbeat();
             },
-            \Kafka\Consumer\State::REQUEST_OFFSET => function() {
-                return $this->offset(); 
+            \Kafka\Consumer\State::REQUEST_OFFSET => function () {
+                return $this->offset();
             },
-            \Kafka\Consumer\State::REQUEST_FETCH_OFFSET => function() {
-                return $this->fetchOffset(); 
+            \Kafka\Consumer\State::REQUEST_FETCH_OFFSET => function () {
+                return $this->fetchOffset();
             },
-            \Kafka\Consumer\State::REQUEST_FETCH => function() {
-                return $this->fetch(); 
+            \Kafka\Consumer\State::REQUEST_FETCH => function () {
+                return $this->fetch();
             },
-            \Kafka\Consumer\State::REQUEST_COMMIT_OFFSET => function() {
-                return $this->commit(); 
+            \Kafka\Consumer\State::REQUEST_COMMIT_OFFSET => function () {
+                return $this->commit();
             },
         ));
         $this->state->init();
@@ -109,7 +110,7 @@ class Process
     // {{{ public function start()
 
     /**
-     * start consumer 
+     * start consumer
      *
      * @access public
      * @return void
@@ -124,7 +125,7 @@ class Process
     // {{{ public function stop()
 
     /**
-     * stop consumer 
+     * stop consumer
      *
      * @access public
      * @return void
@@ -138,7 +139,7 @@ class Process
     // {{{ protected function processRequest()
 
     /**
-     * process Request 
+     * process Request
      *
      * @access public
      * @return void
@@ -146,7 +147,7 @@ class Process
     protected function processRequest($data, $fd)
     {
         $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-        switch($correlationId) {
+        switch ($correlationId) {
         case \Kafka\Protocol::METADATA_REQUEST:
             $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
             if (!isset($result['brokers']) || !isset($result['topics'])) {
@@ -369,7 +370,7 @@ class Process
 
         $topics = \Kafka\Broker::getInstance()->getTopics();
         $brokerToTopics = array();
-        foreach ($result['partitionAssignments'] as $topic) {  
+        foreach ($result['partitionAssignments'] as $topic) {
             foreach ($topic['partitions'] as $partId) {
                 $brokerId = $topics[$topic['topicName']][$partId];
                 if (!isset($brokerToTopics[$brokerId])) {
@@ -417,7 +418,7 @@ class Process
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $params);
         //$this->debug("Heartbeat group start, params:" . json_encode($params));
         $connect->write($requestData);
-}
+    }
 
 // }}}
     // {{{ public function failHeartbeat()
@@ -485,7 +486,7 @@ class Process
                 if ($part['errorCode'] != 0) {
                     $this->stateConvert($part['errorCode']);
                     break 2;
-                } 
+                }
 
                 $offsets[$topic['topicName']][$part['partition']] = $part['offsets'][0];
             }
@@ -545,7 +546,7 @@ class Process
                 if ($part['errorCode'] != 0) {
                     $this->stateConvert($part['errorCode']);
                     break 2;
-                } 
+                }
 
                 $offsets[$topic['topicName']][$part['partition']] = $part['offset'];
             }

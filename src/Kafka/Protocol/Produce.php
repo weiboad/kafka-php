@@ -57,7 +57,7 @@ class Produce extends Protocol
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
         $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeProcudeTopic'), $compression);
+        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeProcudeTopic'), self::COMPRESSION_NONE);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -138,8 +138,13 @@ class Produce extends Protocol
         $data  = self::pack(self::BIT_B8, $magic);
         $data .= self::pack(self::BIT_B8, $compression);
 
+        $key = '';
+        if (is_array($message)) {
+            $key = $message['key'];
+            $message = $message['value'];
+        }
         // message key
-        $data .= self::encodeString('', self::PACK_INT32);
+        $data .= self::encodeString($key, self::PACK_INT32);
 
         // message value
         $data .= self::encodeString($message, self::PACK_INT32, $compression);
@@ -203,7 +208,7 @@ class Produce extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, '_encodeProcudePartion'), $compression);
+        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeProcudePartion'), $compression);
 
         return $topic . $partitions;
     }

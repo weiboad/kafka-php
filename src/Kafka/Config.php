@@ -54,7 +54,7 @@ abstract class Config
         if (strpos($name, 'get') === 0) {
             $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
             if (isset($this->options[$option])) {
-                return $this->options[$option]; 
+                return $this->options[$option];
             }
 
             if (isset(self::$defaults[$option])) {

@@ -56,7 +56,7 @@ class Consumer
     // {{{ public function start()
 
     /**
-     * start consumer 
+     * start consumer
      *
      * @access public
      * @return void
@@ -75,7 +75,7 @@ class Consumer
         $this->isRunning = true;
         if ($isBlock) {
             \Amp\run();
-        } 
+        }
     }
 
     // }}}
