@@ -37,7 +37,7 @@ Simply add a dependency on nmred/kafka-php to your project's composer.json file 
 }
 ```
 
-## Produce
+## Producer
 
 ```php
 <?php
