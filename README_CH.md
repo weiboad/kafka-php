@@ -34,6 +34,10 @@ Kafka-php 使用纯粹的PHP 编写的 kafka 客户端，目前支持 0.8.x 以�
 }
 ```
 
+## 配置
+
+配置参数见 [配置](docs/Configure.md)
+
 ## Produce
 
 ```php
@@ -47,7 +51,6 @@ $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-// 设置生产相关配置，具体配置参数见 [Configuration](Configuration.md)
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('10.13.4.159:9192');

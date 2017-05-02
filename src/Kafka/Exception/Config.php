@@ -12,11 +12,13 @@
 // | $_SWANBR_WEB_DOMAIN_$
 // +---------------------------------------------------------------------------
 
-namespace Kafka;
+namespace Kafka\Exception;
+
+use \Kafka\Exception;
 
 /**
 +------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
+* Kafka php client exception
 +------------------------------------------------------------------------------
 *
 * @package
@@ -26,21 +28,6 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class ProducerConfig extends Config
+class Config extends Exception
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-
-    protected static $defaults = array(
-        'requiredAck' => 1,
-        'timeout' => 5000,
-        'isAsyn' => false,
-        'requestTimeout' => 6000,
-        'produceInterval' => 100,
-    );
-
-    // }}}
-    // {{{ functions
-    // }}}
 }

@@ -34,8 +34,8 @@ class ConsumerConfig extends Config
 
     protected static $defaults = array(
         'groupId' => '',
-        'sessionTimeout' => 6000,
-        'rebalanceTimeout' => 4000,
+        'sessionTimeout' => 30000,
+        'rebalanceTimeout' => 30000,
         'topics' => array(),
         'offsetReset' => 'latest', // earliest
     );

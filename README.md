@@ -37,6 +37,10 @@ Simply add a dependency on nmred/kafka-php to your project's composer.json file 
 }
 ```
 
+## Configuration
+
+Configuration properties are documented in [Configuration](docs/Configure.md)
+
 ## Producer
 
 ```php

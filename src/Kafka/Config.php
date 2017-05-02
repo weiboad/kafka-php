@@ -77,5 +77,48 @@ abstract class Config
     }
 
     // }}}
+    // {{{ public function setClientId()
+
+    public function setClientId($val)
+    {
+        $client = trim($val);
+        if ($client == '') {
+            throw new \Kafka\Exception\Config('Set clientId value is invalid, must is not empty string.');
+        }
+        $this->options['clientId'] = $client;
+    }
+
+    // }}}
+    // {{{ public function setBrokerVersion()
+
+    public function setBrokerVersion($version)
+    {
+        $version = trim($version);
+        if ($version == '' || version_compare($version, '0.8.0') < 0) {
+            throw new \Kafka\Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
+        }
+        $this->options['brokerVersion'] = $version;
+    }
+
+    // }}}
+    // {{{ public function setMetadataBrokerList()
+
+    public function setMetadataBrokerList($list)
+    {
+        $lists = explode(',', trim($list));
+        if (empty($lists)) {
+            throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
+        }
+        foreach ($lists as $list) {
+            list($host, $port) = explode(':', $list);
+            if ($host == '' || $port == '') {
+                throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
+            }
+        }
+
+        $this->options['metadataBrokerList'] = $list;
+    }
+
+    // }}}
     // }}}
 }
