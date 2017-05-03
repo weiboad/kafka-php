@@ -1,0 +1,3 @@
+repo_token: ojc3Y2LcKW8VCM8CW2I0phJi1f7FJXzPm
+coverage_clover: build/logs/clover.xml
+json_path: build/logs/coveralls-upload.json

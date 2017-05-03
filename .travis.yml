@@ -15,7 +15,12 @@ install:
       - travis_retry composer install --no-interaction --ignore-platform-reqs
 
 script:
- - ant travis -keep-going
+    - mkdir -p build/logs
+    - mkdir -p build/coverage
+    - ./tests/run-tests.php -c ../build/logs/clover.xml all
+
+after_script:
+    - php vendor/bin/coveralls  -v
 
 notifications:
   email:

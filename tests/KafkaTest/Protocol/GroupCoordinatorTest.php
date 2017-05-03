@@ -85,7 +85,7 @@ class GroupCoordinatorTest extends \PHPUnit_Framework_TestCase
      * testEncodeNoGroupId
      *
      * @expectedException \Kafka\Exception\Protocol
-	 * @expectedExceptionMessage given group coordinator invalid. `group_id` is undefined.
+     * @expectedExceptionMessage given group coordinator invalid. `group_id` is undefined.
      * @access public
      * @return void
      */
@@ -108,9 +108,9 @@ class GroupCoordinatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecode()
     {
-		$data = '000000000003000b31302e31332e342e313539000023e8';
+        $data = '000000000003000b31302e31332e342e313539000023e8';
         $test = $this->group->decode(\hex2bin($data));
-		$result = '{"errorCode":0,"coordinatorId":3,"coordinatorHost":"10.13.4.159","coordinatorPort":9192}';
+        $result = '{"errorCode":0,"coordinatorId":3,"coordinatorHost":"10.13.4.159","coordinatorPort":9192}';
         $this->assertEquals(json_encode($test), $result);
     }
 
