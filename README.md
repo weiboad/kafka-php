@@ -16,8 +16,6 @@ Kafka-php
 Kafka-php is a pure PHP kafka client that currently supports greater than 0.8.x version of Kafka, this project v0.2.x and v0.1.x are incompatible if using the original v0.1.x You can refer to the document 
 [Kafka PHP v0.1.x Document](https://github.com/weiboad/kafka-php/blob/v0.1.6/README.md), but it is recommended to switch to v0.2.x . v0.2.x use PHP asynchronous implementation and kafka broker interaction, more stable than v0.1.x efficient, because the use of PHP language so do not compile any expansion can be used to reduce the access and maintenance costs
 
-QQ Group: 531522091
-![QQ Group](docs/qq_group.png)
 
 ## Requirements
 
@@ -114,3 +112,9 @@ $consumer->start(function($topic, $part, $message) {
 ## Low-Level API
 
 Refer [Example](https://github.com/weiboad/kafka-php/tree/master/example)
+
+
+## QQ Group
+
+531522091
+![QQ Group](docs/qq_group.png)
