@@ -2,7 +2,7 @@ Kafka-php 配置参数
 ==================
 
 | Property	| C/P	| Range	| Default | Desc |
-| ----  | ---- | ---- | ---- | ---- | ---- |
+| ----  | ---- | ---- | ---- | ---- | 
 | clientId | C/P | | kafka-php | 客户端标识 | 
 | brokerVersion | C/P | 大于 0.8.0 | 0.10.1.0 | 为了计算 Kafka 请求的协议版本 |
 | metadataBrokerList | C/P | | | 指定 Kafka Broker 列表，多个用逗号分隔 |

@@ -2,8 +2,8 @@ Kafka-php Configuration
 ==================
 
 | Property	| C/P	| Range	| Default | Desc |
-| ----  | ---- | ---- | ---- | ---- | ---- |
-| clientId | C/P | | kafka-php | This is a user supplied identifier for the client application | 
+| --  | -- | -- | -- | -- |
+| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application | 
 | brokerVersion | C/P | 大于 0.8.0 | 0.10.1.0 | User supplied broker version |
 | metadataBrokerList | C/P | | | Kafka Broker server list |
 | messageMaxBytes | C/P | 1000 .. 1000000000 | 1000000 | Maximum transmit message size. |
