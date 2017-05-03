@@ -120,7 +120,7 @@ class Protocol
     }
 
     // }}}
-    // {{{ public static function encode()
+    // {{{ public function encode()
 
     /**
      * request encode
@@ -130,7 +130,7 @@ class Protocol
      * @access public
      * @return string
      */
-    public static function encode($key, $payloads)
+    public function encode($key, $payloads)
     {
         if (!isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);
