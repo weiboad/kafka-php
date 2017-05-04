@@ -561,6 +561,11 @@ abstract class Protocol
         if ($packLen == 4294967295) { // uint32(4294967295) is int32 (-1)
             $packLen = 0;
         }
+
+        if ($packLen == 0) {
+            return array('length' => $offset, 'data' => '');
+        }
+
         $data = substr($data, $offset, $packLen);
         $offset += $packLen;
 
@@ -644,8 +649,12 @@ abstract class Protocol
         $offset = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
+        if ($arrayCount == 4294967295) {
+            $arrayCount = 0;
+        }
 
         $result = array();
+
         for ($i = 0; $i < $arrayCount; $i++) {
             if ($bites == self::BIT_B64) {
                 $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));

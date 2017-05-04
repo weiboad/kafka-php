@@ -399,7 +399,7 @@ class Socket
         } elseif ($this->isSocketDead($this->stream)) {
             $this->reconnet();
         }
-        $this->writeBuffer = substr($client->writeBuffer, $bytesWritten);
+        $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
 
     // }}}
@@ -412,7 +412,7 @@ class Socket
      */
     protected function isSocketDead()
     {
-        return !is_resource($socket) || @feof($socket);
+        return !is_resource($this->stream) || @feof($this->stream);
     }
 
     // }}}

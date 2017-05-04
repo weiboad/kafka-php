@@ -1,21 +1,6 @@
 <?php
 require '../../vendor/autoload.php';
 
-date_default_timezone_set('PRC');
-
-use Monolog\Logger;
-use Monolog\Handler\StdoutHandler;
-
-// Create the logger
-$logger = new Logger('my_logger');
-// Now add some handlers
-$logger->pushHandler(new StdoutHandler());
-
-$mutilTest = array(
-	'0.8.2.1' => array('127.0.0.1', 9092),
-	'0.9.0.0' => array('127.0.0.1', 9192),
-	'0.10.1.0' => array('127.0.0.1', 9292),
-);
 $data = array(
 	'replica_id' => -1,
 	'data' => array(
@@ -24,24 +9,26 @@ $data = array(
 			'partitions' => array(
 				array( 
 					'partition_id' => 0,
-					'offset' => 100,
-					'time' => -1,
+					'offset' => 12,
+					'time' => -2,
 				),
 			),
 		),
 	),
 );
 
-foreach ($mutilTest as $version => $hostInfo) {
-	echo 'Start test version:' . $version . PHP_EOL;
-	$conn = new \Kafka\Socket($hostInfo[0], $hostInfo[1]);
-	$conn->connect();
+$protocol = \Kafka\Protocol::init('0.10.1.0');
+$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_REQUEST, $data);
 
-	$encoder = new \Kafka\Protocol\Encoder($conn, $version);
-	$encoder->setLogger($logger);
-	$ret = $encoder->offsetRequest($data);
+$socket = new \Kafka\Socket('127.0.0.1', '9292');
+$socket->SetonReadable(function($data) {
+	$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+	$result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_REQUEST, substr($data, 4));
+	echo json_encode($result);
+	Amp\stop();
+});
 
-	$decoder = new \Kafka\Protocol\Decoder($conn, $version);
-	$result = $decoder->offsetResponse();
-	var_dump($result);
-}
+$socket->connect();
+$socket->write($requestData);
+Amp\run(function () use ($socket, $requestData) {
+});

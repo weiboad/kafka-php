@@ -17,7 +17,7 @@ install:
 script:
     - mkdir -p build/logs
     - mkdir -p build/coverage
-    - ./tests/run-tests.php -c ../build/logs/clover.xml all
+    - ./tests/run-tests.php -c ../build/logs/clover. all
 
 after_script:
     - php vendor/bin/coveralls  -v
