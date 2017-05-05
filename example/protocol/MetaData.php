@@ -12,6 +12,7 @@ $socket->SetonReadable(function($data) {
 	$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
 	$result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
 	echo json_encode($result);
+	var_dump($result);
 	Amp\stop();
 });
 

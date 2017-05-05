@@ -33,7 +33,7 @@ abstract class Config
     // }}}
     // {{{ members
 
-    private $options = array();
+    protected static $options = array();
 
     private static $defaults = array(
         'clientId' => 'kafka-php',
@@ -51,10 +51,10 @@ abstract class Config
 
     public function __call($name, $args)
     {
-        if (strpos($name, 'get') === 0) {
+        if (strpos($name, 'get') === 0 || strpos($name, 'iet') === 0) {
             $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
-            if (isset($this->options[$option])) {
-                return $this->options[$option];
+            if (isset(self::$options[$option])) {
+                return self::$options[$option];
             }
 
             if (isset(self::$defaults[$option])) {
@@ -63,6 +63,7 @@ abstract class Config
             if (isset(static::$defaults[$option])) {
                 return static::$defaults[$option];
             }
+            return false;
         }
 
         if (strpos($name, 'set') === 0) {
@@ -70,7 +71,7 @@ abstract class Config
                 return false;
             }
             $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
-            $this->options[$option] = $args[0];
+            static::$options[$option] = $args[0];
             // check todo
             return true;
         }
@@ -85,7 +86,7 @@ abstract class Config
         if ($client == '') {
             throw new \Kafka\Exception\Config('Set clientId value is invalid, must is not empty string.');
         }
-        $this->options['clientId'] = $client;
+        static::$options['clientId'] = $client;
     }
 
     // }}}
@@ -97,7 +98,7 @@ abstract class Config
         if ($version == '' || version_compare($version, '0.8.0') < 0) {
             throw new \Kafka\Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
         }
-        $this->options['brokerVersion'] = $version;
+        static::$options['brokerVersion'] = $version;
     }
 
     // }}}
@@ -105,18 +106,40 @@ abstract class Config
 
     public function setMetadataBrokerList($list)
     {
-        $lists = explode(',', trim($list));
+        if (trim($list) == '') {
+            throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
+        }
+        $tmp = explode(',', trim($list));
+        $lists = array();
+        foreach ($tmp as $key => $val) {
+            if (trim($val) != '') {
+                $lists[] = $val;
+            }
+        }
         if (empty($lists)) {
             throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
         }
-        foreach ($lists as $list) {
-            list($host, $port) = explode(':', $list);
-            if ($host == '' || $port == '') {
+        foreach ($lists as $val) {
+            $hostinfo = explode(':', $val);
+            foreach ($hostinfo as $key => $val) {
+                if (trim($val) == '') {
+                    unset($hostinfo[$key]); 
+                }
+            }
+            if (count($hostinfo) != 2) {
                 throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
             }
         }
 
-        $this->options['metadataBrokerList'] = $list;
+        static::$options['metadataBrokerList'] = $list;
+    }
+
+    // }}}
+    // {{{ public function clear()
+
+    public function clear()
+    {
+        static::$options = [];
     }
 
     // }}}

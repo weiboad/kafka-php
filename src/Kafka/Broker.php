@@ -45,6 +45,8 @@ class Broker
 
     private $process;
 
+    private $socket;
+
     // }}}
     // {{{ functions
     // {{{ public function setProcess()
@@ -183,13 +185,14 @@ class Broker
 
         if ($host && $port) {
             try {
-                $socket = new \Kafka\Socket($host, $port);
+                $socket = $this->getSocket($host, $port);
                 $socket->SetonReadable($this->process);
                 $socket->connect();
                 $this->{$type}[$key] = $socket;
                 return $socket;
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
+                return false;
             }
         } else {
             return false;
@@ -207,6 +210,27 @@ class Broker
         foreach ($this->dataSockets as $key => $socket) {
             $socket->close();
         }
+    }
+
+    // }}}
+    // {{{ public function getSocket()
+
+    public function getSocket($host, $port)
+    {
+        if ($this->socket != null) {
+            return $this->socket;
+        }
+        $socket = new \Kafka\Socket($host, $port);
+        return $socket;
+    }
+
+    // }}}
+    // {{{ public function setSocket()
+
+    // use unit test
+    public function setSocket($socket)
+    {
+        $this->socket = $socket;
     }
 
     // }}}
