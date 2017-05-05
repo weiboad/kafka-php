@@ -103,10 +103,10 @@ class Protocol
             \Kafka\Protocol\Protocol::GROUP_COORDINATOR_REQUEST => 'GroupCoordinator',
             \Kafka\Protocol\Protocol::JOIN_GROUP_REQUEST => 'JoinGroup',
             \Kafka\Protocol\Protocol::HEART_BEAT_REQUEST => 'Heartbeat',
-            //\Kafka\Protocol\Protocol::LEAVE_GROUP_REQUEST => '',
+            \Kafka\Protocol\Protocol::LEAVE_GROUP_REQUEST => 'LeaveGroup',
             \Kafka\Protocol\Protocol::SYNC_GROUP_REQUEST => 'SyncGroup',
-            //\Kafka\Protocol\Protocol::DESCRIBE_GROUPS_REQUEST => '',
-            //\Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => '',
+            \Kafka\Protocol\Protocol::DESCRIBE_GROUPS_REQUEST => 'DescribeGroups',
+            \Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => 'ListGroup',
         );
 
         $namespace = '\\Kafka\\Protocol\\';
