@@ -91,6 +91,9 @@ if ($run_as == 'groups') {
         echo "$component:\n";
         system("$phpunit_bin $phpunit_opts $tmp_coverage " . escapeshellarg(__DIR__ . '/' . $component), $c_result);
         echo "\n\n";
+		if ($c_result == 2) {
+			$c_result = 0;
+		}
         if ($c_result) {
             $result = $c_result;
         }
