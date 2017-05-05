@@ -61,6 +61,7 @@ class ConsumerConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($config->getClientId(), 'kafka-php');
         $this->assertEquals($config->getSessionTimeout(), 30000);
         $this->assertFalse($config->setValidKey('xxx', '222'));
+        $this->assertFalse($config->getValidKey());
         $config->setValidKey('222');
         $this->assertEquals($config->getValidKey(), '222');
     }
@@ -212,7 +213,7 @@ class ConsumerConfigTest extends \PHPUnit_Framework_TestCase
     public function testSetMetadataBrokerListEmpty2()
     {
         $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList('127.0.0.1,:');
+        $config->setMetadataBrokerList('127.0.0.1: , : ');
     }
 
     // }}}
@@ -412,6 +413,138 @@ class ConsumerConfigTest extends \PHPUnit_Framework_TestCase
     {
         $config = \Kafka\ConsumerConfig::getInstance();
         $config->getTopics();
+    }
+
+    // }}}
+    // {{{ public function testSetMessageMaxBytes()
+
+    /**
+     * testSetMessageMaxBytes
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetMessageMaxBytes()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMessageMaxBytes(1011);
+        $this->assertEquals($config->getMessageMaxBytes(), 1011);
+    }
+
+    // }}}
+    // {{{ public function testSetMessageMaxBytesValid()
+
+    /**
+     * testSetMessageMaxBytesValid
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set message max bytes value is invalid, must set it 1000 .. 1000000000
+     * @access public
+     * @return void
+     */
+    public function testSetMessageMaxBytesValid()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMessageMaxBytes('999');
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataRequestTimeoutMs()
+
+    /**
+     * testSetMetadataRequestTimeoutMs
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataRequestTimeoutMs()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataRequestTimeoutMs(1011);
+        $this->assertEquals($config->getMetadataRequestTimeoutMs(), 1011);
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataRequestTimeoutMsValid()
+
+    /**
+     * testSetMetadataRequestTimeoutMsValid
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set metadata request timeout value is invalid, must set it 10 .. 900000
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataRequestTimeoutMsValid()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataRequestTimeoutMs('9');
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataRefreshIntervalMs()
+
+    /**
+     * testSetMetadataRefreshIntervalMs
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataRefreshIntervalMs()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataRefreshIntervalMs(1011);
+        $this->assertEquals($config->getMetadataRefreshIntervalMs(), 1011);
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataRefreshIntervalMsValid()
+
+    /**
+     * testSetMetadataRefreshIntervalMsValid
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set metadata refresh interval value is invalid, must set it 10 .. 3600000
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataRefreshIntervalMsValid()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataRefreshIntervalMs('9');
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataMaxAgeMs()
+
+    /**
+     * testSetMetadataMaxAgeMs
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataMaxAgeMs()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataMaxAgeMs(1011);
+        $this->assertEquals($config->getMetadataMaxAgeMs(), 1011);
+    }
+
+    // }}}
+    // {{{ public function testSetMetadataMaxAgeMsValid()
+
+    /**
+     * testSetMetadataMaxAgeMsValid
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set metadata max age value is invalid, must set it 1 .. 86400000
+     * @access public
+     * @return void
+     */
+    public function testSetMetadataMaxAgeMsValid()
+    {
+        $config = \Kafka\ConsumerConfig::getInstance();
+        $config->setMetadataMaxAgeMs('86400001');
     }
 
     // }}}

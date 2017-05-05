@@ -201,7 +201,7 @@ class SyncGroupTest extends \PHPUnit_Framework_TestCase
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => array(
                 array(
-                    'version' => 0 
+                    'version' => 0
                 ),
             ),
         );

@@ -33,6 +33,20 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
     // {{{ members
     // }}}
     // {{{ functions
+    // {{{ public function setDown()
+
+    /**
+     * setDown
+     *
+     * @access public
+     * @return void
+     */
+    public function tearDown()
+    {
+        \Kafka\Broker::getInstance()->clear();
+    }
+
+    // }}}
     // {{{ public function testGroupBrokerId()
 
     /**
@@ -77,7 +91,7 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
                     'port' => '9292',
                     'nodeId' => '2',
                 ),
-            ), 
+            ),
             'topics' => array(
                 array(
                     'topicName' => 'test',
@@ -87,13 +101,29 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
                             'partitionId' => 0,
                             'errorCode' => 0,
                             'leader' => 0,
-                        ), 
+                        ),
                         array(
                             'partitionId' => 1,
                             'errorCode' => 0,
                             'leader' => 2,
-                        ), 
-                    ), 
+                        ),
+                    ),
+                ),
+                array(
+                    'topicName' => 'test1',
+                    'errorCode' => 25,
+                    'partitions' => array(
+                        array(
+                            'partitionId' => 0,
+                            'errorCode' => 0,
+                            'leader' => 0,
+                        ),
+                        array(
+                            'partitionId' => 1,
+                            'errorCode' => 0,
+                            'leader' => 2,
+                        ),
+                    ),
                 ),
             ),
         );
@@ -155,7 +185,8 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
         $result = $broker->getMetaConnect('1');
         $this->assertFalse($result);
 
-        $broker->setProcess(function($data) {});
+        $broker->setProcess(function ($data) {
+        });
         $result = $broker->getMetaConnect('1');
         // second call
         $result = $broker->getMetaConnect('1');
@@ -171,6 +202,23 @@ class BrokerTest extends \PHPUnit_Framework_TestCase
         $result = $broker->getRandConnect();
         $this->assertSame($socket, $result);
         $broker->clear();
+    }
+
+    // }}}
+    // {{{ public function testConnectRandFalse()
+
+    /**
+     * testGetConnect
+     *
+     * @access public
+     * @return void
+     */
+    public function testConnectRandFalse()
+    {
+        $broker = \Kafka\Broker::getInstance();
+
+        $result = $broker->getRandConnect();
+        $this->assertFalse($result);
     }
 
     // }}}

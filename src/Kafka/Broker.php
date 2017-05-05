@@ -210,6 +210,7 @@ class Broker
         foreach ($this->dataSockets as $key => $socket) {
             $socket->close();
         }
+        $this->brokers = [];
     }
 
     // }}}

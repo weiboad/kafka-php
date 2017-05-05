@@ -68,7 +68,6 @@ class HeartbeatTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-
         $data = array(
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',

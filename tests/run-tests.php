@@ -86,8 +86,8 @@ if ($run_as == 'groups') {
 } else {
     foreach ($components as $component) {
         $component =   'KafkaTest/' . basename(str_replace('_', '/', $component));
-		$tmp_coverage = '';
-		$tmp_coverage = $phpunit_coverage . md5($component) . '.xml';
+        $tmp_coverage = '';
+        $tmp_coverage = $phpunit_coverage . md5($component) . '.xml';
         echo "$component:\n";
         system("$phpunit_bin $phpunit_opts $tmp_coverage " . escapeshellarg(__DIR__ . '/' . $component), $c_result);
         echo "\n\n";

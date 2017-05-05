@@ -174,7 +174,6 @@ class Offset extends Protocol
      */
     protected function offsetPartition($data, $version)
     {
-
         $offset = 0;
         $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;

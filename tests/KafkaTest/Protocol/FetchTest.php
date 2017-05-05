@@ -68,7 +68,6 @@ class FetchTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-
         $data = array(
             'max_wait_time' => 1000,
             'replica_id' => -1,

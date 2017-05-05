@@ -28,7 +28,6 @@ namespace Kafka;
 
 abstract class Config
 {
-    use SingletonTrait;
     // {{{ consts
     // }}}
     // {{{ members
@@ -123,7 +122,7 @@ abstract class Config
             $hostinfo = explode(':', $val);
             foreach ($hostinfo as $key => $val) {
                 if (trim($val) == '') {
-                    unset($hostinfo[$key]); 
+                    unset($hostinfo[$key]);
                 }
             }
             if (count($hostinfo) != 2) {
@@ -140,6 +139,53 @@ abstract class Config
     public function clear()
     {
         static::$options = [];
+    }
+
+    // }}}
+    // {{{ public function setMessageMaxBytes()
+
+    public function setMessageMaxBytes($messageMaxBytes)
+    {
+        if (!is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
+            throw new \Kafka\Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
+        }
+        static::$options['messageMaxBytes'] = $messageMaxBytes;
+    }
+
+    // }}}
+    // {{{ public function setMetadataRequestTimeoutMs()
+
+    public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs)
+    {
+        if (!is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
+            || $metadataRequestTimeoutMs > 900000) {
+            throw new \Kafka\Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
+        }
+        static::$options['metadataRequestTimeoutMs'] = $metadataRequestTimeoutMs;
+    }
+
+    // }}}
+    // {{{ public function setMetadataRefreshIntervalMs()
+
+    public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs)
+    {
+        if (!is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
+            || $metadataRefreshIntervalMs > 3600000) {
+            throw new \Kafka\Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
+        }
+        static::$options['metadataRefreshIntervalMs'] = $metadataRefreshIntervalMs;
+    }
+
+    // }}}
+    // {{{ public function setMetadataMaxAgeMs()
+
+    public function setMetadataMaxAgeMs($metadataMaxAgeMs)
+    {
+        if (!is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1
+            || $metadataMaxAgeMs > 86400000) {
+            throw new \Kafka\Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
+        }
+        static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
     }
 
     // }}}

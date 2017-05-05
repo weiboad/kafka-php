@@ -28,6 +28,7 @@ namespace Kafka;
 
 class ConsumerConfig extends Config
 {
+    use SingletonTrait;
     // {{{ consts
     // }}}
     // {{{ members
