@@ -239,7 +239,7 @@ class Socket
             $error = 'Could not connect to '
                     . $this->host . ':' . $this->port
                     . ' ('.$errstr.' ['.$errno.'])';
-            throw new \Kafka\Exception\SocketConnect($error);
+            throw new \Kafka\Exception($error);
         }
 
         stream_set_blocking($this->stream, 0);
