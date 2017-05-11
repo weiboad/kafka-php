@@ -35,7 +35,7 @@ class Consumer
     // }}}
     // {{{ members
     
-    private static $isRunning = false;
+    private $isRunning = false;
 
     // }}}
     // {{{ functions
