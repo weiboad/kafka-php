@@ -363,7 +363,11 @@ class Process
             }
 
             $partition['partition_id'] = $partId;
-            $partition['messages'][] = array('value' => $value['value'], 'key' => $value['key']);
+            if (trim($value['key']) != '') {
+                $partition['messages'][] = array('value' => $value['value'], 'key' => $value['key']);
+            } else {
+                $partition['messages'][] = $value['value'];
+            }
             
             $topicData['partitions'][$partId] = $partition;
             $topicData['topic_name'] = $value['topic'];
