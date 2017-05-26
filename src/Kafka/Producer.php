@@ -67,10 +67,7 @@ class Producer
         if ($this->logger) {
             $this->process->setLogger($this->logger);
         }
-        $this->process->start();
-        if ($isBlock) {
-            \Amp\run();
-        }
+        $this->process->start($isBlock);
     }
 
     // }}}
