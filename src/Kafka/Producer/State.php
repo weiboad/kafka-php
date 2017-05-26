@@ -41,6 +41,8 @@ class State
     const STATUS_PROCESS = 8;
     const STATUS_FINISH  = 16;
 
+    private static $reportWatcherId  = false;
+
     // }}}
     // {{{ members
     
@@ -93,13 +95,13 @@ class State
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            \Amp\repeat(function ($watcherId) use ($request, $option) {
+            $watcherId = \Amp\repeat(function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
                 }
-                $this->requests[$request]['watcher'] = $watcherId;
             }, $msInterval = $interval);
+            $this->requests[$request]['watcher'] = $watcherId;
         }
 
         // start sync metadata
@@ -108,9 +110,13 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        \Amp\repeat(function ($watcherId) {
-            $this->report();
-        }, $msInterval = 1000);
+
+        if(static::$reportWatcherId === false) {
+            static::$reportWatcherId = \Amp\repeat(function ($watcherId) {
+                $this->report();
+            }, $msInterval = 1000);
+        }
+        
     }
 
     // }}}
@@ -122,6 +128,11 @@ class State
         $isAsyn = $config->getIsAsyn();
         if (!isset($this->callStatus[$key])) {
             return false;
+        }
+
+
+        if ($this->requests[$key]['watcher'] != null) {
+            \Amp\cancel($this->requests[$key]['watcher']);
         }
 
         switch ($key) {

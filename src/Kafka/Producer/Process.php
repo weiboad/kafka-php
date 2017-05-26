@@ -102,19 +102,21 @@ class Process
      * @access public
      * @return void
      */
-    public function start()
+    public function start($isBlock)
     {
         $this->init();
         $this->state->start();
         $config = \Kafka\ProducerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
-        if (!$isAsyn) {
-            \Amp\repeat(function ($watcherId) {
+        if (!$isAsyn || $isBlock) {
+            $watcherId = \Amp\repeat(function ($watcherId) {
                 if ($this->error) {
                     call_user_func($this->error, 1000);
                 }
                 \Amp\stop();
             }, $msInterval = $config->getRequestTimeout());
+            \Amp\run();
+            \Amp\cancel($watcherId);
         };
     }
 
