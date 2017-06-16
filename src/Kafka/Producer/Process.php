@@ -88,7 +88,8 @@ class Process
         ));
         $this->state->init();
 
-        if (!empty($broker->getTopics())) {
+        $topics = $broker->getTopics();
+        if (!empty($topics)) {
             $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA);
         }
     }
@@ -113,6 +114,7 @@ class Process
                 if ($this->error) {
                     call_user_func($this->error, 1000);
                 }
+                \Amp\cancel($watcherId);
                 \Amp\stop();
             }, $msInterval = $config->getRequestTimeout());
         };

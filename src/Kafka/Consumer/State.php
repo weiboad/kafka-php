@@ -178,6 +178,10 @@ class State
                 break;
             case self::REQUEST_OFFSET:
             case self::REQUEST_FETCH:
+                if (!isset($this->callStatus[$key]['context'])) {
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
+                    break;
+                }
                 unset($this->callStatus[$key]['context'][$context]);
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {

@@ -272,11 +272,12 @@ class Fetch extends Protocol
         $attr  = self::unpack(self::BIT_B8, substr($data, $offset, 1));
         $offset += 1;
         $timestamp = 0;
-        $version = $this->getApiVersion(self::FETCH_REQUEST);
-        if ($version == self::API_VERSION2) {
-            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-            $offset += 8;
-        }
+        //$version = $this->getApiVersion(self::FETCH_REQUEST);
+        //if ($version == self::API_VERSION2) {
+        //    $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        //    $offset += 8;
+        //}
+        
         $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
         $offset += $keyRet['length'];
         $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
