@@ -10,8 +10,8 @@ $logger->pushHandler(new StdoutHandler());
 
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
-$config->setMetadataBrokerList('127.0.0.1:9192');
-$config->setBrokerVersion('0.9.0.1');
+$config->setMetadataBrokerList('127.0.0.1:9092');
+$config->setBrokerVersion('0.10.2.1');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
@@ -21,7 +21,7 @@ $producer->setLogger($logger);
 for($i = 0; $i < 100; $i++) {
 	$result = $producer->send(array(
 		array(
-			'topic' => 'test1',
+			'topic' => 'test',
 			'value' => 'test1....message.',
 			'key' => '',
 		),

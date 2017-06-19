@@ -67,7 +67,7 @@ class Producer
      * @data is data is boolean that is async process, thus it is sync process
      * @return void
      */
-    public function send($data = array())
+    public function send($data = true)
     {
         if ($this->logger) {
             $this->process->setLogger($this->logger);

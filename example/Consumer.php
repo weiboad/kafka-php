@@ -10,11 +10,11 @@ $logger->pushHandler(new StdoutHandler());
 
 $config = \Kafka\ConsumerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
-$config->setMetadataBrokerList('10.13.4.159:9192');
+$config->setMetadataBrokerList('127.0.0.1:9092');
 $config->setGroupId('test');
-$config->setBrokerVersion('0.9.0.1');
+$config->setBrokerVersion('0.10.2.1');
 $config->setTopics(array('test'));
-//$config->setOffsetReset('earliest');
+$config->setOffsetReset('earliest');
 $consumer = new \Kafka\Consumer();
 $consumer->setLogger($logger);
 $consumer->start(function($topic, $part, $message) {

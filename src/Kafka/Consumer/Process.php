@@ -537,7 +537,7 @@ class Process
     public function succFetchOffset($result)
     {
         $msg = sprintf('Get current fetch offset sucess, result: %s', json_encode($result));
-        //$this->debug($msg);
+        $this->debug($msg);
 
         $assign = \Kafka\Consumer\Assignment::getInstance();
         $offsets = $assign->getFetchOffsets();

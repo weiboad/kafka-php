@@ -276,16 +276,31 @@ class Fetch extends Protocol
         $attr  = self::unpack(self::BIT_B8, substr($data, $offset, 1));
         $offset += 1;
         $timestamp = 0;
-        //$version = $this->getApiVersion(self::FETCH_REQUEST);
-        //if ($version == self::API_VERSION2) {
-        //    $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-        //    $offset += 8;
-        //}
-        
-        $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
-        $offset += $keyRet['length'];
-        $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
-        $offset += $valueRet['length'];
+        $backOffset = $offset;
+        try { // try unpack message format v0 and v1, if use v1 unpack fail, try unpack v0
+            $version = $this->getApiVersion(self::FETCH_REQUEST);
+            if ($version == self::API_VERSION2) {
+                $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+                $offset += 8;
+            }
+            
+            $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $offset += $keyRet['length'];
+
+            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $offset += $valueRet['length'];
+            if ($offset != $messageSize) {
+                throw new \Kafka\Exception('pack message fail, message len:' . $messageSize . ' , data unpack offset :' . $offset);
+            }
+        } catch (\Kafka\Exception $e) { // try unpack message format v0
+            $offset = $backOffset;
+            $timestamp = 0;
+            $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $offset += $keyRet['length'];
+
+            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $offset += $valueRet['length'];
+        }
 
         return array(
             'length' => $offset,
