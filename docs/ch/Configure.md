@@ -15,6 +15,8 @@ Kafka-php 配置参数
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | 分组 rebalance 等待 join 时间 |
 | topics | C | | |  将要消费的 kafka topic 名称 | 
 | offsetReset | C | latest,earliest | latest | 如果消费 offset 失效的时候重置 offset 的策略 |
+| maxBytes | C |  | 65536 | 单次 FETCH 请求对于单个分区请求的最大字节数 |
+| maxWaitTime | C |  | 100 | 等待服务端响应 FETCH 请求的最大时间 |
 | requiredAck | P | -1 .. 1000 | 1 | 生产消息确认策略 |
 | timeout | P | 1 .. 900000 | 5000 | 生产消息请求超时时间 |
 | isAsyn | P | true, false | false | 是否采用异步生产消息 |

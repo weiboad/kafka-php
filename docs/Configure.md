@@ -15,6 +15,8 @@ Kafka-php Configuration
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | rebalance join wait timeout |
 | topics | C | | |  Want consumer topics | 
 | offsetReset | C | latest,earliest | latest | Action to take when there is no initial offset in offset store or the desired offset is out of range |
+| maxBytes | C |  | 65536 | Maximum bytes to fetch. |
+| maxWaitTime | C |  | 100 | Maximum time in ms to wait for the response |
 | requiredAck | P | -1 .. 1000 | 1 | This field indicates how many acknowledgements the leader broker must receive from ISR brokers before responding to the request: 0=Broker does not send any response/ack to client, 1=Only the leader broker will need to ack the message, -1 or all=broker will block until message is committed by all in sync replicas (ISRs) or broker\'s in.sync.replicas setting before sending response.  |
 | timeout | P | 1 .. 900000 | 5000 | Producer request timeout |
 | isAsyn | P | true, false | false | Whether to use asynchronous production messages |
