@@ -144,7 +144,7 @@ class Fetch extends Protocol
         $offset += 4;
 
         if ($offset < strlen($data) && $messageSetSize) {
-            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), array($this, 'decodeMessageSet'));
+            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), array($this, 'decodeMessageSet'), $messageSetSize);
             $offset += $messages['length'];
         }
 
@@ -172,7 +172,7 @@ class Fetch extends Protocol
      * @return string
      * @access protected
      */
-    protected function decodeMessageSetArray($data, $func, $options = null)
+    protected function decodeMessageSetArray($data, $func, $messageSetSize = null)
     {
         $offset = 0;
         if (!is_callable($func, false)) {
@@ -182,8 +182,8 @@ class Fetch extends Protocol
         $result = array();
         while ($offset < strlen($data)) {
             $value = substr($data, $offset);
-            if (!is_null($options)) {
-                $ret = call_user_func($func, $value, $options);
+            if (!is_null($messageSetSize)) {
+                $ret = call_user_func($func, $value, $messageSetSize);
             } else {
                 $ret = call_user_func($func, $value);
             }
@@ -201,6 +201,10 @@ class Fetch extends Protocol
 
             $offset += $ret['length'];
             $result[] = $ret['data'];
+        }
+
+        if ($offset < $messageSetSize) {
+            $offset = $messageSetSize;
         }
 
         return array('length' => $offset, 'data' => $result);

@@ -48,9 +48,13 @@ class Producer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct(\Closure $producer)
+    public function __construct(\Closure $producer = null)
     {
-        $this->process = new \Kafka\Producer\Process($producer);
+        if (is_null($producer)) {
+            $this->process = new \Kafka\Producer\SyncProcess();
+        } else {
+            $this->process = new \Kafka\Producer\Process($producer);
+        }
     }
 
     // }}}
@@ -60,17 +64,36 @@ class Producer
      * start producer
      *
      * @access public
+     * @data is data is boolean that is async process, thus it is sync process
      * @return void
      */
-    public function send($isBlock = true)
+    public function send($data = array())
     {
         if ($this->logger) {
             $this->process->setLogger($this->logger);
         }
-        $this->process->start();
-        if ($isBlock) {
-            \Amp\run();
+        if (is_bool($data)) {
+            $this->process->start();
+            if ($data) {
+                \Amp\run();
+            }
+        } else {
+            return $this->process->send($data);
         }
+    }
+
+    // }}}
+    // {{{ public function syncMeta()
+
+    /**
+     * syncMeta producer
+     *
+     * @access public
+     * @return void
+     */
+    public function syncMeta()
+    {
+        return $this->process->syncMeta();
     }
 
     // }}}

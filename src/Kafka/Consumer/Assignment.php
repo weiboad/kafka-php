@@ -127,7 +127,7 @@ class Assignment
             $item = array(
                 'version' => 0,
                 'member_id' => $member['memberId'],
-                'assignments' => $members[$key]
+                'assignments' => isset($members[$key]) ? $members[$key] : array()
             );
             $data[] = $item;
         }

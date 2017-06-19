@@ -130,36 +130,36 @@ class Broker
     // }}}
     // {{{ public function getMetaConnect()
 
-    public function getMetaConnect($key)
+    public function getMetaConnect($key, $modeSync = false)
     {
-        return $this->getConnect($key, 'metaSockets');
+        return $this->getConnect($key, 'metaSockets', $modeSync);
     }
 
     // }}}
     // {{{ public function getRandConnect()
 
-    public function getRandConnect()
+    public function getRandConnect($modeSync = false)
     {
         $nodeIds = array_keys($this->brokers);
         shuffle($nodeIds);
         if (!isset($nodeIds[0])) {
             return false;
         }
-        return $this->getMetaConnect($nodeIds[0]);
+        return $this->getMetaConnect($nodeIds[0], $modeSync);
     }
 
     // }}}
     // {{{ public function getDataConnect()
     
-    public function getDataConnect($key)
+    public function getDataConnect($key, $modeSync = false)
     {
-        return $this->getConnect($key, 'dataSockets');
+        return $this->getConnect($key, 'dataSockets', $modeSync);
     }
 
     // }}}
     // {{{ public function getConnect()
 
-    public function getConnect($key, $type)
+    public function getConnect($key, $type, $modeSync = false)
     {
         if (isset($this->{$type}[$key])) {
             return $this->{$type}[$key];
@@ -185,8 +185,10 @@ class Broker
 
         if ($host && $port) {
             try {
-                $socket = $this->getSocket($host, $port);
-                $socket->SetonReadable($this->process);
+                $socket = $this->getSocket($host, $port, $modeSync);
+                if (!$modeSync) {
+                    $socket->SetonReadable($this->process);
+                }
                 $socket->connect();
                 $this->{$type}[$key] = $socket;
                 return $socket;
@@ -216,12 +218,17 @@ class Broker
     // }}}
     // {{{ public function getSocket()
 
-    public function getSocket($host, $port)
+    public function getSocket($host, $port, $modeSync)
     {
         if ($this->socket != null) {
             return $this->socket;
         }
-        $socket = new \Kafka\Socket($host, $port);
+
+        if ($modeSync) {
+            $socket = new \Kafka\SocketSync($host, $port);
+        } else {
+            $socket = new \Kafka\Socket($host, $port);
+        }
         return $socket;
     }
 

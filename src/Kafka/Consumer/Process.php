@@ -586,13 +586,13 @@ class Process
                     $item['partitions'][] = array(
                         'partition_id' => $partId,
                         'offset' => isset($consumerOffsets[$topic['topic_name']][$partId]) ? $consumerOffsets[$topic['topic_name']][$partId] : 0,
-                        'max_bytes' => 1024 * 1024 * 2,
+                        'max_bytes' => \Kafka\ConsumerConfig::getInstance()->getMaxBytes(),
                     );
                 }
                 $data[] = $item;
             }
             $params = array(
-                'max_wait_time' => 100,
+                'max_wait_time' => \Kafka\ConsumerConfig::getInstance()->getMaxWaitTime(),
                 'replica_id' => -1,
                 'min_bytes' => '1000',
                 'data' => $data,
@@ -690,6 +690,14 @@ class Process
     {
         $this->debug('Commit success, result:' . json_encode($result));
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_COMMIT_OFFSET);
+        foreach ($result as $topic) {
+            foreach ($topic['partitions'] as $part) {
+                if ($part['errorCode'] != 0) {
+                    $this->stateConvert($part['errorCode']);
+                    break 2;
+                }
+            }
+        }
     }
 
     // }}}

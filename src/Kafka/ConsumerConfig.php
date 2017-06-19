@@ -39,6 +39,8 @@ class ConsumerConfig extends Config
         'rebalanceTimeout' => 30000,
         'topics' => array(),
         'offsetReset' => 'latest', // earliest
+        'maxBytes' => 65536, // 64kb
+        'maxWaitTime' => 100,
     );
 
     // }}}

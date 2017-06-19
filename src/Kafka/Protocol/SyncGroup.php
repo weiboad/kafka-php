@@ -124,7 +124,7 @@ class SyncGroup extends Protocol
             throw new \Kafka\Exception\Protocol('given data invalid. `member_id` is undefined.');
         }
 
-        if (!isset($values['assignments']) || empty($values['assignments'])) {
+        if (!isset($values['assignments'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `assignments` is undefined.');
         }
         if (!isset($values['user_data'])) {
