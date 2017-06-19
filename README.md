@@ -81,7 +81,7 @@ $producer->success(function($result) {
 $producer->error(function($errorCode, $context) {
 		var_dump($errorCode);
 });
-$producer->send();
+$producer->send(true);
 ```
 
 ### Synchronous mode

@@ -31,4 +31,4 @@ $producer->success(function($result) {
 $producer->error(function($errorCode) {
 	var_dump($errorCode);
 });
-$producer->send();
+$producer->send(true);

@@ -78,7 +78,7 @@ $producer->success(function($result) {
 $producer->error(function($errorCode, $context) {
 	var_dump($errorCode);
 });
-$producer->send();
+$producer->send(true);
 ```
 
 ### 同步方式调用生产者
