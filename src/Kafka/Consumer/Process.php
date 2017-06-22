@@ -354,7 +354,7 @@ class Process
 
     public function failSyncGroup($errorCode)
     {
-        $error = sprintf('Sync group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId);
+        $error = sprintf('Sync group fail, need rejoin, errorCode %d', $errorCode);
         $this->error($error);
         $this->stateConvert($errorCode);
     }
