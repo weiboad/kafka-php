@@ -163,6 +163,37 @@ class Process
     }
 
     // }}}
+    // {{{ public function syncMeta()
+
+    public function syncMeta()
+    {
+        $this->debug('Start sync metadata request');
+        $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
+        $brokerHost = array();
+        foreach ($brokerList as $key => $val) {
+            if (trim($val)) {
+                $brokerHost[] = $val;
+            }
+        }
+        if (count($brokerHost) == 0) {
+            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+        }
+        shuffle($brokerHost);
+        $broker = \Kafka\Broker::getInstance();
+        foreach ($brokerHost as $host) {
+            $socket = $broker->getMetaConnect($host);
+            if ($socket) {
+                $params = array();
+                $this->debug('Start sync metadata request params:' . json_encode($params));
+                $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
+                $socket->write($requestData);
+                return;
+            }
+        }
+        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
+    }
+
+    // }}}
     // {{{ protected function processRequest()
 
     /**
@@ -193,37 +224,6 @@ class Process
         default:
             $this->error('Error request, correlationId:' . $correlationId);
         }
-    }
-
-    // }}}
-    // {{{ protected function syncMeta()
-
-    protected function syncMeta()
-    {
-        $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
-        $brokerHost = array();
-        foreach ($brokerList as $key => $val) {
-            if (trim($val)) {
-                $brokerHost[] = $val;
-            }
-        }
-        if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
-        }
-        shuffle($brokerHost);
-        $broker = \Kafka\Broker::getInstance();
-        foreach ($brokerHost as $host) {
-            $socket = $broker->getMetaConnect($host);
-            if ($socket) {
-                $params = array();
-                $this->debug('Start sync metadata request params:' . json_encode($params));
-                $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
-                $socket->write($requestData);
-                return;
-            }
-        }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
     }
 
     // }}}
