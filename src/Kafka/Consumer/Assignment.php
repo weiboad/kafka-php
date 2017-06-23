@@ -43,6 +43,8 @@ class Assignment
 
     private $offsets = array();
 
+    private $lastOffsets = array();
+
     private $fetchOffsets = array();
 
     private $consumerOffsets = array();
@@ -167,6 +169,22 @@ class Assignment
     }
 
     // }}}
+    // {{{ public function setLastOffsets()
+
+    public function setLastOffsets($offsets)
+    {
+        $this->lastOffsets = $offsets;
+    }
+
+    // }}}
+    // {{{ public function getOffsets()
+
+    public function getLastOffsets()
+    {
+        return $this->lastOffsets;
+    }
+
+    // }}}
     // {{{ public function setFetchOffsets()
 
     public function setFetchOffsets($offsets)
@@ -211,6 +229,9 @@ class Assignment
 
     public function getConsumerOffset($topic, $part)
     {
+        if (!isset($this->consumerOffsets[$topic][$part])) {
+            return false;
+        }
         return $this->consumerOffsets[$topic][$part];
     }
 
@@ -260,6 +281,19 @@ class Assignment
     public function setPrecommitOffset($topic, $part, $offset)
     {
         $this->precommitOffsets[$topic][$part] = $offset;
+    }
+
+    // }}}
+    // {{{ public function clearOffset()
+
+    public function clearOffset()
+    {
+        $this->offsets = array();
+        $this->lastOffsets = array();
+        $this->fetchOffsets = array();
+        $this->consumerOffsets = array();
+        $this->commitOffsets = array();
+        $this->precommitOffsets = array();
     }
 
     // }}}

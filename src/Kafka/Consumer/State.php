@@ -69,7 +69,7 @@ class State
             'interval' => 2000,
         ),
         self::REQUEST_COMMIT_OFFSET => array(
-            'interval' => 2000,
+            'norepeat' => true,
         ),
     );
 
@@ -130,6 +130,9 @@ class State
     public function start()
     {
         foreach ($this->requests as $request => $option) {
+            if (isset($option['norepeat']) && $option['norepeat']) {
+                continue;
+            }
             $interval = isset($option['interval']) ? $option['interval'] : 200;
             \Amp\repeat(function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
@@ -177,6 +180,16 @@ class State
                 $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                 break;
             case self::REQUEST_OFFSET:
+                if (!isset($this->callStatus[$key]['context'])) {
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
+                    break;
+                }
+                unset($this->callStatus[$key]['context'][$context]);
+                $contextStatus = $this->callStatus[$key]['context'];
+                if (empty($contextStatus)) {
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
+                }
+                break;
             case self::REQUEST_FETCH:
                 if (!isset($this->callStatus[$key]['context'])) {
                     $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
@@ -186,6 +199,7 @@ class State
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {
                     $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
+                    call_user_func($this->requests[self::REQUEST_COMMIT_OFFSET]['func']);
                 }
                 break;
         }
@@ -350,7 +364,6 @@ class State
                 return false;
             case self::REQUEST_HEARTGROUP:
             case self::REQUEST_OFFSET:
-            case self::REQUEST_FETCH_OFFSET:
                 if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
                     return false;
                 }
@@ -362,13 +375,32 @@ class State
                     return true;
                 }
                 return false;
+            case self::REQUEST_FETCH_OFFSET:
+                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                    return false;
+                }
+                $syncStatus = $this->callStatus[self::REQUEST_SYNCGROUP]['status'];
+                if (($syncStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                    return false;
+                }
+                $offsetStatus = $this->callStatus[self::REQUEST_OFFSET]['status'];
+                if (($offsetStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                    return false;
+                }
+                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+                    return true;
+                }
+                return false;
             case self::REQUEST_FETCH:
-            case self::REQUEST_COMMIT_OFFSET:
                 if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
                     return false;
                 }
                 $fetchOffsetStatus = $this->callStatus[self::REQUEST_FETCH_OFFSET]['status'];
                 if (($fetchOffsetStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                    return false;
+                }
+                $commitOffsetStatus = $this->callStatus[self::REQUEST_COMMIT_OFFSET]['status'];
+                if (($commitOffsetStatus & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
                     return false;
                 }
                 if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {

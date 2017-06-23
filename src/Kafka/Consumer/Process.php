@@ -39,6 +39,8 @@ class Process
 
     protected $isRunning = true;
 
+    protected $messages = array();
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -442,7 +444,6 @@ class Process
             if (!$connect) {
                 return;
             }
-            $resetOffset = \Kafka\ConsumerConfig::getInstance()->getOffsetReset();
             $data = array();
             foreach ($topicList as $topic) {
                 $item = array(
@@ -453,7 +454,7 @@ class Process
                     $item['partitions'][] = array(
                         'partition_id' => $partId,
                         'offset' => 1,
-                        'time' =>  ($resetOffset == 'latest') ? -1 : -2,
+                        'time' =>  -1,
                     );
                     $data[] = $item;
                 }
@@ -481,6 +482,7 @@ class Process
         //$this->debug($msg);
 
         $offsets = \Kafka\Consumer\Assignment::getInstance()->getOffsets();
+        $lastOffsets = \Kafka\Consumer\Assignment::getInstance()->getLastOffsets();
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
                 if ($part['errorCode'] != 0) {
@@ -488,10 +490,12 @@ class Process
                     break 2;
                 }
 
-                $offsets[$topic['topicName']][$part['partition']] = $part['offsets'][0];
+                $offsets[$topic['topicName']][$part['partition']] = end($part['offsets']);
+                $lastOffsets[$topic['topicName']][$part['partition']] = $part['offsets'][0];
             }
         }
         \Kafka\Consumer\Assignment::getInstance()->setOffsets($offsets);
+        \Kafka\Consumer\Assignment::getInstance()->setLastOffsets($lastOffsets);
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_OFFSET, $fd);
     }
 
@@ -554,8 +558,17 @@ class Process
         $assign->setFetchOffsets($offsets);
 
         $consumerOffsets = $assign->getConsumerOffsets();
+        $lastOffsets = $assign->getLastOffsets();
         if (empty($consumerOffsets)) {
-            $assign->setConsumerOffsets($assign->getFetchOffsets());
+            $consumerOffsets = $assign->getFetchOffsets();
+            foreach ($consumerOffsets as $topic => $value) {
+                foreach ($value as $partId => $offset) {
+                    if (isset($lastOffsets[$topic][$partId]) && $lastOffsets[$topic][$partId] > $offset) {
+                        $consumerOffsets[$topic][$partId] = $offset + 1;
+                    }
+                }
+            }
+            $assign->setConsumerOffsets($consumerOffsets);
             $assign->setCommitOffsets($assign->getFetchOffsets());
         }
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH_OFFSET);
@@ -566,6 +579,7 @@ class Process
 
     protected function fetch()
     {
+        $this->messages = array();
         $context = array();
         $broker = \Kafka\Broker::getInstance();
         $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
@@ -624,10 +638,14 @@ class Process
                 }
 
                 $offset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
+                if ($offset === false) {
+                    return; // current is rejoin....
+                }
                 foreach ($part['messages'] as $message) {
-                    if ($this->consumer != null) {
-                        call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
-                    }
+                    $this->messages[$topic['topicName']][$part['partition']][] = $message;
+                    //if ($this->consumer != null) {
+                    //    call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
+                    //}
                     $offset = $message['offset'];
                 }
 
@@ -694,10 +712,21 @@ class Process
             foreach ($topic['partitions'] as $part) {
                 if ($part['errorCode'] != 0) {
                     $this->stateConvert($part['errorCode']);
-                    break 2;
+                    return;  // not call user consumer function
                 }
             }
         }
+        
+        foreach ($this->messages as $topic => $value) {
+            foreach ($value as $part => $messages) {
+                foreach ($messages as $message) {
+                    if ($this->consumer != null) {
+                        call_user_func($this->consumer, $topic, $part, $message);
+                    }
+                }
+            }
+        }
+        $this->messages = array();
     }
 
     // }}}
@@ -725,23 +754,29 @@ class Process
             \Kafka\Protocol::UNKNOWN_MEMBER_ID,
         );
 
+        $assign = \Kafka\Consumer\Assignment::getInstance();
         if (in_array($errorCode, $recoverCodes)) {
             $this->state->recover();
+            $assign->clearOffset();
             return false;
         }
 
         if (in_array($errorCode, $rejoinCodes)) {
             if ($errorCode == \Kafka\Protocol::UNKNOWN_MEMBER_ID) {
-                $assign = \Kafka\Consumer\Assignment::getInstance();
                 $assign->setMemberId('');
             }
+            $assign->clearOffset();
             $this->state->rejoin();
             return false;
         }
 
         if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE == $errorCode) {
-            $assign = \Kafka\Consumer\Assignment::getInstance();
-            $offsets = $assign->getOffsets();
+            $resetOffset = \Kafka\ConsumerConfig::getInstance()->getOffsetReset();
+            if ($resetOffset == 'latest') {
+                $offsets = $assign->getLastOffsets();
+            } else {
+                $offsets = $assign->getOffsets();
+            }
             list($topic, $partId) = $context;
             if (isset($offsets[$topic][$partId])) {
                 $assign->setConsumerOffset($topic, $partId, $offsets[$topic][$partId]);
