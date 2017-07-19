@@ -78,7 +78,7 @@ $producer->setLogger($logger);
 $producer->success(function($result) {
 	var_dump($result);
 });
-$producer->error(function($errorCode, $context) {
+$producer->error(function($errorCode) {
 		var_dump($errorCode);
 });
 $producer->send(true);
