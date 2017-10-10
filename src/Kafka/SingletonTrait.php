@@ -46,7 +46,7 @@ trait SingletonTrait
      * @access public
      * @param $hostList
      * @param null $timeout
-     * @return Consumer
+     * @return static
      */
     public static function getInstance()
     {
