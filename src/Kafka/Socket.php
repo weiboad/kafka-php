@@ -248,7 +248,11 @@ class Socket
 
         $this->readWatcher = \Amp\onReadable($this->stream, function () {
             do {
-                $newData = @fread($this->stream, self::READ_MAX_LEN);
+                if(!$this->isSocketDead($this->stream)){
+                    $newData = @fread($this->stream, self::READ_MAX_LEN);
+                }else{
+                    $this->reconnect();
+                }
                 if ($newData) {
                     $this->read($newData);
                 }
@@ -292,6 +296,7 @@ class Socket
     // }}}
     // {{{ public function SetOnReadable()
 
+    public $onReadable;
     /**
      * set on readable callback function
      *
@@ -398,7 +403,7 @@ class Socket
         } elseif ($bytesWritten >= 0) {
             \Amp\enable($this->writeWatcher);
         } elseif ($this->isSocketDead($this->stream)) {
-            $this->reconnet();
+            $this->reconnect();
         }
         $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
