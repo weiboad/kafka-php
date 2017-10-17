@@ -252,6 +252,7 @@ class Socket
                     $newData = @fread($this->stream, self::READ_MAX_LEN);
                 }else{
                     $this->reconnect();
+                    return;
                 }
                 if ($newData) {
                     $this->read($newData);
