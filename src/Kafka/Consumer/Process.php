@@ -662,6 +662,18 @@ class Process
 
     protected function commit()
     {
+        foreach ($this->messages as $topic => $value) {
+            foreach ($value as $part => $messages) {
+                foreach ($messages as $message) {
+                    if ($this->consumer != null) {
+                        call_user_func($this->consumer, $topic, $part, $message);
+                    }
+                }
+            }
+        }
+
+        $this->messages = array();
+        
         $broker = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
         $connect = $broker->getMetaConnect($groupBrokerId);
@@ -704,6 +716,10 @@ class Process
     // }}}
     // {{{ public function succCommit()
 
+    /**
+     * @var State
+     */
+    public $state;
     public function succCommit($result)
     {
         $this->debug('Commit success, result:' . json_encode($result));
@@ -716,17 +732,6 @@ class Process
                 }
             }
         }
-        
-        foreach ($this->messages as $topic => $value) {
-            foreach ($value as $part => $messages) {
-                foreach ($messages as $message) {
-                    if ($this->consumer != null) {
-                        call_user_func($this->consumer, $topic, $part, $message);
-                    }
-                }
-            }
-        }
-        $this->messages = array();
     }
 
     // }}}
