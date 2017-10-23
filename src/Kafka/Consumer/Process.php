@@ -14,6 +14,8 @@
 
 namespace Kafka\Consumer;
 
+use Kafka\ConsumerConfig;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -660,8 +662,31 @@ class Process
     // }}}
     // {{{ protected function commit()
 
+    protected function consume_msg()
+    {
+        foreach ($this->messages as $topic => $value) {
+            foreach ($value as $part => $messages) {
+                foreach ($messages as $message) {
+                    if ($this->consumer != null) {
+                        call_user_func($this->consumer, $topic, $part, $message);
+                    }
+                }
+            }
+        }
+
+        $this->messages = array();
+    }
+
+
     protected function commit()
     {
+        $config= ConsumerConfig::getInstance();
+        if($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET)
+        {
+            $this->consume_msg();
+        }
+
+
         $broker = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
         $connect = $broker->getMetaConnect($groupBrokerId);
@@ -704,6 +729,10 @@ class Process
     // }}}
     // {{{ public function succCommit()
 
+    /**
+     * @var State
+     */
+    public $state;
     public function succCommit($result)
     {
         $this->debug('Commit success, result:' . json_encode($result));
@@ -716,17 +745,10 @@ class Process
                 }
             }
         }
-        
-        foreach ($this->messages as $topic => $value) {
-            foreach ($value as $part => $messages) {
-                foreach ($messages as $message) {
-                    if ($this->consumer != null) {
-                        call_user_func($this->consumer, $topic, $part, $message);
-                    }
-                }
-            }
+        if(ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET)
+        {
+            $this->consume_msg();
         }
-        $this->messages = array();
     }
 
     // }}}
