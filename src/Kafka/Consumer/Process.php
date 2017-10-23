@@ -14,6 +14,8 @@
 
 namespace Kafka\Consumer;
 
+use Kafka\ConsumerConfig;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -660,7 +662,7 @@ class Process
     // }}}
     // {{{ protected function commit()
 
-    protected function commit()
+    protected function consume_msg()
     {
         foreach ($this->messages as $topic => $value) {
             foreach ($value as $part => $messages) {
@@ -673,7 +675,18 @@ class Process
         }
 
         $this->messages = array();
-        
+    }
+
+
+    protected function commit()
+    {
+        $config= ConsumerConfig::getInstance();
+        if($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET)
+        {
+            $this->consume_msg();
+        }
+
+
         $broker = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
         $connect = $broker->getMetaConnect($groupBrokerId);
@@ -731,6 +744,10 @@ class Process
                     return;  // not call user consumer function
                 }
             }
+        }
+        if(ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET)
+        {
+            $this->consume_msg();
         }
     }
 
