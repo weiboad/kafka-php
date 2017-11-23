@@ -99,6 +99,8 @@ class SocketSync
      */
     private $port = -1;
 
+    private $identifier;
+
     /**
      * Max Write Attempts
      * @var int
@@ -121,10 +123,12 @@ class SocketSync
      * @param int $sendTimeoutSec
      * @param int $sendTimeoutUsec
      */
-    public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
+    public function __construct($host, $port, $identifier, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host       = $host;
+        $this->port       = $port;
+        $this->identifier = $identifier;
+
         $this->setRecvTimeoutSec($recvTimeoutSec);
         $this->setRecvTimeoutUsec($recvTimeoutUsec);
         $this->setSendTimeoutSec($sendTimeoutSec);
@@ -226,12 +230,12 @@ class SocketSync
             throw new \Kafka\Exception('Cannot open without port.');
         }
 
-        $this->stream = @fsockopen(
-            $this->host,
-            $this->port,
+        $this->stream = @stream_socket_client(
+            sprintf('tcp://%s:%s/%s', $this->host, $this->port, $this->type),
             $errno,
             $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
+            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
+            STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT
         );
 
         if ($this->stream == false) {

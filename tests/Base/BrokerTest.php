@@ -175,7 +175,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $broker->setData([], $data);
 
         $socket = $this->getMockBuilder(\Kafka\Socket::class)
-            ->setConstructorArgs(['127.0.0.1', '9192'])
+            ->setConstructorArgs(['127.0.0.1', '9192', 'testing'])
             ->disableOriginalClone()
             ->disableArgumentCloning()
             ->setMethods(['connect', 'setOnReadable', 'close'])

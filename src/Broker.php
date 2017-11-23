@@ -188,7 +188,7 @@ class Broker
         }
 
         try {
-            $socket = $this->getSocket($host, $port, $modeSync);
+            $socket = $this->getSocket($host, $port, $modeSync, $type);
             if (! $modeSync) {
                 $socket->setOnReadable($this->process);
             }
@@ -220,16 +220,16 @@ class Broker
     // }}}
     // {{{ public function getSocket()
 
-    public function getSocket($host, $port, $modeSync)
+    public function getSocket($host, $port, $modeSync, $identifier)
     {
         if ($this->socket != null) {
             return $this->socket;
         }
 
         if ($modeSync) {
-            $socket = new \Kafka\SocketSync($host, $port);
+            $socket = new \Kafka\SocketSync($host, $port, $identifier);
         } else {
-            $socket = new \Kafka\Socket($host, $port);
+            $socket = new \Kafka\Socket($host, $port, $identifier);
         }
         return $socket;
     }
