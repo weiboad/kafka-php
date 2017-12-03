@@ -206,23 +206,23 @@ class Process
     {
         $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         switch ($correlationId) {
-        case \Kafka\Protocol::METADATA_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
-            if (!isset($result['brokers']) || !isset($result['topics'])) {
-                $this->error('Get metadata is fail, brokers or topics is null.');
-                $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
-            } else {
-                $broker = \Kafka\Broker::getInstance();
-                $isChange = $broker->setData($result['topics'], $result['brokers']);
-                $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA, $isChange);
-            }
-            break;
-        case \Kafka\Protocol::PRODUCE_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
-            $this->succProduce($result, $fd);
-            break;
-        default:
-            $this->error('Error request, correlationId:' . $correlationId);
+            case \Kafka\Protocol::METADATA_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
+                if (!isset($result['brokers']) || !isset($result['topics'])) {
+                    $this->error('Get metadata is fail, brokers or topics is null.');
+                    $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
+                } else {
+                    $broker = \Kafka\Broker::getInstance();
+                    $isChange = $broker->setData($result['topics'], $result['brokers']);
+                    $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA, $isChange);
+                }
+                break;
+            case \Kafka\Protocol::PRODUCE_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
+                $this->succProduce($result, $fd);
+                break;
+            default:
+                $this->error('Error request, correlationId:' . $correlationId);
         }
     }
 

@@ -136,8 +136,10 @@ class DescribeGroups extends Protocol
         $memberAssignmentOffset = 0;
         $version = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
         $memberAssignmentOffset += 2;
-        $partitionAssignments = $this->decodeArray(substr($memberAssignment, $memberAssignmentOffset),
-                                array($this, 'describeResponsePartition'));
+        $partitionAssignments = $this->decodeArray(
+            substr($memberAssignment, $memberAssignmentOffset),
+            array($this, 'describeResponsePartition')
+        );
         $memberAssignmentOffset += $partitionAssignments['length'];
         $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
 

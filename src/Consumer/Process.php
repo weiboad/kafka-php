@@ -152,69 +152,69 @@ class Process
     {
         $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         switch ($correlationId) {
-        case \Kafka\Protocol::METADATA_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
-            if (!isset($result['brokers']) || !isset($result['topics'])) {
-                $this->error('Get metadata is fail, brokers or topics is null.');
-                $this->state->failRun(\Kafka\Consumer\State::REQUEST_METADATA);
-            } else {
-                $broker = \Kafka\Broker::getInstance();
-                $isChange = $broker->setData($result['topics'], $result['brokers']);
-                $this->state->succRun(\Kafka\Consumer\State::REQUEST_METADATA, $isChange);
-            }
-            break;
-        case \Kafka\Protocol::GROUP_COORDINATOR_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
-            if (isset($result['errorCode']) && $result['errorCode'] == \Kafka\Protocol::NO_ERROR
+            case \Kafka\Protocol::METADATA_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
+                if (!isset($result['brokers']) || !isset($result['topics'])) {
+                    $this->error('Get metadata is fail, brokers or topics is null.');
+                    $this->state->failRun(\Kafka\Consumer\State::REQUEST_METADATA);
+                } else {
+                    $broker = \Kafka\Broker::getInstance();
+                    $isChange = $broker->setData($result['topics'], $result['brokers']);
+                    $this->state->succRun(\Kafka\Consumer\State::REQUEST_METADATA, $isChange);
+                }
+                break;
+            case \Kafka\Protocol::GROUP_COORDINATOR_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
+                if (isset($result['errorCode']) && $result['errorCode'] == \Kafka\Protocol::NO_ERROR
                 && isset($result['coordinatorId'])) {
-                \Kafka\Broker::getInstance()->setGroupBrokerId($result['coordinatorId']);
-                $this->state->succRun(\Kafka\Consumer\State::REQUEST_GETGROUP);
-            } else {
-                $this->state->failRun(\Kafka\Consumer\State::REQUEST_GETGROUP);
-            }
-            break;
-        case \Kafka\Protocol::JOIN_GROUP_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
-            if (isset($result['errorCode']) && $result['errorCode'] == 0) {
-                $this->succJoinGroup($result);
-            } else {
-                $this->failJoinGroup($result['errorCode']);
-            }
-            break;
-        case \Kafka\Protocol::SYNC_GROUP_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
-            if (isset($result['errorCode']) && $result['errorCode'] == 0) {
-                $this->succSyncGroup($result);
-            } else {
-                $this->failSyncGroup($result['errorCode']);
-            }
-            break;
-        case \Kafka\Protocol::HEART_BEAT_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, substr($data, 4));
-            if (isset($result['errorCode']) && $result['errorCode'] == 0) {
-                $this->state->succRun(\Kafka\Consumer\State::REQUEST_HEARTGROUP);
-            } else {
-                $this->failHeartbeat($result['errorCode']);
-            }
-            break;
-        case \Kafka\Protocol::OFFSET_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_REQUEST, substr($data, 4));
-            $this->succOffset($result, $fd);
-            break;
-        case \Kafka\Protocol\Protocol::OFFSET_FETCH_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_FETCH_REQUEST, substr($data, 4));
-            $this->succFetchOffset($result);
-            break;
-        case \Kafka\Protocol\Protocol::FETCH_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::FETCH_REQUEST, substr($data, 4));
-            $this->succFetch($result, $fd);
-            break;
-        case \Kafka\Protocol\Protocol::OFFSET_COMMIT_REQUEST:
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));
-            $this->succCommit($result);
-            break;
-        default:
-            $this->error('Error request, correlationId:' . $correlationId);
+                    \Kafka\Broker::getInstance()->setGroupBrokerId($result['coordinatorId']);
+                    $this->state->succRun(\Kafka\Consumer\State::REQUEST_GETGROUP);
+                } else {
+                    $this->state->failRun(\Kafka\Consumer\State::REQUEST_GETGROUP);
+                }
+                break;
+            case \Kafka\Protocol::JOIN_GROUP_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
+                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                    $this->succJoinGroup($result);
+                } else {
+                    $this->failJoinGroup($result['errorCode']);
+                }
+                break;
+            case \Kafka\Protocol::SYNC_GROUP_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
+                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                    $this->succSyncGroup($result);
+                } else {
+                    $this->failSyncGroup($result['errorCode']);
+                }
+                break;
+            case \Kafka\Protocol::HEART_BEAT_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, substr($data, 4));
+                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                    $this->state->succRun(\Kafka\Consumer\State::REQUEST_HEARTGROUP);
+                } else {
+                    $this->failHeartbeat($result['errorCode']);
+                }
+                break;
+            case \Kafka\Protocol::OFFSET_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_REQUEST, substr($data, 4));
+                $this->succOffset($result, $fd);
+                break;
+            case \Kafka\Protocol\Protocol::OFFSET_FETCH_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_FETCH_REQUEST, substr($data, 4));
+                $this->succFetchOffset($result);
+                break;
+            case \Kafka\Protocol\Protocol::FETCH_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::FETCH_REQUEST, substr($data, 4));
+                $this->succFetch($result, $fd);
+                break;
+            case \Kafka\Protocol\Protocol::OFFSET_COMMIT_REQUEST:
+                $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));
+                $this->succCommit($result);
+                break;
+            default:
+                $this->error('Error request, correlationId:' . $correlationId);
         }
     }
 
@@ -681,8 +681,7 @@ class Process
     protected function commit()
     {
         $config= ConsumerConfig::getInstance();
-        if($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET)
-        {
+        if ($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
             $this->consume_msg();
         }
 
@@ -745,8 +744,7 @@ class Process
                 }
             }
         }
-        if(ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET)
-        {
+        if (ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET) {
             $this->consume_msg();
         }
     }

@@ -115,11 +115,11 @@ class State
         $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
-            case self::REQUEST_METADATA:
-                $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
-                break;
-            default:
-                $this->requests[$request]['interval'] = 1000;
+                case self::REQUEST_METADATA:
+                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                    break;
+                default:
+                    $this->requests[$request]['interval'] = 1000;
             }
         }
     }
@@ -440,7 +440,6 @@ class State
                 }
                 $this->callStatus[$key]['context'] = $contextStatus;
                 break;
-
         }
     }
 

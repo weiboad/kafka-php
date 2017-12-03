@@ -87,8 +87,10 @@ class SyncGroup extends Protocol
             $memberAssignmentOffset = 0;
             $version = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
             $memberAssignmentOffset += 2;
-            $partitionAssignments = $this->decodeArray(substr($memberAssignment, $memberAssignmentOffset),
-                                    array($this, 'syncGroupResponsePartition'));
+            $partitionAssignments = $this->decodeArray(
+                substr($memberAssignment, $memberAssignmentOffset),
+                array($this, 'syncGroupResponsePartition')
+            );
             $memberAssignmentOffset += $partitionAssignments['length'];
             $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
         } else {

@@ -326,7 +326,6 @@ abstract class Protocol
     public static function convertSignedShortFromLittleEndianToBigEndian($bits)
     {
         foreach ($bits as $index => $bit) {
-
             // get LSB
             $lsb = $bit & 0xff;
 
@@ -378,11 +377,11 @@ abstract class Protocol
             case self::OFFSET_REQUEST:
                 // todo
                 return self::API_VERSION0;
-                if (version_compare($this->version, '0.10.1.0') >= 0) {
-                    return self::API_VERSION1;
-                } else {
-                    return self::API_VERSION0;
-                }
+            if (version_compare($this->version, '0.10.1.0') >= 0) {
+                return self::API_VERSION1;
+            } else {
+                return self::API_VERSION0;
+            }
             case self::GROUP_COORDINATOR_REQUEST:
                 return self::API_VERSION0;
             case self::OFFSET_COMMIT_REQUEST:

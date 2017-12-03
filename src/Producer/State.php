@@ -72,16 +72,16 @@ class State
         $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
-            case self::REQUEST_METADATA:
-                $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
-                break;
-            default:
-                $isAsyn = $config->getIsAsyn();
-                if ($isAsyn) {
-                    $this->requests[$request]['interval'] = $config->getProduceInterval();
-                } else {
-                    $this->requests[$request]['interval'] = 1;
-                }
+                case self::REQUEST_METADATA:
+                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                    break;
+                default:
+                    $isAsyn = $config->getIsAsyn();
+                    if ($isAsyn) {
+                        $this->requests[$request]['interval'] = $config->getProduceInterval();
+                    } else {
+                        $this->requests[$request]['interval'] = 1;
+                    }
             }
         }
     }

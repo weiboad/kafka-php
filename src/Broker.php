@@ -97,7 +97,7 @@ class Broker
                 continue;
             }
             $item = array();
-            foreach ($topic['partitions']  as $part) {
+            foreach ($topic['partitions'] as $part) {
                 $item[$part['partitionId']] = $part['leader'];
             }
             $newTopics[$topic['topicName']] = $item;
