@@ -152,32 +152,6 @@ abstract class Protocol
     }
 
     // }}}
-    // {{{ public static function Khex2bin()
-
-    /**
-     * hex to bin
-     *
-     * @param string $string
-     * @static
-     * @access protected
-     * @return string (raw)
-     */
-    public static function Khex2bin($string)
-    {
-        if (function_exists('\hex2bin')) {
-            return \hex2bin($string);
-        } else {
-            $bin = '';
-            $len = strlen($string);
-            for ($i = 0; $i < $len; $i += 2) {
-                $bin .= pack('H*', substr($string, $i, 2));
-            }
-
-            return $bin;
-        }
-    }
-
-    // }}}
     // {{{ public static function unpack()
 
     /**
@@ -230,9 +204,9 @@ abstract class Protocol
     {
         if ($type == self::BIT_B64) {
             if ($data == -1) { // -1L
-                $data = self::Khex2bin('ffffffffffffffff');
+                $data = \hex2bin('ffffffffffffffff');
             } elseif ($data == -2) { // -2L
-                $data = self::Khex2bin('fffffffffffffffe');
+                $data = \hex2bin('fffffffffffffffe');
             } else {
                 $left  = 0xffffffff00000000;
                 $right = 0x00000000ffffffff;
@@ -361,49 +335,55 @@ abstract class Protocol
             case self::PRODUCE_REQUEST:
                 if (version_compare($this->version, '0.10.0') >= 0) {
                     return self::API_VERSION2;
-                } elseif (version_compare($this->version, '0.9.0') >= 0) {
-                    return self::API_VERSION1;
-                } else {
-                    return self::API_VERSION0;
                 }
+
+                if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1;
+                }
+
+                return self::API_VERSION0;
             case self::FETCH_REQUEST:
                 if (version_compare($this->version, '0.10.0') >= 0) {
                     return self::API_VERSION2;
-                } elseif (version_compare($this->version, '0.9.0') >= 0) {
-                    return self::API_VERSION1;
-                } else {
-                    return self::API_VERSION0;
                 }
+
+                if (version_compare($this->version, '0.9.0') >= 0) {
+                    return self::API_VERSION1;
+                }
+
+                return self::API_VERSION0;
             case self::OFFSET_REQUEST:
-                // todo
+//                TODO: make it compatible with V1 of OFFSET_REQUEST
+//                if (version_compare($this->version, '0.10.1.0') >= 0) {
+//                    return self::API_VERSION1;
+//                } else {
+//                    return self::API_VERSION0;
+//                }
                 return self::API_VERSION0;
-            if (version_compare($this->version, '0.10.1.0') >= 0) {
-                return self::API_VERSION1;
-            } else {
-                return self::API_VERSION0;
-            }
             case self::GROUP_COORDINATOR_REQUEST:
                 return self::API_VERSION0;
             case self::OFFSET_COMMIT_REQUEST:
                 if (version_compare($this->version, '0.9.0') >= 0) {
                     return self::API_VERSION2;
-                } elseif (version_compare($this->version, '0.8.2') >= 0) {
-                    return self::API_VERSION1;
-                } else {
-                    return self::API_VERSION0; // supported in 0.8.1 or later
                 }
+
+                if (version_compare($this->version, '0.8.2') >= 0) {
+                    return self::API_VERSION1;
+                }
+
+                return self::API_VERSION0; // supported in 0.8.1 or later
             case self::OFFSET_FETCH_REQUEST:
                 if (version_compare($this->version, '0.8.2') >= 0) {
                     return self::API_VERSION1; // Offset Fetch Request v1 will fetch offset from Kafka
-                } else {
-                    return self::API_VERSION0;//Offset Fetch Request v0 will fetch offset from zookeeper
                 }
+
+                return self::API_VERSION0;//Offset Fetch Request v0 will fetch offset from zookeeper
             case self::JOIN_GROUP_REQUEST:
                 if (version_compare($this->version, '0.10.1.0') >= 0) {
                     return self::API_VERSION1;
-                } else {
-                    return self::API_VERSION0; // supported in 0.9.0.0 and greater
                 }
+
+                return self::API_VERSION0; // supported in 0.9.0.0 and greater
             case self::SYNC_GROUP_REQUEST:
                 return self::API_VERSION0;
             case self::HEART_BEAT_REQUEST:
