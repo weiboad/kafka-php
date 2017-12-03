@@ -51,9 +51,9 @@ class SyncProcess
 
     public function send($data)
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker      = \Kafka\Broker::getInstance();
         $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-        $timeout = \Kafka\ProducerConfig::getInstance()->getTimeout();
+        $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
 
         // get send message
         // data struct
@@ -66,7 +66,7 @@ class SyncProcess
         }
 
         $sendData = $this->convertMessage($data);
-        $result = [];
+        $result   = [];
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId, true);
             if (! $connect) {
@@ -74,7 +74,7 @@ class SyncProcess
             }
 
             $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params = [
+            $params      = [
                 'required_ack' => $requiredAck,
                 'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
                 'data' => $topicList,
@@ -83,11 +83,11 @@ class SyncProcess
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             $connect->write($requestData);
             if ($requiredAck != 0) { // If it is 0 the server will not send any response
-                $dataLen = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $connect->read(4));
-                $data = $connect->read($dataLen);
+                $dataLen       = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $connect->read(4));
+                $data          = $connect->read($dataLen);
                 $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-                $ret = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
-                $result[] = $ret;
+                $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
+                $result[]      = $ret;
             }
         }
         return $result;
@@ -118,10 +118,10 @@ class SyncProcess
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
-                $dataLen = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->read(4));
-                $data = $socket->read($dataLen);
+                $dataLen       = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->read(4));
+                $data          = $socket->read($dataLen);
                 $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-                $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
+                $result        = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
                 if (! isset($result['brokers']) || ! isset($result['topics'])) {
                     throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
                 } else {
@@ -139,8 +139,8 @@ class SyncProcess
 
     protected function convertMessage($data)
     {
-        $sendData = [];
-        $broker = \Kafka\Broker::getInstance();
+        $sendData   = [];
+        $broker     = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {
@@ -160,7 +160,7 @@ class SyncProcess
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partNums = array_keys($topicMeta);
+            $partNums  = array_keys($topicMeta);
             shuffle($partNums);
             $partId = 0;
             if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
@@ -169,7 +169,7 @@ class SyncProcess
                 $partId = $value['partId'];
             }
 
-            $brokerId = $topicMeta[$partId];
+            $brokerId  = $topicMeta[$partId];
             $topicData = [];
             if (isset($sendData[$brokerId][$value['topic']])) {
                 $topicData = $sendData[$brokerId][$value['topic']];
@@ -187,8 +187,8 @@ class SyncProcess
                 $partition['messages'][] = $value['value'];
             }
             
-            $topicData['partitions'][$partId] = $partition;
-            $topicData['topic_name'] = $value['topic'];
+            $topicData['partitions'][$partId]     = $partition;
+            $topicData['topic_name']              = $value['topic'];
             $sendData[$brokerId][$value['topic']] = $topicData;
         }
 

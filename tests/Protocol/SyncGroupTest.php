@@ -312,11 +312,11 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '000000000018000000000001000474657374000000010000000000000000';
-        $test = $this->sync->decode(\hex2bin($data));
+        $data   = '000000000018000000000001000474657374000000010000000000000000';
+        $test   = $this->sync->decode(\hex2bin($data));
         $result = '{"errorCode":0,"partitionAssignments":[{"topicName":"test","partitions":[0]}],"version":0,"userData":""}';
         $this->assertEquals(json_encode($test), $result);
-        $test = $this->sync->decode(\hex2bin('000000000000'));
+        $test   = $this->sync->decode(\hex2bin('000000000000'));
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);
     }

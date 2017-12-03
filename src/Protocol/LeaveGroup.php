@@ -48,8 +48,8 @@ class LeaveGroup extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::LEAVE_GROUP_REQUEST, self::LEAVE_GROUP_REQUEST);
-        $data  = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
+        $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data  .= self::encodeString($payloads['member_id'], self::PACK_INT16);
 
         $data = self::encodeString($header . $data, self::PACK_INT32);
 

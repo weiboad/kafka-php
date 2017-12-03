@@ -275,8 +275,8 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '0000000100047465737400000001000000000000';
-        $test = $this->commit->decode(\hex2bin($data));
+        $data   = '0000000100047465737400000001000000000000';
+        $test   = $this->commit->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
         $this->assertEquals(json_encode($test), $result);
     }

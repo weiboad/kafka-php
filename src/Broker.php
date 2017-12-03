@@ -79,15 +79,15 @@ class Broker
     {
         $brokers = [];
         foreach ($brokersResult as $value) {
-            $key = $value['nodeId'];
-            $hostname = $value['host'] . ':' . $value['port'];
+            $key           = $value['nodeId'];
+            $hostname      = $value['host'] . ':' . $value['port'];
             $brokers[$key] = $hostname;
         }
 
         $change = false;
         if (serialize($this->brokers) != serialize($brokers)) {
             $this->brokers = $brokers;
-            $change = true;
+            $change        = true;
         }
 
         $newTopics = [];
@@ -105,7 +105,7 @@ class Broker
 
         if (serialize($this->topics) != serialize($newTopics)) {
             $this->topics = $newTopics;
-            $change = true;
+            $change       = true;
         }
 
         return $change;
@@ -175,7 +175,7 @@ class Broker
         $host = null;
         $port = null;
         if (isset($this->brokers[$key])) {
-            $hostname = $this->brokers[$key];
+            $hostname          = $this->brokers[$key];
             list($host, $port) = explode(':', $hostname);
         }
 

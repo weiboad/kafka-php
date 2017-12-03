@@ -180,8 +180,8 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '000000010004746573740000000100000000ffffffffffffffff00000000';
-        $test = $this->offset->decode(\hex2bin($data));
+        $data   = '000000010004746573740000000100000000ffffffffffffffff00000000';
+        $test   = $this->offset->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
         $this->assertEquals(json_encode($test), $result);
     }

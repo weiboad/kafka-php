@@ -131,10 +131,10 @@ class ConsumerConfig extends Config
     // }}}
     // }}}
 
-    protected $runtime_options = [
+    protected $runtime_options         = [
         'consume_mode' => self::CONSUME_AFTER_COMMIT_OFFSET
     ];
-    const CONSUME_AFTER_COMMIT_OFFSET = 1;
+    const CONSUME_AFTER_COMMIT_OFFSET  = 1;
     const CONSUME_BEFORE_COMMIT_OFFSET = 2;
 
     public function setConsumeMode($mode)

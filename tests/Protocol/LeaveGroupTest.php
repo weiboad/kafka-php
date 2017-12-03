@@ -126,7 +126,7 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $test = $this->leave->decode(\hex2bin('0000'));
+        $test   = $this->leave->decode(\hex2bin('0000'));
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);
     }

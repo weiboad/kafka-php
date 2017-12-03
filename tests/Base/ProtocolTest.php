@@ -105,7 +105,7 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
     public function testDecode()
     {
         \Kafka\Protocol::init('0.9.0.1');
-        $test = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
+        $test   = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);
     }

@@ -93,26 +93,26 @@ abstract class Protocol
     /**
      * protocol request code
      */
-    const PRODUCE_REQUEST = 0;
-    const FETCH_REQUEST   = 1;
-    const OFFSET_REQUEST  = 2;
-    const METADATA_REQUEST      = 3;
-    const OFFSET_COMMIT_REQUEST = 8;
-    const OFFSET_FETCH_REQUEST  = 9;
+    const PRODUCE_REQUEST           = 0;
+    const FETCH_REQUEST             = 1;
+    const OFFSET_REQUEST            = 2;
+    const METADATA_REQUEST          = 3;
+    const OFFSET_COMMIT_REQUEST     = 8;
+    const OFFSET_FETCH_REQUEST      = 9;
     const GROUP_COORDINATOR_REQUEST = 10;
-    const JOIN_GROUP_REQUEST  = 11;
-    const HEART_BEAT_REQUEST  = 12;
-    const LEAVE_GROUP_REQUEST = 13;
-    const SYNC_GROUP_REQUEST  = 14;
-    const DESCRIBE_GROUPS_REQUEST = 15;
-    const LIST_GROUPS_REQUEST     = 16;
+    const JOIN_GROUP_REQUEST        = 11;
+    const HEART_BEAT_REQUEST        = 12;
+    const LEAVE_GROUP_REQUEST       = 13;
+    const SYNC_GROUP_REQUEST        = 14;
+    const DESCRIBE_GROUPS_REQUEST   = 15;
+    const LIST_GROUPS_REQUEST       = 16;
 
     // unpack/pack bit
-    const BIT_B64 = 'N2';
-    const BIT_B32 = 'N';
-    const BIT_B16 = 'n';
+    const BIT_B64        = 'N2';
+    const BIT_B32        = 'N';
+    const BIT_B16        = 'n';
     const BIT_B16_SIGNED = 's';
-    const BIT_B8  = 'C';
+    const BIT_B8         = 'C';
 
     // }}}
     // {{{ members
@@ -168,7 +168,7 @@ abstract class Protocol
         $result = [];
         self::checkLen($type, $bytes);
         if ($type == self::BIT_B64) {
-            $set = unpack($type, $bytes);
+            $set    = unpack($type, $bytes);
             $result = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
         } elseif ($type == self::BIT_B16_SIGNED) {
             // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
@@ -211,8 +211,8 @@ abstract class Protocol
                 $left  = 0xffffffff00000000;
                 $right = 0x00000000ffffffff;
 
-                $l = ($data & $left) >> 32;
-                $r = $data & $right;
+                $l    = ($data & $left) >> 32;
+                $r    = $data & $right;
                 $data = pack($type, $l, $r);
             }
         } else {
@@ -451,7 +451,7 @@ abstract class Protocol
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
-        $msg = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
+        $msg      = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
         $this->debug('Start Request ' . $msg);
 
         return $binData;
@@ -535,7 +535,7 @@ abstract class Protocol
      */
     public function decodeString($data, $bytes, $compression = self::COMPRESSION_NONE)
     {
-        $offset = ($bytes == self::BIT_B32) ? 4 : 2;
+        $offset  = ($bytes == self::BIT_B32) ? 4 : 2;
         $packLen = self::unpack($bytes, substr($data, 0, $offset)); // int16 topic name length
         if ($packLen == 4294967295) { // uint32(4294967295) is int32 (-1)
             $packLen = 0;
@@ -545,7 +545,7 @@ abstract class Protocol
             return ['length' => $offset, 'data' => ''];
         }
 
-        $data = substr($data, $offset, $packLen);
+        $data    = substr($data, $offset, $packLen);
         $offset += $packLen;
 
         switch ($compression) {
@@ -577,9 +577,9 @@ abstract class Protocol
      */
     public function decodeArray($data, $func, $options = null)
     {
-        $offset = 0;
+        $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset    += 4;
 
         if (! is_callable($func, false)) {
             throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
@@ -605,7 +605,7 @@ abstract class Protocol
                 continue;
             }
 
-            $offset += $ret['length'];
+            $offset  += $ret['length'];
             $result[] = $ret['data'];
         }
 
@@ -625,9 +625,9 @@ abstract class Protocol
      */
     public function decodePrimitiveArray($data, $bites)
     {
-        $offset = 0;
+        $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset    += 4;
         if ($arrayCount == 4294967295) {
             $arrayCount = 0;
         }
@@ -637,16 +637,16 @@ abstract class Protocol
         for ($i = 0; $i < $arrayCount; $i++) {
             if ($bites == self::BIT_B64) {
                 $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-                $offset += 8;
+                $offset  += 8;
             } elseif ($bites == self::BIT_B32) {
                 $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-                $offset += 4;
+                $offset  += 4;
             } elseif (in_array($bites, [self::BIT_B16, self::BIT_B16_SIGNED])) {
                 $result[] = self::unpack($bites, substr($data, $offset, 2));
-                $offset += 2;
+                $offset  += 2;
             } elseif ($bites == self::BIT_B8) {
                 $result[] = self::unpack($bites, substr($data, $offset, 1));
-                $offset += 1;
+                $offset  += 1;
             }
         }
 

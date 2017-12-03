@@ -158,7 +158,7 @@ class Process
                     $this->error('Get metadata is fail, brokers or topics is null.');
                     $this->state->failRun(\Kafka\Consumer\State::REQUEST_METADATA);
                 } else {
-                    $broker = \Kafka\Broker::getInstance();
+                    $broker   = \Kafka\Broker::getInstance();
                     $isChange = $broker->setData($result['topics'], $result['brokers']);
                     $this->state->succRun(\Kafka\Consumer\State::REQUEST_METADATA, $isChange);
                 }
@@ -254,12 +254,12 @@ class Process
 
     protected function getGroupBrokerId()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker  = \Kafka\Broker::getInstance();
         $connect = $broker->getRandConnect();
         if (! $connect) {
             return;
         }
-        $params = [
+        $params      = [
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
         ];
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $params);
@@ -271,16 +271,16 @@ class Process
 
     protected function joinGroup()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker        = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
-        $connect = $broker->getMetaConnect($groupBrokerId);
+        $connect       = $broker->getMetaConnect($groupBrokerId);
         if (! $connect) {
             return false;
         }
-        $topics = \Kafka\ConsumerConfig::getInstance()->getTopics();
-        $assign = \Kafka\Consumer\Assignment::getInstance();
-        $memberId = $assign->getMemberId();
-        $params = [
+        $topics      = \Kafka\ConsumerConfig::getInstance()->getTopics();
+        $assign      = \Kafka\Consumer\Assignment::getInstance();
+        $memberId    = $assign->getMemberId();
+        $params      = [
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
             'session_timeout' => \Kafka\ConsumerConfig::getInstance()->getSessionTimeout(),
             'rebalance_timeout' => \Kafka\ConsumerConfig::getInstance()->getRebalanceTimeout(),
@@ -304,9 +304,9 @@ class Process
 
     public function failJoinGroup($errorCode)
     {
-        $assign = \Kafka\Consumer\Assignment::getInstance();
+        $assign   = \Kafka\Consumer\Assignment::getInstance();
         $memberId = $assign->getMemberId();
-        $error = sprintf('Join group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId);
+        $error    = sprintf('Join group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId);
         $this->error($error);
         $this->stateConvert($errorCode);
     }
@@ -332,23 +332,23 @@ class Process
 
     public function syncGroup()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker        = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
-        $connect = $broker->getMetaConnect($groupBrokerId);
+        $connect       = $broker->getMetaConnect($groupBrokerId);
         if (! $connect) {
             return;
         }
-        $topics = \Kafka\ConsumerConfig::getInstance()->getTopics();
-        $assign = \Kafka\Consumer\Assignment::getInstance();
-        $memberId = $assign->getMemberId();
+        $topics       = \Kafka\ConsumerConfig::getInstance()->getTopics();
+        $assign       = \Kafka\Consumer\Assignment::getInstance();
+        $memberId     = $assign->getMemberId();
         $generationId = $assign->getGenerationId();
-        $params = [
+        $params       = [
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
             'generation_id' => $generationId,
             'member_id' => $memberId,
             'data' => $assign->getAssignments(),
         ];
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $params);
+        $requestData  = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $params);
         $this->debug("Sync group start, params:" . json_encode($params));
         $connect->write($requestData);
     }
@@ -372,7 +372,7 @@ class Process
         $this->debug($msg);
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_SYNCGROUP);
 
-        $topics = \Kafka\Broker::getInstance()->getTopics();
+        $topics         = \Kafka\Broker::getInstance()->getTopics();
         $brokerToTopics = [];
         foreach ($result['partitionAssignments'] as $topic) {
             foreach ($topic['partitions'] as $partId) {
@@ -389,7 +389,7 @@ class Process
                 if (! isset($topicInfo['partitions'])) {
                     $topicInfo['partitions'] = [];
                 }
-                $topicInfo['partitions'][] = $partId;
+                $topicInfo['partitions'][]                      = $partId;
                 $brokerToTopics[$brokerId][$topic['topicName']] = $topicInfo;
             }
         }
@@ -402,24 +402,24 @@ class Process
 
     protected function heartbeat()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker        = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
-        $connect = $broker->getMetaConnect($groupBrokerId);
+        $connect       = $broker->getMetaConnect($groupBrokerId);
         if (! $connect) {
             return;
         }
-        $assign = \Kafka\Consumer\Assignment::getInstance();
+        $assign   = \Kafka\Consumer\Assignment::getInstance();
         $memberId = $assign->getMemberId();
         if (! $memberId) {
             return;
         }
         $generationId = $assign->getGenerationId();
-        $params = [
+        $params       = [
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
             'generation_id' => $generationId,
             'member_id' => $memberId,
         ];
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $params);
+        $requestData  = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $params);
         //$this->debug("Heartbeat group start, params:" . json_encode($params));
         $connect->write($requestData);
     }
@@ -439,8 +439,8 @@ class Process
     protected function offset()
     {
         $context = [];
-        $broker = \Kafka\Broker::getInstance();
-        $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
+        $broker  = \Kafka\Broker::getInstance();
+        $topics  = \Kafka\Consumer\Assignment::getInstance()->getTopics();
         foreach ($topics as $brokerId => $topicList) {
             $connect = $broker->getMetaConnect($brokerId);
             if (! $connect) {
@@ -458,7 +458,7 @@ class Process
                         'offset' => 1,
                         'time' =>  -1,
                     ];
-                    $data[] = $item;
+                    $data[]               = $item;
                 }
             }
             $params = [
@@ -483,7 +483,7 @@ class Process
         $msg = sprintf('Get current offset sucess, result: %s', json_encode($result));
         //$this->debug($msg);
 
-        $offsets = \Kafka\Consumer\Assignment::getInstance()->getOffsets();
+        $offsets     = \Kafka\Consumer\Assignment::getInstance()->getOffsets();
         $lastOffsets = \Kafka\Consumer\Assignment::getInstance()->getLastOffsets();
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
@@ -492,7 +492,7 @@ class Process
                     break 2;
                 }
 
-                $offsets[$topic['topicName']][$part['partition']] = end($part['offsets']);
+                $offsets[$topic['topicName']][$part['partition']]     = end($part['offsets']);
                 $lastOffsets[$topic['topicName']][$part['partition']] = $part['offsets'][0];
             }
         }
@@ -506,15 +506,15 @@ class Process
 
     protected function fetchOffset()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker        = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
-        $connect = $broker->getMetaConnect($groupBrokerId);
+        $connect       = $broker->getMetaConnect($groupBrokerId);
         if (! $connect) {
             return;
         }
 
         $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
-        $data = [];
+        $data   = [];
         foreach ($topics as $brokerId => $topicList) {
             foreach ($topicList as $topic) {
                 $partitions = [];
@@ -545,7 +545,7 @@ class Process
         $msg = sprintf('Get current fetch offset sucess, result: %s', json_encode($result));
         $this->debug($msg);
 
-        $assign = \Kafka\Consumer\Assignment::getInstance();
+        $assign  = \Kafka\Consumer\Assignment::getInstance();
         $offsets = $assign->getFetchOffsets();
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
@@ -560,7 +560,7 @@ class Process
         $assign->setFetchOffsets($offsets);
 
         $consumerOffsets = $assign->getConsumerOffsets();
-        $lastOffsets = $assign->getLastOffsets();
+        $lastOffsets     = $assign->getLastOffsets();
         if (empty($consumerOffsets)) {
             $consumerOffsets = $assign->getFetchOffsets();
             foreach ($consumerOffsets as $topic => $value) {
@@ -581,10 +581,10 @@ class Process
 
     protected function fetch()
     {
-        $this->messages = [];
-        $context = [];
-        $broker = \Kafka\Broker::getInstance();
-        $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
+        $this->messages  = [];
+        $context         = [];
+        $broker          = \Kafka\Broker::getInstance();
+        $topics          = \Kafka\Consumer\Assignment::getInstance()->getTopics();
         $consumerOffsets = \Kafka\Consumer\Assignment::getInstance()->getConsumerOffsets();
         foreach ($topics as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId);
@@ -680,20 +680,20 @@ class Process
 
     protected function commit()
     {
-        $config= ConsumerConfig::getInstance();
+        $config = ConsumerConfig::getInstance();
         if ($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
             $this->consumeMessage();
         }
 
-        $broker = \Kafka\Broker::getInstance();
+        $broker        = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
-        $connect = $broker->getMetaConnect($groupBrokerId);
+        $connect       = $broker->getMetaConnect($groupBrokerId);
         if (! $connect) {
             return;
         }
 
         $commitOffsets = \Kafka\Consumer\Assignment::getInstance()->getCommitOffsets();
-        $topics = \Kafka\Consumer\Assignment::getInstance()->getTopics();
+        $topics        = \Kafka\Consumer\Assignment::getInstance()->getTopics();
         \Kafka\Consumer\Assignment::getInstance()->setPrecommitOffsets($commitOffsets);
         $data = [];
         foreach ($topics as $brokerId => $topicList) {
@@ -707,7 +707,7 @@ class Process
                         continue;
                     }
                     $partitions[$partId]['partition'] = $partId;
-                    $partitions[$partId]['offset'] = $commitOffsets[$topic['topic_name']][$partId];
+                    $partitions[$partId]['offset']    = $commitOffsets[$topic['topic_name']][$partId];
                 }
                 $data[$topic['topic_name']]['partitions'] = $partitions;
                 $data[$topic['topic_name']]['topic_name'] = $topic['topic_name'];
@@ -766,7 +766,7 @@ class Process
             \Kafka\Protocol::INCONSISTENT_GROUP_PROTOCOL,
             \Kafka\Protocol::INVALID_GROUP_ID,
         ];
-        $rejoinCodes = [
+        $rejoinCodes  = [
             \Kafka\Protocol::ILLEGAL_GENERATION,
             \Kafka\Protocol::INVALID_SESSION_TIMEOUT,
             \Kafka\Protocol::REBALANCE_IN_PROGRESS,

@@ -64,7 +64,7 @@ class CommitOffset extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_COMMIT_REQUEST, self::OFFSET_COMMIT_REQUEST);
 
-        $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data = self::encodeString($payloads['group_id'], self::PACK_INT16);
         if ($version == self::API_VERSION1) {
             $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
             $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
@@ -76,7 +76,7 @@ class CommitOffset extends Protocol
         }
 
         $data .= self::encodeArray($payloads['data'], [$this, 'encodeTopic']);
-        $data   = self::encodeString($header . $data, self::PACK_INT32);
+        $data  = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
     }
@@ -92,9 +92,9 @@ class CommitOffset extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
+        $offset  = 0;
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics = $this->decodeArray(substr($data, $offset), [$this, 'decodeTopic'], $version);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'decodeTopic'], $version);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -174,12 +174,12 @@ class CommitOffset extends Protocol
      */
     protected function decodeTopic($data, $version)
     {
-        $offset = 0;
+        $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $topicInfo['length'];
+        $offset   += $topicInfo['length'];
 
         $partitions = $this->decodeArray(substr($data, $offset), [$this, 'decodePartition'], $version);
-        $offset += $partitions['length'];
+        $offset    += $partitions['length'];
 
         return [
             'length' => $offset,
@@ -206,10 +206,10 @@ class CommitOffset extends Protocol
         $offset = 0;
 
         $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset     += 4;
 
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
+        $offset   += 2;
 
 
         return [

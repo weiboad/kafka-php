@@ -292,12 +292,12 @@ class SocketSync
             throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream, length too longer.');
         }
 
-        $null = null;
-        $read = [$this->stream];
+        $null     = null;
+        $read     = [$this->stream];
         $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
         if ($readable > 0) {
             $remainingBytes = $len;
-            $data = $chunk = '';
+            $data           = $chunk = '';
             while ($remainingBytes > 0) {
                 $chunk = fread($this->stream, $remainingBytes);
                 if ($chunk === false) {
@@ -317,7 +317,7 @@ class SocketSync
                     }
                     continue; // attempt another read
                 }
-                $data .= $chunk;
+                $data           .= $chunk;
                 $remainingBytes -= strlen($chunk);
             }
             if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
@@ -352,14 +352,14 @@ class SocketSync
      */
     public function write($buf)
     {
-        $null = null;
+        $null  = null;
         $write = [$this->stream];
 
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
         $failedWriteAttempts = 0;
-        $written = 0;
-        $buflen = strlen($buf);
+        $written             = 0;
+        $buflen              = strlen($buf);
         while ($written < $buflen) {
             // wait for stream to become available for writing
             $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);

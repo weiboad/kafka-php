@@ -54,10 +54,10 @@ class SyncGroup extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::SYNC_GROUP_REQUEST, self::SYNC_GROUP_REQUEST);
-        $data  = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
-        $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
-        $data .= self::encodeArray($payloads['data'], [$this, 'encodeGroupAssignment']);
+        $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
+        $data  .= self::pack(self::BIT_B32, $payloads['generation_id']);
+        $data  .= self::encodeString($payloads['member_id'], self::PACK_INT16);
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeGroupAssignment']);
 
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -75,24 +75,24 @@ class SyncGroup extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
+        $offset    = 0;
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
+        $offset   += 2;
 
         $memberAssignments = $this->decodeString(substr($data, $offset), self::BIT_B32);
-        $offset += $memberAssignments['length'];
+        $offset           += $memberAssignments['length'];
 
         $memberAssignment = $memberAssignments['data'];
         if (strlen($memberAssignment)) {
-            $memberAssignmentOffset = 0;
-            $version = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
+            $memberAssignmentOffset  = 0;
+            $version                 = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
             $memberAssignmentOffset += 2;
-            $partitionAssignments = $this->decodeArray(
+            $partitionAssignments    = $this->decodeArray(
                 substr($memberAssignment, $memberAssignmentOffset),
                 [$this, 'syncGroupResponsePartition']
             );
             $memberAssignmentOffset += $partitionAssignments['length'];
-            $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
+            $userData                = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
         } else {
             return [
                 'errorCode' => $errorCode,
@@ -135,7 +135,7 @@ class SyncGroup extends Protocol
 
         $memberId = self::encodeString($values['member_id'], self::PACK_INT16);
 
-        $data = self::pack(self::BIT_B16, 0);
+        $data  = self::pack(self::BIT_B16, 0);
         $data .= self::encodeArray($values['assignments'], [$this, 'encodeGroupAssignmentTopic']);
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
@@ -194,11 +194,11 @@ class SyncGroup extends Protocol
      */
     protected function syncGroupResponsePartition($data)
     {
-        $offset = 0;
-        $topicName = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $topicName['length'];
+        $offset     = 0;
+        $topicName  = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset    += $topicName['length'];
         $partitions = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
-        $offset += $partitions['length'];
+        $offset    += $partitions['length'];
 
         return [
             'length' => $offset,

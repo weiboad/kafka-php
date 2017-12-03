@@ -69,7 +69,7 @@ abstract class Config
             if (count($args) != 1) {
                 return false;
             }
-            $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
+            $option                   = strtolower(substr($name, 3, 1)) . substr($name, 4);
             static::$options[$option] = $args[0];
             // check todo
             return true;
@@ -108,7 +108,7 @@ abstract class Config
         if (trim($list) == '') {
             throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
         }
-        $tmp = explode(',', trim($list));
+        $tmp   = explode(',', trim($list));
         $lists = [];
         foreach ($tmp as $key => $val) {
             if (trim($val) != '') {

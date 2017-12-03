@@ -147,7 +147,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $test = $this->heart->decode(\hex2bin('0000'));
+        $test   = $this->heart->decode(\hex2bin('0000'));
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);
     }

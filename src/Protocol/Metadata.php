@@ -68,12 +68,12 @@ class Metadata extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
-        $version = $this->getApiVersion(self::METADATA_REQUEST);
-        $brokerRet = $this->decodeArray(substr($data, $offset), [$this, 'metaBroker'], $version);
-        $offset += $brokerRet['length'];
+        $offset       = 0;
+        $version      = $this->getApiVersion(self::METADATA_REQUEST);
+        $brokerRet    = $this->decodeArray(substr($data, $offset), [$this, 'metaBroker'], $version);
+        $offset      += $brokerRet['length'];
         $topicMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaTopicMetaData'], $version);
-        $offset += $topicMetaRet['length'];
+        $offset      += $topicMetaRet['length'];
 
         $result = [
             'brokers' => $brokerRet['data'],
@@ -93,13 +93,13 @@ class Metadata extends Protocol
      */
     protected function metaBroker($data, $version)
     {
-        $offset = 0;
-        $nodeId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset       = 0;
+        $nodeId       = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset      += 4;
         $hostNameInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $hostNameInfo['length'];
-        $port = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset      += $hostNameInfo['length'];
+        $port         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset      += 4;
         return [
             'length' => $offset,
             'data' => [
@@ -121,13 +121,13 @@ class Metadata extends Protocol
      */
     protected function metaTopicMetaData($data, $version)
     {
-        $offset = 0;
-        $topicErrCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
-        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $topicInfo['length'];
+        $offset          = 0;
+        $topicErrCode    = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset         += 2;
+        $topicInfo       = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset         += $topicInfo['length'];
         $partionsMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaPartitionMetaData'], $version);
-        $offset += $partionsMetaRet['length'];
+        $offset         += $partionsMetaRet['length'];
 
         return [
             'length' => $offset,
@@ -150,17 +150,17 @@ class Metadata extends Protocol
      */
     protected function metaPartitionMetaData($data, $version)
     {
-        $offset = 0;
-        $errcode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
-        $partId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $leader = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset   = 0;
+        $errcode  = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset  += 2;
+        $partId   = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset  += 4;
+        $leader   = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset  += 4;
         $replicas = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
-        $offset += $replicas['length'];
-        $isr = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
-        $offset += $isr['length'];
+        $offset  += $replicas['length'];
+        $isr      = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $offset  += $isr['length'];
 
         return [
             'length' => $offset,

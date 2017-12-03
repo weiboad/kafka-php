@@ -104,7 +104,7 @@ class Assignment
 
         $memberCount = count($result);
 
-        $count = 0;
+        $count   = 0;
         $members = [];
         foreach ($topics as $topicName => $partition) {
             foreach ($partition as $partId => $leaderId) {
@@ -126,7 +126,7 @@ class Assignment
 
         $data = [];
         foreach ($result as $key => $member) {
-            $item = [
+            $item   = [
                 'version' => 0,
                 'member_id' => $member['memberId'],
                 'assignments' => isset($members[$key]) ? $members[$key] : []
@@ -288,11 +288,11 @@ class Assignment
 
     public function clearOffset()
     {
-        $this->offsets = [];
-        $this->lastOffsets = [];
-        $this->fetchOffsets = [];
-        $this->consumerOffsets = [];
-        $this->commitOffsets = [];
+        $this->offsets          = [];
+        $this->lastOffsets      = [];
+        $this->fetchOffsets     = [];
+        $this->consumerOffsets  = [];
+        $this->commitOffsets    = [];
         $this->precommitOffsets = [];
     }
 

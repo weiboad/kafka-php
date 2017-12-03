@@ -74,7 +74,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     public function testData()
     {
         $broker = \Kafka\Broker::getInstance();
-        $data = [
+        $data   = [
             'brokers' => [
                 [
                     'host' => '127.0.0.1',
@@ -133,7 +133,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
             1 => '127.0.0.1:9192',
             2 => '127.0.0.1:9292'
         ];
-        $topics = [
+        $topics  = [
             'test' => [
                 0 => 0,
                 1 => 2,
@@ -155,7 +155,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     public function testGetConnect()
     {
         $broker = \Kafka\Broker::getInstance();
-        $data = [
+        $data   = [
             [
                 'host' => '127.0.0.1',
                 'port' => '9092',

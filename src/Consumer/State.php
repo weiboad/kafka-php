@@ -31,19 +31,19 @@ class State
     use \Kafka\SingletonTrait;
     // {{{ consts
 
-    const REQUEST_METADATA  = 1;
-    const REQUEST_GETGROUP  = 2;
-    const REQUEST_JOINGROUP = 3;
-    const REQUEST_SYNCGROUP = 4;
-    const REQUEST_HEARTGROUP = 5;
-    const REQUEST_OFFSET = 6;
-    const REQUEST_FETCH = 7;
-    const REQUEST_FETCH_OFFSET = 8;
+    const REQUEST_METADATA      = 1;
+    const REQUEST_GETGROUP      = 2;
+    const REQUEST_JOINGROUP     = 3;
+    const REQUEST_SYNCGROUP     = 4;
+    const REQUEST_HEARTGROUP    = 5;
+    const REQUEST_OFFSET        = 6;
+    const REQUEST_FETCH         = 7;
+    const REQUEST_FETCH_OFFSET  = 8;
     const REQUEST_COMMIT_OFFSET = 9;
 
-    const STATUS_INIT  = 0;
-    const STATUS_STOP  = 1;
-    const STATUS_START = 2;
+    const STATUS_INIT    = 0;
+    const STATUS_STOP    = 1;
+    const STATUS_START   = 2;
     const STATUS_LOOP    = 4;
     const STATUS_PROCESS = 8;
     const STATUS_FINISH  = 16;
@@ -53,7 +53,7 @@ class State
     
     private $callStatus = [];
     
-    private $requests  = [
+    private $requests = [
         self::REQUEST_METADATA => [],
         self::REQUEST_GETGROUP => [],
         self::REQUEST_JOINGROUP => [],
@@ -434,7 +434,7 @@ class State
             case self::REQUEST_OFFSET:
             case self::REQUEST_FETCH:
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
-                $contextStatus = [];
+                $contextStatus                     = [];
                 foreach ($context as $fd) {
                     $contextStatus[$fd] = self::STATUS_PROCESS;
                 }

@@ -336,12 +336,12 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '0000000100047465737400000001000000000000000000000000002a00000000';
-        $test = $this->produce->decode(\hex2bin($data));
+        $data   = '0000000100047465737400000001000000000000000000000000002a00000000';
+        $test   = $this->produce->decode(\hex2bin($data));
         $result = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":14,"timestamp":0}]}]}';
         $this->assertEquals(json_encode($test), $result);
-        $data = '0000000100047465737400000001000000000000000000000000006effffffffffffffff00000000';
-        $test = $this->produce10->decode(\hex2bin($data));
+        $data   = '0000000100047465737400000001000000000000000000000000006effffffffffffffff00000000';
+        $test   = $this->produce10->decode(\hex2bin($data));
         $result = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":22,"timestamp":-1}]}]}';
         $this->assertEquals(json_encode($test), $result);
     }

@@ -212,7 +212,7 @@ class Process
                     $this->error('Get metadata is fail, brokers or topics is null.');
                     $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
                 } else {
-                    $broker = \Kafka\Broker::getInstance();
+                    $broker   = \Kafka\Broker::getInstance();
                     $isChange = $broker->setData($result['topics'], $result['brokers']);
                     $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA, $isChange);
                 }
@@ -231,10 +231,10 @@ class Process
 
     protected function produce()
     {
-        $context = [];
-        $broker = \Kafka\Broker::getInstance();
+        $context     = [];
+        $broker      = \Kafka\Broker::getInstance();
         $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-        $timeout = \Kafka\ProducerConfig::getInstance()->getTimeout();
+        $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
 
         // get send message
         // data struct
@@ -255,7 +255,7 @@ class Process
             }
 
             $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params = [
+            $params      = [
                 'required_ack' => $requiredAck,
                 'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
                 'data' => $topicList,
@@ -323,8 +323,8 @@ class Process
 
     protected function convertMessage($data)
     {
-        $sendData = [];
-        $broker = \Kafka\Broker::getInstance();
+        $sendData   = [];
+        $broker     = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {
@@ -344,7 +344,7 @@ class Process
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partNums = array_keys($topicMeta);
+            $partNums  = array_keys($topicMeta);
             shuffle($partNums);
             $partId = 0;
             if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
@@ -353,7 +353,7 @@ class Process
                 $partId = $value['partId'];
             }
 
-            $brokerId = $topicMeta[$partId];
+            $brokerId  = $topicMeta[$partId];
             $topicData = [];
             if (isset($sendData[$brokerId][$value['topic']])) {
                 $topicData = $sendData[$brokerId][$value['topic']];
@@ -371,8 +371,8 @@ class Process
                 $partition['messages'][] = $value['value'];
             }
             
-            $topicData['partitions'][$partId] = $partition;
-            $topicData['topic_name'] = $value['topic'];
+            $topicData['partitions'][$partId]     = $partition;
+            $topicData['topic_name']              = $value['topic'];
             $sendData[$brokerId][$value['topic']] = $topicData;
         }
 

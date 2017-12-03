@@ -41,7 +41,7 @@ class ListGroup extends Protocol
     public function encode($payloads)
     {
         $header = $this->requestHeader('kafka-php', self::LIST_GROUPS_REQUEST, self::LIST_GROUPS_REQUEST);
-        $data = self::encodeString($header, self::PACK_INT32);
+        $data   = self::encodeString($header, self::PACK_INT32);
 
         return $data;
     }
@@ -57,10 +57,10 @@ class ListGroup extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
+        $offset    = 0;
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
-        $groups = $this->decodeArray(substr($data, $offset), [$this, 'listGroup']);
+        $offset   += 2;
+        $groups    = $this->decodeArray(substr($data, $offset), [$this, 'listGroup']);
 
         return [
             'errorCode' => $errorCode,
@@ -79,11 +79,11 @@ class ListGroup extends Protocol
      */
     protected function listGroup($data)
     {
-        $offset = 0;
-        $groupId = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $groupId['length'];
+        $offset       = 0;
+        $groupId      = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset      += $groupId['length'];
         $protocolType = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $protocolType['length'];
+        $offset      += $protocolType['length'];
 
         return [
             'length' => $offset,

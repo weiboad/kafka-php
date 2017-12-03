@@ -22,5 +22,11 @@
             <property name="ignoreNewlines" value="true"/>
         </properties>
     </rule>
+
+    <rule ref="Generic.Formatting.MultipleStatementAlignment">
+        <properties>
+            <property name="error" value="true"/>
+        </properties>
+    </rule>
 </ruleset>
 

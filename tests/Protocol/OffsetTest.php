@@ -204,8 +204,8 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '000000010004746573740000000100000000000000000001000000000000002a';
-        $test = $this->offset->decode(\hex2bin($data));
+        $data   = '000000010004746573740000000100000000000000000001000000000000002a';
+        $test   = $this->offset->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"timestamp":0,"offsets":[42]}]}]';
         $this->assertEquals(json_encode($test), $result);
     }

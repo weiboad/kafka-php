@@ -325,8 +325,8 @@ class Socket
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
-        $this->readBuffer = '';
-        $this->writeBuffer = '';
+        $this->readBuffer     = '';
+        $this->writeBuffer    = '';
         $this->readNeedLength = 0;
     }
 
@@ -364,9 +364,9 @@ class Socket
                 if (strlen($this->readBuffer) < 4) {
                     return;
                 }
-                $dataLen = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
+                $dataLen              = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
                 $this->readNeedLength = $dataLen;
-                $this->readBuffer = substr($this->readBuffer, 4);
+                $this->readBuffer     = substr($this->readBuffer, 4);
             }
 
             if (strlen($this->readBuffer) < $this->readNeedLength) {
@@ -374,7 +374,7 @@ class Socket
             }
             $data = substr($this->readBuffer, 0, $this->readNeedLength);
 
-            $this->readBuffer = substr($this->readBuffer, $this->readNeedLength);
+            $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
             call_user_func($this->onReadable, $data, (int) $this->stream);
         } while (strlen($this->readBuffer));

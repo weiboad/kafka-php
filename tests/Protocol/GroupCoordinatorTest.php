@@ -108,8 +108,8 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $data = '000000000003000b31302e31332e342e313539000023e8';
-        $test = $this->group->decode(\hex2bin($data));
+        $data   = '000000000003000b31302e31332e342e313539000023e8';
+        $test   = $this->group->decode(\hex2bin($data));
         $result = '{"errorCode":0,"coordinatorId":3,"coordinatorHost":"10.13.4.159","coordinatorPort":9192}';
         $this->assertEquals(json_encode($test), $result);
     }

@@ -86,7 +86,7 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        $test = $this->list->decode(\hex2bin('0000000000010004746573740008636f6e73756d6572'));
+        $test   = $this->list->decode(\hex2bin('0000000000010004746573740008636f6e73756d6572'));
         $result = '{"errorCode":0,"groups":[{"groupId":"test","protocolType":"consumer"}]}';
         $this->assertEquals(json_encode($test), $result);
     }

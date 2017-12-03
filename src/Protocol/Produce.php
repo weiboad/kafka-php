@@ -74,10 +74,10 @@ class Produce extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
-        $version = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $ret = $this->decodeArray(substr($data, $offset), [$this, 'produceTopicPair'], $version);
-        $offset += $ret['length'];
+        $offset       = 0;
+        $version      = $this->getApiVersion(self::PRODUCE_REQUEST);
+        $ret          = $this->decodeArray(substr($data, $offset), [$this, 'produceTopicPair'], $version);
+        $offset      += $ret['length'];
         $throttleTime = 0;
         if ($version == self::API_VERSION2) {
             $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
@@ -134,13 +134,13 @@ class Produce extends Protocol
     {
         // int8 -- magic  int8 -- attribute
         $version = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $magic = ($version == self::API_VERSION2) ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
-        $data  = self::pack(self::BIT_B8, $magic);
-        $data .= self::pack(self::BIT_B8, $compression);
+        $magic   = ($version == self::API_VERSION2) ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
+        $data    = self::pack(self::BIT_B8, $magic);
+        $data   .= self::pack(self::BIT_B8, $compression);
 
         $key = '';
         if (is_array($message)) {
-            $key = $message['key'];
+            $key     = $message['key'];
             $message = $message['value'];
         }
         // message key
@@ -179,7 +179,7 @@ class Produce extends Protocol
             throw new \Kafka\Exception\Protocol('given produce data invalid. `messages` is undefined.');
         }
 
-        $data = self::pack(self::BIT_B32, $values['partition_id']);
+        $data  = self::pack(self::BIT_B32, $values['partition_id']);
         $data .= self::encodeString($this->encodeMessageSet($values['messages'], $compression), self::PACK_INT32);
 
         return $data;
@@ -207,7 +207,7 @@ class Produce extends Protocol
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partitions` is undefined.');
         }
 
-        $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
+        $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
         $partitions = self::encodeArray($values['partitions'], [$this, 'encodeProcudePartion'], $compression);
 
         return $topic . $partitions;
@@ -224,11 +224,11 @@ class Produce extends Protocol
      */
     protected function produceTopicPair($data, $version)
     {
-        $offset = 0;
+        $offset    = 0;
         $topicInfo = $this->decodeString($data, self::BIT_B16);
-        $offset += $topicInfo['length'];
-        $ret = $this->decodeArray(substr($data, $offset), [$this, 'producePartitionPair'], $version);
-        $offset += $ret['length'];
+        $offset   += $topicInfo['length'];
+        $ret       = $this->decodeArray(substr($data, $offset), [$this, 'producePartitionPair'], $version);
+        $offset   += $ret['length'];
 
         return ['length' => $offset, 'data' => [
             'topicName' => $topicInfo['data'],
@@ -247,17 +247,17 @@ class Produce extends Protocol
      */
     protected function producePartitionPair($data, $version)
     {
-        $offset = 0;
-        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
+        $offset          = 0;
+        $partitionId     = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset         += 4;
+        $errorCode       = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset         += 2;
         $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-        $offset += 8;
-        $timestamp = 0;
+        $offset         += 8;
+        $timestamp       = 0;
         if ($version == self::API_VERSION2) {
             $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-            $offset += 8;
+            $offset   += 8;
         }
 
         return [

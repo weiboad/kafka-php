@@ -77,15 +77,15 @@ class Fetch extends Protocol
      */
     public function decode($data)
     {
-        $offset = 0;
-        $version = $this->getApiVersion(self::FETCH_REQUEST);
+        $offset       = 0;
+        $version      = $this->getApiVersion(self::FETCH_REQUEST);
         $throttleTime = 0;
         if ($version != self::API_VERSION0) {
             $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-            $offset += 4;
+            $offset      += 4;
         }
 
-        $topics = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic'], $version);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic'], $version);
         $offset += $topics['length'];
 
         return [
@@ -105,12 +105,12 @@ class Fetch extends Protocol
      */
     protected function fetchTopic($data, $version)
     {
-        $offset = 0;
+        $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset += $topicInfo['length'];
+        $offset   += $topicInfo['length'];
 
         $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition'], $version);
-        $offset += $partitions['length'];
+        $offset    += $partitions['length'];
 
         return [
             'length' => $offset,
@@ -132,20 +132,20 @@ class Fetch extends Protocol
      */
     protected function fetchPartition($data, $version)
     {
-        $offset = 0;
-        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset += 2;
+        $offset              = 0;
+        $partitionId         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset             += 4;
+        $errorCode           = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset             += 2;
         $highwaterMarkOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-        $offset += 8;
+        $offset             += 8;
 
         $messageSetSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
+        $offset        += 4;
 
         if ($offset < strlen($data) && $messageSetSize) {
             $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), [$this, 'decodeMessageSet'], $messageSetSize);
-            $offset += $messages['length'];
+            $offset  += $messages['length'];
         }
 
         return [
@@ -199,7 +199,7 @@ class Fetch extends Protocol
                 continue;
             }
 
-            $offset += $ret['length'];
+            $offset  += $ret['length'];
             $result[] = $ret['data'];
         }
 
@@ -228,12 +228,12 @@ class Fetch extends Protocol
         if (strlen($data) <= 12) {
             return false;
         }
-        $offset = 0;
-        $roffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-        $offset += 8;
+        $offset      = 0;
+        $roffset     = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $offset     += 8;
         $messageSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $ret = $this->decodeMessage(substr($data, $offset), $messageSize);
+        $offset     += 4;
+        $ret         = $this->decodeMessage(substr($data, $offset), $messageSize);
         if (! is_array($ret) && $ret == false) {
             return false;
         }
@@ -268,38 +268,38 @@ class Fetch extends Protocol
             return false;
         }
 
-        $offset = 0;
-        $crc = self::unpack(self::BIT_B32, substr($data, $offset, 4));
-        $offset += 4;
-        $magic = self::unpack(self::BIT_B8, substr($data, $offset, 1));
-        $offset += 1;
-        $attr  = self::unpack(self::BIT_B8, substr($data, $offset, 1));
-        $offset += 1;
-        $timestamp = 0;
+        $offset     = 0;
+        $crc        = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $offset    += 4;
+        $magic      = self::unpack(self::BIT_B8, substr($data, $offset, 1));
+        $offset    += 1;
+        $attr       = self::unpack(self::BIT_B8, substr($data, $offset, 1));
+        $offset    += 1;
+        $timestamp  = 0;
         $backOffset = $offset;
         try { // try unpack message format v0 and v1, if use v1 unpack fail, try unpack v0
             $version = $this->getApiVersion(self::FETCH_REQUEST);
             if ($version == self::API_VERSION2) {
                 $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
-                $offset += 8;
+                $offset   += 8;
             }
             
-            $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 
             $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
-            $offset += $valueRet['length'];
+            $offset  += $valueRet['length'];
             if ($offset != $messageSize) {
                 throw new \Kafka\Exception('pack message fail, message len:' . $messageSize . ' , data unpack offset :' . $offset);
             }
         } catch (\Kafka\Exception $e) { // try unpack message format v0
-            $offset = $backOffset;
+            $offset    = $backOffset;
             $timestamp = 0;
-            $keyRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
-            $offset += $keyRet['length'];
+            $keyRet    = $this->decodeString(substr($data, $offset), self::BIT_B32);
+            $offset   += $keyRet['length'];
 
             $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
-            $offset += $valueRet['length'];
+            $offset  += $valueRet['length'];
         }
 
         return [
@@ -339,7 +339,7 @@ class Fetch extends Protocol
             $values['max_bytes'] = 2 * 1024 * 1024;
         }
 
-        $data = self::pack(self::BIT_B32, $values['partition_id']);
+        $data  = self::pack(self::BIT_B32, $values['partition_id']);
         $data .= self::pack(self::BIT_B64, $values['offset']);
         $data .= self::pack(self::BIT_B32, $values['max_bytes']);
 
@@ -366,7 +366,7 @@ class Fetch extends Protocol
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `partitions` is undefined.');
         }
 
-        $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
+        $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
         $partitions = self::encodeArray($values['partitions'], [$this, 'encodeFetchPartion']);
 
         return $topic . $partitions;
