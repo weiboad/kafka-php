@@ -40,13 +40,13 @@ class Heartbeat extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['group_id'])) {
+        if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `group_id` is undefined.');
         }
-        if (!isset($payloads['generation_id'])) {
+        if (! isset($payloads['generation_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `generation_id` is undefined.');
         }
-        if (!isset($payloads['member_id'])) {
+        if (! isset($payloads['member_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `member_id` is undefined.');
         }
 

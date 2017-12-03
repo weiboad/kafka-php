@@ -503,7 +503,7 @@ abstract class Protocol
      */
     public static function encodeArray(array $array, $func, $options = null)
     {
-        if (!is_callable($func, false)) {
+        if (! is_callable($func, false)) {
             throw new \Kafka\Exception\Protocol('Encode array failed, given function is not callable.');
         }
 
@@ -511,7 +511,7 @@ abstract class Protocol
 
         $body = '';
         foreach ($array as $value) {
-            if (!is_null($options)) {
+            if (! is_null($options)) {
                 $body .= call_user_func($func, $value, $options);
             } else {
                 $body .= call_user_func($func, $value);
@@ -581,24 +581,24 @@ abstract class Protocol
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
 
-        if (!is_callable($func, false)) {
+        if (! is_callable($func, false)) {
             throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
         }
 
         $result = array();
         for ($i = 0; $i < $arrayCount; $i++) {
             $value = substr($data, $offset);
-            if (!is_null($options)) {
+            if (! is_null($options)) {
                 $ret = call_user_func($func, $value, $options);
             } else {
                 $ret = call_user_func($func, $value);
             }
 
-            if (!is_array($ret) && $ret === false) {
+            if (! is_array($ret) && $ret === false) {
                 break;
             }
 
-            if (!isset($ret['length']) || !isset($ret['data'])) {
+            if (! isset($ret['length']) || ! isset($ret['data'])) {
                 throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
             }
             if ($ret['length'] == 0) {

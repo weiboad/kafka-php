@@ -40,11 +40,11 @@ class FetchOffset extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['data'])) {
+        if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `data` is undefined.');
         }
 
-        if (!isset($payloads['group_id'])) {
+        if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `group_id` is undefined.');
         }
 
@@ -103,11 +103,11 @@ class FetchOffset extends Protocol
      */
     protected function encodeOffsetTopic($values)
     {
-        if (!isset($values['topic_name'])) {
+        if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `topic_name` is undefined.');
         }
 
-        if (!isset($values['partitions']) || empty($values['partitions'])) {
+        if (! isset($values['partitions']) || empty($values['partitions'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partitions` is undefined.');
         }
 

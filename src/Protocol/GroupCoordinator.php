@@ -40,7 +40,7 @@ class GroupCoordinator extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['group_id'])) {
+        if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given group coordinator invalid. `group_id` is undefined.');
         }
 

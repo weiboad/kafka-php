@@ -146,7 +146,7 @@ abstract class Config
 
     public function setMessageMaxBytes($messageMaxBytes)
     {
-        if (!is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
+        if (! is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
             throw new \Kafka\Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
         }
         static::$options['messageMaxBytes'] = $messageMaxBytes;
@@ -157,7 +157,7 @@ abstract class Config
 
     public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs)
     {
-        if (!is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
+        if (! is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
             || $metadataRequestTimeoutMs > 900000) {
             throw new \Kafka\Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
         }
@@ -169,7 +169,7 @@ abstract class Config
 
     public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs)
     {
-        if (!is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
+        if (! is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
             || $metadataRefreshIntervalMs > 3600000) {
             throw new \Kafka\Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
         }
@@ -181,7 +181,7 @@ abstract class Config
 
     public function setMetadataMaxAgeMs($metadataMaxAgeMs)
     {
-        if (!is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1
+        if (! is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1
             || $metadataMaxAgeMs > 86400000) {
             throw new \Kafka\Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }

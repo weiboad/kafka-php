@@ -158,7 +158,7 @@ class State
 
     public function succRun($key, $context = null)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class State
                 $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                 break;
             case self::REQUEST_OFFSET:
-                if (!isset($this->callStatus[$key]['context'])) {
+                if (! isset($this->callStatus[$key]['context'])) {
                     $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     break;
                 }
@@ -191,7 +191,7 @@ class State
                 }
                 break;
             case self::REQUEST_FETCH:
-                if (!isset($this->callStatus[$key]['context'])) {
+                if (! isset($this->callStatus[$key]['context'])) {
                     $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     break;
                 }
@@ -210,7 +210,7 @@ class State
 
     public function failRun($key, $context = null)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -312,7 +312,7 @@ class State
 
     protected function checkRun($key)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -415,7 +415,7 @@ class State
 
     protected function processing($key, $context)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 

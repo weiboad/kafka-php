@@ -40,11 +40,11 @@ class Offset extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['data'])) {
+        if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
         }
 
-        if (!isset($payloads['replica_id'])) {
+        if (! isset($payloads['replica_id'])) {
             $payloads['replica_id'] = -1;
         }
 
@@ -88,15 +88,15 @@ class Offset extends Protocol
      */
     protected function encodeOffsetPartion($values)
     {
-        if (!isset($values['partition_id'])) {
+        if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
         }
 
-        if (!isset($values['time'])) {
+        if (! isset($values['time'])) {
             $values['time'] = -1; // -1
         }
 
-        if (!isset($values['max_offset'])) {
+        if (! isset($values['max_offset'])) {
             $values['max_offset'] = 100000;
         }
 
@@ -122,11 +122,11 @@ class Offset extends Protocol
      */
     protected function encodeOffsetTopic($values)
     {
-        if (!isset($values['topic_name'])) {
+        if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
         }
 
-        if (!isset($values['partitions']) || empty($values['partitions'])) {
+        if (! isset($values['partitions']) || empty($values['partitions'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
         }
 

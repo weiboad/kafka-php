@@ -40,17 +40,17 @@ class Produce extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['data'])) {
+        if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given procude data invalid. `data` is undefined.');
         }
 
-        if (!isset($payloads['required_ack'])) {
+        if (! isset($payloads['required_ack'])) {
             // default server will not send any response
             // (this is the only case where the server will not reply to a request)
             $payloads['required_ack'] = 0;
         }
 
-        if (!isset($payloads['timeout'])) {
+        if (! isset($payloads['timeout'])) {
             $payloads['timeout'] = 100; // default timeout 100ms
         }
 
@@ -101,7 +101,7 @@ class Produce extends Protocol
      */
     protected function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
     {
-        if (!is_array($messages)) {
+        if (! is_array($messages)) {
             $messages = array($messages);
         }
 
@@ -171,11 +171,11 @@ class Produce extends Protocol
      */
     protected function encodeProcudePartion($values, $compression)
     {
-        if (!isset($values['partition_id'])) {
+        if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
         }
 
-        if (!isset($values['messages']) || empty($values['messages'])) {
+        if (! isset($values['messages']) || empty($values['messages'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `messages` is undefined.');
         }
 
@@ -199,11 +199,11 @@ class Produce extends Protocol
      */
     protected function encodeProcudeTopic($values, $compression)
     {
-        if (!isset($values['topic_name'])) {
+        if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');
         }
 
-        if (!isset($values['partitions']) || empty($values['partitions'])) {
+        if (! isset($values['partitions']) || empty($values['partitions'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partitions` is undefined.');
         }
 

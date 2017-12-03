@@ -217,7 +217,7 @@ class Socket
      */
     public function connect()
     {
-        if (!$this->isSocketDead()) {
+        if (! $this->isSocketDead()) {
             return;
         }
 
@@ -239,7 +239,7 @@ class Socket
         if ($this->stream == false) {
             $error = 'Could not connect to '
                     . $this->host . ':' . $this->port
-                    . ' ('.$errstr.' ['.$errno.'])';
+                    . ' (' . $errstr . ' [' . $errno . '])';
             throw new \Kafka\Exception($error);
         }
 
@@ -248,7 +248,7 @@ class Socket
 
         $this->readWatcher = \Amp\onReadable($this->stream, function () {
             do {
-                if (!$this->isSocketDead($this->stream)) {
+                if (! $this->isSocketDead($this->stream)) {
                     $newData = @fread($this->stream, self::READ_MAX_LEN);
                 } else {
                     $this->reconnect();
@@ -376,7 +376,7 @@ class Socket
 
             $this->readBuffer = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
-            call_user_func($this->onReadable, $data, (int)$this->stream);
+            call_user_func($this->onReadable, $data, (int) $this->stream);
         } while (strlen($this->readBuffer));
     }
 
@@ -419,7 +419,7 @@ class Socket
      */
     protected function isSocketDead()
     {
-        return !is_resource($this->stream) || @feof($this->stream);
+        return ! is_resource($this->stream) || @feof($this->stream);
     }
 
     // }}}

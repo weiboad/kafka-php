@@ -40,10 +40,10 @@ class LeaveGroup extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['group_id'])) {
+        if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given leave group data invalid. `group_id` is undefined.');
         }
-        if (!isset($payloads['member_id'])) {
+        if (! isset($payloads['member_id'])) {
             throw new \Kafka\Exception\Protocol('given leave group data invalid. `member_id` is undefined.');
         }
 

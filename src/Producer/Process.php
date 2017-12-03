@@ -89,7 +89,7 @@ class Process
         $this->state->init();
 
         $topics = $broker->getTopics();
-        if (!empty($topics)) {
+        if (! empty($topics)) {
             $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA);
         }
     }
@@ -109,7 +109,7 @@ class Process
         $this->state->start();
         $config = \Kafka\ProducerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
-        if (!$isAsyn) {
+        if (! $isAsyn) {
             \Amp\repeat(function ($watcherId) {
                 if ($this->error) {
                     call_user_func($this->error, 1000);
@@ -208,7 +208,7 @@ class Process
         switch ($correlationId) {
             case \Kafka\Protocol::METADATA_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
-                if (!isset($result['brokers']) || !isset($result['topics'])) {
+                if (! isset($result['brokers']) || ! isset($result['topics'])) {
                     $this->error('Get metadata is fail, brokers or topics is null.');
                     $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
                 } else {
@@ -250,7 +250,7 @@ class Process
         $sendData = $this->convertMessage($data);
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId);
-            if (!$connect) {
+            if (! $connect) {
                 return;
             }
 
@@ -266,7 +266,7 @@ class Process
                 $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE);
             } else {
                 $connect->write($requestData);
-                $context[] = (int)$connect->getSocket();
+                $context[] = (int) $connect->getSocket();
             }
         }
 
@@ -327,19 +327,19 @@ class Process
         $broker = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
-            if (!isset($value['topic']) || !trim($value['topic'])) {
+            if (! isset($value['topic']) || ! trim($value['topic'])) {
                 continue;
             }
 
-            if (!isset($topicInfos[$value['topic']])) {
+            if (! isset($topicInfos[$value['topic']])) {
                 continue;
             }
 
-            if (!isset($value['value']) || !trim($value['value'])) {
+            if (! isset($value['value']) || ! trim($value['value'])) {
                 continue;
             }
 
-            if (!isset($value['key'])) {
+            if (! isset($value['key'])) {
                 $value['key'] = '';
             }
 
@@ -347,7 +347,7 @@ class Process
             $partNums = array_keys($topicMeta);
             shuffle($partNums);
             $partId = 0;
-            if (!isset($value['partId']) || !isset($topicMeta[$value['partId']])) {
+            if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
                 $partId = $partNums[0];
             } else {
                 $partId = $value['partId'];

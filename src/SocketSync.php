@@ -237,7 +237,7 @@ class SocketSync
         if ($this->stream == false) {
             $error = 'Could not connect to '
                     . $this->host . ':' . $this->port
-                    . ' ('.$errstr.' ['.$errno.'])';
+                    . ' (' . $errstr . ' [' . $errno . '])';
             throw new \Kafka\Exception($error);
         }
 
@@ -289,7 +289,7 @@ class SocketSync
     public function read($len, $verifyExactLength = false)
     {
         if ($len > self::READ_MAX_LEN) {
-            throw new \Kafka\Exception('Could not read '.$len.' bytes from stream, length too longer.');
+            throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream, length too longer.');
         }
 
         $null = null;
@@ -302,13 +302,13 @@ class SocketSync
                 $chunk = fread($this->stream, $remainingBytes);
                 if ($chunk === false) {
                     $this->close();
-                    throw new \Kafka\Exception('Could not read '.$len.' bytes from stream (no data)');
+                    throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (no data)');
                 }
                 if (strlen($chunk) === 0) {
                     // Zero bytes because of EOF?
                     if (feof($this->stream)) {
                         $this->close();
-                        throw new \Kafka\Exception('Unexpected EOF while reading '.$len.' bytes from stream (no data)');
+                        throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
                     }
                     // Otherwise wait for bytes
                     $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
@@ -330,13 +330,13 @@ class SocketSync
         }
         if (false !== $readable) {
             $res = stream_get_meta_data($this->stream);
-            if (!empty($res['timed_out'])) {
+            if (! empty($res['timed_out'])) {
                 $this->close();
-                throw new \Kafka\Exception('Timed out reading '.$len.' bytes from stream');
+                throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
             }
         }
         $this->close();
-        throw new \Kafka\Exception('Could not read '.$len.' bytes from stream (not readable)');
+        throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
     }
 
     // }}}
@@ -388,7 +388,7 @@ class SocketSync
             }
             if (false !== $writable) {
                 $res = stream_get_meta_data($this->stream);
-                if (!empty($res['timed_out'])) {
+                if (! empty($res['timed_out'])) {
                     throw new \Kafka\Exception('Timed out writing ' . strlen($buf) . ' bytes to stream after writing ' . $written . ' bytes');
                 }
             }

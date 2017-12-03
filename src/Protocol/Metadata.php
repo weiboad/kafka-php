@@ -40,12 +40,12 @@ class Metadata extends Protocol
      */
     public function encode($topics)
     {
-        if (!is_array($topics)) {
+        if (! is_array($topics)) {
             $topics = array($topics);
         }
 
         foreach ($topics as $topic) {
-            if (!is_string($topic)) {
+            if (! is_string($topic)) {
                 throw new \Kafka\Exception\Protocol('request metadata topic array have invalid value. ');
             }
         }

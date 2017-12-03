@@ -75,7 +75,7 @@ class ConsumerConfig extends Config
 
     public function setSessionTimeout($sessionTimeout)
     {
-        if (!is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
+        if (! is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
             throw new \Kafka\Exception\Config('Set session timeout value is invalid, must set it 1 .. 3600000');
         }
         static::$options['sessionTimeout'] = $sessionTimeout;
@@ -86,7 +86,7 @@ class ConsumerConfig extends Config
 
     public function setRebalanceTimeout($rebalanceTimeout)
     {
-        if (!is_numeric($rebalanceTimeout) || $rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
+        if (! is_numeric($rebalanceTimeout) || $rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
             throw new \Kafka\Exception\Config('Set rebalance timeout value is invalid, must set it 1 .. 3600000');
         }
         static::$options['rebalanceTimeout'] = $rebalanceTimeout;
@@ -97,7 +97,7 @@ class ConsumerConfig extends Config
 
     public function setOffsetReset($offsetReset)
     {
-        if (!in_array($offsetReset, array('latest', 'earliest'))) {
+        if (! in_array($offsetReset, array('latest', 'earliest'))) {
             throw new \Kafka\Exception\Config('Set offset reset value is invalid, must set it `latest` or `earliest`');
         }
         static::$options['offsetReset'] = $offsetReset;
@@ -122,7 +122,7 @@ class ConsumerConfig extends Config
 
     public function setTopics($topics)
     {
-        if (!is_array($topics) || empty($topics)) {
+        if (! is_array($topics) || empty($topics)) {
             throw new \Kafka\Exception\Config('Set consumer topics value is invalid, must set it not empty array');
         }
         static::$options['topics'] = $topics;

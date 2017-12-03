@@ -109,14 +109,14 @@ class Assignment
         foreach ($topics as $topicName => $partition) {
             foreach ($partition as $partId => $leaderId) {
                 $memberNum = $count % $memberCount;
-                if (!isset($members[$memberNum])) {
+                if (! isset($members[$memberNum])) {
                     $members[$memberNum] = array();
                 }
-                if (!isset($members[$memberNum][$topicName])) {
+                if (! isset($members[$memberNum][$topicName])) {
                     $members[$memberNum][$topicName] = array();
                 }
                 $members[$memberNum][$topicName]['topic_name'] = $topicName;
-                if (!isset($members[$memberNum][$topicName]['partitions'])) {
+                if (! isset($members[$memberNum][$topicName]['partitions'])) {
                     $members[$memberNum][$topicName]['partitions'] = array();
                 }
                 $members[$memberNum][$topicName]['partitions'][] = $partId;
@@ -229,7 +229,7 @@ class Assignment
 
     public function getConsumerOffset($topic, $part)
     {
-        if (!isset($this->consumerOffsets[$topic][$part])) {
+        if (! isset($this->consumerOffsets[$topic][$part])) {
             return false;
         }
         return $this->consumerOffsets[$topic][$part];

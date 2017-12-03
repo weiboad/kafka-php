@@ -120,7 +120,7 @@ class State
     {
         $config = \Kafka\ConsumerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -133,7 +133,7 @@ class State
                 break;
             case self::REQUEST_PRODUCE:
                 if ($context == null) {
-                    if (!$isAsyn) {
+                    if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
                         \Amp\stop();
                     } else {
@@ -144,7 +144,7 @@ class State
                 unset($this->callStatus[$key]['context'][$context]);
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {
-                    if (!$isAsyn) {
+                    if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
                         \Amp\stop();
                     } else {
@@ -160,7 +160,7 @@ class State
 
     public function failRun($key, $context = null)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -202,7 +202,7 @@ class State
 
     protected function checkRun($key)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 
@@ -236,7 +236,7 @@ class State
 
     protected function processing($key, $context)
     {
-        if (!isset($this->callStatus[$key])) {
+        if (! isset($this->callStatus[$key])) {
             return false;
         }
 

@@ -40,19 +40,19 @@ class Fetch extends Protocol
      */
     public function encode($payloads)
     {
-        if (!isset($payloads['data'])) {
+        if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given fetch kafka data invalid. `data` is undefined.');
         }
 
-        if (!isset($payloads['replica_id'])) {
+        if (! isset($payloads['replica_id'])) {
             $payloads['replica_id'] = -1;
         }
 
-        if (!isset($payloads['max_wait_time'])) {
+        if (! isset($payloads['max_wait_time'])) {
             $payloads['max_wait_time'] = 100; // default timeout 100ms
         }
 
-        if (!isset($payloads['min_bytes'])) {
+        if (! isset($payloads['min_bytes'])) {
             $payloads['min_bytes'] = 64 * 1024; // 64k
         }
 
@@ -175,24 +175,24 @@ class Fetch extends Protocol
     protected function decodeMessageSetArray($data, $func, $messageSetSize = null)
     {
         $offset = 0;
-        if (!is_callable($func, false)) {
+        if (! is_callable($func, false)) {
             throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
         }
 
         $result = array();
         while ($offset < strlen($data)) {
             $value = substr($data, $offset);
-            if (!is_null($messageSetSize)) {
+            if (! is_null($messageSetSize)) {
                 $ret = call_user_func($func, $value, $messageSetSize);
             } else {
                 $ret = call_user_func($func, $value);
             }
 
-            if (!is_array($ret) && $ret === false) {
+            if (! is_array($ret) && $ret === false) {
                 break;
             }
 
-            if (!isset($ret['length']) || !isset($ret['data'])) {
+            if (! isset($ret['length']) || ! isset($ret['data'])) {
                 throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
             }
             if ($ret['length'] == 0) {
@@ -234,7 +234,7 @@ class Fetch extends Protocol
         $messageSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
         $ret = $this->decodeMessage(substr($data, $offset), $messageSize);
-        if (!is_array($ret) && $ret == false) {
+        if (! is_array($ret) && $ret == false) {
             return false;
         }
         $offset += $ret['length'];
@@ -264,7 +264,7 @@ class Fetch extends Protocol
      */
     protected function decodeMessage($data, $messageSize)
     {
-        if (strlen($data) < $messageSize || !$messageSize) {
+        if (strlen($data) < $messageSize || ! $messageSize) {
             return false;
         }
 
@@ -327,15 +327,15 @@ class Fetch extends Protocol
      */
     protected function encodeFetchPartion($values)
     {
-        if (!isset($values['partition_id'])) {
+        if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `partition_id` is undefined.');
         }
 
-        if (!isset($values['offset'])) {
+        if (! isset($values['offset'])) {
             $values['offset'] = 0;
         }
 
-        if (!isset($values['max_bytes'])) {
+        if (! isset($values['max_bytes'])) {
             $values['max_bytes'] = 2 * 1024 * 1024;
         }
 
@@ -358,11 +358,11 @@ class Fetch extends Protocol
      */
     protected function encodeFetchTopic($values)
     {
-        if (!isset($values['topic_name'])) {
+        if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `topic_name` is undefined.');
         }
 
-        if (!isset($values['partitions']) || empty($values['partitions'])) {
+        if (! isset($values['partitions']) || empty($values['partitions'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `partitions` is undefined.');
         }
 

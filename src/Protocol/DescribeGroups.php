@@ -40,7 +40,7 @@ class DescribeGroups extends Protocol
      */
     public function encode($payloads)
     {
-        if (!is_array($payloads)) {
+        if (! is_array($payloads)) {
             $payloads = array($payloads);
         }
 

@@ -69,7 +69,7 @@ class SyncProcess
         $result = array();
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId, true);
-            if (!$connect) {
+            if (! $connect) {
                 return false;
             }
 
@@ -122,7 +122,7 @@ class SyncProcess
                 $data = $socket->read($dataLen);
                 $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
-                if (!isset($result['brokers']) || !isset($result['topics'])) {
+                if (! isset($result['brokers']) || ! isset($result['topics'])) {
                     throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
                 } else {
                     $broker = \Kafka\Broker::getInstance();
@@ -143,19 +143,19 @@ class SyncProcess
         $broker = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
-            if (!isset($value['topic']) || !trim($value['topic'])) {
+            if (! isset($value['topic']) || ! trim($value['topic'])) {
                 continue;
             }
 
-            if (!isset($topicInfos[$value['topic']])) {
+            if (! isset($topicInfos[$value['topic']])) {
                 continue;
             }
 
-            if (!isset($value['value']) || !trim($value['value'])) {
+            if (! isset($value['value']) || ! trim($value['value'])) {
                 continue;
             }
 
-            if (!isset($value['key'])) {
+            if (! isset($value['key'])) {
                 $value['key'] = '';
             }
 
@@ -163,7 +163,7 @@ class SyncProcess
             $partNums = array_keys($topicMeta);
             shuffle($partNums);
             $partId = 0;
-            if (!isset($value['partId']) || !isset($topicMeta[$value['partId']])) {
+            if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
                 $partId = $partNums[0];
             } else {
                 $partId = $value['partId'];

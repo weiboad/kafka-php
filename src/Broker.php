@@ -142,7 +142,7 @@ class Broker
     {
         $nodeIds = array_keys($this->brokers);
         shuffle($nodeIds);
-        if (!isset($nodeIds[0])) {
+        if (! isset($nodeIds[0])) {
             return false;
         }
         return $this->getMetaConnect($nodeIds[0], $modeSync);
@@ -189,7 +189,7 @@ class Broker
 
         try {
             $socket = $this->getSocket($host, $port, $modeSync);
-            if (!$modeSync) {
+            if (! $modeSync) {
                 $socket->setOnReadable($this->process);
             }
             $socket->connect();

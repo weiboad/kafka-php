@@ -132,7 +132,7 @@ class Protocol
      */
     public static function encode($key, $payloads)
     {
-        if (!isset(self::$objects[$key])) {
+        if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);
         }
 
@@ -150,7 +150,7 @@ class Protocol
      */
     public static function decode($key, $data)
     {
-        if (!isset(self::$objects[$key])) {
+        if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);
         }
 
