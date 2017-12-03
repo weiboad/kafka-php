@@ -26,7 +26,7 @@ class Heartbeat {
 		$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 
 		$socket = new \Kafka\Socket('127.0.0.1', '9192');
-		$socket->SetonReadable(function($data) {
+		$socket->setOnReadable(function($data) {
 			$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
 			$result = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
 			$this->group = $result;
@@ -68,7 +68,7 @@ class Heartbeat {
 		$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
 
 		$socket = new \Kafka\Socket('127.0.0.1', '9192');
-		$socket->SetonReadable(function($data) {
+		$socket->setOnReadable(function($data) {
 			$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
 			$result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
 			//echo json_encode($result);
@@ -97,7 +97,7 @@ class Heartbeat {
 		$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $data);
 
 		$socket = new \Kafka\Socket('127.0.0.1', '9192');
-		$socket->SetonReadable(function($data) {
+		$socket->setOnReadable(function($data) {
 			$coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
 			$result = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, substr($data, 4));
 			echo json_encode($result);

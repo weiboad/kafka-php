@@ -178,7 +178,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs(array('127.0.0.1', '9192'))
             ->disableOriginalClone()
             ->disableArgumentCloning()
-            ->setMethods(['connect', 'SetonReadable', 'close'])
+            ->setMethods(['connect', 'setOnReadable', 'close'])
             ->getMock();
 
         $broker->setSocket($socket);

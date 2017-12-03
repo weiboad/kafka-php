@@ -190,7 +190,7 @@ class Broker
         try {
             $socket = $this->getSocket($host, $port, $modeSync);
             if (!$modeSync) {
-                $socket->SetonReadable($this->process);
+                $socket->setOnReadable($this->process);
             }
             $socket->connect();
             $this->{$type}[$key] = $socket;

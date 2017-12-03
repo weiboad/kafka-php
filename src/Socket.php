@@ -295,7 +295,7 @@ class Socket
     }
 
     // }}}
-    // {{{ public function SetOnReadable()
+    // {{{ public function setOnReadable()
 
     public $onReadable;
     /**
@@ -304,7 +304,7 @@ class Socket
      * @access public
      * @return void
      */
-    public function SetOnReadable(\Closure $read)
+    public function setOnReadable(\Closure $read)
     {
         $this->onReadable = $read;
     }
@@ -411,7 +411,7 @@ class Socket
 
     // }}}
     // {{{ protected function isSocketDead()
-    
+
     /**
      * check the stream is close
      *
