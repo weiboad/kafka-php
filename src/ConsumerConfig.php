@@ -33,15 +33,15 @@ class ConsumerConfig extends Config
     // }}}
     // {{{ members
 
-    protected static $defaults = array(
+    protected static $defaults = [
         'groupId' => '',
         'sessionTimeout' => 30000,
         'rebalanceTimeout' => 30000,
-        'topics' => array(),
+        'topics' => [],
         'offsetReset' => 'latest', // earliest
         'maxBytes' => 65536, // 64kb
         'maxWaitTime' => 100,
-    );
+    ];
 
     // }}}
     // {{{ functions
@@ -97,7 +97,7 @@ class ConsumerConfig extends Config
 
     public function setOffsetReset($offsetReset)
     {
-        if (! in_array($offsetReset, array('latest', 'earliest'))) {
+        if (! in_array($offsetReset, ['latest', 'earliest'])) {
             throw new \Kafka\Exception\Config('Set offset reset value is invalid, must set it `latest` or `earliest`');
         }
         static::$options['offsetReset'] = $offsetReset;

@@ -262,7 +262,7 @@ class Socket
 
         $this->writeWatcher = \Amp\onWritable($this->stream, function () {
             $this->write();
-        }, array('enable' => false)); // <-- let's initialize the watcher as "disabled"
+        }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
 
     // }}}

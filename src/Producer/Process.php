@@ -78,14 +78,14 @@ class Process
         if ($this->logger) {
             $this->state->setLogger($this->logger);
         }
-        $this->state->setCallback(array(
+        $this->state->setCallback([
             \Kafka\Producer\State::REQUEST_METADATA => function () {
                 return $this->syncMeta();
             },
             \Kafka\Producer\State::REQUEST_PRODUCE => function () {
                 return $this->produce();
             },
-        ));
+        ]);
         $this->state->init();
 
         $topics = $broker->getTopics();
@@ -169,7 +169,7 @@ class Process
     {
         $this->debug('Start sync metadata request');
         $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
-        $brokerHost = array();
+        $brokerHost = [];
         foreach ($brokerList as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
@@ -183,7 +183,7 @@ class Process
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host);
             if ($socket) {
-                $params = array();
+                $params = [];
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
@@ -231,7 +231,7 @@ class Process
 
     protected function produce()
     {
-        $context = array();
+        $context = [];
         $broker = \Kafka\Broker::getInstance();
         $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
         $timeout = \Kafka\ProducerConfig::getInstance()->getTimeout();
@@ -255,11 +255,11 @@ class Process
             }
 
             $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params = array(
+            $params = [
                 'required_ack' => $requiredAck,
                 'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
                 'data' => $topicList,
-            );
+            ];
             $this->debug("Send message start, params:" . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             if ($requiredAck == 0) { // If it is 0 the server will not send any response
@@ -296,7 +296,7 @@ class Process
         if ($this->error) {
             call_user_func($this->error, $errorCode);
         }
-        $recoverCodes = array(
+        $recoverCodes = [
             \Kafka\Protocol::UNKNOWN_TOPIC_OR_PARTITION,
             \Kafka\Protocol::INVALID_REQUIRED_ACKS,
             \Kafka\Protocol::RECORD_LIST_TOO_LARGE,
@@ -310,7 +310,7 @@ class Process
             \Kafka\Protocol::INVALID_TOPIC,
             \Kafka\Protocol::INCONSISTENT_GROUP_PROTOCOL,
             \Kafka\Protocol::INVALID_GROUP_ID,
-        );
+        ];
         if (in_array($errorCode, $recoverCodes)) {
             $this->state->recover();
             return false;
@@ -323,7 +323,7 @@ class Process
 
     protected function convertMessage($data)
     {
-        $sendData = array();
+        $sendData = [];
         $broker = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
@@ -354,19 +354,19 @@ class Process
             }
 
             $brokerId = $topicMeta[$partId];
-            $topicData = array();
+            $topicData = [];
             if (isset($sendData[$brokerId][$value['topic']])) {
                 $topicData = $sendData[$brokerId][$value['topic']];
             }
 
-            $partition = array();
+            $partition = [];
             if (isset($topicData['partitions'][$partId])) {
                 $partition = $topicData['partitions'][$partId];
             }
 
             $partition['partition_id'] = $partId;
             if (trim($value['key']) != '') {
-                $partition['messages'][] = array('value' => $value['value'], 'key' => $value['key']);
+                $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
             } else {
                 $partition['messages'][] = $value['value'];
             }

@@ -68,8 +68,8 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->list->encode($data);
         $this->assertEquals(\bin2hex($test), '00000013001000000000001000096b61666b612d706870');

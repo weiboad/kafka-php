@@ -32,9 +32,9 @@ abstract class Config
     // }}}
     // {{{ members
 
-    protected static $options = array();
+    protected static $options = [];
 
-    private static $defaults = array(
+    private static $defaults = [
         'clientId' => 'kafka-php',
         'brokerVersion' => '0.10.1.0',
         'metadataBrokerList' => '',
@@ -42,7 +42,7 @@ abstract class Config
         'metadataRequestTimeoutMs' => '60000',
         'metadataRefreshIntervalMs' => '300000',
         'metadataMaxAgeMs' => -1,
-    );
+    ];
 
     // }}}
     // {{{ functions
@@ -109,7 +109,7 @@ abstract class Config
             throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
         }
         $tmp = explode(',', trim($list));
-        $lists = array();
+        $lists = [];
         foreach ($tmp as $key => $val) {
             if (trim($val) != '') {
                 $lists[] = $val;

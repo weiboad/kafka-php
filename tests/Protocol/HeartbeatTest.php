@@ -68,11 +68,11 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
             'generation_id' => 2,
-        );
+        ];
         $test = $this->heart->encode($data);
         $this->assertEquals(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
     }
@@ -90,7 +90,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array();
+        $data = [];
 
         $test = $this->heart->encode($data);
     }
@@ -108,9 +108,9 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGenerationId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-        );
+        ];
 
         $test = $this->heart->encode($data);
     }
@@ -128,10 +128,10 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoMemberId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
-        );
+        ];
 
         $test = $this->heart->encode($data);
     }

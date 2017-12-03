@@ -72,12 +72,12 @@ class GroupCoordinator extends Protocol
         $coordinatorPort = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
 
-        return array(
+        return [
             'errorCode' => $errorCode,
             'coordinatorId' => $coordinatorId,
             'coordinatorHost' => $hosts['data'],
             'coordinatorPort' => $coordinatorPort
-        );
+        ];
     }
 
     // }}}

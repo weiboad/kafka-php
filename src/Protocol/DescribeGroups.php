@@ -41,11 +41,11 @@ class DescribeGroups extends Protocol
     public function encode($payloads)
     {
         if (! is_array($payloads)) {
-            $payloads = array($payloads);
+            $payloads = [$payloads];
         }
 
         $header = $this->requestHeader('kafka-php', self::DESCRIBE_GROUPS_REQUEST, self::DESCRIBE_GROUPS_REQUEST);
-        $data = self::encodeArray($payloads, array($this, 'encodeString'), self::PACK_INT16);
+        $data = self::encodeArray($payloads, [$this, 'encodeString'], self::PACK_INT16);
 
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -64,7 +64,7 @@ class DescribeGroups extends Protocol
     public function decode($data)
     {
         $offset = 0;
-        $groups = $this->decodeArray(substr($data, $offset), array($this, 'describeGroup'));
+        $groups = $this->decodeArray(substr($data, $offset), [$this, 'describeGroup']);
         $offset += $groups['length'];
 
         return $groups['data'];
@@ -93,20 +93,20 @@ class DescribeGroups extends Protocol
         $protocol = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $protocol['length'];
 
-        $members = $this->decodeArray(substr($data, $offset), array($this, 'describeMember'));
+        $members = $this->decodeArray(substr($data, $offset), [$this, 'describeMember']);
         $offset += $members['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'errorCode' => $errorCode,
                 'groupId' => $groupId['data'],
                 'state' => $state['data'],
                 'protocolType' => $protocolType['data'],
                 'protocol' => $protocol['data'],
                 'members' => $members['data']
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -138,7 +138,7 @@ class DescribeGroups extends Protocol
         $memberAssignmentOffset += 2;
         $partitionAssignments = $this->decodeArray(
             substr($memberAssignment, $memberAssignmentOffset),
-            array($this, 'describeResponsePartition')
+            [$this, 'describeResponsePartition']
         );
         $memberAssignmentOffset += $partitionAssignments['length'];
         $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
@@ -147,29 +147,29 @@ class DescribeGroups extends Protocol
         $metaOffset = 0;
         $version = self::unpack(self::BIT_B16, substr($metaData, $metaOffset, 2));
         $metaOffset += 2;
-        $topics = $this->decodeArray(substr($metaData, $metaOffset), array($this, 'decodeString'), self::BIT_B16);
+        $topics = $this->decodeArray(substr($metaData, $metaOffset), [$this, 'decodeString'], self::BIT_B16);
         $metaOffset += $topics['length'];
         $metaUserData = $this->decodeString(substr($metaData, $metaOffset), self::BIT_B32);
 
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'memberId' => $memberId['data'],
                 'clientId' => $clientId['data'],
                 'clientHost' => $clientHost['data'],
-                'metadata' => array(
+                'metadata' => [
                     'version' => $version,
                     'topics'  => $topics['data'],
                     'userData' => $metaUserData['data'],
-                ),
-                'assignment' => array(
+                ],
+                'assignment' => [
                     'version' => $version,
                     'partitions' => $partitionAssignments['data'],
                     'userData' => $userData['data']
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     // }}}
@@ -189,13 +189,13 @@ class DescribeGroups extends Protocol
         $partitions = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicName['data'],
                 'partitions' => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

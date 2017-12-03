@@ -35,13 +35,13 @@ class Broker
 
     private $groupBrokerId = null;
 
-    private $topics = array();
+    private $topics = [];
 
-    private $brokers = array();
+    private $brokers = [];
 
-    private $metaSockets = array();
+    private $metaSockets = [];
 
-    private $dataSockets = array();
+    private $dataSockets = [];
 
     private $process;
 
@@ -77,7 +77,7 @@ class Broker
 
     public function setData($topics, $brokersResult)
     {
-        $brokers = array();
+        $brokers = [];
         foreach ($brokersResult as $value) {
             $key = $value['nodeId'];
             $hostname = $value['host'] . ':' . $value['port'];
@@ -90,13 +90,13 @@ class Broker
             $change = true;
         }
 
-        $newTopics = array();
+        $newTopics = [];
         foreach ($topics as $topic) {
             if ($topic['errorCode'] != \Kafka\Protocol::NO_ERROR) {
                 $this->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
                 continue;
             }
-            $item = array();
+            $item = [];
             foreach ($topic['partitions'] as $part) {
                 $item[$part['partitionId']] = $part['leader'];
             }

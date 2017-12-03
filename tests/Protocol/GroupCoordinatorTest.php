@@ -70,9 +70,9 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-        );
+        ];
 
         $test = $this->group->encode($data);
         $this->assertEquals(\bin2hex($test), '00000019000a00000000000a00096b61666b612d706870000474657374');
@@ -91,8 +91,8 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->group->encode($data);
     }

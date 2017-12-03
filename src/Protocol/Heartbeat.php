@@ -75,9 +75,9 @@ class Heartbeat extends Protocol
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset += 2;
 
-        return array(
+        return [
             'errorCode' => $errorCode,
-        );
+        ];
     }
 
     // }}}

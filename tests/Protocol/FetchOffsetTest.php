@@ -68,15 +68,15 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(0)
-                )
-            ),
-        );
+                    'partitions' => [0]
+                ]
+            ],
+        ];
 
         $test = $this->offset->encode($data);
         $this->assertEquals(\bin2hex($test), '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000');
@@ -95,8 +95,8 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -114,9 +114,9 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array(
-            'data' => array()
-        );
+        $data = [
+            'data' => []
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -134,13 +134,13 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
-                )
-            ),
-        );
+            'data' => [
+                [
+                ]
+            ],
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -158,14 +158,14 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                )
-            ),
-        );
+                ]
+            ],
+        ];
         $test = $this->offset->encode($data);
     }
 

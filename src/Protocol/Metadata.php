@@ -41,7 +41,7 @@ class Metadata extends Protocol
     public function encode($topics)
     {
         if (! is_array($topics)) {
-            $topics = array($topics);
+            $topics = [$topics];
         }
 
         foreach ($topics as $topic) {
@@ -51,7 +51,7 @@ class Metadata extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::METADATA_REQUEST, self::METADATA_REQUEST);
-        $data   = self::encodeArray($topics, array($this, 'encodeString'), self::PACK_INT16);
+        $data   = self::encodeArray($topics, [$this, 'encodeString'], self::PACK_INT16);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -70,15 +70,15 @@ class Metadata extends Protocol
     {
         $offset = 0;
         $version = $this->getApiVersion(self::METADATA_REQUEST);
-        $brokerRet = $this->decodeArray(substr($data, $offset), array($this, 'metaBroker'), $version);
+        $brokerRet = $this->decodeArray(substr($data, $offset), [$this, 'metaBroker'], $version);
         $offset += $brokerRet['length'];
-        $topicMetaRet = $this->decodeArray(substr($data, $offset), array($this, 'metaTopicMetaData'), $version);
+        $topicMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaTopicMetaData'], $version);
         $offset += $topicMetaRet['length'];
 
-        $result = array(
+        $result = [
             'brokers' => $brokerRet['data'],
             'topics'  => $topicMetaRet['data'],
-        );
+        ];
         return $result;
     }
 
@@ -100,14 +100,14 @@ class Metadata extends Protocol
         $offset += $hostNameInfo['length'];
         $port = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'host' => $hostNameInfo['data'],
                 'port' => $port,
                 'nodeId' => $nodeId
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -126,17 +126,17 @@ class Metadata extends Protocol
         $offset += 2;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $topicInfo['length'];
-        $partionsMetaRet = $this->decodeArray(substr($data, $offset), array($this, 'metaPartitionMetaData'), $version);
+        $partionsMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaPartitionMetaData'], $version);
         $offset += $partionsMetaRet['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicInfo['data'],
                 'errorCode' => $topicErrCode,
                 'partitions' => $partionsMetaRet['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -162,16 +162,16 @@ class Metadata extends Protocol
         $isr = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
         $offset += $isr['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'partitionId' => $partId,
                 'errorCode' => $errcode,
                 'replicas' => $replicas['data'],
                 'leader' => $leader,
                 'isr' => $isr['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

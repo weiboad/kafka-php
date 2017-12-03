@@ -165,7 +165,7 @@ abstract class Protocol
      */
     public static function unpack($type, $bytes)
     {
-        $result = array();
+        $result = [];
         self::checkLen($type, $bytes);
         if ($type == self::BIT_B64) {
             $set = unpack($type, $bytes);
@@ -412,7 +412,7 @@ abstract class Protocol
      */
     public static function getApiText($apikey)
     {
-        $apis = array(
+        $apis = [
             self::PRODUCE_REQUEST => 'ProduceRequest',
             self::FETCH_REQUEST   => 'FetchRequest',
             self::OFFSET_REQUEST  => 'OffsetRequest',
@@ -426,7 +426,7 @@ abstract class Protocol
             self::SYNC_GROUP_REQUEST  => 'SyncGroupRequest',
             self::DESCRIBE_GROUPS_REQUEST => 'DescribeGroupsRequest',
             self::LIST_GROUPS_REQUEST => 'ListGroupsRequest',
-        );
+        ];
         return $apis[$apikey];
     }
 
@@ -542,7 +542,7 @@ abstract class Protocol
         }
 
         if ($packLen == 0) {
-            return array('length' => $offset, 'data' => '');
+            return ['length' => $offset, 'data' => ''];
         }
 
         $data = substr($data, $offset, $packLen);
@@ -560,7 +560,7 @@ abstract class Protocol
             default:
                 throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
         }
-        return array('length' => $offset, 'data' => $data);
+        return ['length' => $offset, 'data' => $data];
     }
 
     // }}}
@@ -585,7 +585,7 @@ abstract class Protocol
             throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
         }
 
-        $result = array();
+        $result = [];
         for ($i = 0; $i < $arrayCount; $i++) {
             $value = substr($data, $offset);
             if (! is_null($options)) {
@@ -609,7 +609,7 @@ abstract class Protocol
             $result[] = $ret['data'];
         }
 
-        return array('length' => $offset, 'data' => $result);
+        return ['length' => $offset, 'data' => $result];
     }
 
     // }}}
@@ -632,7 +632,7 @@ abstract class Protocol
             $arrayCount = 0;
         }
 
-        $result = array();
+        $result = [];
 
         for ($i = 0; $i < $arrayCount; $i++) {
             if ($bites == self::BIT_B64) {
@@ -641,7 +641,7 @@ abstract class Protocol
             } elseif ($bites == self::BIT_B32) {
                 $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
                 $offset += 4;
-            } elseif (in_array($bites, array(self::BIT_B16, self::BIT_B16_SIGNED))) {
+            } elseif (in_array($bites, [self::BIT_B16, self::BIT_B16_SIGNED])) {
                 $result[] = self::unpack($bites, substr($data, $offset, 2));
                 $offset += 2;
             } elseif ($bites == self::BIT_B8) {
@@ -650,7 +650,7 @@ abstract class Protocol
             }
         }
 
-        return array('length' => $offset, 'data' => $result);
+        return ['length' => $offset, 'data' => $result];
     }
 
     // }}}

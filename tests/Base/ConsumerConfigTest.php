@@ -377,8 +377,8 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
     public function testSetTopics()
     {
         $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setTopics(array('test'));
-        $this->assertEquals($config->getTopics(), array('test'));
+        $config->setTopics(['test']);
+        $this->assertEquals($config->getTopics(), ['test']);
     }
 
     // }}}

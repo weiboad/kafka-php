@@ -44,11 +44,11 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
     public function testEncode()
     {
         \Kafka\Protocol::init('0.9.0.1');
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
             'generation_id' => 2,
-        );
+        ];
         $test = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $data);
         $this->assertEquals(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
     }
@@ -67,11 +67,11 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
     public function testEncodeNoKey()
     {
         \Kafka\Protocol::init('0.9.0.1');
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
             'generation_id' => 2,
-        );
+        ];
         $test = \Kafka\Protocol::encode(999, $data);
     }
 
@@ -121,7 +121,7 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function testError()
     {
-        $errors = array(
+        $errors = [
             0 => 'No error--it worked!',
             -1 => 'An unexpected server error',
             1 => 'The requested offset is outside the range of offsets maintained by the server for the given topic/partition.',
@@ -160,7 +160,7 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
             34 => 'Request is not valid given the current SASL state.',
             35 => 'The version of API is not supported.',
             999 => 'Unknown error'
-        );
+        ];
 
         foreach ($errors as $key => $value) {
             $result = \Kafka\Protocol::getError($key);

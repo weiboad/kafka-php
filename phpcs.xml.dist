@@ -14,6 +14,7 @@
 
     <rule ref="Generic.Formatting.SpaceAfterCast" />
     <rule ref="Generic.Formatting.SpaceAfterNot" />
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
 
     <rule ref="Squiz.Strings.ConcatenationSpacing">
         <properties>

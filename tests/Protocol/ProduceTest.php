@@ -79,25 +79,25 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'required_ack' => 1,
             'timeout' => '1000',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
-                            'messages' => array(
+                            'messages' => [
                                 'test...',
                                 'test...',
                                 'test...',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
         $this->assertEquals(\bin2hex($test), '00000092000000010000000000096b61666b612d7068700001000003e800000001000474657374000000010000000000000063000000000000000000000015bbbf9beb01000000000000000007746573742e2e2e000000000000000100000015bbbf9beb01000000000000000007746573742e2e2e000000000000000200000015bbbf9beb01000000000000000007746573742e2e2e');
@@ -114,23 +114,23 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeForMessageKey()
     {
-        $data = array(
+        $data = [
             'required_ack' => 1,
             'timeout' => '1000',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
-                            'messages' => array(
-                                array('key' => 'testkey', 'value' => 'test...')
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                            'messages' => [
+                                ['key' => 'testkey', 'value' => 'test...']
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce10->encode($data);
         $this->assertEquals(\bin2hex($test), '00000057000000020000000000096b61666b612d7068700001000003e80000000100047465737400000001000000000000002800000000000000000000001c4ad6c67a000000000007746573746b657900000007746573742e2e2e');
@@ -147,21 +147,21 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeForMessage()
     {
-        $data = array(
+        $data = [
             'required_ack' => 1,
             'timeout' => '1000',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
                             'messages' => 'test...'
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce10->encode($data);
         $this->assertEquals(\bin2hex($test), '00000050000000020000000000096b61666b612d7068700001000003e8000000010004746573740000000100000000000000210000000000000000000000153c1950a800000000000000000007746573742e2e2e');
@@ -178,23 +178,23 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNotTimeoutAndRequired()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
-                            'messages' => array(
+                            'messages' => [
                                 'test...',
                                 'test...',
                                 'test...',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
         $this->assertEquals(\bin2hex($test), '00000092000000010000000000096b61666b612d70687000000000006400000001000474657374000000010000000000000063000000000000000000000015bbbf9beb01000000000000000007746573742e2e2e000000000000000100000015bbbf9beb01000000000000000007746573742e2e2e000000000000000200000015bbbf9beb01000000000000000007746573742e2e2e');
@@ -213,8 +213,8 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->produce->encode($data);
     }
@@ -232,12 +232,12 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
-            'data' => array(
-                array(
-                ),
-            ),
-        );
+        $data = [
+            'data' => [
+                [
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
     }
@@ -255,13 +255,13 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
     }
@@ -279,17 +279,17 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitionId()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
-                        ),
-                    ),
-                ),
-            ),
-        );
+                    'partitions' => [
+                        [
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
     }
@@ -307,20 +307,20 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoMessage()
     {
-        $data = array(
+        $data = [
             'required_ack' => 1,
             'timeout' => '1000',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->produce->encode($data);
     }

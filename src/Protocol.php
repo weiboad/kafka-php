@@ -85,7 +85,7 @@ class Protocol
     // }}}
     // {{{ members
 
-    protected static $objects = array();
+    protected static $objects = [];
 
     // }}}
     // {{{ functions
@@ -93,7 +93,7 @@ class Protocol
     
     public static function init($version, $logger = null)
     {
-        $class = array(
+        $class = [
             \Kafka\Protocol\Protocol::PRODUCE_REQUEST => 'Produce',
             \Kafka\Protocol\Protocol::FETCH_REQUEST => 'Fetch',
             \Kafka\Protocol\Protocol::OFFSET_REQUEST => 'Offset',
@@ -107,7 +107,7 @@ class Protocol
             \Kafka\Protocol\Protocol::SYNC_GROUP_REQUEST => 'SyncGroup',
             \Kafka\Protocol\Protocol::DESCRIBE_GROUPS_REQUEST => 'DescribeGroups',
             \Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => 'ListGroup',
-        );
+        ];
 
         $namespace = '\\Kafka\\Protocol\\';
         foreach ($class as $key => $className) {

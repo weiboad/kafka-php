@@ -44,12 +44,12 @@ class State
     // }}}
     // {{{ members
     
-    private $callStatus = array();
+    private $callStatus = [];
     
-    private $requests  = array(
-        self::REQUEST_METADATA => array(),
-        self::REQUEST_PRODUCE => array(),
-    );
+    private $requests  = [
+        self::REQUEST_METADATA => [],
+        self::REQUEST_PRODUCE => [],
+    ];
 
     // }}}
     // {{{ functions
@@ -57,14 +57,14 @@ class State
 
     public function init()
     {
-        $this->callStatus = array(
-            self::REQUEST_METADATA => array(
+        $this->callStatus = [
+            self::REQUEST_METADATA => [
                 'status'=> self::STATUS_LOOP,
-            ),
-            self::REQUEST_PRODUCE => array(
+            ],
+            self::REQUEST_PRODUCE => [
                 'status'=> self::STATUS_LOOP,
-            ),
-        );
+            ],
+        ];
 
         // instances clear
 
@@ -189,12 +189,12 @@ class State
 
     public function recover()
     {
-        $this->callStatus = array(
+        $this->callStatus = [
             self::REQUEST_METADATA => $this->callStatus[self::REQUEST_METADATA],
-            self::REQUEST_PRODUCE => array(
+            self::REQUEST_PRODUCE => [
                 'status'=> self::STATUS_LOOP,
-            ),
-        );
+            ],
+        ];
     }
 
     // }}}
@@ -251,7 +251,7 @@ class State
                     break;
                 }
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
-                $contextStatus = array();
+                $contextStatus = [];
                 if (is_array($context)) {
                     foreach ($context as $fd) {
                         $contextStatus[$fd] = self::STATUS_PROCESS;

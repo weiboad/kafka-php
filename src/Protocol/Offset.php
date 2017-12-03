@@ -50,7 +50,7 @@ class Offset extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_REQUEST, self::OFFSET_REQUEST);
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
-        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeOffsetTopic'));
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeOffsetTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -70,7 +70,7 @@ class Offset extends Protocol
         $offset = 0;
 
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics = $this->decodeArray(substr($data, $offset), array($this, 'offsetTopic'), $version);
+        $topics = $this->decodeArray(substr($data, $offset), [$this, 'offsetTopic'], $version);
         $offset += $topics['length'];
         
         return $topics['data'];
@@ -131,7 +131,7 @@ class Offset extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeOffsetPartion'));
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartion']);
 
         return $topic . $partitions;
     }
@@ -151,16 +151,16 @@ class Offset extends Protocol
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'offsetPartition'), $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'offsetPartition'], $version);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicInfo['data'],
                 'partitions'  => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -187,15 +187,15 @@ class Offset extends Protocol
         $offsets = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B64);
         $offset += $offsets['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
                 'timestamp' => $timestamp,
                 'offsets' => $offsets['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

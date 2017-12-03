@@ -68,23 +68,23 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'max_wait_time' => 1000,
             'replica_id' => -1,
             'min_bytes' => 1000,
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
                             'offset' => 45,
                             'max_bytes' => 128,
-                        )
-                    ),
-                ),
-            ),
-        );
+                        ]
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->fetch->encode($data);
         $this->assertEquals(\bin2hex($test), '0000003d000100010000000100096b61666b612d706870ffffffff000003e8000003e8000000010004746573740000000100000000000000000000002d00000080');
@@ -103,8 +103,8 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->fetch->encode($data);
     }
@@ -120,21 +120,21 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoOffset()
     {
-        $data = array(
+        $data = [
             'max_wait_time' => 1000,
             'replica_id' => -1,
             'min_bytes' => 1000,
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
-                        )
-                    ),
-                ),
-            ),
-        );
+                        ]
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->fetch->encode($data);
         $this->assertEquals(\bin2hex($test), '0000003d000100010000000100096b61666b612d706870ffffffff000003e8000003e8000000010004746573740000000100000000000000000000000000200000');
@@ -153,12 +153,12 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
-            'data' => array(
-                array(
-                ),
-            ),
-        );
+        $data = [
+            'data' => [
+                [
+                ],
+            ],
+        ];
 
         $test = $this->fetch->encode($data);
     }
@@ -176,13 +176,13 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->fetch->encode($data);
     }
@@ -200,17 +200,17 @@ class FetchTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitionId()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
-                        ),
-                    ),
-                ),
-            ),
-        );
+                    'partitions' => [
+                        [
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->fetch->encode($data);
     }

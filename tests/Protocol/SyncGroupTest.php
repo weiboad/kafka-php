@@ -87,7 +87,7 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array();
+        $data = [];
 
         $test = $this->sync->encode($data);
     }
@@ -105,9 +105,9 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGenerationId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-        );
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -125,10 +125,10 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoMemberId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
-        );
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -146,11 +146,11 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c'
-        );
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -168,16 +168,16 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoVersion()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-            'data' => array(
-                array(
+            'data' => [
+                [
 
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -195,16 +195,16 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoDataMemberId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'version' => 0
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -222,17 +222,17 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoDataAssignments()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'version' => 0 ,
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -250,20 +250,20 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'version' => 0 ,
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-                    'assignments' => array(
-                        array(),
-                    )
-                ),
-            ),
-        );
+                    'assignments' => [
+                        [],
+                    ]
+                ],
+            ],
+        ];
 
         $test = $this->sync->encode($data);
     }
@@ -281,22 +281,22 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'version' => 0 ,
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
-                    'assignments' => array(
-                        array(
+                    'assignments' => [
+                        [
                             'topic_name' => 'test',
-                        ),
-                    )
-                ),
-            ),
-        );
+                        ],
+                    ]
+                ],
+            ],
+        ];
 
         $test = $this->sync->encode($data);
     }

@@ -67,7 +67,7 @@ class JoinGroup extends Protocol
         }
         $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         $data .= self::encodeString($payloads['protocol_type'], self::PACK_INT16);
-        $data .= self::encodeArray($payloads['data'], array($this, 'encodeGroupProtocol'));
+        $data .= self::encodeArray($payloads['data'], [$this, 'encodeGroupProtocol']);
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -96,17 +96,17 @@ class JoinGroup extends Protocol
         $memberId = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $memberId['length'];
 
-        $members = $this->decodeArray(substr($data, $offset), array($this, 'joinGroupMember'));
+        $members = $this->decodeArray(substr($data, $offset), [$this, 'joinGroupMember']);
         $offset += $memberId['length'];
 
-        return array(
+        return [
             'errorCode' => $errorCode,
             'generationId' => $generationId,
             'groupProtocol' => $groupProtocol['data'],
             'leaderId' => $leaderId['data'],
             'memberId' => $memberId['data'],
             'members' => $members['data'],
-        );
+        ];
     }
 
     // }}}
@@ -139,7 +139,7 @@ class JoinGroup extends Protocol
         }
 
         $data = self::pack(self::BIT_B16, 0);
-        $data .= self::encodeArray($values['subscription'], array($this, 'encodeGroupProtocolMetaTopic'));
+        $data .= self::encodeArray($values['subscription'], [$this, 'encodeGroupProtocolMetaTopic']);
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
         return $protocolName . self::encodeString($data, self::PACK_INT32);
@@ -182,21 +182,21 @@ class JoinGroup extends Protocol
         $metaOffset = 0;
         $version = self::unpack(self::BIT_B16, substr($metaData, $metaOffset, 2));
         $metaOffset += 2;
-        $topics = $this->decodeArray(substr($metaData, $metaOffset), array($this, 'decodeString'), self::BIT_B16);
+        $topics = $this->decodeArray(substr($metaData, $metaOffset), [$this, 'decodeString'], self::BIT_B16);
         $metaOffset += $topics['length'];
         $userData = $this->decodeString(substr($metaData, $metaOffset), self::BIT_B32);
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'memberId' => $memberId['data'],
-                'memberMeta' => array(
+                'memberMeta' => [
                     'version' => $version,
                     'topics'  => $topics['data'],
                     'userData' => $userData['data'],
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     // }}}

@@ -68,9 +68,9 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'test'
-        );
+        ];
 
         $test = $this->describe->encode($data);
         $this->assertEquals(\bin2hex($test), '0000001d000f00000000000f00096b61666b612d70687000000001000474657374');
@@ -104,8 +104,8 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeEmptyArray()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->describe->encode($data);
         $this->assertEquals(\bin2hex($test), '00000017000f00000000000f00096b61666b612d70687000000000');

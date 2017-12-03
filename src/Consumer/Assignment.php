@@ -37,21 +37,21 @@ class Assignment
 
     private $generationId = '';
 
-    private $assignments = array();
+    private $assignments = [];
 
-    private $topics = array();
+    private $topics = [];
 
-    private $offsets = array();
+    private $offsets = [];
 
-    private $lastOffsets = array();
+    private $lastOffsets = [];
 
-    private $fetchOffsets = array();
+    private $fetchOffsets = [];
 
-    private $consumerOffsets = array();
+    private $consumerOffsets = [];
 
-    private $commitOffsets = array();
+    private $commitOffsets = [];
 
-    private $precommitOffsets = array();
+    private $precommitOffsets = [];
 
     // }}}
     // {{{ functions
@@ -105,32 +105,32 @@ class Assignment
         $memberCount = count($result);
 
         $count = 0;
-        $members = array();
+        $members = [];
         foreach ($topics as $topicName => $partition) {
             foreach ($partition as $partId => $leaderId) {
                 $memberNum = $count % $memberCount;
                 if (! isset($members[$memberNum])) {
-                    $members[$memberNum] = array();
+                    $members[$memberNum] = [];
                 }
                 if (! isset($members[$memberNum][$topicName])) {
-                    $members[$memberNum][$topicName] = array();
+                    $members[$memberNum][$topicName] = [];
                 }
                 $members[$memberNum][$topicName]['topic_name'] = $topicName;
                 if (! isset($members[$memberNum][$topicName]['partitions'])) {
-                    $members[$memberNum][$topicName]['partitions'] = array();
+                    $members[$memberNum][$topicName]['partitions'] = [];
                 }
                 $members[$memberNum][$topicName]['partitions'][] = $partId;
                 $count++;
             }
         }
 
-        $data = array();
+        $data = [];
         foreach ($result as $key => $member) {
-            $item = array(
+            $item = [
                 'version' => 0,
                 'member_id' => $member['memberId'],
-                'assignments' => isset($members[$key]) ? $members[$key] : array()
-            );
+                'assignments' => isset($members[$key]) ? $members[$key] : []
+            ];
             $data[] = $item;
         }
         $this->assignments = $data;
@@ -288,12 +288,12 @@ class Assignment
 
     public function clearOffset()
     {
-        $this->offsets = array();
-        $this->lastOffsets = array();
-        $this->fetchOffsets = array();
-        $this->consumerOffsets = array();
-        $this->commitOffsets = array();
-        $this->precommitOffsets = array();
+        $this->offsets = [];
+        $this->lastOffsets = [];
+        $this->fetchOffsets = [];
+        $this->consumerOffsets = [];
+        $this->commitOffsets = [];
+        $this->precommitOffsets = [];
     }
 
     // }}}

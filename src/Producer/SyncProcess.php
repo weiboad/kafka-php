@@ -66,7 +66,7 @@ class SyncProcess
         }
 
         $sendData = $this->convertMessage($data);
-        $result = array();
+        $result = [];
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId, true);
             if (! $connect) {
@@ -74,11 +74,11 @@ class SyncProcess
             }
 
             $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params = array(
+            $params = [
                 'required_ack' => $requiredAck,
                 'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
                 'data' => $topicList,
-            );
+            ];
             $this->debug("Send message start, params:" . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             $connect->write($requestData);
@@ -100,7 +100,7 @@ class SyncProcess
     {
         $this->debug('Start sync metadata request');
         $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
-        $brokerHost = array();
+        $brokerHost = [];
         foreach ($brokerList as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
@@ -114,7 +114,7 @@ class SyncProcess
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host, true);
             if ($socket) {
-                $params = array();
+                $params = [];
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
@@ -139,7 +139,7 @@ class SyncProcess
 
     protected function convertMessage($data)
     {
-        $sendData = array();
+        $sendData = [];
         $broker = \Kafka\Broker::getInstance();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
@@ -170,19 +170,19 @@ class SyncProcess
             }
 
             $brokerId = $topicMeta[$partId];
-            $topicData = array();
+            $topicData = [];
             if (isset($sendData[$brokerId][$value['topic']])) {
                 $topicData = $sendData[$brokerId][$value['topic']];
             }
 
-            $partition = array();
+            $partition = [];
             if (isset($topicData['partitions'][$partId])) {
                 $partition = $topicData['partitions'][$partId];
             }
 
             $partition['partition_id'] = $partId;
             if (trim($value['key']) != '') {
-                $partition['messages'][] = array('value' => $value['value'], 'key' => $value['key']);
+                $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
             } else {
                 $partition['messages'][] = $value['value'];
             }

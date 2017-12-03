@@ -68,24 +68,24 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'generation_id' => 2,
             'member_id' => 'kafka-php-c7e3d40a-57d8-4220-9523-cebfce9a0685',
             'retention_time' => 36000,
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition' => 0,
                             'offset' => 45,
                             'metadata' => '',
-                        )
-                    )
-                )
-            ),
-        );
+                        ]
+                    ]
+                ]
+            ],
+        ];
         $test = $this->commit->encode($data);
         $this->assertEquals(\bin2hex($test), '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000');
     }
@@ -101,20 +101,20 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeDefault()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition' => 0,
                             'offset' => 45,
-                        )
-                    )
-                )
-            ),
-        );
+                        ]
+                    ]
+                ]
+            ],
+        ];
         $test = $this->commit->encode($data);
         $this->assertEquals(\bin2hex($test), '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000');
     }
@@ -132,9 +132,9 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test'
-        );
+        ];
 
         $test = $this->commit->encode($data);
     }
@@ -152,9 +152,9 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array(
-            'data' => array()
-        );
+        $data = [
+            'data' => []
+        ];
 
         $test = $this->commit->encode($data);
     }
@@ -172,13 +172,13 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
-                )
-            ),
-        );
+            'data' => [
+                [
+                ]
+            ],
+        ];
 
         $test = $this->commit->encode($data);
     }
@@ -196,14 +196,14 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                )
-            ),
-        );
+                ]
+            ],
+        ];
         $test = $this->commit->encode($data);
     }
 
@@ -220,17 +220,17 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartition()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array()
-                    )
-                )
-            ),
-        );
+                    'partitions' => [
+                        []
+                    ]
+                ]
+            ],
+        ];
         $test = $this->commit->encode($data);
     }
 
@@ -247,19 +247,19 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoOffset()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition' => 0
-                        )
-                    )
-                )
-            ),
-        );
+                        ]
+                    ]
+                ]
+            ],
+        ];
         $test = $this->commit->encode($data);
     }
 

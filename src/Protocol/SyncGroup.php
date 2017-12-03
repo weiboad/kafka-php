@@ -57,7 +57,7 @@ class SyncGroup extends Protocol
         $data  = self::encodeString($payloads['group_id'], self::PACK_INT16);
         $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
         $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
-        $data .= self::encodeArray($payloads['data'], array($this, 'encodeGroupAssignment'));
+        $data .= self::encodeArray($payloads['data'], [$this, 'encodeGroupAssignment']);
 
         $data = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -89,22 +89,22 @@ class SyncGroup extends Protocol
             $memberAssignmentOffset += 2;
             $partitionAssignments = $this->decodeArray(
                 substr($memberAssignment, $memberAssignmentOffset),
-                array($this, 'syncGroupResponsePartition')
+                [$this, 'syncGroupResponsePartition']
             );
             $memberAssignmentOffset += $partitionAssignments['length'];
             $userData = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
         } else {
-            return array(
+            return [
                 'errorCode' => $errorCode,
-            );
+            ];
         }
 
-        return array(
+        return [
             'errorCode' => $errorCode,
             'partitionAssignments' => $partitionAssignments['data'],
             'version' => $version,
             'userData' => $userData['data'],
-        );
+        ];
     }
 
     // }}}
@@ -136,7 +136,7 @@ class SyncGroup extends Protocol
         $memberId = self::encodeString($values['member_id'], self::PACK_INT16);
 
         $data = self::pack(self::BIT_B16, 0);
-        $data .= self::encodeArray($values['assignments'], array($this, 'encodeGroupAssignmentTopic'));
+        $data .= self::encodeArray($values['assignments'], [$this, 'encodeGroupAssignmentTopic']);
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
         return $memberId . self::encodeString($data, self::PACK_INT32);
@@ -163,7 +163,7 @@ class SyncGroup extends Protocol
 
         $topicName = self::encodeString($values['topic_name'], self::PACK_INT16);
 
-        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeGroupAssignmentTopicPartition'));
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeGroupAssignmentTopicPartition']);
 
         return $topicName . $partitions;
     }
@@ -200,13 +200,13 @@ class SyncGroup extends Protocol
         $partitions = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicName['data'],
                 'partitions' => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

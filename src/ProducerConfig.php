@@ -33,13 +33,13 @@ class ProducerConfig extends Config
     // }}}
     // {{{ members
 
-    protected static $defaults = array(
+    protected static $defaults = [
         'requiredAck' => 1,
         'timeout' => 5000,
         'isAsyn' => false,
         'requestTimeout' => 6000,
         'produceInterval' => 100,
-    );
+    ];
 
     // }}}
     // {{{ functions

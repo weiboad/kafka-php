@@ -57,7 +57,7 @@ class Produce extends Protocol
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
         $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeProcudeTopic'), self::COMPRESSION_NONE);
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeProcudeTopic'], self::COMPRESSION_NONE);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -76,13 +76,13 @@ class Produce extends Protocol
     {
         $offset = 0;
         $version = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $ret = $this->decodeArray(substr($data, $offset), array($this, 'produceTopicPair'), $version);
+        $ret = $this->decodeArray(substr($data, $offset), [$this, 'produceTopicPair'], $version);
         $offset += $ret['length'];
         $throttleTime = 0;
         if ($version == self::API_VERSION2) {
             $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         }
-        return array('throttleTime' => $throttleTime, 'data' => $ret['data']);
+        return ['throttleTime' => $throttleTime, 'data' => $ret['data']];
     }
 
     // }}}
@@ -102,7 +102,7 @@ class Produce extends Protocol
     protected function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
     {
         if (! is_array($messages)) {
-            $messages = array($messages);
+            $messages = [$messages];
         }
 
         $data = '';
@@ -208,7 +208,7 @@ class Produce extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeProcudePartion'), $compression);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeProcudePartion'], $compression);
 
         return $topic . $partitions;
     }
@@ -227,13 +227,13 @@ class Produce extends Protocol
         $offset = 0;
         $topicInfo = $this->decodeString($data, self::BIT_B16);
         $offset += $topicInfo['length'];
-        $ret = $this->decodeArray(substr($data, $offset), array($this, 'producePartitionPair'), $version);
+        $ret = $this->decodeArray(substr($data, $offset), [$this, 'producePartitionPair'], $version);
         $offset += $ret['length'];
 
-        return array('length' => $offset, 'data' => array(
+        return ['length' => $offset, 'data' => [
             'topicName' => $topicInfo['data'],
             'partitions'=> $ret['data'],
-        ));
+        ]];
     }
 
     // }}}
@@ -260,15 +260,15 @@ class Produce extends Protocol
             $offset += 8;
         }
 
-        return array(
+        return [
             'length' => $offset,
-            'data'   => array(
+            'data'   => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
                 'offset' => $offset,
                 'timestamp' => $timestamp,
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

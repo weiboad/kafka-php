@@ -60,12 +60,12 @@ class ListGroup extends Protocol
         $offset = 0;
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset += 2;
-        $groups = $this->decodeArray(substr($data, $offset), array($this, 'listGroup'));
+        $groups = $this->decodeArray(substr($data, $offset), [$this, 'listGroup']);
 
-        return array(
+        return [
             'errorCode' => $errorCode,
             'groups' => $groups['data'],
-        );
+        ];
     }
 
     // }}}
@@ -85,13 +85,13 @@ class ListGroup extends Protocol
         $protocolType = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $protocolType['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'groupId' => $groupId['data'],
                 'protocolType' => $protocolType['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

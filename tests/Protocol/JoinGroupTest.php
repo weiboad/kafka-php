@@ -79,18 +79,18 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'member_id' => '',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'protocol_name' => 'group',
                     'version' => 0,
-                    'subscription' => array('test'),
-                ),
-            ),
-        );
+                    'subscription' => ['test'],
+                ],
+            ],
+        ];
         $test9 = $this->group9->encode($data);
         $this->assertEquals(\bin2hex($test9), '00000048000b00000000000b00096b61666b612d7068700004746573740000177000000008636f6e73756d657200000001000567726f75700000001000000000000100047465737400000000');
         $test10 = $this->group10->encode($data);
@@ -110,8 +110,8 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGroupId()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -129,9 +129,9 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoSessionTimeout()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
-        );
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -149,10 +149,10 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoMemberId()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
-        );
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -170,11 +170,11 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'member_id' => '',
-        );
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -190,21 +190,21 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeHasProtocolType()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'rebalance_timeout' => 6000,
             'member_id' => '',
             'protocol_type' => 'testtype',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'protocol_name' => 'group',
                     'version' => 0,
-                    'subscription' => array('test'),
+                    'subscription' => ['test'],
                     'user_data' => '',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $test9 = $this->group9->encode($data);
         $this->assertEquals(\bin2hex($test9), '00000048000b00000000000b00096b61666b612d7068700004746573740000177000000008746573747479706500000001000567726f75700000001000000000000100047465737400000000');
         $test10 = $this->group10->encode($data);
@@ -224,16 +224,16 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoProtocolName()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'rebalance_timeout' => 6000,
             'member_id' => '',
-            'data' => array(
-                array(
-                ),
-            ),
-        );
+            'data' => [
+                [
+                ],
+            ],
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -251,17 +251,17 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoVersion()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'rebalance_timeout' => 6000,
             'member_id' => '',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'protocol_name' => 'group',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->group9->encode($data);
     }
@@ -279,18 +279,18 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoSubscription()
     {
-        $data = array(
+        $data = [
             'group_id' => 'test',
             'session_timeout' => 6000,
             'rebalance_timeout' => 6000,
             'member_id' => '',
-            'data' => array(
-                array(
+            'data' => [
+                [
                     'protocol_name' => 'group',
                     'version' => 0,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->group9->encode($data);
     }

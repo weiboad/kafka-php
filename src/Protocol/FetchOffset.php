@@ -50,7 +50,7 @@ class FetchOffset extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_FETCH_REQUEST, self::OFFSET_FETCH_REQUEST);
         $data = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeOffsetTopic'));
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeOffsetTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -70,7 +70,7 @@ class FetchOffset extends Protocol
     {
         $offset = 0;
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics = $this->decodeArray(substr($data, $offset), array($this, 'offsetTopic'), $version);
+        $topics = $this->decodeArray(substr($data, $offset), [$this, 'offsetTopic'], $version);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -112,7 +112,7 @@ class FetchOffset extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeOffsetPartion'));
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartion']);
 
         return $topic . $partitions;
     }
@@ -132,16 +132,16 @@ class FetchOffset extends Protocol
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'offsetPartition'), $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'offsetPartition'], $version);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicInfo['data'],
                 'partitions'  => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -169,15 +169,15 @@ class FetchOffset extends Protocol
         $offset += 2;
 
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
                 'metadata' => $metadata['data'],
                 'offset' => $roffset,
-            )
-        );
+            ]
+        ];
     }
 
     // }}}

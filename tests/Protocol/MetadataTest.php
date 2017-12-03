@@ -68,9 +68,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
+        $data = [
             'test'
-        );
+        ];
 
         $test = $this->meta->encode($data);
         $this->assertEquals(\bin2hex($test), '0000001d000300000000000300096b61666b612d70687000000001000474657374');
@@ -104,8 +104,8 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeEmptyArray()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->meta->encode($data);
         $this->assertEquals(\bin2hex($test), '00000017000300000000000300096b61666b612d70687000000000');
@@ -124,9 +124,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeValidTopic()
     {
-        $data = array(
+        $data = [
             1
-        );
+        ];
 
         $test = $this->meta->encode($data);
     }

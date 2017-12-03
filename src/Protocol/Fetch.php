@@ -60,7 +60,7 @@ class Fetch extends Protocol
         $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
         $data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
         $data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
-        $data  .= self::encodeArray($payloads['data'], array($this, 'encodeFetchTopic'));
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeFetchTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -85,13 +85,13 @@ class Fetch extends Protocol
             $offset += 4;
         }
 
-        $topics = $this->decodeArray(substr($data, $offset), array($this, 'fetchTopic'), $version);
+        $topics = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic'], $version);
         $offset += $topics['length'];
 
-        return array(
+        return [
             'throttleTime' => $throttleTime,
             'topics' => $topics['data'],
-        );
+        ];
     }
 
     // }}}
@@ -109,16 +109,16 @@ class Fetch extends Protocol
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'fetchPartition'), $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition'], $version);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicInfo['data'],
                 'partitions'  => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -144,20 +144,20 @@ class Fetch extends Protocol
         $offset += 4;
 
         if ($offset < strlen($data) && $messageSetSize) {
-            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), array($this, 'decodeMessageSet'), $messageSetSize);
+            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), [$this, 'decodeMessageSet'], $messageSetSize);
             $offset += $messages['length'];
         }
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
                 'highwaterMarkOffset' => $highwaterMarkOffset,
                 'messageSetSize' => $messageSetSize,
-                'messages' => isset($messages['data']) ? $messages['data'] : array(),
-            )
-        );
+                'messages' => isset($messages['data']) ? $messages['data'] : [],
+            ]
+        ];
     }
 
     // }}}
@@ -179,7 +179,7 @@ class Fetch extends Protocol
             throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
         }
 
-        $result = array();
+        $result = [];
         while ($offset < strlen($data)) {
             $value = substr($data, $offset);
             if (! is_null($messageSetSize)) {
@@ -207,7 +207,7 @@ class Fetch extends Protocol
             $offset = $messageSetSize;
         }
 
-        return array('length' => $offset, 'data' => $result);
+        return ['length' => $offset, 'data' => $result];
     }
 
     // }}}
@@ -239,14 +239,14 @@ class Fetch extends Protocol
         }
         $offset += $ret['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'offset' => $roffset,
                 'size'   => $messageSize,
                 'message' => $ret['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -302,17 +302,17 @@ class Fetch extends Protocol
             $offset += $valueRet['length'];
         }
 
-        return array(
+        return [
             'length' => $offset,
-            'data'   => array(
+            'data'   => [
                 'crc' => $crc,
                 'magic' => $magic,
                 'attr' => $attr,
                 'timestamp' => $timestamp,
                 'key' => $keyRet['data'],
                 'value' => $valueRet['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -367,7 +367,7 @@ class Fetch extends Protocol
         }
 
         $topic = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], array($this, 'encodeFetchPartion'));
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeFetchPartion']);
 
         return $topic . $partitions;
     }

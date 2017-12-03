@@ -293,7 +293,7 @@ class SocketSync
         }
 
         $null = null;
-        $read = array($this->stream);
+        $read = [$this->stream];
         $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
         if ($readable > 0) {
             $remainingBytes = $len;
@@ -353,7 +353,7 @@ class SocketSync
     public function write($buf)
     {
         $null = null;
-        $write = array($this->stream);
+        $write = [$this->stream];
 
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer

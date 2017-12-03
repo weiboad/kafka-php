@@ -79,19 +79,19 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
+                    'partitions' => [
+                        [
                             'partition_id' => 0,
                             'offset' => 100,
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->offset->encode($data);
         $this->assertEquals(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
@@ -112,8 +112,8 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData()
     {
-        $data = array(
-        );
+        $data = [
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -131,12 +131,12 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoTopicName()
     {
-        $data = array(
-            'data' => array(
-                array(
-                ),
-            ),
-        );
+        $data = [
+            'data' => [
+                [
+                ],
+            ],
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -154,13 +154,13 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitions()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $test = $this->offset->encode($data);
     }
@@ -178,17 +178,17 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoPartitionId()
     {
-        $data = array(
-            'data' => array(
-                array(
+        $data = [
+            'data' => [
+                [
                     'topic_name' => 'test',
-                    'partitions' => array(
-                        array(
-                        ),
-                    ),
-                ),
-            ),
-        );
+                    'partitions' => [
+                        [
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $test = $this->offset->encode($data);
     }

@@ -75,7 +75,7 @@ class CommitOffset extends Protocol
             $data .= self::pack(self::BIT_B64, $payloads['retention_time']);
         }
 
-        $data .= self::encodeArray($payloads['data'], array($this, 'encodeTopic'));
+        $data .= self::encodeArray($payloads['data'], [$this, 'encodeTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -94,7 +94,7 @@ class CommitOffset extends Protocol
     {
         $offset = 0;
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics = $this->decodeArray(substr($data, $offset), array($this, 'decodeTopic'), $version);
+        $topics = $this->decodeArray(substr($data, $offset), [$this, 'decodeTopic'], $version);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -120,7 +120,7 @@ class CommitOffset extends Protocol
         }
 
         $data  = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $data .= self::encodeArray($values['partitions'], array($this, 'encodePartition'));
+        $data .= self::encodeArray($values['partitions'], [$this, 'encodePartition']);
 
         return $data;
     }
@@ -178,16 +178,16 @@ class CommitOffset extends Protocol
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), array($this, 'decodePartition'), $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'decodePartition'], $version);
         $offset += $partitions['length'];
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'topicName' => $topicInfo['data'],
                 'partitions'  => $partitions['data'],
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
@@ -212,13 +212,13 @@ class CommitOffset extends Protocol
         $offset += 2;
 
 
-        return array(
+        return [
             'length' => $offset,
-            'data' => array(
+            'data' => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
-            )
-        );
+            ]
+        ];
     }
 
     // }}}
