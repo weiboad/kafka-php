@@ -34,7 +34,7 @@ class Consumer
     // {{{ consts
     // }}}
     // {{{ members
-    
+
     private $isRunning = false;
 
     // }}}
@@ -61,7 +61,7 @@ class Consumer
      * @access public
      * @return void
      */
-    public function start(\Closure $consumer = null, $isBlock = true)
+    public function start(callable $consumer = null, $isBlock = true)
     {
         if ($this->isRunning) {
             $this->error('Has start consumer');

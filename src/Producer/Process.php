@@ -51,7 +51,7 @@ class Process
     // {{{ functions
     // {{{ public function __construct()
 
-    public function __construct(\Closure $producer = null)
+    public function __construct(callable $producer = null)
     {
         $this->producer = $producer;
     }
