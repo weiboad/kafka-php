@@ -32,6 +32,7 @@
         }
     },
     "require-dev": {
+        "infection/infection": "^0.6",
         "kmelia/monolog-stdout-handler": "^1.2",
         "monolog/monolog": "^1.23",
         "phpstan/phpstan": "^0.9",
