@@ -28,7 +28,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class GroupCoordinatorTest extends \PHPUnit_Framework_TestCase
+class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

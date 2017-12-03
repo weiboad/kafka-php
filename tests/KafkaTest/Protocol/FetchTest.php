@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class FetchTest extends \PHPUnit_Framework_TestCase
+class FetchTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

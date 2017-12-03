@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class CommitOffsetTest extends \PHPUnit_Framework_TestCase
+class CommitOffsetTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

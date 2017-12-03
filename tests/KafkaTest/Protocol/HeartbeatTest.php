@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class HeartbeatTest extends \PHPUnit_Framework_TestCase
+class HeartbeatTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

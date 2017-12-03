@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class ProduceTest extends \PHPUnit_Framework_TestCase
+class ProduceTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

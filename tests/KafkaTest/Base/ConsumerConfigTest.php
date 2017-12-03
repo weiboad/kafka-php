@@ -26,7 +26,7 @@ namespace KafkaTest;
 +------------------------------------------------------------------------------
 */
 
-class ConsumerConfigTest extends \PHPUnit_Framework_TestCase
+class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}
