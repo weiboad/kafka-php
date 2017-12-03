@@ -10,8 +10,14 @@
      beStrictAboutChangesToGlobalState="true"
 >
     <testsuites>
-        <testsuite name="KafkaTest client Test Suite">
-            <directory suffix=".php">tests/KafkaTest</directory>
+        <testsuite name="base">
+            <directory suffix=".php">tests/Base</directory>
+        </testsuite>
+        <testsuite name="produce">
+            <directory suffix=".php">tests/Produce</directory>
+        </testsuite>
+        <testsuite name="protocol">
+            <directory suffix=".php">tests/Protocol</directory>
         </testsuite>
     </testsuites>
 
