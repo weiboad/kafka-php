@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class JoinGroupTest extends \PHPUnit_Framework_TestCase
+class JoinGroupTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

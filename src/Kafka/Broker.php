@@ -150,7 +150,7 @@ class Broker
 
     // }}}
     // {{{ public function getDataConnect()
-    
+
     public function getDataConnect($key, $modeSync = false)
     {
         return $this->getConnect($key, 'dataSockets', $modeSync);
@@ -183,20 +183,22 @@ class Broker
             list($host, $port) = explode(':', $key);
         }
 
-        if ($host && $port) {
-            try {
-                $socket = $this->getSocket($host, $port, $modeSync);
-                if (!$modeSync) {
-                    $socket->SetonReadable($this->process);
-                }
-                $socket->connect();
-                $this->{$type}[$key] = $socket;
-                return $socket;
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-                return false;
+        if (! $host || ! $port || (! $modeSync && ! $this->process)) {
+            return false;
+        }
+
+        try {
+            $socket = $this->getSocket($host, $port, $modeSync);
+            if (!$modeSync) {
+                $socket->SetonReadable($this->process);
             }
-        } else {
+            $socket->connect();
+            $this->{$type}[$key] = $socket;
+
+            return $socket;
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+
             return false;
         }
     }

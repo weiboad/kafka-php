@@ -26,7 +26,7 @@ namespace KafkaTest\Produce;
 +------------------------------------------------------------------------------
 */
 
-class ProduceTest extends \PHPUnit_Framework_TestCase
+class ProduceTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}
@@ -43,6 +43,7 @@ class ProduceTest extends \PHPUnit_Framework_TestCase
      */
     public function testSend()
     {
+        $this->markTestIncomplete('Test not implemented yet');
     }
 
     // }}}

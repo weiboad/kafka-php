@@ -26,7 +26,7 @@ namespace KafkaTest\Protocol;
 +------------------------------------------------------------------------------
 */
 
-class LeaveGroupTest extends \PHPUnit_Framework_TestCase
+class LeaveGroupTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

@@ -26,7 +26,7 @@ namespace KafkaTest;
 +------------------------------------------------------------------------------
 */
 
-class ProtocolTest extends \PHPUnit_Framework_TestCase
+class ProtocolTest extends \PHPUnit\Framework\TestCase
 {
     // {{{ consts
     // }}}

@@ -8,10 +8,17 @@
     ],
     "homepage": "http://www.swanlinux.net",
     "license": "BSD-3-Clause",
+    "config": {
+        "platform": {
+            "php": "7.1.12"
+        },
+        "preferred-install": "dist",
+        "sort-packages": true
+  },
     "require": {
-        "php": ">=5.5",
-	"psr/log" : "1.0.2",
-	"amphp/amp": "v1.2.2"
+        "php": "^7.1",
+        "amphp/amp": "^1.2",
+        "psr/log": "^1.0"
     },
     "autoload": {
         "psr-0": {
@@ -25,10 +32,10 @@
         }
     },
     "require-dev": {
-        "satooshi/php-coveralls": "dev-master",
-        "phpunit/phpcov": "*",
-	"monolog/monolog" : "1.22.1",
-	"kmelia/monolog-stdout-handler" : "1.2.1",
-        "phpunit/PHPUnit": "~4.0"
+        "kmelia/monolog-stdout-handler": "^1.2",
+        "monolog/monolog": "^1.23",
+        "phpunit/phpunit": "^5.7",
+        "phpunit/phpcov": "^3.1",
+        "satooshi/php-coveralls": "2.0.x-dev@dev"
     }
 }

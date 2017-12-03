@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+     backupGlobals="false"
+     colors="true"
+     verbose="true"
+     beStrictAboutOutputDuringTests="true"
+     beStrictAboutTestsThatDoNotTestAnything="true"
+     beStrictAboutTodoAnnotatedTests="true"
+     beStrictAboutChangesToGlobalState="true"
+>
+    <testsuites>
+        <testsuite name="KafkaTest client Test Suite">
+            <directory suffix=".php">tests/KafkaTest</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+</phpunit>
