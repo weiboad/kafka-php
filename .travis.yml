@@ -36,15 +36,18 @@ jobs:
       after_script:
         - ./vendor/bin/coveralls  -v
 
-    - stage: Code-style
+    - stage: Code Quality
+      env: CODE_STANDARD=1
       script:
         - ./vendor/bin/phpcs
 
-    - stage: Static analysis
+    - stage: Code Quality
+      env: STATIC_ANALYSIS=1
       script:
         - ./vendor/bin/phpstan analyse -c phpstan.neon -l 1 src tests
 
-    - stage: Mutation testing
+    - stage: Code Quality
+      env: MUTATION_TESTING=1
       script:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
