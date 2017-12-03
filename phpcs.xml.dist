@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset>
+    <arg name="basepath" value="." />
+    <arg name="extensions" value="php" />
+    <arg name="parallel" value="80" />
+    <arg name="colors" />
+    <arg name="cache" value=".php_cs.cache" />
+    <arg value="np" />
+
+    <file>example</file>
+    <file>src</file>
+    <file>tests</file>
+
+    <rule ref="PSR2"/>
+
+    <rule ref="Generic.Formatting.SpaceAfterCast" />
+    <rule ref="Generic.Formatting.SpaceAfterNot" />
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+
+    <rule ref="Squiz.Strings.ConcatenationSpacing">
+        <properties>
+            <property name="spacing" value="1"/>
+            <property name="ignoreNewlines" value="true"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Formatting.MultipleStatementAlignment">
+        <properties>
+            <property name="error" value="true"/>
+        </properties>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/example/*</exclude-pattern>
+    </rule>
+</ruleset>
+
