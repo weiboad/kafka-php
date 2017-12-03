@@ -662,7 +662,7 @@ class Process
     // }}}
     // {{{ protected function commit()
 
-    protected function consume_msg()
+    protected function consumeMessage()
     {
         foreach ($this->messages as $topic => $value) {
             foreach ($value as $part => $messages) {
@@ -682,9 +682,8 @@ class Process
     {
         $config= ConsumerConfig::getInstance();
         if ($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
-            $this->consume_msg();
+            $this->consumeMessage();
         }
-
 
         $broker = \Kafka\Broker::getInstance();
         $groupBrokerId = $broker->getGroupBrokerId();
@@ -745,7 +744,7 @@ class Process
             }
         }
         if (ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET) {
-            $this->consume_msg();
+            $this->consumeMessage();
         }
     }
 
