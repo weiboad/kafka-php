@@ -36,6 +36,10 @@ jobs:
       after_script:
         - ./vendor/bin/coveralls  -v
 
+    - stage: Code-style
+      script:
+        - ./vendor/bin/phpcs
+
 notifications:
   email:
       - swansoft_team@groups.163.com
