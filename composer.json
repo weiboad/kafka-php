@@ -34,6 +34,8 @@
     "require-dev": {
         "kmelia/monolog-stdout-handler": "^1.2",
         "monolog/monolog": "^1.23",
+        "phpstan/phpstan": "^0.9",
+        "phpstan/phpstan-phpunit": "^0.9",
         "phpunit/phpcov": "^4.0",
         "phpunit/phpunit": "^6.5",
         "satooshi/php-coveralls": "2.0.x-dev@dev",

@@ -40,6 +40,10 @@ jobs:
       script:
         - ./vendor/bin/phpcs
 
+    - stage: Static analysis
+      script:
+        - ./vendor/bin/phpstan analyse -c phpstan.neon -l 1 src tests
+
 notifications:
   email:
       - swansoft_team@groups.163.com

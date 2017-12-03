@@ -26,6 +26,10 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
+/**
+ * @method string|false ietGroupId()
+ * @method array|false ietTopics()
+ */
 class ConsumerConfig extends Config
 {
     use SingletonTrait;

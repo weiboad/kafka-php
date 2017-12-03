@@ -43,6 +43,8 @@ class Process
 
     protected $error = null;
 
+    private $state;
+
     // }}}
     // {{{ functions
     // {{{ public function __construct()
@@ -370,7 +372,7 @@ class Process
             } else {
                 $partition['messages'][] = $value['value'];
             }
-            
+
             $topicData['partitions'][$partId]     = $partition;
             $topicData['topic_name']              = $value['topic'];
             $sendData[$brokerId][$value['topic']] = $topicData;
