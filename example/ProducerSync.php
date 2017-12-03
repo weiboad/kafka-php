@@ -3,6 +3,7 @@ require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
 use Monolog\Logger;
 use Monolog\Handler\StdoutHandler;
+
 // Create the logger
 $logger = new Logger('my_logger');
 // Now add some handlers
@@ -18,13 +19,13 @@ $config->setProduceInterval(500);
 $producer = new \Kafka\Producer();
 $producer->setLogger($logger);
 
-for($i = 0; $i < 100; $i++) {
-	$result = $producer->send(array(
-		array(
-			'topic' => 'test',
-			'value' => 'test1....message.',
-			'key' => '',
-		),
-	));
-	var_dump($result);
+for ($i = 0; $i < 100; $i++) {
+    $result = $producer->send([
+        [
+            'topic' => 'test',
+            'value' => 'test1....message.',
+            'key' => '',
+        ],
+    ]);
+    var_dump($result);
 }

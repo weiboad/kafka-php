@@ -7,6 +7,7 @@
     <arg name="cache" value=".php_cs.cache" />
     <arg value="np" />
 
+    <file>example</file>
     <file>src</file>
     <file>tests</file>
 
@@ -27,6 +28,10 @@
         <properties>
             <property name="error" value="true"/>
         </properties>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/example/*</exclude-pattern>
     </rule>
 </ruleset>
 
