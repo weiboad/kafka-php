@@ -10,6 +10,13 @@ Kafka-php 配置参数
 | metadataRequestTimeoutMs | C/P | 10 .. 900000 | 60000 | 获取 meta 信息超时时间 |
 | metadataRefreshIntervalMs | C/P | 10 .. 3600000  | 300000 | 获取同步 meta 信息的时间间隔 |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | meta 信息有效期
+| sslEnable | C/P | true/false | false | 是否开启 Ssl 连接 |
+| sslLocalCert | C/P | File path |  | 本地证书路径 |
+| sslLocalPk | C/P | File path |  | 如果使用独立的文件来存储证书（local_cert）和私钥， 那么使用此选项来指明私钥文件的路径。|
+| sslVerifyPeer | C/P | true/false | false | 是否需要验证 SSL 证书。|
+| sslPassphrase | C/P |  |  | local_cert 文件的密码。|
+| sslCafile | C/P |  |  | 当设置 sslVerifyPeer 为 true 时， 用来验证远端证书所用到的 CA 证书。 本选项值为 CA 证书在本地文件系统的全路径及文件名。|
+| sslPeerName | C/P |  |  | 要连接的服务器名称。如果未设置，那么服务器名称将根据打开 SSL 流的主机名称猜测得出。|
 | groupId | C |  | |  消费模块的分组 ID |
 | sessionTimeout | C | 1 .. 3600000 | 30000 | 分组中消费者的有效时间 |
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | 分组 rebalance 等待 join 时间 |

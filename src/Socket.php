@@ -28,85 +28,9 @@ use Amp\Loop;
 +------------------------------------------------------------------------------
 */
 
-class Socket
+class Socket extends CommonSocket
 {
-    // {{{ consts
-
-    const READ_MAX_LEN = 5242880; // read socket max length 5MB
-
-    /**
-     * max write socket buffer
-     * fixed:send of 8192 bytes failed with errno=11 Resource temporarily
-     * fixed:'fwrite(): send of ???? bytes failed with errno=35 Resource temporarily unavailable'
-     * unavailable error info
-     */
-    const MAX_WRITE_BUFFER = 2048;
-
-    // }}}
     // {{{ members
-
-    /**
-     * Send timeout in seconds.
-     *
-     * @var float
-     * @access private
-     */
-    private $sendTimeoutSec = 0;
-
-    /**
-     * Send timeout in microseconds.
-     *
-     * @var float
-     * @access private
-     */
-    private $sendTimeoutUsec = 100000;
-
-    /**
-     * Recv timeout in seconds
-     *
-     * @var float
-     * @access private
-     */
-    private $recvTimeoutSec = 0;
-
-    /**
-     * Recv timeout in microseconds
-     *
-     * @var float
-     * @access private
-     */
-    private $recvTimeoutUsec = 750000;
-
-    /**
-     * Stream resource
-     *
-     * @var mixed
-     * @access private
-     */
-    private $stream = null;
-
-    /**
-     * Socket host
-     *
-     * @var mixed
-     * @access private
-     */
-    private $host = null;
-
-    /**
-     * Socket port
-     *
-     * @var mixed
-     * @access private
-     */
-    private $port = -1;
-
-    /**
-     * Max Write Attempts
-     * @var int
-     * @access private
-     */
-    private $maxWriteAttempts = 3;
 
     /**
      * Reader watcher
@@ -145,70 +69,6 @@ class Socket
 
     // }}}
     // {{{ functions
-    // {{{ public function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $host
-     * @param $port
-     * @param int $recvTimeoutSec
-     * @param int $recvTimeoutUsec
-     * @param int $sendTimeoutSec
-     * @param int $sendTimeoutUsec
-     */
-    public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
-    {
-        $this->host = $host;
-        $this->port = $port;
-        $this->setRecvTimeoutSec($recvTimeoutSec);
-        $this->setRecvTimeoutUsec($recvTimeoutUsec);
-        $this->setSendTimeoutSec($sendTimeoutSec);
-        $this->setSendTimeoutUsec($sendTimeoutUsec);
-    }
-
-    /**
-     * @param float $sendTimeoutSec
-     */
-    public function setSendTimeoutSec($sendTimeoutSec)
-    {
-        $this->sendTimeoutSec = $sendTimeoutSec;
-    }
-
-    /**
-     * @param float $sendTimeoutUsec
-     */
-    public function setSendTimeoutUsec($sendTimeoutUsec)
-    {
-        $this->sendTimeoutUsec = $sendTimeoutUsec;
-    }
-
-    /**
-     * @param float $recvTimeoutSec
-     */
-    public function setRecvTimeoutSec($recvTimeoutSec)
-    {
-        $this->recvTimeoutSec = $recvTimeoutSec;
-    }
-
-    /**
-     * @param float $recvTimeoutUsec
-     */
-    public function setRecvTimeoutUsec($recvTimeoutUsec)
-    {
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-    }
-
-    /**
-     * @param int $number
-     */
-    public function setMaxWriteAttempts($number)
-    {
-        $this->maxWriteAttempts = $number;
-    }
-
-    // }}}
     // {{{ public function connect()
 
     /**
@@ -223,35 +83,15 @@ class Socket
             return;
         }
 
-        if (empty($this->host)) {
-            throw new \Kafka\Exception('Cannot open null host.');
-        }
-        if ($this->port <= 0) {
-            throw new \Kafka\Exception('Cannot open without port.');
-        }
+        $this->createStream();
 
-        $this->stream = @fsockopen(
-            $this->host,
-            $this->port,
-            $errno,
-            $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
-        );
+        stream_set_blocking($this->getSocket(), 0);
+        stream_set_read_buffer($this->getSocket(), 0);
 
-        if ($this->stream == false) {
-            $error = 'Could not connect to '
-                    . $this->host . ':' . $this->port
-                    . ' (' . $errstr . ' [' . $errno . '])';
-            throw new \Kafka\Exception($error);
-        }
-
-        stream_set_blocking($this->stream, 0);
-        stream_set_read_buffer($this->stream, 0);
-
-        $this->readWatcher = Loop::onReadable($this->stream, function () {
+        $this->readWatcher = Loop::onReadable($this->getSocket(), function () {
             do {
                 if (! $this->isSocketDead()) {
-                    $newData = @fread($this->stream, self::READ_MAX_LEN);
+                    $newData = @fread($this->getSocket(), self::READ_MAX_LEN);
                 } else {
                     $this->reconnect();
                     return;
@@ -262,7 +102,7 @@ class Socket
             } while ($newData);
         });
 
-        $this->writeWatcher = Loop::onWritable($this->stream, function () {
+        $this->writeWatcher = Loop::onWritable($this->getSocket(), function () {
             $this->write();
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
@@ -280,20 +120,6 @@ class Socket
     {
         $this->close();
         $this->connect();
-    }
-
-    // }}}
-    // {{{ public function getSocket()
-
-    /**
-     * get the socket
-     *
-     * @access public
-     * @return void
-     */
-    public function getSocket()
-    {
-        return $this->stream;
     }
 
     // }}}
@@ -324,8 +150,8 @@ class Socket
     {
         Loop::cancel($this->readWatcher);
         Loop::cancel($this->writeWatcher);
-        if (is_resource($this->stream)) {
-            fclose($this->stream);
+        if (is_resource($this->getSocket())) {
+            fclose($this->getSocket());
         }
         $this->readBuffer     = '';
         $this->writeBuffer    = '';
@@ -340,7 +166,7 @@ class Socket
      */
     public function isResource()
     {
-        return is_resource($this->stream);
+        return is_resource($this->getSocket());
     }
 
     // }}}
@@ -378,7 +204,7 @@ class Socket
 
             $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
-            call_user_func($this->onReadable, $data, (int) $this->stream);
+            call_user_func($this->onReadable, $data, (int) $this->getSocket());
         } while (strlen($this->readBuffer));
     }
 
@@ -399,7 +225,7 @@ class Socket
             $this->writeBuffer .= $data;
         }
         $bytesToWrite = strlen($this->writeBuffer);
-        $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
+        $bytesWritten = @fwrite($this->getSocket(), $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
             Loop::disable($this->writeWatcher);
@@ -421,7 +247,7 @@ class Socket
      */
     protected function isSocketDead()
     {
-        return ! is_resource($this->stream) || @feof($this->stream);
+        return ! is_resource($this->getSocket()) || @feof($this->getSocket());
     }
 
     // }}}

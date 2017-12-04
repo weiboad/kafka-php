@@ -26,152 +26,9 @@ namespace Kafka;
 +------------------------------------------------------------------------------
 */
 
-class SocketSync
+class SocketSync extends CommonSocket
 {
-    // {{{ consts
-
-    const READ_MAX_LEN = 5242880; // read socket max length 5MB
-
-    /**
-     * max write socket buffer
-     * fixed:send of 8192 bytes failed with errno=11 Resource temporarily
-     * fixed:'fwrite(): send of ???? bytes failed with errno=35 Resource temporarily unavailable'
-     * unavailable error info
-     */
-    const MAX_WRITE_BUFFER = 2048;
-
-    // }}}
-    // {{{ members
-
-    /**
-     * Send timeout in seconds.
-     *
-     * @var float
-     * @access private
-     */
-    private $sendTimeoutSec = 0;
-
-    /**
-     * Send timeout in microseconds.
-     *
-     * @var float
-     * @access private
-     */
-    private $sendTimeoutUsec = 100000;
-
-    /**
-     * Recv timeout in seconds
-     *
-     * @var float
-     * @access private
-     */
-    private $recvTimeoutSec = 0;
-
-    /**
-     * Recv timeout in microseconds
-     *
-     * @var float
-     * @access private
-     */
-    private $recvTimeoutUsec = 750000;
-
-    /**
-     * Stream resource
-     *
-     * @var mixed
-     * @access private
-     */
-    private $stream = null;
-
-    /**
-     * Socket host
-     *
-     * @var mixed
-     * @access private
-     */
-    private $host = null;
-
-    /**
-     * Socket port
-     *
-     * @var mixed
-     * @access private
-     */
-    private $port = -1;
-
-    /**
-     * Max Write Attempts
-     * @var int
-     * @access private
-     */
-    private $maxWriteAttempts = 3;
-
-    // }}}
     // {{{ functions
-    // {{{ public function __construct()
-
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $host
-     * @param $port
-     * @param int $recvTimeoutSec
-     * @param int $recvTimeoutUsec
-     * @param int $sendTimeoutSec
-     * @param int $sendTimeoutUsec
-     */
-    public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
-    {
-        $this->host = $host;
-        $this->port = $port;
-        $this->setRecvTimeoutSec($recvTimeoutSec);
-        $this->setRecvTimeoutUsec($recvTimeoutUsec);
-        $this->setSendTimeoutSec($sendTimeoutSec);
-        $this->setSendTimeoutUsec($sendTimeoutUsec);
-    }
-
-    /**
-     * @param float $sendTimeoutSec
-     */
-    public function setSendTimeoutSec($sendTimeoutSec)
-    {
-        $this->sendTimeoutSec = $sendTimeoutSec;
-    }
-
-    /**
-     * @param float $sendTimeoutUsec
-     */
-    public function setSendTimeoutUsec($sendTimeoutUsec)
-    {
-        $this->sendTimeoutUsec = $sendTimeoutUsec;
-    }
-
-    /**
-     * @param float $recvTimeoutSec
-     */
-    public function setRecvTimeoutSec($recvTimeoutSec)
-    {
-        $this->recvTimeoutSec = $recvTimeoutSec;
-    }
-
-    /**
-     * @param float $recvTimeoutUsec
-     */
-    public function setRecvTimeoutUsec($recvTimeoutUsec)
-    {
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-    }
-
-    /**
-     * @param int $number
-     */
-    public function setMaxWriteAttempts($number)
-    {
-        $this->maxWriteAttempts = $number;
-    }
-
-    // }}}
     // {{{ public static function createFromStream()
 
     /**
@@ -190,21 +47,6 @@ class SocketSync
     }
 
     // }}}
-    // {{{ public function setStream()
-
-    /**
-     * Optional method to set the internal stream handle
-     *
-     * @param mixed $stream
-     * @access public
-     * @return void
-     */
-    public function setStream($stream)
-    {
-        $this->stream = $stream;
-    }
-
-    // }}}
     // {{{ public function connect()
 
     /**
@@ -215,33 +57,13 @@ class SocketSync
      */
     public function connect()
     {
-        if (is_resource($this->stream)) {
+        if (is_resource($this->getSocket())) {
             return;
         }
 
-        if (empty($this->host)) {
-            throw new \Kafka\Exception('Cannot open null host.');
-        }
-        if ($this->port <= 0) {
-            throw new \Kafka\Exception('Cannot open without port.');
-        }
+        $this->createStream();
 
-        $this->stream = @fsockopen(
-            $this->host,
-            $this->port,
-            $errno,
-            $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000)
-        );
-
-        if ($this->stream == false) {
-            $error = 'Could not connect to '
-                    . $this->host . ':' . $this->port
-                    . ' (' . $errstr . ' [' . $errno . '])';
-            throw new \Kafka\Exception($error);
-        }
-
-        stream_set_blocking($this->stream, 0);
+        stream_set_blocking($this->getSocket(), 0);
     }
 
     // }}}
@@ -255,8 +77,8 @@ class SocketSync
      */
     public function close()
     {
-        if (is_resource($this->stream)) {
-            fclose($this->stream);
+        if (is_resource($this->getSocket())) {
+            fclose($this->getSocket());
         }
     }
 
@@ -268,7 +90,7 @@ class SocketSync
      */
     public function isResource()
     {
-        return is_resource($this->stream);
+        return is_resource($this->getSocket());
     }
 
     // }}}
@@ -293,20 +115,20 @@ class SocketSync
         }
 
         $null     = null;
-        $read     = [$this->stream];
+        $read     = [$this->getSocket()];
         $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
         if ($readable > 0) {
             $remainingBytes = $len;
             $data           = $chunk = '';
             while ($remainingBytes > 0) {
-                $chunk = fread($this->stream, $remainingBytes);
+                $chunk = fread($this->getSocket(), $remainingBytes);
                 if ($chunk === false) {
                     $this->close();
                     throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (no data)');
                 }
                 if (strlen($chunk) === 0) {
                     // Zero bytes because of EOF?
-                    if (feof($this->stream)) {
+                    if (feof($this->getSocket())) {
                         $this->close();
                         throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
                     }
@@ -329,7 +151,7 @@ class SocketSync
             return $data;
         }
         if (false !== $readable) {
-            $res = stream_get_meta_data($this->stream);
+            $res = stream_get_meta_data($this->getSocket());
             if (! empty($res['timed_out'])) {
                 $this->close();
                 throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
@@ -353,7 +175,7 @@ class SocketSync
     public function write($buf)
     {
         $null  = null;
-        $write = [$this->stream];
+        $write = [$this->getSocket()];
 
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
@@ -366,10 +188,10 @@ class SocketSync
             if ($writable > 0) {
                 if ($buflen - $written > self::MAX_WRITE_BUFFER) {
                     // write max buffer size
-                    $wrote = fwrite($this->stream, substr($buf, $written, self::MAX_WRITE_BUFFER));
+                    $wrote = fwrite($this->getSocket(), substr($buf, $written, self::MAX_WRITE_BUFFER));
                 } else {
                     // write remaining buffer bytes to stream
-                    $wrote = fwrite($this->stream, substr($buf, $written));
+                    $wrote = fwrite($this->getSocket(), substr($buf, $written));
                 }
                 if ($wrote === -1 || $wrote === false) {
                     throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
@@ -387,7 +209,7 @@ class SocketSync
                 continue;
             }
             if (false !== $writable) {
-                $res = stream_get_meta_data($this->stream);
+                $res = stream_get_meta_data($this->getSocket());
                 if (! empty($res['timed_out'])) {
                     throw new \Kafka\Exception('Timed out writing ' . strlen($buf) . ' bytes to stream after writing ' . $written . ' bytes');
                 }
@@ -407,8 +229,8 @@ class SocketSync
      */
     public function rewind()
     {
-        if (is_resource($this->stream)) {
-            rewind($this->stream);
+        if (is_resource($this->getSocket())) {
+            rewind($this->getSocket());
         }
     }
 

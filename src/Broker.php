@@ -47,6 +47,8 @@ class Broker
 
     private $socket;
 
+    private $config;
+
     // }}}
     // {{{ functions
     // {{{ public function setProcess()
@@ -54,6 +56,14 @@ class Broker
     public function setProcess(\Closure $process)
     {
         $this->process = $process;
+    }
+
+    // }}}
+    // {{{ public function setConfig()
+
+    public function setConfig($config)
+    {
+        $this->config = $config;
     }
 
     // }}}
@@ -227,9 +237,9 @@ class Broker
         }
 
         if ($modeSync) {
-            $socket = new \Kafka\SocketSync($host, $port);
+            $socket = new \Kafka\SocketSync($host, $port, $this->config);
         } else {
-            $socket = new \Kafka\Socket($host, $port);
+            $socket = new \Kafka\Socket($host, $port, $this->config);
         }
         return $socket;
     }

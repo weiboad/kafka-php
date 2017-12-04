@@ -11,11 +11,19 @@ $logger->pushHandler(new StdoutHandler());
 
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
-$config->setMetadataBrokerList('127.0.0.1:9092');
+$config->setMetadataBrokerList('127.0.0.1:9093');
 $config->setBrokerVersion('0.10.2.1');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
+
+// if use ssl connect
+//$config->setSslLocalCert('/home/vagrant/code/kafka-php/ca-cert');
+//$config->setSslLocalPk('/home/vagrant/code/kafka-php/ca-key');
+//$config->setSslEnable(true);
+//$config->setSslPassphrase('123456');
+//$config->setSslPeerName('nmred');
+
 $producer = new \Kafka\Producer();
 $producer->setLogger($logger);
 

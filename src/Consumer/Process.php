@@ -69,6 +69,7 @@ class Process
 
         // init process request
         $broker = \Kafka\Broker::getInstance();
+        $broker->setConfig($config);
         $broker->setProcess(function ($data, $fd) {
             $this->processRequest($data, $fd);
         });

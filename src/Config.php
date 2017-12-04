@@ -42,6 +42,13 @@ abstract class Config
         'metadataRequestTimeoutMs' => '60000',
         'metadataRefreshIntervalMs' => '300000',
         'metadataMaxAgeMs' => -1,
+        'sslEnable' => false,
+        'sslLocalCert' => '',
+        'sslLocalPk' => '',
+        'sslVerifyPeer' => false,
+        'sslPassphrase' => '',
+        'sslCafile' => '',
+        'sslPeerName' => ''
     ];
 
     // }}}
@@ -186,6 +193,39 @@ abstract class Config
             throw new \Kafka\Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
+    }
+
+    // }}}
+    // {{{ public function setSslLocalCert()
+
+    public function setSslLocalCert($localCert)
+    {
+        if (! is_string($localCert) || ! file_exists($localCert)) {
+            throw new \Kafka\Exception\Config('Set ssl local cert file is invalid');
+        }
+        static::$options['sslLocalCert'] = $localCert;
+    }
+
+    // }}}
+    // {{{ public function setSslLocalPk()
+
+    public function setSslLocalPk($localPk)
+    {
+        if (! is_string($localPk) || ! file_exists($localPk)) {
+            throw new \Kafka\Exception\Config('Set ssl local private key file is invalid');
+        }
+        static::$options['sslLocalPk'] = $localPk;
+    }
+
+    // }}}
+    // {{{ public function setSslCafile()
+
+    public function setSslCafile($cafile)
+    {
+        if (! is_string($cafile) || ! file_exists($cafile)) {
+            throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
+        }
+        static::$options['sslCafile'] = $cafile;
     }
 
     // }}}

@@ -43,6 +43,10 @@ class SyncProcess
         // init protocol
         $config = \Kafka\ProducerConfig::getInstance();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
+        // init broker
+        $broker = \Kafka\Broker::getInstance();
+        $broker->setConfig($config);
+
         $this->syncMeta();
     }
 

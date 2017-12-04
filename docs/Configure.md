@@ -10,6 +10,13 @@ Kafka-php Configuration
 | metadataRequestTimeoutMs | C/P | 10 .. 900000 | 60000 | Non-topic request timeout in milliseconds. This is for metadata requests, etc. |
 | metadataRefreshIntervalMs | C/P | 10 .. 3600000  | 300000 | Topic metadata refresh interval in milliseconds. The metadata is automatically refreshed on error and connect. Use -1 to disable the intervalled refresh.  |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | Metadata cache max age. Defaults to metadata.refresh.interval.ms * 3 |
+| sslEnable | C/P | true/false | false | Whether enable ssl connect or not |
+| sslLocalCert | C/P | File path |  | Path to local certificate file on filesystem. |
+| sslLocalPk | C/P | File path |  | Path to local private key file on filesystem in case of separate files for certificate (local_cert) and private key. |
+| sslVerifyPeer | C/P | true/false | false | Require verification of SSL certificate used. |
+| sslPassphrase | C/P |  |  | Passphrase with which your local_cert file was encoded. |
+| sslCafile | C/P |  |  | Location of Certificate Authority file on local filesystem which should be used with the verify_peer context option to authenticate the identity of the remote peer.|
+| sslPeerName | C/P |  |  | Peer name to be used. If this value is not set, then the name is guessed based on the hostname used when opening the stream. |
 | groupId | C |  | |  Client group id string. All clients sharing the same group.id belong to the same group. |
 | sessionTimeout | C | 1 .. 3600000 | 30000 | Client group session and failure detection timeout.  |
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | rebalance join wait timeout |

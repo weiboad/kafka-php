@@ -16,6 +16,14 @@ $config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
+
+// if use ssl connect
+//$config->setSslLocalCert('/home/vagrant/code/kafka-php/ca-cert');
+//$config->setSslLocalPk('/home/vagrant/code/kafka-php/ca-key');
+//$config->setSslEnable(true);
+//$config->setSslPassphrase('123456');
+//$config->setSslPeerName('nmred');
+
 $producer = new \Kafka\Producer(function () {
     return [
         [
