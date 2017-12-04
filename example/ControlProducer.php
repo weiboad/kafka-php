@@ -11,8 +11,8 @@ $logger->pushHandler(new StdoutHandler());
 
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(1000);
-$config->setMetadataBrokerList('10.13.4.162:9192');
-$config->setBrokerVersion('0.9.0.1');
+$config->setMetadataBrokerList('127.0.0.1:9092');
+$config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
 $config->setIsAsyn(true);
 $config->setProduceInterval(500);
@@ -33,7 +33,7 @@ class Message
 
 // control message send interval time
 $message = new Message;
-\Amp\repeat(function () use ($message) {
+\Amp\Loop::repeat(3000, function () use ($message) {
     $message->setMessage([
         [
             'topic' => 'test',
@@ -41,7 +41,7 @@ $message = new Message;
             'key' => '',
         ],
     ]);
-}, 3000);
+});
 
 $producer = new \Kafka\Producer(function () use ($message) {
     $tmp = $message->getMessage();

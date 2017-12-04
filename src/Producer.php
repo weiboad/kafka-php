@@ -75,7 +75,7 @@ class Producer
         if (is_bool($data)) {
             $this->process->start();
             if ($data) {
-                \Amp\run();
+                \Amp\Loop::run();
             }
         } else {
             return $this->process->send($data);

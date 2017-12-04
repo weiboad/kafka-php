@@ -14,6 +14,8 @@
 
 namespace Kafka\Producer;
 
+use Amp\Loop;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -93,13 +95,13 @@ class State
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            \Amp\repeat(function ($watcherId) use ($request, $option) {
+            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
                 }
                 $this->requests[$request]['watcher'] = $watcherId;
-            }, $msInterval = $interval);
+            });
         }
 
         // start sync metadata
@@ -108,9 +110,9 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        \Amp\repeat(function ($watcherId) {
+        Loop::repeat(1000, function ($watcherId) {
             $this->report();
-        }, $msInterval = 1000);
+        });
     }
 
     // }}}
@@ -135,7 +137,7 @@ class State
                 if ($context == null) {
                     if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        \Amp\stop();
+                        Loop::stop();
                     } else {
                         $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     }
@@ -146,7 +148,7 @@ class State
                 if (empty($contextStatus)) {
                     if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        \Amp\stop();
+                        Loop::stop();
                     } else {
                         $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     }

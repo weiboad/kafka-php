@@ -74,7 +74,7 @@ class Consumer
         $process->start();
         $this->isRunning = true;
         if ($isBlock) {
-            \Amp\run();
+            \Amp\Loop::run();
         }
     }
 

@@ -14,6 +14,8 @@
 
 namespace Kafka;
 
+use Amp\Loop;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka broker socket
@@ -246,7 +248,7 @@ class Socket
         stream_set_blocking($this->stream, 0);
         stream_set_read_buffer($this->stream, 0);
 
-        $this->readWatcher = \Amp\onReadable($this->stream, function () {
+        $this->readWatcher = Loop::onReadable($this->stream, function () {
             do {
                 if (! $this->isSocketDead()) {
                     $newData = @fread($this->stream, self::READ_MAX_LEN);
@@ -260,7 +262,7 @@ class Socket
             } while ($newData);
         });
 
-        $this->writeWatcher = \Amp\onWritable($this->stream, function () {
+        $this->writeWatcher = Loop::onWritable($this->stream, function () {
             $this->write();
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
@@ -320,8 +322,8 @@ class Socket
      */
     public function close()
     {
-        \Amp\cancel($this->readWatcher);
-        \Amp\cancel($this->writeWatcher);
+        Loop::cancel($this->readWatcher);
+        Loop::cancel($this->writeWatcher);
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
@@ -400,9 +402,9 @@ class Socket
         $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
-            \Amp\disable($this->writeWatcher);
+            Loop::disable($this->writeWatcher);
         } elseif ($bytesWritten >= 0) {
-            \Amp\enable($this->writeWatcher);
+            Loop::enable($this->writeWatcher);
         } elseif ($this->isSocketDead()) {
             $this->reconnect();
         }

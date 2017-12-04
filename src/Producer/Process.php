@@ -14,6 +14,8 @@
 
 namespace Kafka\Producer;
 
+use Amp\Loop;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka protocol since Kafka v0.8
@@ -112,13 +114,13 @@ class Process
         $config = \Kafka\ProducerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
         if (! $isAsyn) {
-            \Amp\repeat(function ($watcherId) {
+            Loop::repeat($config->getRequestTimeout(), function ($watcherId) {
                 if ($this->error) {
                     call_user_func($this->error, 1000);
                 }
-                \Amp\cancel($watcherId);
-                \Amp\stop();
-            }, $msInterval = $config->getRequestTimeout());
+                Loop::cancel($watcherId);
+                Loop::stop();
+            });
         };
     }
 
