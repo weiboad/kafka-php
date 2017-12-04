@@ -527,10 +527,10 @@ abstract class Protocol
     /**
      * decode unpack string type
      *
-     * @param bytes $data
+     * @param string $data bytes to be decoded
      * @param int $bytes self::BIT_B32: int32 big endian order. self::BIT_B16: int16 big endian order.
      * @param int $compression
-     * @return string
+     * @return array
      * @access public
      */
     public function decodeString($data, $bytes, $compression = self::COMPRESSION_NONE)
@@ -572,7 +572,7 @@ abstract class Protocol
      * @param array $array
      * @param Callable $func
      * @param null $options
-     * @return string
+     * @return array
      * @access public
      */
     public function decodeArray($data, $func, $options = null)
@@ -618,16 +618,18 @@ abstract class Protocol
     /**
      * decode primitive type array
      *
-     * @param bytes[] $data
-     * @param bites $bites
+     * @param string $data Bytes to be decoded
+     * @param string $bit  Message bit
+     *
      * @return array
      * @access public
      */
-    public function decodePrimitiveArray($data, $bites)
+    public function decodePrimitiveArray($data, $bit)
     {
         $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset    += 4;
+
         if ($arrayCount == 4294967295) {
             $arrayCount = 0;
         }
@@ -635,17 +637,17 @@ abstract class Protocol
         $result = [];
 
         for ($i = 0; $i < $arrayCount; $i++) {
-            if ($bites == self::BIT_B64) {
+            if ($bit == self::BIT_B64) {
                 $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset  += 8;
-            } elseif ($bites == self::BIT_B32) {
+            } elseif ($bit == self::BIT_B32) {
                 $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
                 $offset  += 4;
-            } elseif (in_array($bites, [self::BIT_B16, self::BIT_B16_SIGNED])) {
-                $result[] = self::unpack($bites, substr($data, $offset, 2));
+            } elseif (in_array($bit, [self::BIT_B16, self::BIT_B16_SIGNED])) {
+                $result[] = self::unpack($bit, substr($data, $offset, 2));
                 $offset  += 2;
-            } elseif ($bites == self::BIT_B8) {
-                $result[] = self::unpack($bites, substr($data, $offset, 1));
+            } elseif ($bit == self::BIT_B8) {
+                $result[] = self::unpack($bit, substr($data, $offset, 1));
                 $offset  += 1;
             }
         }

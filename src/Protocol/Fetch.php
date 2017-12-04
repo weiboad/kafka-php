@@ -143,6 +143,8 @@ class Fetch extends Protocol
         $messageSetSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset        += 4;
 
+        $messages = [];
+
         if ($offset < strlen($data) && $messageSetSize) {
             $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), [$this, 'decodeMessageSet'], $messageSetSize);
             $offset  += $messages['length'];
@@ -155,7 +157,7 @@ class Fetch extends Protocol
                 'errorCode' => $errorCode,
                 'highwaterMarkOffset' => $highwaterMarkOffset,
                 'messageSetSize' => $messageSetSize,
-                'messages' => isset($messages['data']) ? $messages['data'] : [],
+                'messages' => $messages['data'] ?? [],
             ]
         ];
     }
@@ -283,7 +285,7 @@ class Fetch extends Protocol
                 $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset   += 8;
             }
-            
+
             $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 

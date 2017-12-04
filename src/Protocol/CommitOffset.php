@@ -167,8 +167,9 @@ class CommitOffset extends Protocol
     /**
      * decode commit offset topic response
      *
-     * @param byte[] $data
+     * @param string $data Bytes to be decoded
      * @param string $version
+     *
      * @access protected
      * @return array
      */
@@ -196,8 +197,9 @@ class CommitOffset extends Protocol
     /**
      * decode commit offset partition response
      *
-     * @param byte[] $data
+     * @param string $data Bytes to be decoded
      * @param string $version
+     *
      * @access protected
      * @return array
      */

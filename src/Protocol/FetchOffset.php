@@ -62,7 +62,7 @@ class FetchOffset extends Protocol
     /**
      * decode group response
      *
-     * @param byte[] $data
+     * @param string $data Bytes to be decode
      * @access public
      * @return array
      */
