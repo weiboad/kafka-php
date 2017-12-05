@@ -106,6 +106,10 @@ abstract class Protocol
     const SYNC_GROUP_REQUEST        = 14;
     const DESCRIBE_GROUPS_REQUEST   = 15;
     const LIST_GROUPS_REQUEST       = 16;
+    const SASL_HAND_SHAKE_REQUEST   = 17;
+    const API_VERSIONS_REQUEST      = 18;
+    const CREATE_TOPICS_REQUEST     = 19;
+    const DELETE_TOPICS_REQUEST     = 20;
 
     // unpack/pack bit
     const BIT_B64        = 'N2';
