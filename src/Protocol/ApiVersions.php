@@ -63,11 +63,10 @@ class ApiVersions extends Protocol
         $apiVersions = $this->decodeArray(substr($data, $offset), [$this, 'apiVersion']);
         $offset     += $apiVersions['length'];
 
-        $result = [
+        return [
             'apiVerions' => $apiVersions['data'],
             'errorCode'  => $errcode,
         ];
-        return $result;
     }
 
     // }}}

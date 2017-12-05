@@ -80,7 +80,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
      * testEncodeIsNotString
      *
      * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage request sasl hand shake mechanism invalid value.
+     * @expectedExceptionMessage Invalid request SASL hand shake mechanism given.
      * @access public
      * @return void
      */
@@ -99,7 +99,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
      * testEncodeIsNotAllow
      *
      * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessageRegExp /request sasl hand shake mechanism invalid value, must in \w+/
+     * @expectedExceptionMessageRegExp /Invalid request SASL hand shake mechanism given, it must be one of: \w+/
      * @access public
      * @return void
      */

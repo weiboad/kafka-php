@@ -206,8 +206,6 @@ class Protocol
             \Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => 'ListGroup',
             \Kafka\Protocol\Protocol::SASL_HAND_SHAKE_REQUEST => 'SaslHandShake',
             \Kafka\Protocol\Protocol::API_VERSIONS_REQUEST => 'ApiVersions',
-            // \Kafka\Protocol\Protocol::CREATE_TOPICS_REQUEST => 'CreateTopics',
-            // \Kafka\Protocol\Protocol::DELETE_TOPICS_REQUEST => 'DeleteTopics',
         ];
 
         $namespace = '\\Kafka\\Protocol\\';
