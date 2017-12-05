@@ -430,6 +430,8 @@ abstract class Protocol
             self::SYNC_GROUP_REQUEST  => 'SyncGroupRequest',
             self::DESCRIBE_GROUPS_REQUEST => 'DescribeGroupsRequest',
             self::LIST_GROUPS_REQUEST => 'ListGroupsRequest',
+            self::SASL_HAND_SHAKE_REQUEST => 'SaslHandShakeRequest',
+            self::API_VERSIONS_REQUEST => 'ApiVerionsRequest',
         ];
         return $apis[$apikey];
     }
