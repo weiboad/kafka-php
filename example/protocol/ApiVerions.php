@@ -1,7 +1,7 @@
 <?php
 require '../../vendor/autoload.php';
 
-$data = 'PLAIN';
+$data        = 'PLAIN';
 $protocol    = \Kafka\Protocol::init('1.0.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::API_VERSIONS_REQUEST, $data);
 

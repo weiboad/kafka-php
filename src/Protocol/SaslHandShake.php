@@ -55,7 +55,7 @@ class SaslHandShake extends Protocol
         }
 
         if (! in_array($mechanism, $this->allowSaslMechanisms)) {
-            throw new \Kafka\Exception\Protocol('request sasl hand shake mechanism invalid value, must in' . implode('|', $this->allowSaslMechanisms));
+            throw new \Kafka\Exception\Protocol('request sasl hand shake mechanism invalid value, must in ' . implode('|', $this->allowSaslMechanisms));
         }
 
         $header = $this->requestHeader('kafka-php', self::SASL_HAND_SHAKE_REQUEST, self::SASL_HAND_SHAKE_REQUEST);
@@ -76,11 +76,11 @@ class SaslHandShake extends Protocol
      */
     public function decode($data)
     {
-        $offset       = 0;
-        $errcode  = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset  += 2;
+        $offset            = 0;
+        $errcode           = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset           += 2;
         $enabledMechanisms = $this->decodeArray(substr($data, $offset), [$this, 'mechanism']);
-        $offset  += $enabledMechanisms['length'];
+        $offset           += $enabledMechanisms['length'];
 
         $result = [
             'mechanisms' => $enabledMechanisms['data'],
@@ -100,9 +100,9 @@ class SaslHandShake extends Protocol
      */
     protected function mechanism($data)
     {
-        $offset       = 0;
+        $offset        = 0;
         $mechanismInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset      += $mechanismInfo['length'];
+        $offset       += $mechanismInfo['length'];
         return [
             'length' => $offset,
             'data' => $mechanismInfo['data']

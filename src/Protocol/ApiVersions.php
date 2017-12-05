@@ -57,11 +57,11 @@ class ApiVersions extends Protocol
      */
     public function decode($data)
     {
-        $offset       = 0;
-        $errcode  = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset  += 2;
+        $offset      = 0;
+        $errcode     = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset     += 2;
         $apiVersions = $this->decodeArray(substr($data, $offset), [$this, 'apiVersion']);
-        $offset  += $apiVersions['length'];
+        $offset     += $apiVersions['length'];
 
         $result = [
             'apiVerions' => $apiVersions['data'],
@@ -81,13 +81,13 @@ class ApiVersions extends Protocol
      */
     protected function apiVersion($data)
     {
-        $offset = 0;
-        $apiKey = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-        $offset += 2;
+        $offset     = 0;
+        $apiKey     = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+        $offset    += 2;
         $minVersion = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-        $offset += 2;
+        $offset    += 2;
         $maxVersion = self::unpack(self::BIT_B16, substr($data, $offset, 2));
-        $offset += 2;
+        $offset    += 2;
 
         return [
             'length' => $offset,
