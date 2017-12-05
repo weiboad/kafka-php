@@ -50,30 +50,24 @@ class State
     const STATUS_PROCESS = 8;
     const STATUS_FINISH  = 16;
 
+    private const CLEAN_REQUEST_STATE = [
+        self::REQUEST_METADATA      => [],
+        self::REQUEST_GETGROUP      => [],
+        self::REQUEST_JOINGROUP     => [],
+        self::REQUEST_SYNCGROUP     => [],
+        self::REQUEST_HEARTGROUP    => [],
+        self::REQUEST_OFFSET        => ['interval' => 2000],
+        self::REQUEST_FETCH         => ['interval' => 100],
+        self::REQUEST_FETCH_OFFSET  => ['interval' => 2000],
+        self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
+    ];
+
     // }}}
     // {{{ members
-    
+
     private $callStatus = [];
-    
-    private $requests = [
-        self::REQUEST_METADATA => [],
-        self::REQUEST_GETGROUP => [],
-        self::REQUEST_JOINGROUP => [],
-        self::REQUEST_SYNCGROUP => [],
-        self::REQUEST_HEARTGROUP => [],
-        self::REQUEST_OFFSET => [
-            'interval' => 2000,
-        ],
-        self::REQUEST_FETCH => [
-            'interval' => 100,
-        ],
-        self::REQUEST_FETCH_OFFSET => [
-            'interval' => 2000,
-        ],
-        self::REQUEST_COMMIT_OFFSET => [
-            'norepeat' => true,
-        ],
-    ];
+
+    private $requests = self::CLEAN_REQUEST_STATE;
 
     // }}}
     // {{{ functions
@@ -82,33 +76,15 @@ class State
     public function init()
     {
         $this->callStatus = [
-            self::REQUEST_METADATA => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_GETGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_JOINGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_SYNCGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_HEARTGROUP => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_COMMIT_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
+            self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
+            self::REQUEST_GETGROUP      => ['status' => self::STATUS_START],
+            self::REQUEST_JOINGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_SYNCGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_HEARTGROUP    => ['status' => self::STATUS_LOOP],
+            self::REQUEST_OFFSET        => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH         => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH_OFFSET  => ['status' => self::STATUS_LOOP],
+            self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
 
         // instances clear
@@ -153,6 +129,25 @@ class State
         Loop::repeat(1000, function ($watcherId) {
             $this->report();
         });
+    }
+
+    public function stop()
+    {
+        $this->removeWatchers();
+
+        $this->callStatus = [];
+        $this->requests   = self::CLEAN_REQUEST_STATE;
+    }
+
+    private function removeWatchers(): void
+    {
+        foreach (array_keys($this->requests) as $request) {
+            if ($this->requests[$request]['watcher'] === null) {
+                return;
+            }
+
+            Loop::cancel($this->requests[$request]['watcher']);
+        }
     }
 
     // }}}
@@ -249,29 +244,15 @@ class State
         }
 
         $this->callStatus = [
-            self::REQUEST_METADATA => $this->callStatus[self::REQUEST_METADATA],
-            self::REQUEST_GETGROUP => $this->callStatus[self::REQUEST_GETGROUP],
-            self::REQUEST_JOINGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_SYNCGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_HEARTGROUP => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_COMMIT_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
+            self::REQUEST_METADATA      => $this->callStatus[self::REQUEST_METADATA],
+            self::REQUEST_GETGROUP      => $this->callStatus[self::REQUEST_GETGROUP],
+            self::REQUEST_JOINGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_SYNCGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_HEARTGROUP    => ['status' => self::STATUS_LOOP],
+            self::REQUEST_OFFSET        => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH         => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH_OFFSET  => ['status' => self::STATUS_LOOP],
+            self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
     }
 
@@ -281,31 +262,15 @@ class State
     public function recover()
     {
         $this->callStatus = [
-            self::REQUEST_METADATA => $this->callStatus[self::REQUEST_METADATA],
-            self::REQUEST_GETGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_JOINGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_SYNCGROUP => [
-                'status'=> self::STATUS_START,
-            ],
-            self::REQUEST_HEARTGROUP => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_FETCH_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_COMMIT_OFFSET => [
-                'status'=> self::STATUS_LOOP,
-            ],
+            self::REQUEST_METADATA      => $this->callStatus[self::REQUEST_METADATA],
+            self::REQUEST_GETGROUP      => ['status' => self::STATUS_START],
+            self::REQUEST_JOINGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_SYNCGROUP     => ['status' => self::STATUS_START],
+            self::REQUEST_HEARTGROUP    => ['status' => self::STATUS_LOOP],
+            self::REQUEST_OFFSET        => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH         => ['status' => self::STATUS_LOOP],
+            self::REQUEST_FETCH_OFFSET  => ['status' => self::STATUS_LOOP],
+            self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
     }
 

@@ -39,8 +39,6 @@ class Process
 
     protected $consumer = null;
 
-    protected $isRunning = true;
-
     protected $messages = [];
 
     // }}}
@@ -137,7 +135,9 @@ class Process
      */
     public function stop()
     {
-        $this->isRunning = false;
+        // TODO: we should remove the consumer from the group here
+
+        $this->state->stop();
     }
 
     // }}}
