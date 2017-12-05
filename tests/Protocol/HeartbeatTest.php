@@ -52,9 +52,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->heart)) {
-            $this->heart = new \Kafka\Protocol\Heartbeat('0.9.0.1');
-        }
+        $this->heart = new \Kafka\Protocol\Heartbeat('0.9.0.1');
     }
 
     // }}}
@@ -74,7 +72,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
             'generation_id' => 2,
         ];
         $test = $this->heart->encode($data);
-        $this->assertEquals(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
+        $this->assertSame(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
     }
 
     // }}}
@@ -149,7 +147,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
     {
         $test   = $this->heart->decode(\hex2bin('0000'));
         $result = '{"errorCode":0}';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

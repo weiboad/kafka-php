@@ -52,9 +52,7 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->commit)) {
-            $this->commit = new \Kafka\Protocol\CommitOffset('0.9.0.1');
-        }
+        $this->commit = new \Kafka\Protocol\CommitOffset('0.9.0.1');
     }
 
     // }}}
@@ -87,7 +85,7 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $test = $this->commit->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000');
+        $this->assertSame(\bin2hex($test), '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000');
     }
 
     // }}}
@@ -116,7 +114,7 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $test = $this->commit->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000');
+        $this->assertSame(\bin2hex($test), '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000');
     }
 
     // }}}
@@ -264,7 +262,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
     }
 
     // }}}
-
     // {{{ public function testDecode()
 
     /**
@@ -278,7 +275,7 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $data   = '0000000100047465737400000001000000000000';
         $test   = $this->commit->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

@@ -60,12 +60,8 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->offset)) {
-            $this->offset = new \Kafka\Protocol\Offset('0.9.0.1');
-        }
-        if (is_null($this->offset10)) {
-            $this->offset10 = new \Kafka\Protocol\Offset('0.10.1.0');
-        }
+        $this->offset   = new \Kafka\Protocol\Offset('0.9.0.1');
+        $this->offset10 = new \Kafka\Protocol\Offset('0.10.1.0');
     }
 
     // }}}
@@ -94,9 +90,9 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         ];
 
         $test = $this->offset->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
+        $this->assertSame(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
         $test = $this->offset10->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
+        $this->assertSame(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
     }
 
     // }}}
@@ -207,7 +203,7 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $data   = '000000010004746573740000000100000000000000000001000000000000002a';
         $test   = $this->offset->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"timestamp":0,"offsets":[42]}]}]';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

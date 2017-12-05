@@ -52,9 +52,7 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->leave)) {
-            $this->leave = new \Kafka\Protocol\LeaveGroup('0.9.0.1');
-        }
+        $this->leave = new \Kafka\Protocol\LeaveGroup('0.9.0.1');
     }
 
     // }}}
@@ -74,7 +72,7 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
         ];
 
         $test = $this->leave->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000049000d00000000000d00096b61666b612d706870000474657374002e6b61666b612d7068702d65623139633065612d346233652d346564302d626164612d633837333935316338656561');
+        $this->assertSame(\bin2hex($test), '00000049000d00000000000d00096b61666b612d706870000474657374002e6b61666b612d7068702d65623139633065612d346233652d346564302d626164612d633837333935316338656561');
     }
 
     // }}}
@@ -128,7 +126,7 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
     {
         $test   = $this->leave->decode(\hex2bin('0000'));
         $result = '{"errorCode":0}';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

@@ -52,9 +52,7 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->offset)) {
-            $this->offset = new \Kafka\Protocol\FetchOffset('0.9.0.1');
-        }
+        $this->offset = new \Kafka\Protocol\FetchOffset('0.9.0.1');
     }
 
     // }}}
@@ -79,7 +77,7 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         ];
 
         $test = $this->offset->encode($data);
-        $this->assertEquals(\bin2hex($test), '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000');
+        $this->assertSame(\bin2hex($test), '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000');
     }
 
     // }}}
@@ -183,7 +181,7 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $data   = '000000010004746573740000000100000000ffffffffffffffff00000000';
         $test   = $this->offset->decode(\hex2bin($data));
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

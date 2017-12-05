@@ -54,9 +54,7 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->group)) {
-            $this->group = new \Kafka\Protocol\GroupCoordinator('0.9.0.1');
-        }
+        $this->group = new \Kafka\Protocol\GroupCoordinator('0.9.0.1');
     }
 
     // }}}
@@ -75,7 +73,7 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $test = $this->group->encode($data);
-        $this->assertEquals(\bin2hex($test), '00000019000a00000000000a00096b61666b612d706870000474657374');
+        $this->assertSame(\bin2hex($test), '00000019000a00000000000a00096b61666b612d706870000474657374');
     }
 
     // }}}
@@ -111,7 +109,7 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
         $data   = '000000000003000b31302e31332e342e313539000023e8';
         $test   = $this->group->decode(\hex2bin($data));
         $result = '{"errorCode":0,"coordinatorId":3,"coordinatorHost":"10.13.4.159","coordinatorPort":9192}';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}

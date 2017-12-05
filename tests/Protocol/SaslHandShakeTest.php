@@ -52,9 +52,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        if (is_null($this->sasl)) {
-            $this->sasl = new \Kafka\Protocol\SaslHandShake('0.10.0.0');
-        }
+        $this->sasl = new \Kafka\Protocol\SaslHandShake('0.10.0.0');
     }
 
     // }}}
@@ -70,7 +68,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
     {
         $data = 'PLAIN';
         $test = $this->sasl->encode($data);
-        $this->assertEquals(\bin2hex($test), '0000001a001100000000001100096b61666b612d7068700005504c41494e');
+        $this->assertSame(\bin2hex($test), '0000001a001100000000001100096b61666b612d7068700005504c41494e');
     }
 
     // }}}
@@ -124,7 +122,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
         $data   = '0022000000010006475353415049';
         $test   = $this->sasl->decode(\hex2bin($data));
         $result = '{"mechanisms":["GSSAPI"],"errorCode":34}';
-        $this->assertEquals(json_encode($test), $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
 
     // }}}
