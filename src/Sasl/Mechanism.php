@@ -36,21 +36,21 @@ abstract class Mechanism
     // {{{ consts
     // }}}
     // {{{ functions
-    // {{{ public function handShake()
+    // {{{ protected function handShake()
     
     /**
      *
      * sasl authenticate hand shake
      *
-     * @access public
+     * @access protected
      * @return void
      */
-    protected function handShake(CommonSocket $socket, string $mechanism)
+    protected function handShake(CommonSocket $socket, string $mechanism) : void
     {
         $requestData = Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, $mechanism);
-        $socket->selectWrite($requestData);
-        $dataLen       = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->selectRead(4));
-        $data          = $socket->selectRead($dataLen);
+        $socket->writeBlocking($requestData);
+        $dataLen       = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->readBlocking(4));
+        $data          = $socket->readBlocking($dataLen);
         $correlationId = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         $result        = Protocol::decode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, substr($data, 4));
         if (! is_array($result) || ! isset($result['errorCode'])) {

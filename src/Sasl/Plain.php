@@ -30,7 +30,7 @@ use Kafka\Exception;
 +------------------------------------------------------------------------------
 */
 
-class Plain extends Mechanism implements SaslMechanism
+final class Plain extends Mechanism implements SaslMechanism
 {
     // {{{ consts
     
@@ -54,14 +54,10 @@ class Plain extends Mechanism implements SaslMechanism
      * @access public
      * @return void
      */
-    public function __construct(array $options)
+    public function __construct(string $username, string $password)
     {
-        if (! isset($options['username']) || ! isset($options['password'])) {
-            throw new Exception('Sasl plain given options is invalid, must give username and password');
-        }
-
-        $this->username = trim($options['username']);
-        $this->password = trim($options['password']);
+        $this->username = trim($username);
+        $this->password = trim($password);
     }
 
     // }}}
@@ -74,14 +70,14 @@ class Plain extends Mechanism implements SaslMechanism
      * @access public
      * @return void
      */
-    public function authenticate(CommonSocket $socket)
+    public function authenticate(CommonSocket $socket) : void
     {
         $this->handShake($socket, $this->getMechanismName());
         $split = \Kafka\Protocol\Protocol::pack(\Kafka\Protocol\Protocol::BIT_B8, 0);
         $data  = $split . $this->username . $split . $this->password;
         $data  = \Kafka\Protocol\Protocol::encodeString($data, \Kafka\Protocol\Protocol::PACK_INT32);
-        $socket->selectWrite($data);
-        $data = $socket->selectRead(4, true);
+        $socket->writeBlocking($data);
+        $data = $socket->readBlocking(4, true);
     }
 
     // }}}
@@ -94,7 +90,7 @@ class Plain extends Mechanism implements SaslMechanism
      * @access public
      * @return string
      */
-    public function getMechanismName()
+    public function getMechanismName() : string
     {
         return self::MECHANISM_NAME;
     }

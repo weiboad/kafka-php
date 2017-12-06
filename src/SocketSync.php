@@ -75,7 +75,7 @@ class SocketSync extends CommonSocket
      * @access public
      * @return void
      */
-    public function close()
+    public function close() : void
     {
         if (is_resource($this->getSocket())) {
             fclose($this->getSocket());
@@ -108,9 +108,9 @@ class SocketSync extends CommonSocket
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read($len, $verifyExactLength = false)
+    public function read(int $len, bool $verifyExactLength = false) : string
     {
-        return $this->selectRead($len, $verifyExactLength);
+        return $this->readBlocking($len, $verifyExactLength);
     }
 
     // }}}
@@ -124,9 +124,9 @@ class SocketSync extends CommonSocket
      * @return integer
      * @throws \Kafka\Exception
      */
-    public function write($buf)
+    public function write(string $buf) : int
     {
-        return $this->selectWrite($buf);
+        return $this->writeBlocking($buf);
     }
 
     // }}}

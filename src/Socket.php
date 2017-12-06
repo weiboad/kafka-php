@@ -91,7 +91,7 @@ class Socket extends CommonSocket
         $this->readWatcher = Loop::onReadable($this->getSocket(), function () {
             do {
                 if (! $this->isSocketDead()) {
-                    $newData = @fread($this->getSocket(), self::READ_MAX_LEN);
+                    $newData = @fread($this->getSocket(), self::READ_MAX_LENGTH);
                 } else {
                     $this->reconnect();
                     return;
@@ -146,7 +146,7 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function close()
+    public function close() : void
     {
         Loop::cancel($this->readWatcher);
         Loop::cancel($this->writeWatcher);

@@ -29,18 +29,6 @@ namespace Kafka;
 interface SaslMechanism
 {
     // {{{ functions
-    // {{{ public function __construct()
-    
-    /**
-     *
-     * __construct
-     *
-     * @access public
-     * @return void
-     */
-    public function __construct(array $options);
-
-    // }}}
     // {{{ public function authenticate()
     
     /**
@@ -50,7 +38,7 @@ interface SaslMechanism
      * @access public
      * @return void
      */
-    public function authenticate(CommonSocket $socket);
+    public function authenticate(CommonSocket $socket) : void;
 
     // }}}
     // {{{ public function getMechanismName()
@@ -62,7 +50,7 @@ interface SaslMechanism
      * @access public
      * @return string
      */
-    public function getMechanismName();
+    public function getMechanismName() : string;
 
     // }}}
     // }}}
