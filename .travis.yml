@@ -13,7 +13,6 @@ cache:
 
 before_install:
   - pecl install -f krb5-1.1.2
-  - echo "extension=krb5.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
   - composer self-update
 
