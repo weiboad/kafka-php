@@ -103,16 +103,20 @@ class SyncProcess
     public function syncMeta()
     {
         $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
+
+        $brokerList = \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
-        foreach ($brokerList as $key => $val) {
+
+        foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
             }
         }
+
         if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+            throw new \Kafka\Exception('No valid broker configured');
         }
+
         shuffle($brokerHost);
         $broker = \Kafka\Broker::getInstance();
         foreach ($brokerHost as $host) {
@@ -135,7 +139,13 @@ class SyncProcess
                 return;
             }
         }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
+
+        throw new \Kafka\Exception(
+            sprintf(
+                'It was not possible to establish a connection for metadata with the brokers "%s"',
+                $brokerList
+            )
+        );
     }
 
     // }}}
@@ -190,7 +200,7 @@ class SyncProcess
             } else {
                 $partition['messages'][] = $value['value'];
             }
-            
+
             $topicData['partitions'][$partId]     = $partition;
             $topicData['topic_name']              = $value['topic'];
             $sendData[$brokerId][$value['topic']] = $topicData;

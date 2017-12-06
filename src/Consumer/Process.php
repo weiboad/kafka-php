@@ -225,16 +225,20 @@ class Process
     protected function syncMeta()
     {
         $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList());
+
+        $brokerList = \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
-        foreach ($brokerList as $key => $val) {
+
+        foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
             }
         }
+
         if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+            throw new \Kafka\Exception('No valid broker configured');
         }
+
         shuffle($brokerHost);
         $broker = \Kafka\Broker::getInstance();
         foreach ($brokerHost as $host) {
@@ -247,7 +251,13 @@ class Process
                 return;
             }
         }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
+
+        throw new \Kafka\Exception(
+            sprintf(
+                'It was not possible to establish a connection for metadata with the brokers "%s"',
+                $brokerList
+            )
+        );
     }
 
     // }}}
