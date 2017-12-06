@@ -86,7 +86,7 @@ $producer->send(true);
 
 ### Synchronous mode
 
-```
+```php
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
