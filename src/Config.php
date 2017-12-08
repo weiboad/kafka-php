@@ -29,26 +29,57 @@ namespace Kafka;
 abstract class Config
 {
     // {{{ consts
+
+    const SECURITY_PROTOCOL_PLAINTEXT      = 'PLAINTEXT';
+    const SECURITY_PROTOCOL_SSL            = 'SSL';
+    const SECURITY_PROTOCOL_SASL_PLAINTEXT = 'SASL_PLAINTEXT';
+    const SECURITY_PROTOCOL_SASL_SSL       = 'SASL_SSL';
+
+    const SASL_MECHANISMS_PLAIN         = 'PLAIN';
+    const SASL_MECHANISMS_GSSAPI        = 'GSSAPI';
+    const SASL_MECHANISMS_SCRAM_SHA_256 = 'SCRAM_SHA_256';
+    const SASL_MECHANISMS_SCRAM_SHA_512 = 'SCRAM_SHA_512';
+
+    private const ALLOW_SECURITY_PROTOCOLS = [
+        self::SECURITY_PROTOCOL_PLAINTEXT,
+        self::SECURITY_PROTOCOL_SSL,
+        self::SECURITY_PROTOCOL_SASL_PLAINTEXT,
+        self::SECURITY_PROTOCOL_SASL_SSL
+    ];
+
+    private const ALLOW_MECHANISMS = [
+        self::SASL_MECHANISMS_PLAIN,
+        self::SASL_MECHANISMS_GSSAPI,
+        self::SASL_MECHANISMS_SCRAM_SHA_256,
+        self::SASL_MECHANISMS_SCRAM_SHA_512
+    ];
+
     // }}}
     // {{{ members
 
     protected static $options = [];
 
     private static $defaults = [
-        'clientId' => 'kafka-php',
-        'brokerVersion' => '0.10.1.0',
+        'clientId'           => 'kafka-php',
+        'brokerVersion'      => '0.10.1.0',
         'metadataBrokerList' => '',
-        'messageMaxBytes' => '1000000',
-        'metadataRequestTimeoutMs' => '60000',
+        'messageMaxBytes'    => '1000000',
+        'metadataRequestTimeoutMs'  => '60000',
         'metadataRefreshIntervalMs' => '300000',
         'metadataMaxAgeMs' => -1,
-        'sslEnable' => false,
-        'sslLocalCert' => '',
-        'sslLocalPk' => '',
+        'securityProtocol' => self::SECURITY_PROTOCOL_PLAINTEXT,
+        'sslEnable'     => false, // this config item will override, don't config it.
+        'sslLocalCert'  => '',
+        'sslLocalPk'    => '',
         'sslVerifyPeer' => false,
         'sslPassphrase' => '',
-        'sslCafile' => '',
-        'sslPeerName' => ''
+        'sslCafile'     => '',
+        'sslPeerName'   => '',
+        'saslMechanism' => self::SASL_MECHANISMS_PLAIN,
+        'saslUsername'  => '',
+        'saslPassword'  => '',
+        'saslKeytab'    => '',
+        'saslPrincipal' => '',
     ];
 
     // }}}
@@ -226,6 +257,41 @@ abstract class Config
             throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
         }
         static::$options['sslCafile'] = $cafile;
+    }
+
+    // }}}
+    // {{{ public function setKeytab()
+
+    public function setKeytab($keytab)
+    {
+        if (! is_string($keytab) || ! file_exists($keytab)) {
+            throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
+        }
+        static::$options['saslKeytab'] = $keytab;
+    }
+
+    // }}}
+    // {{{ public function setSecurityProtocol()
+
+    public function setSecurityProtocol($protocol)
+    {
+        if (! in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
+            throw new \Kafka\Exception\Config('Invalid security protocol given.');
+        }
+
+        static::$options['securityProtocol'] = $protocol;
+    }
+
+    // }}}
+    // {{{ public function setSaslMechanism()
+
+    public function setSaslMechanism($mechanism)
+    {
+        if (! in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
+            throw new \Kafka\Exception\Config('Invalid security sasl mechanism given.');
+        }
+
+        static::$options['saslMechanism'] = $mechanism;
     }
 
     // }}}

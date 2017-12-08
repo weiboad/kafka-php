@@ -14,6 +14,10 @@
 
 namespace Kafka;
 
+use \Kafka\Sasl\Plain;
+use \Kafka\Sasl\Gssapi;
+use \Kafka\Sasl\Scram;
+
 /**
 +------------------------------------------------------------------------------
 * Kafka Broker info manager
@@ -61,7 +65,7 @@ class Broker
     // }}}
     // {{{ public function setConfig()
 
-    public function setConfig($config)
+    public function setConfig(Config $config)
     {
         $this->config = $config;
     }
@@ -208,7 +212,6 @@ class Broker
             return $socket;
         } catch (\Exception $e) {
             $this->error($e->getMessage());
-
             return false;
         }
     }
@@ -236,10 +239,11 @@ class Broker
             return $this->socket;
         }
 
+        $saslProvider = $this->judgeConnectionConfig();
         if ($modeSync) {
-            $socket = new \Kafka\SocketSync($host, $port, $this->config);
+            $socket = new \Kafka\SocketSync($host, $port, $this->config, $saslProvider);
         } else {
-            $socket = new \Kafka\Socket($host, $port, $this->config);
+            $socket = new \Kafka\Socket($host, $port, $this->config, $saslProvider);
         }
         return $socket;
     }
@@ -251,6 +255,64 @@ class Broker
     public function setSocket($socket)
     {
         $this->socket = $socket;
+    }
+
+    // }}}
+    // {{{ private function judgeConnectionConfig()
+
+    private function judgeConnectionConfig() : ?SaslMechanism
+    {
+        if ($this->config == null) {
+            return null;
+        }
+
+        $plainConnections = [
+            Config::SECURITY_PROTOCOL_PLAINTEXT,
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+        ];
+        $saslConnections  = [
+            Config::SECURITY_PROTOCOL_SASL_SSL,
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+        ];
+        
+        $securityProtocol = $this->config->getSecurityProtocol();
+        if (in_array($securityProtocol, $plainConnections, true)) {
+            $this->config->setSslEnable(false);
+        } else {
+            $this->config->setSslEnable(true);
+        }
+
+        if (in_array($securityProtocol, $saslConnections, true)) {
+            return $this->getSaslMechanismProvider();
+        }
+
+        return null;
+    }
+
+    // }}}
+    // {{{ private function getSaslMechanismProvider()
+
+    private function getSaslMechanismProvider() : SaslMechanism
+    {
+        $mechanism = $this->config->getSaslMechanism();
+        $provider  = null;
+        $username  = $this->config->getSaslUsername();
+        $password  = $this->config->getSaslPassword();
+        switch ($mechanism) {
+            case Config::SASL_MECHANISMS_PLAIN:
+                $provider = new Plain($username, $password);
+                break;
+            case Config::SASL_MECHANISMS_GSSAPI:
+                $provider = new Gssapi($this->config->getSaslKeytab(), $this->config->getSaslPrincipal());
+                break;
+            case Config::SASL_MECHANISMS_SCRAM_SHA_256:
+                $provider = new Scram($username, $password, Scram::SCRAM_SHA_256);
+                break;
+            case Config::SASL_MECHANISMS_SCRAM_SHA_512:
+                $provider = new Scram($username, $password, Scram::SCRAM_SHA_512);
+                break;
+        }
+        return $provider;
     }
 
     // }}}

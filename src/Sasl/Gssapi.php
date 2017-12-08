@@ -100,13 +100,13 @@ final class Gssapi extends Mechanism implements SaslMechanism
         // send token to server and get server token
         $data = ProtocolTool::encodeString($token, ProtocolTool::PACK_INT32);
         $socket->writeBlocking($data);
-        $dataLen       = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->read(4));
+        $dataLen       = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
         $stoken        = $socket->readBlocking($dataLen);
         $outputMessage = '';
         // warp message use server token and send to server authenticate
         $gssapi->wrap($stoken, $outputMessage);
         $data = \Kafka\Protocol\Protocol::encodeString($outputMessage, \Kafka\Protocol\Protocol::PACK_INT32);
-        $socket->write($data);
+        $socket->writeBlocking($data);
     }
 
     // }}}
