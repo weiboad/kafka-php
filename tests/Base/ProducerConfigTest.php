@@ -212,5 +212,245 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
     }
 
     // }}}
+    // {{{ public function testSetSslLocalCert()
+
+    /**
+     * testSetSslLocalCert
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set ssl local cert file is invalid
+     * @access public
+     * @return void
+     */
+    public function testSetSslLocalCert()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSslLocalCert('invalid_path');
+    }
+
+    // }}}
+    // {{{ public function testSetSslLocalCertNotFile()
+
+    /**
+     * testSetSslLocalCert
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set ssl local cert file is invalid
+     * @access public
+     * @return void
+     */
+    public function testSetSslLocalCertNotFile()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSslLocalCert('/tmp');
+    }
+
+    // }}}
+    // {{{ public function testSetSslLocalCertValid()
+
+    /**
+     * testSetSslLocalCertValid
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSslLocalCertValid()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $path   = '/etc/passwd';
+        $config->setSslLocalCert($path);
+        $this->assertEquals($path, $config->getSslLocalCert());
+    }
+
+    // }}}
+    // {{{ public function testSetSslLocalPk()
+
+    /**
+     * testSetSslLocalPk
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set ssl local private key file is invalid
+     * @access public
+     * @return void
+     */
+    public function testSetSslLocalPk()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSslLocalPk('invalid_path');
+    }
+
+    // }}}
+    // {{{ public function testSetSslLocalPkValid()
+
+    /**
+     * testSetSslLocalPkValid
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSslLocalPkValid()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $path   = '/etc/passwd';
+        $config->setSslLocalPk($path);
+        $this->assertEquals($path, $config->getSslLocalPk());
+    }
+
+    // }}}
+    // {{{ public function testSetSslCafile()
+
+    /**
+     * testSetSslCafile
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set ssl ca file is invalid
+     * @access public
+     * @return void
+     */
+    public function testSetSslCafile()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSslCafile('invalid_path');
+    }
+
+    // }}}
+    // {{{ public function testSetSslCafileValid()
+
+    /**
+     * testSetSslCafile
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSslCafileValid()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $path   = '/etc/passwd';
+        $config->setSslCafile($path);
+        $this->assertEquals($path, $config->getSslCafile());
+    }
+
+    // }}}
+    // {{{ public function testSetSaslKeytab()
+
+    /**
+     * testSetSaslKeytab
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Set sasl gssapi keytab file is invalid
+     * @access public
+     * @return void
+     */
+    public function testSetSaslKeytab()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSaslKeytab('invalid_path');
+    }
+
+    // }}}
+    // {{{ public function testSetSaslKeytabValid()
+
+    /**
+     * testSetSaslKeytab
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSaslKeytabValid()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $path   = '/etc/passwd';
+        $config->setSaslKeytab($path);
+        $this->assertEquals($path, $config->getSaslKeytab());
+    }
+
+    // }}}
+    // {{{ public function testSetSecurityProtocol()
+
+    /**
+     * testSetSecurityProtocol
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Invalid security protocol given.
+     * @access public
+     * @return void
+     */
+    public function testSetSecurityProtocol()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSecurityProtocol('xxxx');
+    }
+
+    // }}}
+    // {{{ public function testSetSecurityProtocolValid()
+
+    /**
+     * testSetSecurityProtocol
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSecurityProtocolValid()
+    {
+        $config   = \Kafka\ProducerConfig::getInstance();
+        $protocol = \Kafka\Config::SECURITY_PROTOCOL_PLAINTEXT;
+        $config->setSecurityProtocol($protocol);
+        $this->assertEquals($protocol, $config->getSecurityProtocol());
+    }
+
+    // }}}
+    // {{{ public function testSetSaslMechanism()
+
+    /**
+     * testSetSaslMechanism
+     *
+     * @expectedException \Kafka\Exception\Config
+     * @expectedExceptionMessage Invalid security sasl mechanism given.
+     * @access public
+     * @return void
+     */
+    public function testSetSaslMechanism()
+    {
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setSaslMechanism('xxxx');
+    }
+
+    // }}}
+    // {{{ public function testSetSaslMechanismValid()
+
+    /**
+     * testSetSaslMechanism
+     *
+     * @access public
+     * @return void
+     */
+    public function testSetSaslMechanismValid()
+    {
+        $config    = \Kafka\ProducerConfig::getInstance();
+        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
+        $config->setSaslMechanism($mechanism);
+        $this->assertEquals($mechanism, $config->getSaslMechanism());
+    }
+
+    // }}}
+    // {{{ public function testClear()
+
+    /**
+     * testClear
+     *
+     * @access public
+     * @return void
+     */
+    public function testClear()
+    {
+        $config    = \Kafka\ProducerConfig::getInstance();
+        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
+        $config->setSaslMechanism($mechanism);
+        $this->assertEquals($mechanism, $config->getSaslMechanism());
+        $config->clear();
+        $this->assertEquals(\Kafka\Config::SASL_MECHANISMS_PLAIN, $config->getSaslMechanism());
+    }
+
+    // }}}
     // }}}
 }

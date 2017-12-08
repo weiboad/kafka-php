@@ -229,9 +229,9 @@ abstract class Config
     // }}}
     // {{{ public function setSslLocalCert()
 
-    public function setSslLocalCert($localCert)
+    public function setSslLocalCert(string $localCert)
     {
-        if (! is_string($localCert) || ! file_exists($localCert)) {
+        if (! file_exists($localCert) || ! is_file($localCert)) {
             throw new \Kafka\Exception\Config('Set ssl local cert file is invalid');
         }
         static::$options['sslLocalCert'] = $localCert;
@@ -240,9 +240,9 @@ abstract class Config
     // }}}
     // {{{ public function setSslLocalPk()
 
-    public function setSslLocalPk($localPk)
+    public function setSslLocalPk(string $localPk)
     {
-        if (! is_string($localPk) || ! file_exists($localPk)) {
+        if (! file_exists($localPk) || ! is_file($localPk)) {
             throw new \Kafka\Exception\Config('Set ssl local private key file is invalid');
         }
         static::$options['sslLocalPk'] = $localPk;
@@ -251,21 +251,21 @@ abstract class Config
     // }}}
     // {{{ public function setSslCafile()
 
-    public function setSslCafile($cafile)
+    public function setSslCafile(string $cafile)
     {
-        if (! is_string($cafile) || ! file_exists($cafile)) {
+        if (! file_exists($cafile) || ! is_file($cafile)) {
             throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
         }
         static::$options['sslCafile'] = $cafile;
     }
 
     // }}}
-    // {{{ public function setKeytab()
+    // {{{ public function setSaslKeytab()
 
-    public function setKeytab($keytab)
+    public function setSaslKeytab(string $keytab)
     {
-        if (! is_string($keytab) || ! file_exists($keytab)) {
-            throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
+        if (! file_exists($keytab) || ! is_file($keytab)) {
+            throw new \Kafka\Exception\Config('Set sasl gssapi keytab file is invalid');
         }
         static::$options['saslKeytab'] = $keytab;
     }
