@@ -65,7 +65,7 @@ class Producer
      *
      * @access public
      * @data is data is boolean that is async process, thus it is sync process
-     * @return void
+     * @return void|bool|array
      */
     public function send($data = true)
     {
