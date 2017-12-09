@@ -51,7 +51,7 @@ class Process
     // {{{ functions
     // {{{ public function __construct()
 
-    public function __construct(\Closure $producer = null)
+    public function __construct(callable $producer = null)
     {
         $this->producer = $producer;
     }
@@ -173,16 +173,20 @@ class Process
     public function syncMeta()
     {
         $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList());
+
+        $brokerList = \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
-        foreach ($brokerList as $key => $val) {
+
+        foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
             }
         }
+
         if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+            throw new \Kafka\Exception('No valid broker configured');
         }
+
         shuffle($brokerHost);
         $broker = \Kafka\Broker::getInstance();
         foreach ($brokerHost as $host) {
@@ -195,7 +199,13 @@ class Process
                 return;
             }
         }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
+
+        throw new \Kafka\Exception(
+            sprintf(
+                'It was not possible to establish a connection for metadata with the brokers "%s"',
+                $brokerList
+            )
+        );
     }
 
     // }}}

@@ -132,7 +132,7 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function setOnReadable(\Closure $read)
+    public function setOnReadable(callable $read)
     {
         $this->onReadable = $read;
     }

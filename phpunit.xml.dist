@@ -13,11 +13,11 @@
         <testsuite name="base">
             <directory suffix=".php">tests/Base</directory>
         </testsuite>
-        <testsuite name="produce">
-            <directory suffix=".php">tests/Produce</directory>
-        </testsuite>
         <testsuite name="protocol">
             <directory suffix=".php">tests/Protocol</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory suffix=".php">tests/Functional</directory>
         </testsuite>
     </testsuites>
 

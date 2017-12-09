@@ -15,7 +15,6 @@ before_install:
   - pecl install -f krb5-1.1.2
   - pecl install uopz 
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
-  - composer self-update
 
 install: travis_retry composer install --no-interaction
 
@@ -54,7 +53,77 @@ jobs:
       script:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
-        - ./vendor/bin/infection --min-msi=40 --min-covered-msi=76 --threads=4
+        - ./vendor/bin/infection --min-msi=41 --min-covered-msi=77 --threads=4
+
+    - stage: Functional tests
+      services:
+        - docker
+      addons:
+        apt:
+          packages:
+            - docker-ce
+      env: KAFKA_VERSION=0.9.0.1
+      before_install:
+        - docker-compose up -d kafka-$KAFKA_VERSION
+        - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
+      script:
+        - sleep 10 # add some arbitrary time to ensure that kafka is running fine
+        - docker-compose exec kafka-$KAFKA_VERSION /opt/kafka_2.11-0.9.0.1/bin/kafka-topics.sh --zookeeper zookeeper:2181 --create --partitions 3 --replication-factor 1 --topic test
+        - docker-compose run -e KAFKA_BROKERS=kafka-$KAFKA_VERSION:9092 -e KAFKA_VERSION -e KAFKA_TOPIC=test test-runner
+
+    - stage: Functional tests
+      services:
+        - docker
+      addons:
+        apt:
+          packages:
+            - docker-ce
+      env: KAFKA_VERSION=0.10.2.1
+      before_install:
+        - docker-compose up -d kafka-$KAFKA_VERSION
+        - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
+      script:
+        - sleep 10 # add some arbitrary time to ensure that kafka is running fine
+        - docker-compose exec kafka-$KAFKA_VERSION /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --create --partitions 3 --replication-factor 1 --topic test
+        - docker-compose run -e KAFKA_BROKERS=kafka-$KAFKA_VERSION:9092 -e KAFKA_VERSION -e KAFKA_TOPIC=test test-runner
+      after_script:
+        - docker-compose down
+
+    - stage: Functional tests
+      services:
+        - docker
+      addons:
+        apt:
+          packages:
+            - docker-ce
+      env: KAFKA_VERSION=0.11.0.1
+      before_install:
+        - docker-compose up -d kafka-$KAFKA_VERSION
+        - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
+      script:
+        - sleep 10 # add some arbitrary time to ensure that kafka is running fine
+        - docker-compose exec kafka-$KAFKA_VERSION /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --create --partitions 3 --replication-factor 1 --topic test
+        - docker-compose run -e KAFKA_BROKERS=kafka-$KAFKA_VERSION:9092 -e KAFKA_VERSION -e KAFKA_TOPIC=test test-runner
+      after_script:
+        - docker-compose down
+
+    - stage: Functional tests
+      services:
+        - docker
+      addons:
+        apt:
+          packages:
+            - docker-ce
+      env: KAFKA_VERSION=1.0.0
+      before_install:
+        - docker-compose up -d kafka-$KAFKA_VERSION
+        - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
+      script:
+        - sleep 10 # add some arbitrary time to ensure that kafka is running fine
+        - docker-compose exec kafka-$KAFKA_VERSION /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --create --partitions 3 --replication-factor 1 --topic test
+        - docker-compose run -e KAFKA_BROKERS=kafka-$KAFKA_VERSION:9092 -e KAFKA_VERSION -e KAFKA_TOPIC=test test-runner
+      after_script:
+        - docker-compose down
 
 notifications:
   email:

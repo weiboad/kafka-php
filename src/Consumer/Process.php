@@ -39,15 +39,13 @@ class Process
 
     protected $consumer = null;
 
-    protected $isRunning = true;
-
     protected $messages = [];
 
     // }}}
     // {{{ functions
     // {{{ public function __construct()
 
-    public function __construct(\Closure $consumer = null)
+    public function __construct(callable $consumer = null)
     {
         $this->consumer = $consumer;
     }
@@ -137,7 +135,9 @@ class Process
      */
     public function stop()
     {
-        $this->isRunning = false;
+        // TODO: we should remove the consumer from the group here
+
+        $this->state->stop();
     }
 
     // }}}
@@ -225,16 +225,20 @@ class Process
     protected function syncMeta()
     {
         $this->debug('Start sync metadata request');
-        $brokerList = explode(',', \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList());
+
+        $brokerList = \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
-        foreach ($brokerList as $key => $val) {
+
+        foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
             }
         }
+
         if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('Not set config `metadataBrokerList`');
+            throw new \Kafka\Exception('No valid broker configured');
         }
+
         shuffle($brokerHost);
         $broker = \Kafka\Broker::getInstance();
         foreach ($brokerHost as $host) {
@@ -247,7 +251,13 @@ class Process
                 return;
             }
         }
-        throw new \Kafka\Exception('Not has broker can connection `metadataBrokerList`');
+
+        throw new \Kafka\Exception(
+            sprintf(
+                'It was not possible to establish a connection for metadata with the brokers "%s"',
+                $brokerList
+            )
+        );
     }
 
     // }}}
@@ -555,7 +565,7 @@ class Process
                     break 2;
                 }
 
-                $offsets[$topic['topicName']][$part['partition']] = $part['offset'] - 1;
+                $offsets[$topic['topicName']][$part['partition']] = $part['offset'];
             }
         }
         $assign->setFetchOffsets($offsets);

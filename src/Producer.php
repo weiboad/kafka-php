@@ -34,7 +34,7 @@ class Producer
     // {{{ consts
     // }}}
     // {{{ members
-    
+
     private $process = null;
 
     // }}}
@@ -48,7 +48,7 @@ class Producer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct(\Closure $producer = null)
+    public function __construct(callable $producer = null)
     {
         if (is_null($producer)) {
             $this->process = new \Kafka\Producer\SyncProcess();
@@ -105,7 +105,7 @@ class Producer
      * @access public
      * @return void
      */
-    public function success(\Closure $success = null)
+    public function success(callable $success = null)
     {
         $this->process->setSuccess($success);
     }
@@ -119,7 +119,7 @@ class Producer
      * @access public
      * @return void
      */
-    public function error(\Closure $error = null)
+    public function error(callable $error = null)
     {
         $this->process->setError($error);
     }
