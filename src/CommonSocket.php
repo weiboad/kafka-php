@@ -327,7 +327,7 @@ abstract class CommonSocket
 
         $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
 
-        $context      = stream_context_create([]);
+        $context = stream_context_create([]);
         if ($this->config != null && $this->config->getSslEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
             $localCert    = $this->config->getSslLocalCert();

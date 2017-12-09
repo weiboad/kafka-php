@@ -26,7 +26,7 @@ namespace KafkaTest\Base\Stream;
 +------------------------------------------------------------------------------
 */
 
-class Simple 
+class Simple
 {
     // {{{ consts
     // }}}

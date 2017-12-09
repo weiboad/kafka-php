@@ -40,7 +40,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     // {{{ functions
     // {{{ public function tearDown()
 
-    public function tearDown()  
+    public function tearDown()
     {
         $this->clearStreamMock();
     }
@@ -56,8 +56,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testConstruct()
     {
-        $host = '127.0.0.1';
-        $port = 9092;
+        $host   = '127.0.0.1';
+        $port   = 9092;
         $socket = new Socket($host, $port);
         $this->assertSame($host, $socket->getHost());
         $this->assertSame($port, $socket->getPort());
@@ -134,8 +134,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStream()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $this->initStreamMock($transport, $host, $port);
@@ -167,8 +167,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamFailure()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $this->initStreamMock($transport, $host, $port, null, false);
@@ -192,16 +192,16 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamSsl()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
-        $transport = 'ssl';
-        $localCert    = '/etc/testcert';
-        $localKey     = 'etc/localkey';
-        $verifyPeer   = false;
-        $passphrase   = '123456';
-        $cafile       = '/etc/cafile';
-        $peerName     = 'kafka';
-        $context = stream_context_create(['ssl' => [
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'ssl';
+        $localCert  = '/etc/testcert';
+        $localKey   = 'etc/localkey';
+        $verifyPeer = false;
+        $passphrase = '123456';
+        $cafile     = '/etc/cafile';
+        $peerName   = 'kafka';
+        $context    = stream_context_create(['ssl' => [
                 'local_cert' => $localCert,
                 'local_pk' => $localKey,
                 'verify_peer' => $verifyPeer,
@@ -243,10 +243,10 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testReadBlockingMaxRead()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
-        $socket = new Socket($host, $port);
+        $socket    = new Socket($host, $port);
         $socket->readBlocking(Socket::READ_MAX_LENGTH + 1);
     }
 
@@ -283,7 +283,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     {
         $socket = $this->createStream();
         \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', array('timed_out' => true));
+        \uopz_set_return('stream_get_meta_data', ['timed_out' => true]);
         $socket->readBlocking(4);
     }
 
@@ -302,7 +302,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     {
         $socket = $this->createStream();
         \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', array());
+        \uopz_set_return('stream_get_meta_data', []);
         $socket->readBlocking(4);
     }
 
@@ -319,8 +319,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testReadBlockingReadFailure()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $streamMock = $this->initStreamMock($transport, $host, $port);
@@ -368,7 +368,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     {
         $socket = $this->createStream();
         \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', array('timed_out' => true));
+        \uopz_set_return('stream_get_meta_data', ['timed_out' => true]);
         $socket->writeBlocking('test');
     }
 
@@ -387,7 +387,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     {
         $socket = $this->createStream();
         \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', array());
+        \uopz_set_return('stream_get_meta_data', []);
         $socket->writeBlocking('test');
     }
 
@@ -402,9 +402,9 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingMaxBuffer()
     {
-        $str = str_pad('',  Socket::MAX_WRITE_BUFFER * 2, "*");
-        $host = '127.0.0.1';
-        $port = 9192;
+        $str       = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $streamMock = $this->initStreamMock($transport, $host, $port);
@@ -438,14 +438,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingReturnFalse()
     {
-        $str = str_pad('',  Socket::MAX_WRITE_BUFFER * 2, "*");
-        $host = '127.0.0.1';
-        $port = 9192;
+        $str       = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $streamMock = $this->initStreamMock($transport, $host, $port);
         $streamMock->method('write')->will($this->onConsecutiveCalls(
-            0 
+            0
         ))->withConsecutive(
             [substr($str, 0, Socket::MAX_WRITE_BUFFER)]
         );
@@ -467,7 +467,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         if ($context == null) {
             $context = stream_context_create([]);
         }
-        $uri = sprintf('%s://%s:%s', $transport, $host, $port);
+        $uri    = sprintf('%s://%s:%s', $transport, $host, $port);
         $stream = @fopen($uri, 'r+', false, $context);
         \uopz_set_return('stream_socket_client', $stream);
     }
@@ -497,8 +497,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
     private function createStream()
     {
-        $host = '127.0.0.1';
-        $port = 9192;
+        $host      = '127.0.0.1';
+        $port      = 9192;
         $transport = 'tcp';
 
         $streamMock = $this->initStreamMock($transport, $host, $port);
@@ -533,6 +533,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    // }}} 
+    // }}}
     // }}}
 }

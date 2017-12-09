@@ -231,16 +231,16 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSocketNotSetConfig()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker   = \Kafka\Broker::getInstance();
         $hostname = '127.0.0.1';
-        $port = '9092';
-        $socket = $broker->getSocket($hostname, $port, true);
+        $port     = '9092';
+        $socket   = $broker->getSocket($hostname, $port, true);
 
         $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
 
         // not set config object
 
-        //$config = $this->getMockForAbstractClass(\Kafka\Config::class); 
+        //$config = $this->getMockForAbstractClass(\Kafka\Config::class);
         //$socket = $this->method('')
     }
 

@@ -26,7 +26,7 @@ namespace KafkaTest\Base\Stream;
 +------------------------------------------------------------------------------
 */
 
-class StreamMock 
+class StreamMock
 {
     // {{{ consts
     // }}}
