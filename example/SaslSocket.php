@@ -5,8 +5,8 @@ use \Kafka\Sasl\Scram;
 
 \Kafka\Protocol::init('1.0.0');
 $provider = new \Kafka\Sasl\Plain('nmred', '123456');
-$provider = new \Kafka\Sasl\Gssapi('/etc/security/keytabs/kafkaclient.keytab', 'kafka/node1@NMREDKAFKA.COM');
-//$provider = new Scram('alice', 'alice-secret', Scram::SCRAM_SHA_256);
+//$provider = new \Kafka\Sasl\Gssapi('/etc/security/keytabs/kafkaclient.keytab', 'kafka/node1@NMREDKAFKA.COM');
+$provider = new Scram('alice', 'alice-secret', Scram::SCRAM_SHA_256);
 
 $socket = new \Kafka\SocketSync('127.0.0.1', '9092');
 $socket->setSaslProvider($provider);

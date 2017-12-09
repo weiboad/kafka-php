@@ -51,6 +51,7 @@ class SaslGssapiTest extends \PHPUnit\Framework\TestCase
     {
         \uopz_unset_return('extension_loaded');
         \uopz_unset_return('is_readable');
+        \uopz_set_return(\KRB5CCache::class, 'initKeytab', '');
         $this->deleteKeytab();
     }
 
@@ -160,6 +161,69 @@ class SaslGssapiTest extends \PHPUnit\Framework\TestCase
     }
 
     // }}}
+    // {{{ public function testInitSecurityContext()
+
+    /**
+     * testInitSecurityContext
+     *
+     * @access public
+     * @return void
+     */
+    public function testInitSecurityContext()
+    {
+        if (! extension_loaded('krb5')) {
+            return;
+        }
+        \uopz_flags(\Kafka\Sasl\Gssapi::class, 'initSecurityContext', ZEND_ACC_PUBLIC);
+        $this->mockKrb5(true);
+        $provider = new \Kafka\Sasl\Gssapi($this->keytab, 'testprincipal');
+        $this->assertSame('', $provider->initSecurityContext());
+    }
+
+    // }}}
+    // {{{ public function testInitSecurityContextNotSuccess()
+
+    /**
+     * testInitSecurityContext
+     *
+     * @expectedException \Kafka\Exception
+     * @expectedExceptionMessage Init security context failure.
+     * @access public
+     * @return void
+     */
+    public function testInitSecurityContextNotSuccess()
+    {
+        if (! extension_loaded('krb5')) {
+            return;
+        }
+        \uopz_flags(\Kafka\Sasl\Gssapi::class, 'initSecurityContext', ZEND_ACC_PUBLIC);
+        $this->mockKrb5(false);
+        $provider = new \Kafka\Sasl\Gssapi($this->keytab, 'testprincipal');
+        $provider->initSecurityContext();
+    }
+
+    // }}}
+    // {{{ public function testWarpToken()
+
+    /**
+     * testWarpToken
+     *
+     * @access public
+     * @return void
+     */
+    public function testWarpToken()
+    {
+        if (! extension_loaded('krb5')) {
+            return;
+        }
+        \uopz_flags(\Kafka\Sasl\Gssapi::class, 'warpToken', ZEND_ACC_PUBLIC);
+        $this->mockKrb5(true);
+        $provider = new \Kafka\Sasl\Gssapi($this->keytab, 'testprincipal');
+        $provider->initSecurityContext();
+        $this->assertSame('', $provider->warpToken('xxxx'));
+    }
+
+    // }}}
     // {{{ private function getSocketForTestGssapi()
 
     private function getSocketForTestGssapi()
@@ -209,6 +273,17 @@ class SaslGssapiTest extends \PHPUnit\Framework\TestCase
         $this->deleteKeytab();
         mkdir(dirname($this->keytab));
         file_put_contents($this->keytab, 'test');
+    }
+
+    // }}}
+    // {{{ private function mockKrb5()
+
+    private function mockKrb5($success = false)
+    {
+        \uopz_set_return(\KRB5CCache::class, 'initKeytab', '');
+        \uopz_set_return(\GSSAPIContext::class, 'acquireCredentials', '');
+        \uopz_set_return(\GSSAPIContext::class, 'initSecContext', $success);
+        \uopz_set_return(\GSSAPIContext::class, 'wrap', '');
     }
 
     // }}}
