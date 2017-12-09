@@ -41,6 +41,7 @@ jobs:
     - stage: Code Quality
       env: CODE_STANDARD=1
       script:
+        - sed -i '/^extension=uopz*/d' ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
         - ./vendor/bin/phpcs
 
     - stage: Code Quality

@@ -132,7 +132,7 @@ abstract class CommonSocket
      * @param $port
      * @param Object $config
      */
-    public function __construct($host, $port, $config = null, $saslProvider = null)
+    public function __construct(string $host, int $port, ?Config $config = null, ?SaslMechanism $saslProvider = null)
     {
         $this->host                  = $host;
         $this->port                  = $port;
@@ -140,58 +140,44 @@ abstract class CommonSocket
         $this->saslMechanismProvider = $saslProvider;
     }
 
-    /**
-     * @param float $sendTimeoutSec
-     */
-    public function setSendTimeoutSec($sendTimeoutSec)
+    // }}}
+    // {{{ public function getHost()
+    
+    public function getHost() : string
     {
-        $this->sendTimeoutSec = $sendTimeoutSec;
-    }
-
-    /**
-     * @param float $sendTimeoutUsec
-     */
-    public function setSendTimeoutUsec($sendTimeoutUsec)
-    {
-        $this->sendTimeoutUsec = $sendTimeoutUsec;
-    }
-
-    /**
-     * @param float $recvTimeoutSec
-     */
-    public function setRecvTimeoutSec($recvTimeoutSec)
-    {
-        $this->recvTimeoutSec = $recvTimeoutSec;
-    }
-
-    /**
-     * @param float $recvTimeoutUsec
-     */
-    public function setRecvTimeoutUsec($recvTimeoutUsec)
-    {
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-    }
-
-    /**
-     * @param int $number
-     */
-    public function setMaxWriteAttempts($number)
-    {
-        $this->maxWriteAttempts = $number;
+        return $this->host;
     }
 
     // }}}
-    // {{{ public function getSocket()
-
-    /**
-     * get the socket
-     *
-     * @access public
-     * @return resource
-     */
-    public function getSocket()
+    // {{{ public function getPort()
+    
+    public function getPort() : int
     {
-        return $this->stream;
+        return $this->port;
+    }
+
+    // }}}
+    // {{{ public function setConfig()
+    
+    public function setConfig(Config $config) : void
+    {
+        $this->config = $config;
+    }
+
+    // }}}
+    // {{{ public function getConfig()
+    
+    public function getConfig() : ?Config
+    {
+        return $this->config;
+    }
+
+    // }}}
+    // {{{ public function getSaslProvider()
+    
+    public function getSaslProvider() : ?SaslMechanism
+    {
+        return $this->saslMechanismProvider;
     }
 
     // }}}
@@ -207,6 +193,118 @@ abstract class CommonSocket
     public function setSaslProvider(SaslMechanism $provider) : void
     {
         $this->saslMechanismProvider = $provider;
+    }
+
+    // }}}
+    // {{{ public function setSendTimeoutSec()
+
+    /**
+     * @param float $sendTimeoutSec
+     */
+    public function setSendTimeoutSec(float $sendTimeoutSec) : void
+    {
+        $this->sendTimeoutSec = $sendTimeoutSec;
+    }
+
+    // }}}
+    // {{{ public function setSendTimeoutUsec()
+
+    /**
+     * @param float $sendTimeoutUsec
+     */
+    public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
+    {
+        $this->sendTimeoutUsec = $sendTimeoutUsec;
+    }
+
+    // }}}
+    // {{{ public function setRecvTimeoutSec()
+
+    /**
+     * @param float $recvTimeoutSec
+     */
+    public function setRecvTimeoutSec(float $recvTimeoutSec) : void
+    {
+        $this->recvTimeoutSec = $recvTimeoutSec;
+    }
+    
+    // }}}
+    // {{{ public function setRecvTimeoutUsec()
+
+    /**
+     * @param float $recvTimeoutUsec
+     */
+    public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
+    {
+        $this->recvTimeoutUsec = $recvTimeoutUsec;
+    }
+    
+    // }}}
+    // {{{ public function setMaxWriteAttempts()
+
+    /**
+     * @param int $number
+     */
+    public function setMaxWriteAttempts(int $number) : void
+    {
+        $this->maxWriteAttempts = $number;
+    }
+
+    // }}}
+    // {{{ public function getSendTimeoutSec()
+
+    public function getSendTimeoutSec() : float
+    {
+        return $this->sendTimeoutSec;
+    }
+
+    // }}}
+    // {{{ public function getSendTimeoutUsec()
+
+    public function getSendTimeoutUsec() : float
+    {
+        return $this->sendTimeoutUsec;
+    }
+
+    // }}}
+    // {{{ public function getRecvTimeoutSec()
+
+    public function getRecvTimeoutSec() : float
+    {
+        return $this->recvTimeoutSec;
+    }
+    
+    // }}}
+    // {{{ public function getRecvTimeoutUsec()
+
+    public function getRecvTimeoutUsec() : float
+    {
+        return $this->recvTimeoutUsec;
+    }
+    
+    // }}}
+    // {{{ public function getMaxWriteAttempts()
+
+    /**
+     * @param int $number
+     */
+    public function getMaxWriteAttempts() : int
+    {
+        return $this->maxWriteAttempts;
+    }
+
+    // }}}
+    // {{{ public function getSocket()
+
+    /**
+     * get the socket
+     *
+     * @access public
+     * @return resource
+     */
+    public function getSocket()
+    {
+        return $this->stream;
     }
 
     // }}}
@@ -226,8 +324,9 @@ abstract class CommonSocket
         if ($this->port <= 0) {
             throw new \Kafka\Exception('Cannot open without port.');
         }
-        
+
         $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
+
         $context      = stream_context_create([]);
         if ($this->config != null && $this->config->getSslEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
@@ -311,11 +410,7 @@ abstract class CommonSocket
         $data           = $chunk = '';
         while ($remainingBytes > 0) {
             $chunk = fread($this->getSocket(), $remainingBytes);
-            if ($chunk === false) {
-                $this->close();
-                throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (no data)');
-            }
-            if (strlen($chunk) === 0) {
+            if ($chunk === false || strlen($chunk) === 0) {
                 // Zero bytes because of EOF?
                 if (feof($this->getSocket())) {
                     $this->close();

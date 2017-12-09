@@ -49,8 +49,6 @@ class Broker
 
     private $process;
 
-    private $socket;
-
     private $config;
 
     // }}}
@@ -235,10 +233,6 @@ class Broker
 
     public function getSocket($host, $port, $modeSync)
     {
-        if ($this->socket != null) {
-            return $this->socket;
-        }
-
         $saslProvider = $this->judgeConnectionConfig();
         if ($modeSync) {
             $socket = new \Kafka\SocketSync($host, $port, $this->config, $saslProvider);
@@ -246,15 +240,6 @@ class Broker
             $socket = new \Kafka\Socket($host, $port, $this->config, $saslProvider);
         }
         return $socket;
-    }
-
-    // }}}
-    // {{{ public function setSocket()
-
-    // use unit test
-    public function setSocket($socket)
-    {
-        $this->socket = $socket;
     }
 
     // }}}
