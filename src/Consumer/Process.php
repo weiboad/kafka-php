@@ -565,7 +565,7 @@ class Process
                     break 2;
                 }
 
-                $offsets[$topic['topicName']][$part['partition']] = $part['offset'] - 1;
+                $offsets[$topic['topicName']][$part['partition']] = $part['offset'];
             }
         }
         $assign->setFetchOffsets($offsets);
