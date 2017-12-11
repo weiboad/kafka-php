@@ -187,7 +187,7 @@ class Protocol
     // }}}
     // {{{ functions
     // {{{ public static function init()
-    
+
     public static function init($version, $logger = null)
     {
         $class = [
@@ -270,7 +270,7 @@ class Protocol
     public static function getError($errCode)
     {
         if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {
-            return 'Unknown error';
+            return 'Unknown error (' . $errCode . ')';
         }
 
         return self::PROTOCOL_ERROR_MAP[$errCode];

@@ -53,7 +53,7 @@ class Broker
     // {{{ functions
     // {{{ public function setProcess()
 
-    public function setProcess(\Closure $process)
+    public function setProcess(callable $process)
     {
         $this->process = $process;
     }
