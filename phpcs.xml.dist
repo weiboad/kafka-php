@@ -11,6 +11,9 @@
     <file>src</file>
     <file>tests</file>
 
+    <!-- Exclude tests stream mock -->
+    <exclude-pattern>*/tests\/Base\/Stream/*</exclude-pattern>
+
     <rule ref="PSR2"/>
 
     <rule ref="Generic.Formatting.SpaceAfterCast" />
