@@ -32,7 +32,7 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 +------------------------------------------------------------------------------
 */
 
-final class Scram extends Mechanism implements SaslMechanism
+class Scram extends Mechanism implements SaslMechanism
 {
     // {{{ consts
 
@@ -85,19 +85,17 @@ final class Scram extends Mechanism implements SaslMechanism
     }
 
     // }}}
-    // {{{ public function authenticate()
+    // {{{ protected function performAuthentication()
     
     /**
      *
      * sasl authenticate
      *
-     * @access public
+     * @access protected
      * @return void
      */
-    public function authenticate(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket) : void
     {
-        $this->handShake($socket, $this->getMechanismName());
-        
         $firstMessage = $this->firstMessage();
         $data         = ProtocolTool::encodeString($firstMessage, ProtocolTool::PACK_INT32);
         $socket->writeBlocking($data);
@@ -116,7 +114,6 @@ final class Scram extends Mechanism implements SaslMechanism
     }
 
     // }}}
-    // {{{ public function getMechanismName()
     
     /**
      *
@@ -125,71 +122,12 @@ final class Scram extends Mechanism implements SaslMechanism
      * @access public
      * @return string
      */
-    public function getMechanismName() : string
+    public function getName() : string
     {
         return self::MECHANISM_NAME . $this->hashAlgorithm;
     }
 
-    // }}}
-    // {{{ private function hash()
-
-    private function hash(string $data) : string
-    {
-        return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
-    }
-
-    // }}}
-    // {{{ private function hmac()
-
-    private function hmac(string $key, string $data, bool $raw) : string
-    {
-        return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
-    }
-
-    // }}}
-    // {{{ private function formatName()
-
-  /**
-    * Prepare a name for inclusion in a SCRAM response.
-    * @See RFC-4013.
-    *
-    * @param string $user a name to be prepared.
-    * @return string the reformated name.
-    * @access private
-    */
-    private function formatName(string $user) : string
-    {
-        $user = str_replace('=', '=3D', $user);
-        $user = str_replace(',', '=2C', $user);
-        return $user;
-    }
-
-    // }}}
-    // {{{ private function hi()
-
-  /**
-    * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
-    *
-    * @param string $str The string to hash.
-    * @param string $hash The hash value.
-    * @param int $i The iteration count.
-    * @return string
-    * @access private
-    */
-    private function hi(string $str, string $salt, int $icnt) : string
-    {
-        $int1   = "\0\0\0\1";
-        $ui     = $this->hmac($str, $salt . $int1, true);
-        $result = $ui;
-        for ($k = 1; $k < $icnt; $k++) {
-            $ui     = $this->hmac($str, $ui, true);
-            $result = $result ^ $ui;
-        }
-        return $result;
-    }
-
-    // }}}
-    // {{{ private function firstMessage()
+    // {{{ protected function firstMessage()
 
     /**
       * Generate the initial response which can be either sent directly in the first message or as a response to an empty
@@ -197,7 +135,7 @@ final class Scram extends Mechanism implements SaslMechanism
       * @return string The SCRAM response to send.
       * @access private
       */
-    private function firstMessage() : string
+    protected function firstMessage() : string
     {
         $message                = '';
         $this->cnonce           = $this->generateNonce();
@@ -207,7 +145,7 @@ final class Scram extends Mechanism implements SaslMechanism
     }
 
     // }}}
-    // {{{ private function finalMessage()
+    // {{{ protected function finalMessage()
 
     /**
       * Generate the final message
@@ -215,7 +153,7 @@ final class Scram extends Mechanism implements SaslMechanism
       * @return string The SCRAM response to send.
       * @access private
       */
-    private function finalMessage(string $challenge) : string
+    protected function finalMessage(string $challenge) : string
     {
         $message        = '';
         $challengeArray = explode(',', $challenge);
@@ -267,19 +205,19 @@ final class Scram extends Mechanism implements SaslMechanism
     }
 
     // }}}
-    // {{{ private function verifyMessage()
+    // {{{ protected function verifyMessage()
 
     /**
       * SCRAM has also a server verification step
       *
       * @param string $data The additional data sent along a successful outcome.
       * @return bool Whether the server has been authenticated.
-      * @access private
+      * @access protected
       */
-    private function verifyMessage(string $data) : bool
+    protected function verifyMessage(string $data) : bool
     {
         $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9]{3}=|[A-Xa-z0-9]{2}==)?)$#';
-        if ($this->saltedPassword == null || $this->authMessage == null) {
+        if ($this->saltedPassword === null || $this->authMessage === null) {
             return false;
         }
 
@@ -287,28 +225,86 @@ final class Scram extends Mechanism implements SaslMechanism
             return false;
         }
 
-        $serverSignature = base64_decode($matches[1]);
-        $serverKey       = $this->hmac($this->saltedPassword, "Server Key", true);
-        $serverSignature = $this->hmac($serverKey, $this->authMessage, true);
-        return ($serverSignature === $serverSignature);
+        $proposedServerSignature = base64_decode($matches[1]);
+        $serverKey               = $this->hmac($this->saltedPassword, "Server Key", true);
+        $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
+        return hash_equals($proposedServerSignature, $serverSignature);
     }
 
     // }}}
-    // {{{ private function generateNonce()
+    // {{{ protected function generateNonce()
 
   /**
     * Creates the client nonce for the response
     *
     * @return string
-    * @access private
+    * @access protected
     */
-    private function generateNonce() : string
+    protected function generateNonce() : string
     {
         $str = '';
         for ($i=0; $i<32; $i++) {
             $str .= chr(mt_rand(0, 255));
         }
         return base64_encode($str);
+    }
+
+    // }}}
+    // {{{ private function hash()
+
+    private function hash(string $data) : string
+    {
+        return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
+    }
+
+    // }}}
+    // {{{ private function hmac()
+
+    private function hmac(string $key, string $data, bool $raw) : string
+    {
+        return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
+    }
+
+    // }}}
+    // {{{ private function formatName()
+
+  /**
+    * Prepare a name for inclusion in a SCRAM response.
+    * @See RFC-4013.
+    *
+    * @param string $user a name to be prepared.
+    * @return string the reformated name.
+    * @access private
+    */
+    private function formatName(string $user) : string
+    {
+        return str_replace(['=', ','], ['=3D', '=2C'], $user);
+
+        return $user;
+    }
+
+    // }}}
+    // {{{ private function hi()
+
+  /**
+    * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
+    *
+    * @param string $str The string to hash.
+    * @param string $hash The hash value.
+    * @param int $i The iteration count.
+    * @return string
+    * @access private
+    */
+    private function hi(string $str, string $salt, int $icnt) : string
+    {
+        $int1   = "\0\0\0\1";
+        $ui     = $this->hmac($str, $salt . $int1, true);
+        $result = $ui;
+        for ($k = 1; $k < $icnt; $k++) {
+            $ui     = $this->hmac($str, $ui, true);
+            $result = $result ^ $ui;
+        }
+        return $result;
     }
 
     // }}}

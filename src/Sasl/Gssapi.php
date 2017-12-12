@@ -32,25 +32,14 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 +------------------------------------------------------------------------------
 */
 
-final class Gssapi extends Mechanism implements SaslMechanism
+class Gssapi extends Mechanism
 {
-    // {{{ consts
-    
     private const MECHANISM_NAME = "GSSAPI";
-
-    // }}}
-    // {{{ members
-
-    private $keytab;
 
     private $principal;
 
     private $gssapi;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
-    
     /**
      *
      * __construct
@@ -58,35 +47,44 @@ final class Gssapi extends Mechanism implements SaslMechanism
      * @access public
      * @return void
      */
-    public function __construct(string $keytab, string $principal)
+    public function __construct(\GSSAPIContext $gssapi, string $principal)
     {
-        if (! file_exists($keytab) || ! is_file($keytab)) {
-            throw new Exception('Invalid keytab, keytab file not exists.');
-        }
-        if (! is_readable($keytab)) {
-            throw new Exception('Invalid keytab, keytab file disable read.');
-        }
-
-        $this->keytab    = $keytab;
+        $this->gssapi    = $gssapi;
         $this->principal = $principal;
     }
 
-    // }}}
-    // {{{ public function authenticate()
-    
+
+    public static function fromKeytab(string $keytab, string $principal): self
+    {
+        if (! extension_loaded('krb5')) {
+            throw new Exception('Extension "krb5" is required for "GSSAPI" authentication');
+        }
+
+        if (! file_exists($keytab) || ! is_file($keytab)) {
+            throw new Exception('Invalid keytab, keytab file not exists.');
+        }
+
+        if (! is_readable($keytab)) {
+            throw new Exception('Invalid keytab, keytab file disable read.');
+        }
+        
+        $ccache = new \KRB5CCache();
+        $ccache->initKeytab($principal, $keytab);
+
+        $gssapi = new \GSSAPIContext();
+        $gssapi->acquireCredentials($ccache, $principal, \GSS_C_INITIATE);
+        return new self($gssapi, $principal);
+    }
+
     /**
      *
      * sasl authenticate
      *
-     * @access public
+     * @access protected
      * @return void
      */
-    public function authenticate(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket) : void
     {
-        if (! extension_loaded('krb5')) {
-            throw new Exception('Extension `krb5` not installed.');
-        }
-        $this->handShake($socket, $this->getMechanismName());
         $token = $this->initSecurityContext();
 
         // send token to server and get server token
@@ -95,14 +93,11 @@ final class Gssapi extends Mechanism implements SaslMechanism
         $dataLen = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
         $stoken  = $socket->readBlocking($dataLen);
         // warp message use server token and send to server authenticate
-        $outputMessage = $this->warpToken($stoken);
+        $outputMessage = $this->wrapToken($stoken);
         $data          = \Kafka\Protocol\Protocol::encodeString($outputMessage, \Kafka\Protocol\Protocol::PACK_INT32);
         $socket->writeBlocking($data);
     }
 
-    // }}}
-    // {{{ public function getMechanismName()
-    
     /**
      *
      * get sasl authenticate mechanism name
@@ -110,22 +105,13 @@ final class Gssapi extends Mechanism implements SaslMechanism
      * @access public
      * @return string
      */
-    public function getMechanismName() : string
+    public function getName() : string
     {
         return self::MECHANISM_NAME;
     }
 
-    // }}}
-    // {{{ private function initSecurityContext()
-    
     private function initSecurityContext() : string
     {
-        // init krb5 ccache
-        $ccache = new \KRB5CCache();
-        $ccache->initKeytab($this->principal, $this->keytab);
-        $this->gssapi = new \GSSAPIContext();
-        $this->gssapi->acquireCredentials($ccache, $this->principal, GSS_C_INITIATE);
-
         $token = '';
         $ret   = $this->gssapi->initSecContext($this->principal, null, null, null, $token);
         if (! $ret) {
@@ -133,16 +119,11 @@ final class Gssapi extends Mechanism implements SaslMechanism
         }
         return $token;
     }
-    // }}}
-    // {{{ private function warpToken()
     
-    private function warpToken(string $token) : string
+    private function wrapToken(string $token) : string
     {
         $message = '';
         $this->gssapi->wrap($token, $message);
         return $message;
     }
-
-    // }}}
-    // }}}
 }

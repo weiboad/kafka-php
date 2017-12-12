@@ -183,24 +183,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
 
         $result = $broker->getMetaConnect('1');
         $this->assertFalse($result);
-
-        $broker->setProcess(function ($data) {
-        });
-        //$result = $broker->getMetaConnect('1');
-        //// second call
-        //$result = $broker->getMetaConnect('1');
-        //$this->assertSame($socket, $result);
-        //$result = $broker->getDataConnect('1');
-        //$this->assertSame($socket, $result);
-        //$result = $broker->getDataConnect('127.0.0.1:9292');
-        //$this->assertSame($socket, $result);
-        //$result = $broker->getDataConnect('127.0.0.1:9292');
-        //$this->assertSame($socket, $result);
-        //$result = $broker->getDataConnect('invalid_key');
-        //$this->assertFalse($result);
-        //$result = $broker->getRandConnect();
-        //$this->assertSame($socket, $result);
-        //$broker->clear();
     }
 
     // }}}
@@ -237,11 +219,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $socket   = $broker->getSocket($hostname, $port, true);
 
         $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
-
-        // not set config object
-
-        //$config = $this->getMockForAbstractClass(\Kafka\Config::class);
-        //$socket = $this->method('')
     }
 
     // }}}

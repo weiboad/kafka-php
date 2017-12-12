@@ -57,13 +57,13 @@ class SocketSync extends CommonSocket
      */
     public function connect()
     {
-        if (is_resource($this->getSocket())) {
+        if (is_resource($this->stream)) {
             return;
         }
 
         $this->createStream();
 
-        stream_set_blocking($this->getSocket(), 0);
+        stream_set_blocking($this->stream, 0);
     }
 
     // }}}
@@ -77,8 +77,8 @@ class SocketSync extends CommonSocket
      */
     public function close() : void
     {
-        if (is_resource($this->getSocket())) {
-            fclose($this->getSocket());
+        if (is_resource($this->stream)) {
+            fclose($this->stream);
         }
     }
 
@@ -90,7 +90,7 @@ class SocketSync extends CommonSocket
      */
     public function isResource()
     {
-        return is_resource($this->getSocket());
+        return is_resource($this->stream);
     }
 
     // }}}
@@ -139,8 +139,8 @@ class SocketSync extends CommonSocket
      */
     public function rewind()
     {
-        if (is_resource($this->getSocket())) {
-            rewind($this->getSocket());
+        if (is_resource($this->stream)) {
+            rewind($this->stream);
         }
     }
 

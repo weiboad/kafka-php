@@ -13,7 +13,6 @@ cache:
 
 before_install:
   - pecl install -f krb5-1.1.2
-  - if [ $CODE_STANDARD"" != 1"" ]; then pecl install uopz; fi 
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
 
 install: travis_retry composer install --no-interaction
@@ -35,7 +34,7 @@ jobs:
       script:
         - ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       after_script:
-        - ./vendor/bin/coveralls  -v
+        - ./vendor/bin/php-coveralls  -v
 
     - stage: Code Quality
       env: CODE_STANDARD=1

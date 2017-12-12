@@ -141,61 +141,6 @@ abstract class CommonSocket
     }
 
     // }}}
-    // {{{ public function getHost()
-    
-    public function getHost() : string
-    {
-        return $this->host;
-    }
-
-    // }}}
-    // {{{ public function getPort()
-    
-    public function getPort() : int
-    {
-        return $this->port;
-    }
-
-    // }}}
-    // {{{ public function setConfig()
-    
-    public function setConfig(Config $config) : void
-    {
-        $this->config = $config;
-    }
-
-    // }}}
-    // {{{ public function getConfig()
-    
-    public function getConfig() : ?Config
-    {
-        return $this->config;
-    }
-
-    // }}}
-    // {{{ public function getSaslProvider()
-    
-    public function getSaslProvider() : ?SaslMechanism
-    {
-        return $this->saslMechanismProvider;
-    }
-
-    // }}}
-    // {{{ public function setSaslProvider()
-
-    /**
-     * set SASL provider
-     *
-     * @access public
-     * @param SaslMechanism provider
-     * @return void
-     */
-    public function setSaslProvider(SaslMechanism $provider) : void
-    {
-        $this->saslMechanismProvider = $provider;
-    }
-
-    // }}}
     // {{{ public function setSendTimeoutSec()
 
     /**
@@ -251,63 +196,6 @@ abstract class CommonSocket
     }
 
     // }}}
-    // {{{ public function getSendTimeoutSec()
-
-    public function getSendTimeoutSec() : float
-    {
-        return $this->sendTimeoutSec;
-    }
-
-    // }}}
-    // {{{ public function getSendTimeoutUsec()
-
-    public function getSendTimeoutUsec() : float
-    {
-        return $this->sendTimeoutUsec;
-    }
-
-    // }}}
-    // {{{ public function getRecvTimeoutSec()
-
-    public function getRecvTimeoutSec() : float
-    {
-        return $this->recvTimeoutSec;
-    }
-    
-    // }}}
-    // {{{ public function getRecvTimeoutUsec()
-
-    public function getRecvTimeoutUsec() : float
-    {
-        return $this->recvTimeoutUsec;
-    }
-    
-    // }}}
-    // {{{ public function getMaxWriteAttempts()
-
-    /**
-     * @param int $number
-     */
-    public function getMaxWriteAttempts() : int
-    {
-        return $this->maxWriteAttempts;
-    }
-
-    // }}}
-    // {{{ public function getSocket()
-
-    /**
-     * get the socket
-     *
-     * @access public
-     * @return resource
-     */
-    public function getSocket()
-    {
-        return $this->stream;
-    }
-
-    // }}}
     // {{{ protected function createStream()
 
     /**
@@ -347,14 +235,7 @@ abstract class CommonSocket
             ]]);
         }
         
-        $this->stream = stream_socket_client(
-            $remoteSocket,
-            $errno,
-            $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
-            STREAM_CLIENT_CONNECT,
-            $context
-        );
+        $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
 
         if ($this->stream == false) {
             $error = 'Could not connect to '
@@ -363,12 +244,41 @@ abstract class CommonSocket
             throw new \Kafka\Exception($error);
         }
         // SASL auth
-        if ($this->saslMechanismProvider != null) {
+        if ($this->saslMechanismProvider !== null) {
             $this->saslMechanismProvider->authenticate($this);
         }
     }
 
     // }}}
+    // {{{ protected function createSocket()
+
+    protected function createSocket($remoteSocket, $context, &$errno, &$errstr)
+    {
+        return stream_socket_client(
+            $remoteSocket,
+            $errno,
+            $errstr,
+            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
+            STREAM_CLIENT_CONNECT,
+            $context
+        );
+    }
+
+    // }}}
+    protected function select($sockets, $timeoutSec, $timeoutUsec, $isRead = true)
+    {
+        $null = null;
+        if ($isRead) {
+            return @stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
+        } else {
+            return @stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
+        }
+    }
+
+    protected function getMetaData()
+    {
+        return stream_get_meta_data($this->stream);
+    }
     // {{{ public function readBlocking()
 
     /**
@@ -390,14 +300,14 @@ abstract class CommonSocket
         }
 
         $null     = null;
-        $read     = [$this->getSocket()];
-        $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        $read     = [$this->stream];
+        $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
         if ($readable === false) {
             $this->close();
             throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
         }
         if ($readable === 0) { // select timeout
-            $res = stream_get_meta_data($this->getSocket());
+            $res = $this->getMetaData();
             $this->close();
             if (! empty($res['timed_out'])) {
                 throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
@@ -409,15 +319,15 @@ abstract class CommonSocket
         $remainingBytes = $len;
         $data           = $chunk = '';
         while ($remainingBytes > 0) {
-            $chunk = fread($this->getSocket(), $remainingBytes);
+            $chunk = fread($this->stream, $remainingBytes);
             if ($chunk === false || strlen($chunk) === 0) {
                 // Zero bytes because of EOF?
-                if (feof($this->getSocket())) {
+                if (feof($this->stream)) {
                     $this->close();
                     throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
                 }
                 // Otherwise wait for bytes
-                $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+                $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
                 if ($readable !== 1) {
                     throw new \Kafka\Exception('Timed out while reading ' . $len . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
                 }
@@ -448,7 +358,7 @@ abstract class CommonSocket
      */
     public function writeBlocking(string $buf) : int
     {
-        $write = [$this->getSocket()];
+        $write = [$this->stream];
 
         $null = null;
         // fwrite to a socket may be partial, so loop until we
@@ -458,12 +368,12 @@ abstract class CommonSocket
         $bytesToWrite   = strlen($buf);
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
-            $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
+            $writable = $this->select($write, $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
             if (false === $writable) {
                 throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
             if (0 === $writable) {
-                $res = stream_get_meta_data($this->getSocket());
+                $res = $this->getMetaData();
                 if (! empty($res['timed_out'])) {
                     throw new \Kafka\Exception('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');
                 } else {
@@ -473,10 +383,10 @@ abstract class CommonSocket
             
             if ($bytesToWrite - $bytesWritten > self::MAX_WRITE_BUFFER) {
                 // write max buffer size
-                $wrote = fwrite($this->getSocket(), substr($buf, $bytesWritten, self::MAX_WRITE_BUFFER));
+                $wrote = fwrite($this->stream, substr($buf, $bytesWritten, self::MAX_WRITE_BUFFER));
             } else {
                 // write remaining buffer bytes to stream
-                $wrote = fwrite($this->getSocket(), substr($buf, $bytesWritten));
+                $wrote = fwrite($this->stream, substr($buf, $bytesWritten));
             }
             
             if ($wrote === -1 || $wrote === false) {

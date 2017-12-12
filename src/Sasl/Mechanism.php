@@ -31,13 +31,15 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 +------------------------------------------------------------------------------
 */
 
-abstract class Mechanism
+abstract class Mechanism implements \Kafka\SaslMechanism
 {
-    // {{{ consts
-    // }}}
-    // {{{ functions
-    // {{{ protected function handShake()
-    
+
+    public function authenticate(CommonSocket $socket): void
+    {
+        $this->handShake($socket, $this->getName());
+        $this->performAuthentication($socket);
+    }
+
     /**
      *
      * sasl authenticate hand shake
@@ -60,6 +62,6 @@ abstract class Mechanism
         }
     }
 
-    // }}}
-    // }}}
+    abstract protected function performAuthentication(CommonSocket $socket): void;
+    abstract public function getName(): string;
 }

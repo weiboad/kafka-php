@@ -16,8 +16,9 @@ namespace KafkaTest\Base;
 
 use \Kafka\Socket;
 use \Kafka\Config;
-use \KafkaTest\Base\Stream\Simple as SimpleStream;
-use \KafkaTest\Base\Stream\StreamMock;
+use \KafkaTest\Base\StreamStub\Simple as SimpleStream;
+use \KafkaTest\Base\StreamStub\Stream;
+use org\bovigo\vfs\vfsStream;
 
 /**
 +------------------------------------------------------------------------------
@@ -36,55 +37,24 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     // {{{ consts
     // }}}
     // {{{ members
+
+    private $root;
+
     // }}}
     // {{{ functions
+    // {{{ public function setUp()
+
+    public function setUp()
+    {
+        $this->root = vfsStream::setup('test', 0777, ['localKey' => 'data', 'localCert' => 'data', 'cafile' => 'data']);
+    }
+
+    // }}}
     // {{{ public function tearDown()
 
     public function tearDown()
     {
         $this->clearStreamMock();
-    }
-
-    // }}}
-    // {{{ public function testConstruct()
-
-    /**
-     * testConstruct
-     *
-     * @access public
-     * @return void
-     */
-    public function testConstruct()
-    {
-        $host   = '127.0.0.1';
-        $port   = 9092;
-        $socket = new Socket($host, $port);
-        $this->assertSame($host, $socket->getHost());
-        $this->assertSame($port, $socket->getPort());
-        $this->assertNull($socket->getConfig());
-        $this->assertNull($socket->getSaslProvider());
-
-        $config = $this->getMockForAbstractClass(Config::class);
-        $socket->setConfig($config);
-        $this->assertEquals($config, $socket->getConfig());
-        
-        
-        $sasl = new \Kafka\Sasl\Plain('username', 'password');
-        $socket->setSaslProvider($sasl);
-        $this->assertEquals($sasl, $socket->getSaslProvider());
-
-        $socket->setSendTimeoutSec(200);
-        $this->assertEquals(200, $socket->getSendTimeoutSec());
-        $socket->setSendTimeoutUsec(330.11);
-        $this->assertEquals(330.11, $socket->getSendTimeoutUsec());
-        $socket->setRecvTimeoutSec(130.11);
-        $this->assertEquals(130.11, $socket->getRecvTimeoutSec());
-        $socket->setRecvTimeoutUsec(430.11);
-        $this->assertEquals(430.11, $socket->getRecvTimeoutUsec());
-        $socket->setMaxWriteAttempts(3);
-        $this->assertEquals(3, $socket->getMaxWriteAttempts());
-
-        $this->assertNull($socket->getSocket());
     }
 
     // }}}
@@ -100,9 +70,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamHostName()
     {
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
         $socket = new Socket('', -99);
-        $socket->createStream();
+        $socket->connect();
     }
 
     // }}}
@@ -118,9 +87,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamPort()
     {
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
         $socket = new Socket('123', -99);
-        $socket->createStream();
+        $socket->connect();
     }
 
     // }}}
@@ -138,20 +106,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
 
-        $this->initStreamMock($transport, $host, $port);
+        $this->initStreamStub($transport, $host, $port);
 
-        $this->mockStreamSocketClient($transport, $host, $port);
-
-        \uopz_flags(\Kafka\Sasl\Plain::class, null, 0);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
         $sasl = $this->createMock(\Kafka\Sasl\Plain::class);
         $sasl->expects($this->once())
              ->method('authenticate')
              ->with($this->isInstanceOf(Socket::class));
-        
-        $socket = new Socket($host, $port);
-        $socket->setSaslProvider($sasl);
-        $stream = $socket->createStream();
+        $socket = $this->mockStreamSocketClient($host, $port, null, $sasl);
+        $socket->connect();
     }
 
     // }}}
@@ -171,14 +133,9 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
 
-        $this->initStreamMock($transport, $host, $port, null, false);
-
-        $this->mockStreamSocketClient($transport, $host, $port);
-
-        \uopz_flags(\Kafka\Sasl\Plain::class, null, 0);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
-        $socket = new Socket($host, $port);
-        $stream = $socket->createStream();
+        $this->initStreamStub($transport, $host, $port, false);
+        $socket = $this->mockStreamSocketClient($host, $port);
+        $socket->connect();
     }
 
     // }}}
@@ -195,11 +152,11 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $host       = '127.0.0.1';
         $port       = 9192;
         $transport  = 'ssl';
-        $localCert  = '/etc/testcert';
-        $localKey   = 'etc/localkey';
+        $localCert  = $this->root->url() . '/localCert';
+        $localKey   = $this->root->url() . '/localKey';
         $verifyPeer = false;
         $passphrase = '123456';
-        $cafile     = '/etc/cafile';
+        $cafile     = $this->root->url() . '/cafile';
         $peerName   = 'kafka';
         $context    = stream_context_create(['ssl' => [
                 'local_cert' => $localCert,
@@ -209,25 +166,28 @@ class SocketTest extends \PHPUnit\Framework\TestCase
                 'cafile' => $cafile,
                 'peer_name' => $peerName
         ]]);
+        
 
-        $streamMock = $this->initStreamMock($transport, $host, $port, $context);
+        $streamMock = $this->initStreamStub($transport, $host, $port, true);
         $streamMock->expects($this->once())
                    ->method('context')
-                   ->with($this->equalTo($context));
+                   ->with($this->equalTo(stream_context_get_options($context)));
 
-        $this->mockStreamSocketClient($transport, $host, $port, $context);
+        $config = $this->getMockForAbstractClass(\Kafka\Config::class);
+        $config->setSslEnable(true);
+        $config->setSslLocalPk($localKey);
+        $config->setSslLocalCert($localCert);
+        $config->setSslCafile($cafile);
+        $config->setSslPassphrase($passphrase);
+        $config->setSslVerifyPeer($verifyPeer);
+        $config->setSslPeerName($peerName);
 
-        \uopz_flags(\Kafka\Sasl\Plain::class, null, 0);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
         $sasl = $this->createMock(\Kafka\Sasl\Plain::class);
         $sasl->expects($this->once())
              ->method('authenticate')
              ->with($this->isInstanceOf(Socket::class));
-        $config = $this->getMockForAbstractClass(\Kafka\Config::class);
-        $config->setSslEnable(true);
-        
-        $socket = new Socket($host, $port, $config, $sasl);
-        $stream = $socket->createStream();
+        $socket = $this->mockStreamSocketClient($host, $port, $config, $sasl);
+        $socket->connect();
     }
 
     // }}}
@@ -246,7 +206,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $host      = '127.0.0.1';
         $port      = 9192;
         $transport = 'tcp';
-        $socket    = new Socket($host, $port);
+        $socket    = $this->mockStreamSocketClient($host, $port);
         $socket->readBlocking(Socket::READ_MAX_LENGTH + 1);
     }
 
@@ -263,8 +223,12 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testReadBlockingFailure()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', false);
+        $host      = '127.0.0.1';
+        $port      = 9192;
+        $transport = 'tcp';
+
+        $this->initStreamStub($transport, $host, $port);
+        $socket = $this->createStream($host, $port, false);
         $socket->readBlocking(4);
     }
 
@@ -281,9 +245,13 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testReadBlockingTimeout()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', ['timed_out' => true]);
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $socket = $this->createStream($host, $port, 0, ['timed_out' => true]);
         $socket->readBlocking(4);
     }
 
@@ -300,9 +268,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testReadBlockingTimeoutElse()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', []);
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $socket = $this->createStream($host, $port, 0, []);
+        $socket->connect();
         $socket->readBlocking(4);
     }
 
@@ -323,15 +296,10 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
 
-        $streamMock = $this->initStreamMock($transport, $host, $port);
+        $streamMock = $this->initStreamStub($transport, $host, $port);
         $streamMock->method('eof')->will($this->returnValue(true));
 
-        $this->mockStreamSocketClient($transport, $host, $port);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
-
-        \uopz_set_return('stream_select', 1);
-        $socket = new Socket($host, $port);
-        $socket->createStream();
+        $socket = $this->createStream($host, $port, 1);
         $socket->readBlocking(4);
     }
 
@@ -348,8 +316,13 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingFailure()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', false);
+        $host      = '127.0.0.1';
+        $port      = 9192;
+        $transport = 'tcp';
+
+        $this->initStreamStub($transport, $host, $port);
+        $socket = $this->createStream($host, $port, false);
+        $socket->connect();
         $socket->writeBlocking('test');
     }
 
@@ -360,16 +333,20 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      * testWriteBlockingTimeout
      *
      * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Timed out writing 4 bytes to stream after writing 0 bytes
+     * @expectedExceptionMessage Timed out writing 1 bytes to stream after writing 0 bytes
      * @access public
      * @return void
      */
     public function testWriteBlockingTimeout()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', ['timed_out' => true]);
-        $socket->writeBlocking('test');
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $socket = $this->createStream($host, $port, 0, ['timed_out' => true]);
+        $socket->writeBlocking(4);
     }
 
     // }}}
@@ -385,10 +362,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingTimeoutElse()
     {
-        $socket = $this->createStream();
-        \uopz_set_return('stream_select', 0);
-        \uopz_set_return('stream_get_meta_data', []);
-        $socket->writeBlocking('test');
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $socket = $this->createStream($host, $port, 0, []);
+        $socket->writeBlocking('xxxx');
     }
 
     // }}}
@@ -407,7 +388,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
 
-        $streamMock = $this->initStreamMock($transport, $host, $port);
+        $streamMock = $this->initStreamStub($transport, $host, $port);
         $streamMock->method('write')->will($this->onConsecutiveCalls(
             Socket::MAX_WRITE_BUFFER,
             Socket::MAX_WRITE_BUFFER
@@ -416,12 +397,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
             [substr($str, Socket::MAX_WRITE_BUFFER)]
         );
 
-        $this->mockStreamSocketClient($transport, $host, $port);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
-
-        \uopz_set_return('stream_select', 1);
-        $socket = new Socket($host, $port);
-        $socket->createStream();
+        $socket = $this->createStream($host, $port, 1);
         $this->assertEquals(Socket::MAX_WRITE_BUFFER * 2, $socket->writeBlocking($str));
     }
 
@@ -443,51 +419,54 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
 
-        $streamMock = $this->initStreamMock($transport, $host, $port);
+        $streamMock = $this->initStreamStub($transport, $host, $port);
         $streamMock->method('write')->will($this->onConsecutiveCalls(
             0
         ))->withConsecutive(
             [substr($str, 0, Socket::MAX_WRITE_BUFFER)]
         );
 
-        $this->mockStreamSocketClient($transport, $host, $port);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
-
-        \uopz_set_return('stream_select', 1);
-        $socket = new Socket($host, $port);
-        $socket->createStream();
+        $socket = $this->createStream($host, $port, 1);
         $socket->writeBlocking($str);
     }
 
     // }}}
     // {{{ private function mockStreamSocketClient()
 
-    private function mockStreamSocketClient($transport, $host, $port, $context = null)
+    private function mockStreamSocketClient($host, $port, $config = null, $sasl = null, $mockMethod = [])
     {
-        if ($context == null) {
-            $context = stream_context_create([]);
+        if (empty($mockMethod)) {
+            $mockMethod = ['createSocket'];
+        } else {
+            $mockMethod = array_merge(['createSocket'], $mockMethod);
         }
-        $uri    = sprintf('%s://%s:%s', $transport, $host, $port);
-        $stream = @fopen($uri, 'r+', false, $context);
-        \uopz_set_return('stream_socket_client', $stream);
+        
+        $socket = $this->getMockBuilder(Socket::class)
+            ->setMethods($mockMethod)
+            ->setConstructorArgs([$host, $port, $config, $sasl])
+            ->getMock();
+
+        $socket->method('createSocket')
+               ->will($this->returnCallback(function ($remoteSocket, $context, &$errno, &$error) {
+                    return @fopen($remoteSocket, 'r+', false, $context);
+               }));
+        return $socket;
     }
 
     // }}}
-    // {{{ private function initStreamMock()
+    // {{{ private function initStreamStub()
 
-    private function initStreamMock($transport, $host, $port, $context = null, $success = true)
+    private function initStreamStub($transport, $host, $port, $success = true)
     {
         $uri = sprintf('%s://%s:%s', $transport, $host, $port);
-        if ($context == null) {
-            $context = stream_context_create([]);
-        }
         stream_wrapper_register($transport, SimpleStream::class);
-        $streamMock = $this->createMock(StreamMock::class);
+        $streamMock = $this->createMock(Stream::class);
         $streamMock->method('open')->with(
             $this->equalTo($uri),
             $this->equalTo('r+'),
             $this->equalTo(0)
         )->will($this->returnValue($success));
+        $streamMock->method('option')->will($this->returnValue(true));
         SimpleStream::setMock($streamMock);
         return $streamMock;
     }
@@ -495,18 +474,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     // }}}
     // {{{ private function createStream()
 
-    private function createStream()
+    private function createStream($host, $port, $select, $metaData = [])
     {
-        $host      = '127.0.0.1';
-        $port      = 9192;
-        $transport = 'tcp';
-
-        $streamMock = $this->initStreamMock($transport, $host, $port);
-        $this->mockStreamSocketClient($transport, $host, $port);
-        \uopz_flags(Socket::class, 'createStream', ZEND_ACC_PUBLIC);
-
-        $socket = new Socket($host, $port);
-        $socket->createStream();
+        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select', 'getMetaData']);
+        $socket->method('select')
+               ->will($this->returnValue($select));
+        $socket->method('getMetaData')
+               ->will($this->returnValue($metaData));
+        $socket->connect();
         return $socket;
     }
 
@@ -520,16 +495,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         }
         if (in_array('tcp', stream_get_wrappers(), true)) {
             stream_wrapper_unregister('tcp');
-        }
-
-        if (\uopz_get_return('stream_socket_client')) {
-            \uopz_unset_return('stream_socket_client');
-        }
-        if (\uopz_get_return('stream_select')) {
-            \uopz_unset_return('stream_select');
-        }
-        if (\uopz_get_return('stream_get_meta_data')) {
-            \uopz_unset_return('stream_get_meta_data');
         }
     }
 
