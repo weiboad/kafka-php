@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for group coordinator api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class GroupCoordinator extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * group coordinator request encode
@@ -50,9 +23,6 @@ class GroupCoordinator extends Protocol
 
         return $data;
     }
-
-    // }}}
-    // {{{ public function decode()
 
     /**
      * decode group response
@@ -79,7 +49,4 @@ class GroupCoordinator extends Protocol
             'coordinatorPort' => $coordinatorPort
         ];
     }
-
-    // }}}
-    // }}}
 }

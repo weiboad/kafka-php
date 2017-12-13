@@ -1,34 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for container
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class Protocol
 {
-    // {{{ consts
 
     /**
      * protocol request code
@@ -179,14 +153,7 @@ class Protocol
         60 => 'A partition reassignment is in progress'
     ];
 
-    // }}}
-    // {{{ members
-
     protected static $objects = [];
-
-    // }}}
-    // {{{ functions
-    // {{{ public static function init()
 
     public static function init($version, $logger = null)
     {
@@ -218,9 +185,6 @@ class Protocol
         }
     }
 
-    // }}}
-    // {{{ public static function encode()
-
     /**
      * request encode
      *
@@ -238,9 +202,6 @@ class Protocol
         return self::$objects[$key]->encode($payloads);
     }
 
-    // }}}
-    // {{{ public static function decode()
-
     /**
      * decode response
      *
@@ -255,9 +216,6 @@ class Protocol
 
         return self::$objects[$key]->decode($data);
     }
-
-    // }}}
-    // {{{ public static function getError()
 
     /**
      * get error
@@ -275,7 +233,4 @@ class Protocol
 
         return self::PROTOCOL_ERROR_MAP[$errCode];
     }
-
-    // }}}
-    // }}}
 }

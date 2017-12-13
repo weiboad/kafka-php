@@ -1,39 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function setDown()
 
     /**
      * setDown
@@ -45,9 +14,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
     {
         \Kafka\ConsumerConfig::getInstance()->clear();
     }
-
-    // }}}
-    // {{{ public function testDefaultConfig()
 
     /**
      * testDefaultConfig
@@ -66,9 +32,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config->getValidKey(), '222');
     }
 
-    // }}}
-    // {{{ public function testSetClientId()
-
     /**
      * testSetClientId
      *
@@ -81,9 +44,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setClientId('kafka-php1');
         $this->assertEquals($config->getClientId(), 'kafka-php1');
     }
-
-    // }}}
-    // {{{ public function testSetClientIdEmpty()
 
     /**
      * testSetClientIdEmpty
@@ -99,9 +59,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setClientId('');
     }
 
-    // }}}
-    // {{{ public function testSetBrokerVersion()
-
     /**
      * testSetBrokerVersion
      *
@@ -114,9 +71,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setBrokerVersion('0.9.0.1');
         $this->assertEquals($config->getBrokerVersion(), '0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testSetBrokerVersionEmpty()
 
     /**
      * testSetBrokerVersionEmpty
@@ -132,9 +86,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setBrokerVersion('');
     }
 
-    // }}}
-    // {{{ public function testSetBrokerVersionValid()
-
     /**
      * testSetBrokerVersionValid
      *
@@ -149,9 +100,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setBrokerVersion('0.1');
     }
 
-    // }}}
-    // {{{ public function testSetMetadataBrokerList()
-
     /**
      * testSetMetadataBrokerList
      *
@@ -164,9 +112,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataBrokerList('127.0.0.1:9192,127.0.0.1:9292');
         $this->assertEquals($config->getMetadataBrokerList(), '127.0.0.1:9192,127.0.0.1:9292');
     }
-
-    // }}}
-    // {{{ public function testSetMetadataBrokerListEmpty()
 
     /**
      * testSetMetadataBrokerListEmpty
@@ -182,9 +127,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataBrokerList('');
     }
 
-    // }}}
-    // {{{ public function testSetMetadataBrokerListEmpty1()
-
     /**
      * testSetMetadataBrokerListEmpty
      *
@@ -198,9 +140,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config = \Kafka\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList(',');
     }
-
-    // }}}
-    // {{{ public function testSetMetadataBrokerListEmpty2()
 
     /**
      * testSetMetadataBrokerListEmpty2
@@ -216,9 +155,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataBrokerList('127.0.0.1: , : ');
     }
 
-    // }}}
-    // {{{ public function testSetGroupId()
-
     /**
      * testSetGroupId
      *
@@ -231,9 +167,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setGroupId('test');
         $this->assertEquals($config->getGroupId(), 'test');
     }
-
-    // }}}
-    // {{{ public function testSetGroupIdEmpty()
 
     /**
      * testSetGroupIdEmpty
@@ -249,9 +182,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setGroupId('');
     }
 
-    // }}}
-    // {{{ public function testGetGroupIdEmpty()
-
     /**
      * testGetGroupIdEmpty
      *
@@ -266,9 +196,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->getGroupId();
     }
 
-    // }}}
-    // {{{ public function testSetSessionTimeout()
-
     /**
      * testSetSessionTimeout
      *
@@ -281,9 +208,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSessionTimeout(2000);
         $this->assertEquals($config->getSessionTimeout(), 2000);
     }
-
-    // }}}
-    // {{{ public function testSetSessionTimeoutValid()
 
     /**
      * testSetSessionTimeoutValid
@@ -299,9 +223,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSessionTimeout('-1');
     }
 
-    // }}}
-    // {{{ public function testSetRebalanceTimeout()
-
     /**
      * testSetRebalanceTimeout
      *
@@ -314,9 +235,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRebalanceTimeout(2000);
         $this->assertEquals($config->getRebalanceTimeout(), 2000);
     }
-
-    // }}}
-    // {{{ public function testSetRebalanceTimeoutValid()
 
     /**
      * testSetRebalanceTimeoutValid
@@ -332,9 +250,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRebalanceTimeout('-1');
     }
 
-    // }}}
-    // {{{ public function testSetOffsetReset()
-
     /**
      * testSetOffsetReset
      *
@@ -347,9 +262,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setOffsetReset('earliest');
         $this->assertEquals($config->getOffsetReset(), 'earliest');
     }
-
-    // }}}
-    // {{{ public function testSetOffsetResetValid()
 
     /**
      * testSetOffsetResetValid
@@ -365,9 +277,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setOffsetReset('xxxx');
     }
 
-    // }}}
-    // {{{ public function testSetTopics()
-
     /**
      * testSetTopics
      *
@@ -380,9 +289,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTopics(['test']);
         $this->assertEquals($config->getTopics(), ['test']);
     }
-
-    // }}}
-    // {{{ public function testSetTopicsEmpty()
 
     /**
      * testSetTopicsEmpty
@@ -398,9 +304,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTopics('');
     }
 
-    // }}}
-    // {{{ public function testGetTopicsEmpty()
-
     /**
      * testGetTopicsEmpty
      *
@@ -415,9 +318,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->getTopics();
     }
 
-    // }}}
-    // {{{ public function testSetMessageMaxBytes()
-
     /**
      * testSetMessageMaxBytes
      *
@@ -430,9 +330,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMessageMaxBytes(1011);
         $this->assertEquals($config->getMessageMaxBytes(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetMessageMaxBytesValid()
 
     /**
      * testSetMessageMaxBytesValid
@@ -448,9 +345,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMessageMaxBytes('999');
     }
 
-    // }}}
-    // {{{ public function testSetMetadataRequestTimeoutMs()
-
     /**
      * testSetMetadataRequestTimeoutMs
      *
@@ -463,9 +357,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataRequestTimeoutMs(1011);
         $this->assertEquals($config->getMetadataRequestTimeoutMs(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetMetadataRequestTimeoutMsValid()
 
     /**
      * testSetMetadataRequestTimeoutMsValid
@@ -481,9 +372,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataRequestTimeoutMs('9');
     }
 
-    // }}}
-    // {{{ public function testSetMetadataRefreshIntervalMs()
-
     /**
      * testSetMetadataRefreshIntervalMs
      *
@@ -496,9 +384,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataRefreshIntervalMs(1011);
         $this->assertEquals($config->getMetadataRefreshIntervalMs(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetMetadataRefreshIntervalMsValid()
 
     /**
      * testSetMetadataRefreshIntervalMsValid
@@ -514,9 +399,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataRefreshIntervalMs('9');
     }
 
-    // }}}
-    // {{{ public function testSetMetadataMaxAgeMs()
-
     /**
      * testSetMetadataMaxAgeMs
      *
@@ -529,9 +411,6 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setMetadataMaxAgeMs(1011);
         $this->assertEquals($config->getMetadataMaxAgeMs(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetMetadataMaxAgeMsValid()
 
     /**
      * testSetMetadataMaxAgeMsValid
@@ -546,7 +425,4 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
         $config = \Kafka\ConsumerConfig::getInstance();
         $config->setMetadataMaxAgeMs('86400001');
     }
-
-    // }}}
-    // }}}
 }

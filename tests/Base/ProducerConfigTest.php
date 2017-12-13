@@ -1,39 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ProducerConfigTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function setDown()
 
     /**
      * setDown
@@ -45,9 +14,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
     {
         \Kafka\ProducerConfig::getInstance()->clear();
     }
-
-    // }}}
-    // {{{ public function testSetRequestTimeout()
 
     /**
      * testSetRequestTimeout
@@ -61,9 +27,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRequestTimeout(1011);
         $this->assertEquals($config->getRequestTimeout(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetRequestTimeoutValid()
 
     /**
      * testSetRequestTimeoutValid
@@ -79,9 +42,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRequestTimeout('-1');
     }
 
-    // }}}
-    // {{{ public function testSetProduceInterval()
-
     /**
      * testSetProduceInterval
      *
@@ -94,9 +54,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setProduceInterval(1011);
         $this->assertEquals($config->getProduceInterval(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetProduceIntervalValid()
 
     /**
      * testSetProduceIntervalValid
@@ -112,9 +69,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setProduceInterval('-1');
     }
 
-    // }}}
-    // {{{ public function testSetTimeout()
-
     /**
      * testSetTimeout
      *
@@ -127,9 +81,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTimeout(1011);
         $this->assertEquals($config->getTimeout(), 1011);
     }
-
-    // }}}
-    // {{{ public function testSetTimeoutValid()
 
     /**
      * testSetTimeoutValid
@@ -145,9 +96,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setTimeout('-1');
     }
 
-    // }}}
-    // {{{ public function testSetRequiredAck()
-
     /**
      * testSetRequiredAck
      *
@@ -160,9 +108,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRequiredAck(1);
         $this->assertEquals($config->getRequiredAck(), 1);
     }
-
-    // }}}
-    // {{{ public function testSetRequiredAckValid()
 
     /**
      * testSetRequiredAckValid
@@ -178,9 +123,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setRequiredAck('-2');
     }
 
-    // }}}
-    // {{{ public function testSetIsAsyn()
-
     /**
      * testSetIsAsyn
      *
@@ -193,9 +135,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setIsAsyn(true);
         $this->assertTrue($config->getIsAsyn());
     }
-
-    // }}}
-    // {{{ public function testSetIsAsynValid()
 
     /**
      * testSetIsAsynValid
@@ -211,9 +150,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setIsAsyn('-2');
     }
 
-    // }}}
-    // {{{ public function testSetSslLocalCert()
-
     /**
      * testSetSslLocalCert
      *
@@ -227,9 +163,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config = \Kafka\ProducerConfig::getInstance();
         $config->setSslLocalCert('invalid_path');
     }
-
-    // }}}
-    // {{{ public function testSetSslLocalCertNotFile()
 
     /**
      * testSetSslLocalCert
@@ -245,9 +178,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslLocalCert('/tmp');
     }
 
-    // }}}
-    // {{{ public function testSetSslLocalCertValid()
-
     /**
      * testSetSslLocalCertValid
      *
@@ -261,9 +191,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslLocalCert($path);
         $this->assertEquals($path, $config->getSslLocalCert());
     }
-
-    // }}}
-    // {{{ public function testSetSslLocalPk()
 
     /**
      * testSetSslLocalPk
@@ -279,9 +206,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslLocalPk('invalid_path');
     }
 
-    // }}}
-    // {{{ public function testSetSslLocalPkValid()
-
     /**
      * testSetSslLocalPkValid
      *
@@ -295,9 +219,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslLocalPk($path);
         $this->assertEquals($path, $config->getSslLocalPk());
     }
-
-    // }}}
-    // {{{ public function testSetSslCafile()
 
     /**
      * testSetSslCafile
@@ -313,9 +234,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslCafile('invalid_path');
     }
 
-    // }}}
-    // {{{ public function testSetSslCafileValid()
-
     /**
      * testSetSslCafile
      *
@@ -329,9 +247,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSslCafile($path);
         $this->assertEquals($path, $config->getSslCafile());
     }
-
-    // }}}
-    // {{{ public function testSetSaslKeytab()
 
     /**
      * testSetSaslKeytab
@@ -347,9 +262,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSaslKeytab('invalid_path');
     }
 
-    // }}}
-    // {{{ public function testSetSaslKeytabValid()
-
     /**
      * testSetSaslKeytab
      *
@@ -363,9 +275,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSaslKeytab($path);
         $this->assertEquals($path, $config->getSaslKeytab());
     }
-
-    // }}}
-    // {{{ public function testSetSecurityProtocol()
 
     /**
      * testSetSecurityProtocol
@@ -381,9 +290,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSecurityProtocol('xxxx');
     }
 
-    // }}}
-    // {{{ public function testSetSecurityProtocolValid()
-
     /**
      * testSetSecurityProtocol
      *
@@ -397,9 +303,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSecurityProtocol($protocol);
         $this->assertEquals($protocol, $config->getSecurityProtocol());
     }
-
-    // }}}
-    // {{{ public function testSetSaslMechanism()
 
     /**
      * testSetSaslMechanism
@@ -415,9 +318,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSaslMechanism('xxxx');
     }
 
-    // }}}
-    // {{{ public function testSetSaslMechanismValid()
-
     /**
      * testSetSaslMechanism
      *
@@ -431,9 +331,6 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->setSaslMechanism($mechanism);
         $this->assertEquals($mechanism, $config->getSaslMechanism());
     }
-
-    // }}}
-    // {{{ public function testClear()
 
     /**
      * testClear
@@ -450,7 +347,4 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
         $config->clear();
         $this->assertEquals(\Kafka\Config::SASL_MECHANISMS_PLAIN, $config->getSaslMechanism());
     }
-
-    // }}}
-    // }}}
 }

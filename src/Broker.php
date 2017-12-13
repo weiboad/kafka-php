@@ -1,41 +1,13 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
 
 use \Kafka\Sasl\Plain;
 use \Kafka\Sasl\Gssapi;
 use \Kafka\Sasl\Scram;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka Broker info manager
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class Broker
 {
     use SingletonTrait;
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     private $groupBrokerId = null;
 
@@ -51,41 +23,25 @@ class Broker
 
     private $config;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function setProcess()
-
     public function setProcess(callable $process)
     {
         $this->process = $process;
     }
-
-    // }}}
-    // {{{ public function setConfig()
 
     public function setConfig(Config $config)
     {
         $this->config = $config;
     }
 
-    // }}}
-    // {{{ public function setGroupBrokerId()
-
     public function setGroupBrokerId($brokerId)
     {
         $this->groupBrokerId = $brokerId;
     }
 
-    // }}}
-    // {{{ public function getGroupBrokerId()
-
     public function getGroupBrokerId()
     {
         return $this->groupBrokerId;
     }
-
-    // }}}
-    // {{{ public function setData()
 
     public function setData($topics, $brokersResult)
     {
@@ -123,32 +79,20 @@ class Broker
         return $change;
     }
 
-    // }}}
-    // {{{ public function getTopics()
-
     public function getTopics()
     {
         return $this->topics;
     }
-
-    // }}}
-    // {{{ public function getBrokers()
 
     public function getBrokers()
     {
         return $this->brokers;
     }
 
-    // }}}
-    // {{{ public function getMetaConnect()
-
     public function getMetaConnect($key, $modeSync = false)
     {
         return $this->getConnect($key, 'metaSockets', $modeSync);
     }
-
-    // }}}
-    // {{{ public function getRandConnect()
 
     public function getRandConnect($modeSync = false)
     {
@@ -160,16 +104,10 @@ class Broker
         return $this->getMetaConnect($nodeIds[0], $modeSync);
     }
 
-    // }}}
-    // {{{ public function getDataConnect()
-
     public function getDataConnect($key, $modeSync = false)
     {
         return $this->getConnect($key, 'dataSockets', $modeSync);
     }
-
-    // }}}
-    // {{{ public function getConnect()
 
     public function getConnect($key, $type, $modeSync = false)
     {
@@ -214,9 +152,6 @@ class Broker
         }
     }
 
-    // }}}
-    // {{{ public function clear()
-
     public function clear()
     {
         foreach ($this->metaSockets as $key => $socket) {
@@ -228,9 +163,6 @@ class Broker
         $this->brokers = [];
     }
 
-    // }}}
-    // {{{ public function getSocket()
-
     public function getSocket($host, $port, $modeSync)
     {
         $saslProvider = $this->judgeConnectionConfig();
@@ -241,9 +173,6 @@ class Broker
         }
         return $socket;
     }
-
-    // }}}
-    // {{{ private function judgeConnectionConfig()
 
     private function judgeConnectionConfig() : ?SaslMechanism
     {
@@ -274,9 +203,6 @@ class Broker
         return null;
     }
 
-    // }}}
-    // {{{ private function getSaslMechanismProvider()
-
     private function getSaslMechanismProvider() : SaslMechanism
     {
         $mechanism = $this->config->getSaslMechanism();
@@ -299,7 +225,4 @@ class Broker
         }
         return $provider;
     }
-
-    // }}}
-    // }}}
 }

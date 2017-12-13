@@ -1,41 +1,12 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Producer;
 
 use Amp\Loop;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class Process
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
-
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     protected $producer = null;
 
@@ -47,17 +18,10 @@ class Process
 
     private $state;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
-
     public function __construct(callable $producer = null)
     {
         $this->producer = $producer;
     }
-
-    // }}}
-    // {{{ public function init()
 
     /**
      * start consumer
@@ -99,9 +63,6 @@ class Process
         }
     }
 
-    // }}}
-    // {{{ public function start()
-
     /**
      * start consumer
      *
@@ -125,9 +86,6 @@ class Process
         };
     }
 
-    // }}}
-    // {{{ public function stop()
-
     /**
      * stop consumer
      *
@@ -138,9 +96,6 @@ class Process
     {
         $this->isRunning = false;
     }
-
-    // }}}
-    // {{{ public function setSuccess()
 
     /**
      * set success callback
@@ -153,9 +108,6 @@ class Process
         $this->success = $success;
     }
 
-    // }}}
-    // {{{ public function setError()
-
     /**
      * set error callback
      *
@@ -166,9 +118,6 @@ class Process
     {
         $this->error = $error;
     }
-
-    // }}}
-    // {{{ public function syncMeta()
 
     public function syncMeta()
     {
@@ -208,9 +157,6 @@ class Process
         );
     }
 
-    // }}}
-    // {{{ protected function processRequest()
-
     /**
      * process Request
      *
@@ -240,9 +186,6 @@ class Process
                 $this->error('Error request, correlationId:' . $correlationId);
         }
     }
-
-    // }}}
-    // {{{ protected function produce()
 
     protected function produce()
     {
@@ -288,9 +231,6 @@ class Process
         return $context;
     }
 
-    // }}}
-    // {{{ protected function succProduce()
-
     protected function succProduce($result, $fd)
     {
         $msg = sprintf('Send message sucess, result: %s', json_encode($result));
@@ -300,9 +240,6 @@ class Process
         }
         $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE, $fd);
     }
-
-    // }}}
-    // {{{ protected function stateConvert()
 
     protected function stateConvert($errorCode, $context = null)
     {
@@ -332,9 +269,6 @@ class Process
         }
         return true;
     }
-
-    // }}}
-    // {{{ protected function convertMessage()
 
     protected function convertMessage($data)
     {
@@ -393,7 +327,4 @@ class Process
 
         return $sendData;
     }
-
-    // }}}
-    // }}}
 }

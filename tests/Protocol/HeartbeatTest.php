@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class HeartbeatTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * heart object
@@ -39,10 +11,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $heart = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
     {
         $this->heart = new \Kafka\Protocol\Heartbeat('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -75,9 +40,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
-
     /**
      * testEncodeNoGroupId
      *
@@ -92,9 +54,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->heart->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoGenerationId()
 
     /**
      * testEncodeNoGenerationId
@@ -112,9 +71,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->heart->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoMemberId()
 
     /**
      * testEncodeNoMemberId
@@ -134,9 +90,6 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
         $test = $this->heart->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -149,7 +102,4 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

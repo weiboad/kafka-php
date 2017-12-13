@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * sasl object
@@ -39,10 +11,6 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $sasl = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
     {
         $this->sasl = new \Kafka\Protocol\SaslHandShake('0.10.0.0');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -70,9 +35,6 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
         $test = $this->sasl->encode($data);
         $this->assertSame(\bin2hex($test), '0000001a001100000000001100096b61666b612d7068700005504c41494e');
     }
-
-    // }}}
-    // {{{ public function testEncodeIsNotString()
 
     /**
      * testEncodeIsNotString
@@ -90,9 +52,6 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
         $test = $this->sasl->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeIsNotAllow()
-
     /**
      * testEncodeIsNotAllow
      *
@@ -108,9 +67,6 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
         $test = $this->sasl->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -124,7 +80,4 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
         $result = '{"mechanisms":["GSSAPI"],"errorCode":34}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

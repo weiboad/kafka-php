@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for produce api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class Produce extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * produce request encode
@@ -63,9 +36,6 @@ class Produce extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ public function decode()
-
     /**
      * decode produce response
      *
@@ -84,9 +54,6 @@ class Produce extends Protocol
         }
         return ['throttleTime' => $throttleTime, 'data' => $ret['data']];
     }
-
-    // }}}
-    // {{{ protected function encodeMessageSet()
 
     /**
      * encode message set
@@ -117,9 +84,6 @@ class Produce extends Protocol
         }
         return $data;
     }
-
-    // }}}
-    // {{{ protected function encodeMessage()
 
     /**
      * encode signal message
@@ -157,9 +121,6 @@ class Produce extends Protocol
         return $message;
     }
 
-    // }}}
-    // {{{ protected function encodeProcudePartion()
-
     /**
      * encode signal part
      *
@@ -184,9 +145,6 @@ class Produce extends Protocol
 
         return $data;
     }
-
-    // }}}
-    // {{{ protected function encodeProcudeTopic()
 
     /**
      * encode signal topic
@@ -213,9 +171,6 @@ class Produce extends Protocol
         return $topic . $partitions;
     }
 
-    // }}}
-    // {{{ protected function produceTopicPair()
-
     /**
      * decode produce topic pair response
      *
@@ -235,9 +190,6 @@ class Produce extends Protocol
             'partitions'=> $ret['data'],
         ]];
     }
-
-    // }}}
-    // {{{ protected function producePartitionPair()
 
     /**
      * decode produce partition pair response
@@ -270,7 +222,4 @@ class Produce extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

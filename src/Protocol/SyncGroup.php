@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for sync group api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class SyncGroup extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * sync group request encode
@@ -63,9 +36,6 @@ class SyncGroup extends Protocol
 
         return $data;
     }
-
-    // }}}
-    // {{{ public function decode()
 
     /**
      * decode group response
@@ -107,9 +77,6 @@ class SyncGroup extends Protocol
         ];
     }
 
-    // }}}
-    // {{{ protected function encodeGroupAssignment()
-
     /**
      * encode group assignment protocol
      *
@@ -142,9 +109,6 @@ class SyncGroup extends Protocol
         return $memberId . self::encodeString($data, self::PACK_INT32);
     }
 
-    // }}}
-    // {{{ protected function encodeGroupAssignmentTopic()
-
     /**
      * encode group assignment topic protocol
      *
@@ -168,9 +132,6 @@ class SyncGroup extends Protocol
         return $topicName . $partitions;
     }
 
-    // }}}
-    // {{{ protected function encodeGroupAssignmentTopicPartition()
-
     /**
      * encode group assignment topic protocol
      *
@@ -182,9 +143,6 @@ class SyncGroup extends Protocol
     {
         return self::pack(self::BIT_B32, $values);
     }
-
-    // }}}
-    // {{{ protected function syncGroupResponsePartition()
 
     /**
      * decode sync group partition response
@@ -208,7 +166,4 @@ class SyncGroup extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

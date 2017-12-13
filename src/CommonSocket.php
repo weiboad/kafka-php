@@ -1,34 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka broker socket abstract
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 abstract class CommonSocket
 {
-    // {{{ consts
 
     const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
 
@@ -39,9 +13,6 @@ abstract class CommonSocket
      * unavailable error info
      */
     const MAX_WRITE_BUFFER = 2048;
-
-    // }}}
-    // {{{ members
 
     /**
      * Send timeout in seconds.
@@ -120,10 +91,6 @@ abstract class CommonSocket
      */
     private $saslMechanismProvider = null;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
-
     /**
      * __construct
      *
@@ -140,9 +107,6 @@ abstract class CommonSocket
         $this->saslMechanismProvider = $saslProvider;
     }
 
-    // }}}
-    // {{{ public function setSendTimeoutSec()
-
     /**
      * @param float $sendTimeoutSec
      */
@@ -150,9 +114,6 @@ abstract class CommonSocket
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
-
-    // }}}
-    // {{{ public function setSendTimeoutUsec()
 
     /**
      * @param float $sendTimeoutUsec
@@ -162,9 +123,6 @@ abstract class CommonSocket
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
-    // }}}
-    // {{{ public function setRecvTimeoutSec()
-
     /**
      * @param float $recvTimeoutSec
      */
@@ -173,8 +131,6 @@ abstract class CommonSocket
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
     
-    // }}}
-    // {{{ public function setRecvTimeoutUsec()
 
     /**
      * @param float $recvTimeoutUsec
@@ -184,8 +140,6 @@ abstract class CommonSocket
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
     
-    // }}}
-    // {{{ public function setMaxWriteAttempts()
 
     /**
      * @param int $number
@@ -194,9 +148,6 @@ abstract class CommonSocket
     {
         $this->maxWriteAttempts = $number;
     }
-
-    // }}}
-    // {{{ protected function createStream()
 
     /**
      * create the socket stream
@@ -249,9 +200,6 @@ abstract class CommonSocket
         }
     }
 
-    // }}}
-    // {{{ protected function createSocket()
-
     /**
      * Encapsulation of stream_socket_client
      *
@@ -271,13 +219,10 @@ abstract class CommonSocket
         );
     }
 
-    // }}}
     public function getSocket()
     {
         return $this->stream;
     }
-
-    // }}}
 
     /**
      * Encapsulation of stream_select
@@ -307,7 +252,6 @@ abstract class CommonSocket
     {
         return stream_get_meta_data($this->stream);
     }
-    // {{{ public function readBlocking()
 
     /**
      * Read from the socket at most $len bytes.
@@ -365,9 +309,6 @@ abstract class CommonSocket
         }
         return $data;
     }
-
-    // }}}
-    // {{{ public function writeBlocking()
 
     /**
      * Write to the socket.
@@ -427,9 +368,6 @@ abstract class CommonSocket
         return $bytesWritten;
     }
 
-    // }}}
-    // {{{ abstract public function close()
-
     /**
      * close the socket
      *
@@ -437,7 +375,4 @@ abstract class CommonSocket
      * @return void
      */
     abstract public function close() : void;
-
-    // }}}
-    // }}}
 }

@@ -1,30 +1,5 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 /**
  * @method string|false ietGroupId()
@@ -33,9 +8,6 @@ namespace Kafka;
 class ConsumerConfig extends Config
 {
     use SingletonTrait;
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     protected static $defaults = [
         'groupId' => '',
@@ -46,10 +18,6 @@ class ConsumerConfig extends Config
         'maxBytes' => 65536, // 64kb
         'maxWaitTime' => 100,
     ];
-
-    // }}}
-    // {{{ functions
-    // {{{ public function getGroupId()
 
     public function getGroupId()
     {
@@ -62,9 +30,6 @@ class ConsumerConfig extends Config
         return $groupId;
     }
 
-    // }}}
-    // {{{ public function setGroupId()
-
     public function setGroupId($groupId)
     {
         $groupId = trim($groupId);
@@ -74,9 +39,6 @@ class ConsumerConfig extends Config
         static::$options['groupId'] = $groupId;
     }
 
-    // }}}
-    // {{{ public function setSessionTimeout()
-
     public function setSessionTimeout($sessionTimeout)
     {
         if (! is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
@@ -84,9 +46,6 @@ class ConsumerConfig extends Config
         }
         static::$options['sessionTimeout'] = $sessionTimeout;
     }
-
-    // }}}
-    // {{{ public function setRebalanceTimeout()
 
     public function setRebalanceTimeout($rebalanceTimeout)
     {
@@ -96,9 +55,6 @@ class ConsumerConfig extends Config
         static::$options['rebalanceTimeout'] = $rebalanceTimeout;
     }
 
-    // }}}
-    // {{{ public function setOffsetReset()
-
     public function setOffsetReset($offsetReset)
     {
         if (! in_array($offsetReset, ['latest', 'earliest'])) {
@@ -106,9 +62,6 @@ class ConsumerConfig extends Config
         }
         static::$options['offsetReset'] = $offsetReset;
     }
-
-    // }}}
-    // {{{ public function getTopics()
 
     public function getTopics()
     {
@@ -121,9 +74,6 @@ class ConsumerConfig extends Config
         return $topics;
     }
 
-    // }}}
-    // {{{ public function setTopics()
-
     public function setTopics($topics)
     {
         if (! is_array($topics) || empty($topics)) {
@@ -131,9 +81,6 @@ class ConsumerConfig extends Config
         }
         static::$options['topics'] = $topics;
     }
-
-    // }}}
-    // }}}
 
     protected $runtime_options         = [
         'consume_mode' => self::CONSUME_AFTER_COMMIT_OFFSET

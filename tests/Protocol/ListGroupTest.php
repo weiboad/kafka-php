@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ListGroupTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * list object
@@ -39,10 +11,6 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $list = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
     {
         $this->list = new \Kafka\Protocol\ListGroup('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -73,9 +38,6 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000013001000000000001000096b61666b612d706870');
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -88,7 +50,4 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0,"groups":[{"groupId":"test","protocolType":"consumer"}]}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

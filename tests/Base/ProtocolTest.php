@@ -1,39 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ProtocolTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -52,9 +21,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
         $test = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $data);
         $this->assertEquals(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
     }
-
-    // }}}
-    // {{{ public function testEncodeNoKey()
 
     /**
      * testEncodeNoKey
@@ -75,9 +41,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
         $test = \Kafka\Protocol::encode(999, $data);
     }
 
-    // }}}
-    // {{{ public function testDecodeNoKey()
-
     /**
      * testDecodeNoKey
      *
@@ -93,9 +56,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
         $test = \Kafka\Protocol::decode(999, $data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -109,9 +69,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);
     }
-
-    // }}}
-    // {{{ public function testError()
 
     /**
      * @test
@@ -191,7 +148,4 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
             [999, 'Unknown error (999)'],
         ];
     }
-
-    // }}}
-    // }}}
 }

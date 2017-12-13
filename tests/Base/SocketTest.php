@@ -1,17 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base;
 
 use \Kafka\Socket;
@@ -20,45 +7,20 @@ use \KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use \KafkaTest\Base\StreamStub\Stream;
 use org\bovigo\vfs\vfsStream;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class SocketTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     private $root;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     public function setUp()
     {
         $this->root = vfsStream::setup('test', 0777, ['localKey' => 'data', 'localCert' => 'data', 'cafile' => 'data']);
     }
 
-    // }}}
-    // {{{ public function tearDown()
-
     public function tearDown()
     {
         $this->clearStreamMock();
     }
-
-    // }}}
-    // {{{ public function testCreateStreamHostName()
 
     /**
      * testCreateStreamHostName
@@ -74,9 +36,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->connect();
     }
 
-    // }}}
-    // {{{ public function testCreateStreamPort()
-
     /**
      * testCreateStreamPort
      *
@@ -90,9 +49,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = new Socket('123', -99);
         $socket->connect();
     }
-
-    // }}}
-    // {{{ public function testCreateStream()
 
     /**
      * testCreateStream
@@ -116,9 +72,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->connect();
     }
 
-    // }}}
-    // {{{ public function testCreateStreamFailure()
-
     /**
      * testCreateStreamFailure
      *
@@ -137,9 +90,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = $this->mockStreamSocketClient($host, $port);
         $socket->connect();
     }
-
-    // }}}
-    // {{{ public function testCreateStreamSsl()
 
     /**
      * testCreateStreamSsl
@@ -190,9 +140,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->connect();
     }
 
-    // }}}
-    // {{{ public function testReadBlockingMaxRead()
-
     /**
      * testReadBlockingMaxRead
      *
@@ -209,9 +156,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket    = $this->mockStreamSocketClient($host, $port);
         $socket->readBlocking(Socket::READ_MAX_LENGTH + 1);
     }
-
-    // }}}
-    // {{{ public function testReadBlockingFailure()
 
     /**
      * testReadBlockingFailure
@@ -232,9 +176,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->readBlocking(4);
     }
 
-    // }}}
-    // {{{ public function testReadBlockingTimeout()
-
     /**
      * testReadBlockingTimeout
      *
@@ -254,9 +195,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = $this->createStream($host, $port, 0, ['timed_out' => true]);
         $socket->readBlocking(4);
     }
-
-    // }}}
-    // {{{ public function testReadBlockingTimeoutElse()
 
     /**
      * testReadBlockingTimeoutElse
@@ -279,9 +217,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->readBlocking(4);
     }
 
-    // }}}
-    // {{{ public function testReadBlockingReadFailure()
-
     /**
      * testReadBlockingReadFailure
      *
@@ -302,9 +237,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = $this->createStream($host, $port, 1);
         $socket->readBlocking(4);
     }
-
-    // }}}
-    // {{{ public function testReadBlockingReadFailureTryTimeout()
 
     /**
      * testReadBlockingReadFailureTryTimeout
@@ -336,9 +268,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->readBlocking(4);
     }
 
-    // }}}
-    // {{{ public function testRecvTimeout()
-
     /**
      * testRecvTimeout
      *
@@ -366,9 +295,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('xxxx', $data);
     }
 
-    // }}}
-    // {{{ public function testWriteBlockingFailure()
-
     /**
      * testWriteBlockingFailure
      *
@@ -388,9 +314,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->connect();
         $socket->writeBlocking('test');
     }
-
-    // }}}
-    // {{{ public function testWriteBlockingTimeout()
 
     /**
      * testWriteBlockingTimeout
@@ -412,9 +335,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket->writeBlocking(4);
     }
 
-    // }}}
-    // {{{ public function testWriteBlockingTimeoutElse()
-
     /**
      * testWriteBlockingTimeoutElse
      *
@@ -434,9 +354,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = $this->createStream($host, $port, 0, []);
         $socket->writeBlocking('xxxx');
     }
-
-    // }}}
-    // {{{ public function testWriteBlockingMaxBuffer()
 
     /**
      * testWriteBlockingMaxBuffer
@@ -464,9 +381,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Socket::MAX_WRITE_BUFFER * 2, $socket->writeBlocking($str));
     }
 
-    // }}}
-    // {{{ public function testWriteBlockingReturnFalse()
-
     /**
      * testWriteBlockingReturnFalse
      *
@@ -492,9 +406,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $socket = $this->createStream($host, $port, 1);
         $socket->writeBlocking($str);
     }
-
-    // }}}
-    // {{{ public function testSendTimeout()
 
     /**
      * testSendTimeout
@@ -523,9 +434,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(4, $data);
     }
 
-    // }}}
-    // {{{ private function mockStreamSocketClient()
-
     private function mockStreamSocketClient($host, $port, $config = null, $sasl = null, $mockMethod = [])
     {
         if (empty($mockMethod)) {
@@ -546,9 +454,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         return $socket;
     }
 
-    // }}}
-    // {{{ private function initStreamStub()
-
     private function initStreamStub($transport, $host, $port, $success = true)
     {
         $uri = sprintf('%s://%s:%s', $transport, $host, $port);
@@ -564,9 +469,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         return $streamMock;
     }
 
-    // }}}
-    // {{{ private function createStream()
-
     private function createStream($host, $port, $select, $metaData = [])
     {
         $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select', 'getMetaData']);
@@ -578,8 +480,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         return $socket;
     }
 
-    // }}}
-    // {{{ private function clearStreamMock()
     
     private function clearStreamMock()
     {
@@ -590,7 +490,4 @@ class SocketTest extends \PHPUnit\Framework\TestCase
             stream_wrapper_unregister('tcp');
         }
     }
-
-    // }}}
-    // }}}
 }

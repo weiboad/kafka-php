@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for commit offset api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class CommitOffset extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * commit offset request encode
@@ -81,9 +54,6 @@ class CommitOffset extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ public function decode()
-
     /**
      * decode group response
      *
@@ -99,9 +69,6 @@ class CommitOffset extends Protocol
 
         return $topics['data'];
     }
-
-    // }}}
-    // {{{ protected function encodeTopic()
 
     /**
      * encode commit offset topic array
@@ -124,9 +91,6 @@ class CommitOffset extends Protocol
 
         return $data;
     }
-
-    // }}}
-    // {{{ protected function encodePartition()
 
     /**
      * encode commit offset partition array
@@ -161,9 +125,6 @@ class CommitOffset extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ protected function decodeTopic()
-
     /**
      * decode commit offset topic response
      *
@@ -191,9 +152,6 @@ class CommitOffset extends Protocol
         ];
     }
 
-    // }}}
-    // {{{ protected function decodePartition()
-
     /**
      * decode commit offset partition response
      *
@@ -213,7 +171,6 @@ class CommitOffset extends Protocol
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
 
-
         return [
             'length' => $offset,
             'data' => [
@@ -222,7 +179,4 @@ class CommitOffset extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

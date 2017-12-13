@@ -1,41 +1,10 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base\Sasl;
 
 use \Kafka\Sasl\Scram;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class ScramTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function testScram()
 
     /**
      * testScram
@@ -54,9 +23,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $socket = $this->getSocketForVerify();
         $provider->authenticate($socket);
     }
-
-    // }}}
-    // {{{ public function testScramVerify()
 
     /**
      * testScramVerify
@@ -78,9 +44,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $provider->authenticate($socket);
     }
 
-    // }}}
-    // {{{ public function testFinalMessageInvalid()
-
     /**
      * testFinalMessageInvalid
      *
@@ -93,9 +56,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
     {
         $this->finalMessage();
     }
-
-    // }}}
-    // {{{ public function testFinalMessageInvalidSalt()
 
     /**
      * testFinalMessageInvalidSalt
@@ -111,9 +71,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $this->finalMessage($message);
     }
 
-    // }}}
-    // {{{ public function testFinalMessageInvalidCnonce()
-
     /**
      * testFinalMessageInvalidCnonce
      *
@@ -128,9 +85,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $this->finalMessage($message);
     }
 
-    // }}}
-    // {{{ public function testInvalidAlgorithm()
-
     /**
      * testInvalidAlgorithm
      *
@@ -144,9 +98,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         new Scram('nmred', '123456', 64);
     }
 
-    // }}}
-    // {{{ public function testGetMechanismName()
-
     /**
      * testGetMechanismName
      *
@@ -158,9 +109,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $provider = new Scram('nmred', '123456', Scram::SCRAM_SHA_256);
         $this->assertSame('SCRAM-SHA-256', $provider->getName());
     }
-
-    // }}}
-    // {{{ private function getSocketForVerify()
 
     private function getSocketForVerify(string $verifyMessage = '')
     {
@@ -194,8 +142,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
             );
         return $socket;
     }
-    // }}}
-    // {{{ private function getSocketForInvalidFinalMessage()
 
     private function getSocketForInvalidFinalMessage(string $serverMessage = '')
     {
@@ -227,8 +173,6 @@ class ScramTest extends \PHPUnit\Framework\TestCase
             );
         return $socket;
     }
-    // }}}
-    // {{{ private function finalMessage()
 
     private function finalMessage(string $message = '')
     {
@@ -244,6 +188,4 @@ class ScramTest extends \PHPUnit\Framework\TestCase
 
         $provider->authenticate($socket);
     }
-    // }}}
-    // }}}
 }

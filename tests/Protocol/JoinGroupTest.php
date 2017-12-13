@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class JoinGroupTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * group object v0.9.0
@@ -48,10 +20,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     protected $group10 = null;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
-
     /**
      * setUp
      *
@@ -63,9 +31,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $this->group9  = new \Kafka\Protocol\JoinGroup('0.9.0.1');
         $this->group10 = new \Kafka\Protocol\JoinGroup('0.10.1.0');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -93,9 +58,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test10), '0000004c000b00010000000b00096b61666b612d706870000474657374000017700000177000000008636f6e73756d657200000001000567726f75700000001000000000000100047465737400000000');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
-
     /**
      * testEncodeNoGroupId
      *
@@ -111,9 +73,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoSessionTimeout()
 
     /**
      * testEncodeNoSessionTimeout
@@ -131,9 +90,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoMemberId()
 
     /**
      * testEncodeNoMemberId
@@ -153,9 +109,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->group9->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -174,9 +127,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeHasProtocolType()
 
     /**
      * testEncodeHasProtocolType
@@ -207,9 +157,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test10), '0000004c000b00010000000b00096b61666b612d706870000474657374000017700000177000000008746573747479706500000001000567726f75700000001000000000000100047465737400000000');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoProtocolName()
-
     /**
      * testEncodeNoProtocolName
      *
@@ -233,9 +180,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoVersion()
 
     /**
      * testEncodeNoVersion
@@ -261,9 +205,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoSubscription()
 
     /**
      * testEncodeNoSubscription
@@ -291,9 +232,6 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->group9->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -307,7 +245,4 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0,"generationId":1,"groupProtocol":"group","leaderId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","memberId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","members":[{"memberId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","memberMeta":{"version":0,"topics":["test"],"userData":""}}]}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

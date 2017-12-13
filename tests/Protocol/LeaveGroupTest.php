@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class LeaveGroupTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * leave object
@@ -39,10 +11,6 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $leave = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
     {
         $this->leave = new \Kafka\Protocol\LeaveGroup('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -75,9 +40,6 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000049000d00000000000d00096b61666b612d706870000474657374002e6b61666b612d7068702d65623139633065612d346233652d346564302d626164612d633837333935316338656561');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
-
     /**
      * testEncodeNoGroupId
      *
@@ -92,9 +54,6 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->leave->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoMemberId()
 
     /**
      * testEncodeNoMemberId
@@ -113,9 +72,6 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->leave->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -128,7 +84,4 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

@@ -1,37 +1,9 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ProducerConfig extends Config
 {
     use SingletonTrait;
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     protected static $defaults = [
         'requiredAck' => 1,
@@ -41,10 +13,6 @@ class ProducerConfig extends Config
         'produceInterval' => 100,
     ];
 
-    // }}}
-    // {{{ functions
-    // {{{ public function setRequestTimeout()
-
     public function setRequestTimeout($requestTimeout)
     {
         if (! is_numeric($requestTimeout) || $requestTimeout < 1 || $requestTimeout > 900000) {
@@ -52,9 +20,6 @@ class ProducerConfig extends Config
         }
         static::$options['requestTimeout'] = $requestTimeout;
     }
-
-    // }}}
-    // {{{ public function setProduceInterval()
 
     public function setProduceInterval($produceInterval)
     {
@@ -64,9 +29,6 @@ class ProducerConfig extends Config
         static::$options['produceInterval'] = $produceInterval;
     }
 
-    // }}}
-    // {{{ public function setTimeout()
-
     public function setTimeout($timeout)
     {
         if (! is_numeric($timeout) || $timeout < 1 || $timeout > 900000) {
@@ -74,9 +36,6 @@ class ProducerConfig extends Config
         }
         static::$options['timeout'] = $timeout;
     }
-
-    // }}}
-    // {{{ public function setRequiredAck()
 
     public function setRequiredAck($requiredAck)
     {
@@ -86,9 +45,6 @@ class ProducerConfig extends Config
         static::$options['requiredAck'] = $requiredAck;
     }
 
-    // }}}
-    // {{{ public function setIsAsyn()
-
     public function setIsAsyn($asyn)
     {
         if (! is_bool($asyn)) {
@@ -96,7 +52,4 @@ class ProducerConfig extends Config
         }
         static::$options['isAsyn'] = $asyn;
     }
-
-    // }}}
-    // }}}
 }

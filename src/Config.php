@@ -1,34 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 abstract class Config
 {
-    // {{{ consts
 
     const SECURITY_PROTOCOL_PLAINTEXT      = 'PLAINTEXT';
     const SECURITY_PROTOCOL_SSL            = 'SSL';
@@ -54,9 +28,6 @@ abstract class Config
         self::SASL_MECHANISMS_SCRAM_SHA_512
     ];
 
-    // }}}
-    // {{{ members
-
     protected static $options = [];
 
     private static $defaults = [
@@ -81,10 +52,6 @@ abstract class Config
         'saslKeytab'    => '',
         'saslPrincipal' => '',
     ];
-
-    // }}}
-    // {{{ functions
-    // {{{ public function __call()
 
     public function __call($name, $args)
     {
@@ -114,9 +81,6 @@ abstract class Config
         }
     }
 
-    // }}}
-    // {{{ public function setClientId()
-
     public function setClientId($val)
     {
         $client = trim($val);
@@ -126,9 +90,6 @@ abstract class Config
         static::$options['clientId'] = $client;
     }
 
-    // }}}
-    // {{{ public function setBrokerVersion()
-
     public function setBrokerVersion($version)
     {
         $version = trim($version);
@@ -137,9 +98,6 @@ abstract class Config
         }
         static::$options['brokerVersion'] = $version;
     }
-
-    // }}}
-    // {{{ public function setMetadataBrokerList()
 
     public function setMetadataBrokerList($list)
     {
@@ -171,16 +129,10 @@ abstract class Config
         static::$options['metadataBrokerList'] = $list;
     }
 
-    // }}}
-    // {{{ public function clear()
-
     public function clear()
     {
         static::$options = [];
     }
-
-    // }}}
-    // {{{ public function setMessageMaxBytes()
 
     public function setMessageMaxBytes($messageMaxBytes)
     {
@@ -189,9 +141,6 @@ abstract class Config
         }
         static::$options['messageMaxBytes'] = $messageMaxBytes;
     }
-
-    // }}}
-    // {{{ public function setMetadataRequestTimeoutMs()
 
     public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs)
     {
@@ -202,9 +151,6 @@ abstract class Config
         static::$options['metadataRequestTimeoutMs'] = $metadataRequestTimeoutMs;
     }
 
-    // }}}
-    // {{{ public function setMetadataRefreshIntervalMs()
-
     public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs)
     {
         if (! is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
@@ -213,9 +159,6 @@ abstract class Config
         }
         static::$options['metadataRefreshIntervalMs'] = $metadataRefreshIntervalMs;
     }
-
-    // }}}
-    // {{{ public function setMetadataMaxAgeMs()
 
     public function setMetadataMaxAgeMs($metadataMaxAgeMs)
     {
@@ -226,9 +169,6 @@ abstract class Config
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
     }
 
-    // }}}
-    // {{{ public function setSslLocalCert()
-
     public function setSslLocalCert(string $localCert)
     {
         if (! file_exists($localCert) || ! is_file($localCert)) {
@@ -236,9 +176,6 @@ abstract class Config
         }
         static::$options['sslLocalCert'] = $localCert;
     }
-
-    // }}}
-    // {{{ public function setSslLocalPk()
 
     public function setSslLocalPk(string $localPk)
     {
@@ -248,9 +185,6 @@ abstract class Config
         static::$options['sslLocalPk'] = $localPk;
     }
 
-    // }}}
-    // {{{ public function setSslCafile()
-
     public function setSslCafile(string $cafile)
     {
         if (! file_exists($cafile) || ! is_file($cafile)) {
@@ -259,9 +193,6 @@ abstract class Config
         static::$options['sslCafile'] = $cafile;
     }
 
-    // }}}
-    // {{{ public function setSaslKeytab()
-
     public function setSaslKeytab(string $keytab)
     {
         if (! file_exists($keytab) || ! is_file($keytab)) {
@@ -269,9 +200,6 @@ abstract class Config
         }
         static::$options['saslKeytab'] = $keytab;
     }
-
-    // }}}
-    // {{{ public function setSecurityProtocol()
 
     public function setSecurityProtocol($protocol)
     {
@@ -282,9 +210,6 @@ abstract class Config
         static::$options['securityProtocol'] = $protocol;
     }
 
-    // }}}
-    // {{{ public function setSaslMechanism()
-
     public function setSaslMechanism($mechanism)
     {
         if (! in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
@@ -293,7 +218,4 @@ abstract class Config
 
         static::$options['saslMechanism'] = $mechanism;
     }
-
-    // }}}
-    // }}}
 }

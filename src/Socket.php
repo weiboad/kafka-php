@@ -1,36 +1,10 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
 
 use Amp\Loop;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka broker socket
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class Socket extends CommonSocket
 {
-    // {{{ members
 
     /**
      * Reader watcher
@@ -66,10 +40,6 @@ class Socket extends CommonSocket
      * @access private
      */
     private $readNeedLength = 0;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function connect()
 
     /**
      * Connects the socket
@@ -107,9 +77,6 @@ class Socket extends CommonSocket
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
 
-    // }}}
-    // {{{ public function reconnect()
-
     /**
      * reconnect the socket
      *
@@ -122,9 +89,6 @@ class Socket extends CommonSocket
         $this->connect();
     }
 
-    // }}}
-    // {{{ public function setOnReadable()
-
     public $onReadable;
     /**
      * set on readable callback function
@@ -136,9 +100,6 @@ class Socket extends CommonSocket
     {
         $this->onReadable = $read;
     }
-
-    // }}}
-    // {{{ public function close()
 
     /**
      * close the socket
@@ -168,9 +129,6 @@ class Socket extends CommonSocket
     {
         return is_resource($this->stream);
     }
-
-    // }}}
-    // {{{ public function read()
 
     /**
      * Read from the socket at most $len bytes.
@@ -208,9 +166,6 @@ class Socket extends CommonSocket
         } while (strlen($this->readBuffer));
     }
 
-    // }}}
-    // {{{ public function write()
-
     /**
      * Write to the socket.
      *
@@ -237,9 +192,6 @@ class Socket extends CommonSocket
         $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
 
-    // }}}
-    // {{{ protected function isSocketDead()
-
     /**
      * check the stream is close
      *
@@ -249,7 +201,4 @@ class Socket extends CommonSocket
     {
         return ! is_resource($this->stream) || @feof($this->stream);
     }
-
-    // }}}
-    // }}}
 }

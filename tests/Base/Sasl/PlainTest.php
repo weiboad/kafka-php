@@ -1,39 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base\Sasl;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class PlainTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function testHandShake()
 
     /**
      * testHandShake
@@ -60,9 +29,6 @@ class PlainTest extends \PHPUnit\Framework\TestCase
         $provider = new \Kafka\Sasl\Plain('nmred', '123456');
         $provider->authenticate($socket);
     }
-
-    // }}}
-    // {{{ public function testHandShakeNotSupport()
 
     /**
      * testHandShake
@@ -91,9 +57,6 @@ class PlainTest extends \PHPUnit\Framework\TestCase
         $provider->authenticate($socket);
     }
 
-    // }}}
-    // {{{ public function testGetMechanismName()
-
     /**
      * testGetMechanismName
      *
@@ -105,7 +68,4 @@ class PlainTest extends \PHPUnit\Framework\TestCase
         $provider = new \Kafka\Sasl\Plain('nmred', '123456');
         $this->assertSame('PLAIN', $provider->getName());
     }
-
-    // }}}
-    // }}}
 }

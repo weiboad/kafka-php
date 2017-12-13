@@ -1,57 +1,21 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Consumer;
 
 use Kafka\ConsumerConfig;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class Process
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
-    // {{{ consts
-    // }}}
-    // {{{ members
-
     protected $consumer = null;
 
     protected $messages = [];
-
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
 
     public function __construct(callable $consumer = null)
     {
         $this->consumer = $consumer;
     }
-
-    // }}}
-    // {{{ public function init()
 
     /**
      * start consumer
@@ -109,9 +73,6 @@ class Process
         $this->state->init();
     }
 
-    // }}}
-    // {{{ public function start()
-
     /**
      * start consumer
      *
@@ -123,9 +84,6 @@ class Process
         $this->init();
         $this->state->start();
     }
-
-    // }}}
-    // {{{ public function stop()
 
     /**
      * stop consumer
@@ -139,9 +97,6 @@ class Process
 
         $this->state->stop();
     }
-
-    // }}}
-    // {{{ protected function processRequest()
 
     /**
      * process Request
@@ -219,9 +174,6 @@ class Process
         }
     }
 
-    // }}}
-    // {{{ protected function syncMeta()
-
     protected function syncMeta()
     {
         $this->debug('Start sync metadata request');
@@ -260,9 +212,6 @@ class Process
         );
     }
 
-    // }}}
-    // {{{ protected function getGroupBrokerId()
-
     protected function getGroupBrokerId()
     {
         $broker  = \Kafka\Broker::getInstance();
@@ -276,9 +225,6 @@ class Process
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $params);
         $connect->write($requestData);
     }
-
-    // }}}
-    // {{{ protected function joinGroup()
 
     protected function joinGroup()
     {
@@ -310,9 +256,6 @@ class Process
         $this->debug("Join group start, params:" . json_encode($params));
     }
 
-    // }}}
-    // {{{ public function failJoinGroup()
-
     public function failJoinGroup($errorCode)
     {
         $assign   = \Kafka\Consumer\Assignment::getInstance();
@@ -321,9 +264,6 @@ class Process
         $this->error($error);
         $this->stateConvert($errorCode);
     }
-
-    // }}}
-    // {{{ public function succJoinGroup()
 
     public function succJoinGroup($result)
     {
@@ -337,9 +277,6 @@ class Process
         $msg = sprintf('Join group sucess, params: %s', json_encode($result));
         $this->debug($msg);
     }
-
-    // }}}
-    // {{{ public function syncGroup()
 
     public function syncGroup()
     {
@@ -364,18 +301,12 @@ class Process
         $connect->write($requestData);
     }
 
-    // }}}
-    // {{{ public function failSyncGroup()
-
     public function failSyncGroup($errorCode)
     {
         $error = sprintf('Sync group fail, need rejoin, errorCode %d', $errorCode);
         $this->error($error);
         $this->stateConvert($errorCode);
     }
-
-    // }}}
-    // {{{ public function succSyncGroup()
 
     public function succSyncGroup($result)
     {
@@ -408,9 +339,6 @@ class Process
         $assign->setTopics($brokerToTopics);
     }
 
-    // }}}
-    // {{{ protected function heartbeat()
-
     protected function heartbeat()
     {
         $broker        = \Kafka\Broker::getInstance();
@@ -435,17 +363,11 @@ class Process
         $connect->write($requestData);
     }
 
-// }}}
-    // {{{ public function failHeartbeat()
-
     public function failHeartbeat($errorCode)
     {
         $this->error('Heartbeat error, errorCode:' . $errorCode);
         $this->stateConvert($errorCode);
     }
-
-    // }}}
-    // {{{ protected function offset()
 
     protected function offset()
     {
@@ -486,9 +408,6 @@ class Process
         return $context;
     }
 
-    // }}}
-    // {{{ public function succOffset()
-
     public function succOffset($result, $fd)
     {
         $msg = sprintf('Get current offset sucess, result: %s', json_encode($result));
@@ -511,9 +430,6 @@ class Process
         \Kafka\Consumer\Assignment::getInstance()->setLastOffsets($lastOffsets);
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_OFFSET, $fd);
     }
-
-    // }}}
-    // {{{ protected function fetchOffset()
 
     protected function fetchOffset()
     {
@@ -547,9 +463,6 @@ class Process
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_FETCH_REQUEST, $params);
         $connect->write($requestData);
     }
-
-    // }}}
-    // {{{ public function succFetchOffset()
 
     public function succFetchOffset($result)
     {
@@ -586,9 +499,6 @@ class Process
         }
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH_OFFSET);
     }
-
-    // }}}
-    // {{{ protected function fetch()
 
     protected function fetch()
     {
@@ -632,9 +542,6 @@ class Process
         return $context;
     }
 
-    // }}}
-    // {{{ public function succFetch()
-
     public function succFetch($result, $fd)
     {
         $assign = \Kafka\Consumer\Assignment::getInstance();
@@ -670,9 +577,6 @@ class Process
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH, $fd);
     }
 
-    // }}}
-    // {{{ protected function commit()
-
     protected function consumeMessage()
     {
         foreach ($this->messages as $topic => $value) {
@@ -687,7 +591,6 @@ class Process
 
         $this->messages = [];
     }
-
 
     protected function commit()
     {
@@ -735,9 +638,6 @@ class Process
         $connect->write($requestData);
     }
 
-    // }}}
-    // {{{ public function succCommit()
-
     /**
      * @var State
      */
@@ -758,9 +658,6 @@ class Process
             $this->consumeMessage();
         }
     }
-
-    // }}}
-    // {{{ protected function stateConvert()
 
     protected function stateConvert($errorCode, $context = null)
     {
@@ -814,7 +711,4 @@ class Process
         }
         return true;
     }
-
-    // }}}
-    // }}}
 }

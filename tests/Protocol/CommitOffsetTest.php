@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class CommitOffsetTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * commit object
@@ -39,10 +11,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $commit = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
     {
         $this->commit = new \Kafka\Protocol\CommitOffset('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -88,9 +53,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000');
     }
 
-    // }}}
-    // {{{ public function testEncodeDefault()
-
     /**
      * testEncodeDefault
      *
@@ -117,9 +79,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -137,9 +96,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->commit->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
-
     /**
      * testEncodeNoGroupId
      *
@@ -156,9 +112,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->commit->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoTopicName()
 
     /**
      * testEncodeNoTopicName
@@ -181,9 +134,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->commit->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoPartitions()
-
     /**
      * testEncodeNoPartitions
      *
@@ -204,9 +154,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         ];
         $test = $this->commit->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoPartition()
 
     /**
      * testEncodeNoPartition
@@ -231,9 +178,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         ];
         $test = $this->commit->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoOffset()
 
     /**
      * testEncodeNoOffset
@@ -261,9 +205,6 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->commit->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -277,7 +218,4 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

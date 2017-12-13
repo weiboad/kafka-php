@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * describe object
@@ -39,10 +11,6 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $describe = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
     {
         $this->describe = new \Kafka\Protocol\DescribeGroups('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -74,9 +39,6 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '0000001d000f00000000000f00096b61666b612d70687000000001000474657374');
     }
 
-    // }}}
-    // {{{ public function testEncodeString()
-
     /**
      * testEncodeString
      *
@@ -90,9 +52,6 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
         $test = $this->describe->encode($data);
         $this->assertSame(\bin2hex($test), '0000001d000f00000000000f00096b61666b612d70687000000001000474657374');
     }
-
-    // }}}
-    // {{{ public function testEncodeEmptyArray()
 
     /**
      * testEncodeEmptyArray
@@ -109,9 +68,6 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000017000f00000000000f00096b61666b612d70687000000000');
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -125,7 +81,4 @@ class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
         $result = '[{"errorCode":0,"groupId":"test","state":"Stable","protocolType":"consumer","protocol":"group","members":[{"memberId":"kafka-php-4da393fb-37cf-42cc-90dd-7bf6ba31fd30","clientId":"kafka-php","clientHost":"\/127.0.0.1","metadata":{"version":0,"topics":["test"],"userData":""},"assignment":{"version":0,"partitions":[{"topicName":"test","partitions":[0]}],"userData":""}}]}]';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

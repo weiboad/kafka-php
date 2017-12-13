@@ -1,39 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class BrokerTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
-    // }}}
-    // {{{ functions
-    // {{{ public function setDown()
 
     /**
      * setDown
@@ -45,9 +14,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     {
         \Kafka\Broker::getInstance()->clear();
     }
-
-    // }}}
-    // {{{ public function testGroupBrokerId()
 
     /**
      * testGroupBrokerId
@@ -61,9 +27,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $broker->setGroupBrokerId(1);
         $this->assertEquals($broker->getGroupBrokerId(), 1);
     }
-
-    // }}}
-    // {{{ public function testData()
 
     /**
      * testData
@@ -143,9 +106,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($topics, $broker->getTopics());
     }
 
-    // }}}
-    // {{{ public function testGetConnect()
-
     /**
      * testGetConnect
      *
@@ -185,9 +145,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    // }}}
-    // {{{ public function testConnectRandFalse()
-
     /**
      * testGetConnect
      *
@@ -201,9 +158,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $result = $broker->getRandConnect();
         $this->assertFalse($result);
     }
-
-    // }}}
-    // {{{ public function testGetSocketNotSetConfig()
 
     /**
      * testGetSocket
@@ -220,7 +174,4 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
     }
-
-    // }}}
-    // }}}
 }

@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class FetchOffsetTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * offset object
@@ -39,10 +11,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $offset = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
     {
         $this->offset = new \Kafka\Protocol\FetchOffset('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -80,9 +45,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -98,9 +60,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->offset->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
 
     /**
      * testEncodeNoGroupId
@@ -118,9 +77,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->offset->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoTopicName()
 
     /**
      * testEncodeNoTopicName
@@ -143,9 +99,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->offset->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoPartitions()
-
     /**
      * testEncodeNoPartitions
      *
@@ -167,9 +120,6 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->offset->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -183,7 +133,4 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

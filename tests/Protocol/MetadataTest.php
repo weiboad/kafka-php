@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class MetadataTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * meta object
@@ -39,10 +11,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $meta = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     {
         $this->meta = new \Kafka\Protocol\Metadata('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -74,9 +39,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '0000001d000300000000000300096b61666b612d70687000000001000474657374');
     }
 
-    // }}}
-    // {{{ public function testEncodeString()
-
     /**
      * testEncodeString
      *
@@ -90,9 +52,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $test = $this->meta->encode($data);
         $this->assertSame(\bin2hex($test), '0000001d000300000000000300096b61666b612d70687000000001000474657374');
     }
-
-    // }}}
-    // {{{ public function testEncodeEmptyArray()
 
     /**
      * testEncodeEmptyArray
@@ -108,9 +67,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $test = $this->meta->encode($data);
         $this->assertSame(\bin2hex($test), '00000017000300000000000300096b61666b612d70687000000000');
     }
-
-    // }}}
-    // {{{ public function testEncodeValidTopic()
 
     /**
      * testEncodeValidTopic
@@ -129,9 +85,6 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $test = $this->meta->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -145,7 +98,4 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $result = '{"brokers":[{"host":"10.77.96.137","port":9192,"nodeId":9},{"host":"10.75.26.24","port":9192,"nodeId":7},{"host":"10.13.4.159","port":9192,"nodeId":3},{"host":"10.77.96.136","port":9192,"nodeId":8},{"host":"10.13.4.160","port":9192,"nodeId":4}],"topics":[{"topicName":"test","errorCode":0,"partitions":[{"partitionId":8,"errorCode":0,"replicas":[3,7,8],"leader":3,"isr":[3,8,7]},{"partitionId":2,"errorCode":0,"replicas":[9,3,4],"leader":9,"isr":[4,9,3]},{"partitionId":5,"errorCode":0,"replicas":[7,9,3],"leader":7,"isr":[3,9,7]},{"partitionId":4,"errorCode":0,"replicas":[4,7,8],"leader":4,"isr":[4,8,7]},{"partitionId":7,"errorCode":0,"replicas":[9,4,7],"leader":9,"isr":[4,9,7]},{"partitionId":1,"errorCode":0,"replicas":[8,9,3],"leader":8,"isr":[9,8,3]},{"partitionId":9,"errorCode":0,"replicas":[4,8,9],"leader":4,"isr":[4,9,8]},{"partitionId":3,"errorCode":0,"replicas":[3,4,7],"leader":3,"isr":[3,4,7]},{"partitionId":6,"errorCode":0,"replicas":[8,3,4],"leader":8,"isr":[4,3,8]},{"partitionId":0,"errorCode":0,"replicas":[7,8,9],"leader":7,"isr":[8,9,7]}]}]}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

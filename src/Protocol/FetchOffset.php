@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for fetch offset api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class FetchOffset extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * fetch offset request encode
@@ -56,9 +29,6 @@ class FetchOffset extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ public function decode()
-
     /**
      * decode group response
      *
@@ -76,9 +46,6 @@ class FetchOffset extends Protocol
         return $topics['data'];
     }
 
-    // }}}
-    // {{{ protected function encodeOffsetPartion()
-
     /**
      * encode signal part
      *
@@ -90,9 +57,6 @@ class FetchOffset extends Protocol
     {
         return self::pack(self::BIT_B32, $values);
     }
-
-    // }}}
-    // {{{ protected function encodeOffsetTopic()
 
     /**
      * encode signal topic
@@ -116,9 +80,6 @@ class FetchOffset extends Protocol
 
         return $topic . $partitions;
     }
-
-    // }}}
-    // {{{ protected function offsetTopic()
 
     /**
      * decode offset topic response
@@ -144,9 +105,6 @@ class FetchOffset extends Protocol
         ];
     }
 
-    // }}}
-    // {{{ protected function offsetPartition()
-
     /**
      * decode offset partition response
      *
@@ -168,7 +126,6 @@ class FetchOffset extends Protocol
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
 
-
         return [
             'length' => $offset,
             'data' => [
@@ -179,7 +136,4 @@ class FetchOffset extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

@@ -1,17 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Sasl;
 
 use Kafka\CommonSocket;
@@ -19,18 +6,6 @@ use Kafka\SaslMechanism;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka sasl provider for gssapi(Kerberos) mechanism
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class Gssapi extends Mechanism
 {
@@ -54,7 +29,6 @@ class Gssapi extends Mechanism
         $this->gssapi    = $gssapi;
         $this->principal = $principal;
     }
-
 
     public static function fromKeytab(string $keytab, string $principal): self
     {

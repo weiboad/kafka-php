@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for describe group api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class DescribeGroups extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * describe group request encode
@@ -52,9 +25,6 @@ class DescribeGroups extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ public function decode()
-
     /**
      * decode group response
      *
@@ -69,9 +39,6 @@ class DescribeGroups extends Protocol
 
         return $groups['data'];
     }
-
-    // }}}
-    // {{{ protected function describeGroup()
 
     /**
      * decode describe group response
@@ -108,9 +75,6 @@ class DescribeGroups extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // {{{ protected function describeMember()
 
     /**
      * decode describe members response
@@ -151,7 +115,6 @@ class DescribeGroups extends Protocol
         $metaOffset  += $topics['length'];
         $metaUserData = $this->decodeString(substr($metaData, $metaOffset), self::BIT_B32);
 
-
         return [
             'length' => $offset,
             'data' => [
@@ -171,9 +134,6 @@ class DescribeGroups extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // {{{ protected function describeResponsePartition()
 
     /**
      * decode describe group partition response
@@ -197,7 +157,4 @@ class DescribeGroups extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

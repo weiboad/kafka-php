@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class SocketSync extends CommonSocket
 {
-    // {{{ functions
-    // {{{ public static function createFromStream()
 
     /**
      * Optional method to set the internal stream handle
@@ -45,9 +18,6 @@ class SocketSync extends CommonSocket
         $socket->setStream($stream);
         return $socket;
     }
-
-    // }}}
-    // {{{ public function connect()
 
     /**
      * Connects the socket
@@ -65,9 +35,6 @@ class SocketSync extends CommonSocket
 
         stream_set_blocking($this->stream, 0);
     }
-
-    // }}}
-    // {{{ public function close()
 
     /**
      * close the socket
@@ -93,9 +60,6 @@ class SocketSync extends CommonSocket
         return is_resource($this->stream);
     }
 
-    // }}}
-    // {{{ public function read()
-
     /**
      * Read from the socket at most $len bytes.
      *
@@ -112,9 +76,6 @@ class SocketSync extends CommonSocket
         return $this->readBlocking($len);
     }
 
-    // }}}
-    // {{{ public function write()
-
     /**
      * Write to the socket.
      *
@@ -128,9 +89,6 @@ class SocketSync extends CommonSocket
         return $this->writeBlocking($buf);
     }
 
-    // }}}
-    // {{{ public function rewind()
-
     /**
      * Rewind the stream
      *
@@ -142,7 +100,4 @@ class SocketSync extends CommonSocket
             rewind($this->stream);
         }
     }
-
-    // }}}
-    // }}}
 }

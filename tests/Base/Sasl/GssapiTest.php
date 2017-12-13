@@ -1,53 +1,18 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Base\Sasl;
 
 use \Kafka\Sasl\Gssapi;
 use org\bovigo\vfs\vfsStream;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class GssapiTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     private $root;
-
-    // }}}
-    // {{{ functions
-    // {{{ protected function setUp()
 
     protected function setUp()
     {
         $this->root = vfsStream::setup('test', 0777, ['keytab' => 'testdata']);
     }
-
-    // }}}
-    // {{{ public function testGssapi()
 
     /**
      * testGssapi
@@ -63,9 +28,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
         $saslProvider->authenticate($socket);
     }
 
-    // }}}
-    // {{{ public function testKeytabIsNotExists()
-
     /**
      * testKeytabIsNotExists
      *
@@ -78,9 +40,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     {
         Gssapi::fromKeytab($this->root->url() . '/rand', 'testprincipal');
     }
-
-    // }}}
-    // {{{ public function testKeytabIsNotReadable()
 
     /**
      * testKeytabIsNotReadable
@@ -97,9 +56,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
         Gssapi::fromKeytab($keytab, 'testprincipal');
     }
 
-    // }}}
-    // {{{ public function testGetMechanismName()
-
     /**
      * testGetMechanismName
      *
@@ -112,9 +68,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
         $saslProvider = new Gssapi($this->mockGssapiContext($principal, false, 0, 0), $principal);
         $this->assertSame('GSSAPI', $saslProvider->getName());
     }
-
-    // }}}
-    // {{{ public function testInitSecurityContextNotSuccess()
 
     /**
      * testInitSecurityContext
@@ -131,9 +84,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
         $saslProvider = new Gssapi($this->mockGssapiContext($principal, false, 1, 0), $principal);
         $saslProvider->authenticate($socket);
     }
-
-    // }}}
-    // {{{ private function getSocketForTestGssapi()
 
     private function getSocketForTestGssapi($writeTimes = 3)
     {
@@ -162,7 +112,6 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
             );
         return $socket;
     }
-    // }}}
 
     private function mockGssapiContext(string $principal, bool $success = true, int $initTimes = 1, int $wrapTimes = 1) : \GSSAPIContext
     {
@@ -189,6 +138,4 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
                       }));
         return $gssapiContext;
     }
-
-    // }}}
 }

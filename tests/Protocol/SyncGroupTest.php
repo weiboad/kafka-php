@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class SyncGroupTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * sync object
@@ -39,10 +11,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
      * @access protected
      */
     protected $sync = null;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
 
     /**
      * setUp
@@ -54,9 +22,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
     {
         $this->sync = new \Kafka\Protocol\SyncGroup('0.9.0.1');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -72,9 +37,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '0000009d000e00000000000e00096b61666b612d70687000047465737400000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000018000000000001000474657374000000010000000000000000');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoGroupId()
-
     /**
      * testEncodeNoGroupId
      *
@@ -89,9 +51,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoGenerationId()
 
     /**
      * testEncodeNoGenerationId
@@ -109,9 +68,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoMemberId()
 
     /**
      * testEncodeNoMemberId
@@ -131,9 +87,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->sync->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -152,9 +105,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoVersion()
 
     /**
      * testEncodeNoVersion
@@ -180,9 +130,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->sync->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoDataMemberId()
-
     /**
      * testEncodeNoDataMemberId
      *
@@ -206,9 +153,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoDataAssignments()
 
     /**
      * testEncodeNoDataAssignments
@@ -234,9 +178,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoTopicName()
 
     /**
      * testEncodeNoTopicName
@@ -265,9 +206,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->sync->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoPartitions()
 
     /**
      * testEncodeNoPartitions
@@ -299,9 +237,6 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $test = $this->sync->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -318,7 +253,4 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $result = '{"errorCode":0}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

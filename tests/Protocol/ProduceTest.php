@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class ProduceTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * produce object
@@ -48,10 +20,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     protected $produce10 = null;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
-
     /**
      * setUp
      *
@@ -63,9 +31,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $this->produce   = new \Kafka\Protocol\Produce('0.9.0.1');
         $this->produce10 = new \Kafka\Protocol\Produce('0.10.1.0');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -99,9 +64,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000092000000010000000000096b61666b612d7068700001000003e800000001000474657374000000010000000000000063000000000000000000000015bbbf9beb01000000000000000007746573742e2e2e000000000000000100000015bbbf9beb01000000000000000007746573742e2e2e000000000000000200000015bbbf9beb01000000000000000007746573742e2e2e');
     }
 
-    // }}}
-    // {{{ public function testEncodeForMessageKey()
-
     /**
      * testEncodeForMessageKey
      *
@@ -132,9 +94,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000057000000020000000000096b61666b612d7068700001000003e80000000100047465737400000001000000000000002800000000000000000000001c4ad6c67a000000000007746573746b657900000007746573742e2e2e');
     }
 
-    // }}}
-    // {{{ public function testEncodeForMessage()
-
     /**
      * testEncodeForMessage
      *
@@ -162,9 +121,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $test = $this->produce10->encode($data);
         $this->assertSame(\bin2hex($test), '00000050000000020000000000096b61666b612d7068700001000003e8000000010004746573740000000100000000000000210000000000000000000000153c1950a800000000000000000007746573742e2e2e');
     }
-
-    // }}}
-    // {{{ public function testEncodeNotTimeoutAndRequired()
 
     /**
      * testEncodeNotTimeoutAndRequired
@@ -196,9 +152,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000092000000010000000000096b61666b612d70687000000000006400000001000474657374000000010000000000000063000000000000000000000015bbbf9beb01000000000000000007746573742e2e2e000000000000000100000015bbbf9beb01000000000000000007746573742e2e2e000000000000000200000015bbbf9beb01000000000000000007746573742e2e2e');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -214,9 +167,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->produce->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoTopicName()
 
     /**
      * testEncodeNoTopicName
@@ -238,9 +188,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $test = $this->produce->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoPartitions()
-
     /**
      * testEncodeNoPartitions
      *
@@ -261,9 +208,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->produce->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoPartitionId()
 
     /**
      * testEncodeNoPartitionId
@@ -289,9 +233,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->produce->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoMessage()
 
     /**
      * testEncodeNoMessage
@@ -321,9 +262,6 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $test = $this->produce->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -341,7 +279,4 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
         $result = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":22,"timestamp":-1}]}]}';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

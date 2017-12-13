@@ -1,36 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace KafkaTest\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class OffsetTest extends \PHPUnit\Framework\TestCase
 {
-    // {{{ consts
-    // }}}
-    // {{{ members
 
     /**
      * offset object
@@ -48,10 +20,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      */
     protected $offset10 = null;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function setUp()
-
     /**
      * setUp
      *
@@ -63,9 +31,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $this->offset   = new \Kafka\Protocol\Offset('0.9.0.1');
         $this->offset10 = new \Kafka\Protocol\Offset('0.10.1.0');
     }
-
-    // }}}
-    // {{{ public function testEncode()
 
     /**
      * testEncode
@@ -95,9 +60,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
     }
 
-    // }}}
-    // {{{ public function testEncodeNoData()
-
     /**
      * testEncodeNoData
      *
@@ -113,9 +75,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->offset->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoTopicName()
 
     /**
      * testEncodeNoTopicName
@@ -137,9 +96,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->offset->encode($data);
     }
 
-    // }}}
-    // {{{ public function testEncodeNoPartitions()
-
     /**
      * testEncodeNoPartitions
      *
@@ -160,9 +116,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->offset->encode($data);
     }
-
-    // }}}
-    // {{{ public function testEncodeNoPartitionId()
 
     /**
      * testEncodeNoPartitionId
@@ -189,9 +142,6 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $test = $this->offset->encode($data);
     }
 
-    // }}}
-    // {{{ public function testDecode()
-
     /**
      * testDecode
      *
@@ -205,7 +155,4 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
         $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"timestamp":0,"offsets":[42]}]}]';
         $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
     }
-
-    // }}}
-    // }}}
 }

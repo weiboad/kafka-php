@@ -1,17 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Sasl;
 
 use Kafka\CommonSocket;
@@ -20,21 +7,8 @@ use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka sasl provider for scram mechanism
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class Scram extends Mechanism implements SaslMechanism
 {
-    // {{{ consts
 
     const SCRAM_SHA_256 = 256;
     const SCRAM_SHA_512 = 512;
@@ -45,9 +19,6 @@ class Scram extends Mechanism implements SaslMechanism
         self::SCRAM_SHA_256 => 'sha256',
         self::SCRAM_SHA_512 => 'sha512',
     ];
-
-    // }}}
-    // {{{ members
 
     private $hashAlgorithm;
 
@@ -63,9 +34,6 @@ class Scram extends Mechanism implements SaslMechanism
 
     private $authMessage;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
     
     /**
      *
@@ -84,8 +52,6 @@ class Scram extends Mechanism implements SaslMechanism
         $this->password      = trim($password);
     }
 
-    // }}}
-    // {{{ protected function performAuthentication()
     
     /**
      *
@@ -113,7 +79,6 @@ class Scram extends Mechanism implements SaslMechanism
         }
     }
 
-    // }}}
     
     /**
      *
@@ -126,8 +91,6 @@ class Scram extends Mechanism implements SaslMechanism
     {
         return self::MECHANISM_NAME . $this->hashAlgorithm;
     }
-
-    // {{{ protected function firstMessage()
 
     /**
       * Generate the initial response which can be either sent directly in the first message or as a response to an empty
@@ -143,9 +106,6 @@ class Scram extends Mechanism implements SaslMechanism
         $this->firstMessageBare = substr($message, 3);
         return $message;
     }
-
-    // }}}
-    // {{{ protected function finalMessage()
 
     /**
       * Generate the final message
@@ -204,9 +164,6 @@ class Scram extends Mechanism implements SaslMechanism
         return $finalMessage . $proof;
     }
 
-    // }}}
-    // {{{ protected function verifyMessage()
-
     /**
       * SCRAM has also a server verification step
       *
@@ -231,9 +188,6 @@ class Scram extends Mechanism implements SaslMechanism
         return hash_equals($proposedServerSignature, $serverSignature);
     }
 
-    // }}}
-    // {{{ protected function generateNonce()
-
   /**
     * Creates the client nonce for the response
     *
@@ -249,24 +203,15 @@ class Scram extends Mechanism implements SaslMechanism
         return base64_encode($str);
     }
 
-    // }}}
-    // {{{ private function hash()
-
     private function hash(string $data) : string
     {
         return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
     }
 
-    // }}}
-    // {{{ private function hmac()
-
     private function hmac(string $key, string $data, bool $raw) : string
     {
         return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
     }
-
-    // }}}
-    // {{{ private function formatName()
 
   /**
     * Prepare a name for inclusion in a SCRAM response.
@@ -282,9 +227,6 @@ class Scram extends Mechanism implements SaslMechanism
 
         return $user;
     }
-
-    // }}}
-    // {{{ private function hi()
 
   /**
     * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
@@ -306,7 +248,4 @@ class Scram extends Mechanism implements SaslMechanism
         }
         return $result;
     }
-
-    // }}}
-    // }}}
 }

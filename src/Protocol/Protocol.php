@@ -1,37 +1,10 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 abstract class Protocol
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
-
-    // {{{ consts
 
     /**
      *  Default kafka broker verion
@@ -118,9 +91,6 @@ abstract class Protocol
     const BIT_B16_SIGNED = 's';
     const BIT_B8         = 'C';
 
-    // }}}
-    // {{{ members
-
     /**
      * kafka broker version
      *
@@ -140,10 +110,6 @@ abstract class Protocol
      */
     private static $isLittleEndianSystem = null;
 
-    // }}}
-    // {{{ functions
-    // {{{ public function __construct()
-
     /**
      * __construct
      *
@@ -154,9 +120,6 @@ abstract class Protocol
     {
         $this->version = $version;
     }
-
-    // }}}
-    // {{{ public static function unpack()
 
     /**
      * Unpack a bit integer as big endian long
@@ -192,9 +155,6 @@ abstract class Protocol
         return is_array($result) ? array_shift($result) : $result;
     }
 
-    // }}}
-    // {{{ public static function pack()
-
     /**
      * pack a bit integer as big endian long
      *
@@ -225,9 +185,6 @@ abstract class Protocol
 
         return $data;
     }
-
-    // }}}
-    // {{{ protected static function checkLen()
 
     /**
      * check unpack bit is valid
@@ -264,9 +221,6 @@ abstract class Protocol
         }
     }
 
-    // }}}
-    // {{{ public static function isSystemLittleEndian()
-
     /**
      * Determines if the computer currently running this code is big endian or little endian.
      *
@@ -290,9 +244,6 @@ abstract class Protocol
 
         return self::$isLittleEndianSystem;
     }
-
-    // }}}
-    // {{{ public static function convertSignedShortFromLittleEndianToBigEndian()
 
     /**
      * Converts a signed short (16 bits) from little endian to big endian.
@@ -320,9 +271,6 @@ abstract class Protocol
         }
         return $bits;
     }
-
-    // }}}
-    // {{{ public function getApiVersion()
 
     /**
      * Get kafka api version according to specifiy kafka broker version
@@ -404,9 +352,6 @@ abstract class Protocol
         return self::API_VERSION0;
     }
 
-    // }}}
-    // {{{ public static function getApiText()
-
     /**
      * Get kafka api text
      *
@@ -436,9 +381,6 @@ abstract class Protocol
         return $apis[$apikey];
     }
 
-    // }}}
-    // {{{ public function requestHeader()
-
     /**
      * get request header
      *
@@ -462,9 +404,6 @@ abstract class Protocol
 
         return $binData;
     }
-
-    // }}}
-    // {{{ public static function encodeString()
 
     /**
      * encode pack string type
@@ -493,9 +432,6 @@ abstract class Protocol
         }
         return self::pack($packLen, strlen($string)) . $string;
     }
-
-    // }}}
-    // {{{ public static function encodeArray()
 
     /**
      * encode key array
@@ -526,9 +462,6 @@ abstract class Protocol
 
         return self::pack(self::BIT_B32, $arrayCount) . $body;
     }
-
-    // }}}
-    // {{{ public function decodeString()
 
     /**
      * decode unpack string type
@@ -568,9 +501,6 @@ abstract class Protocol
         }
         return ['length' => $offset, 'data' => $data];
     }
-
-    // }}}
-    // {{{ public function decodeArray()
 
     /**
      * decode key array
@@ -618,9 +548,6 @@ abstract class Protocol
         return ['length' => $offset, 'data' => $result];
     }
 
-    // }}}
-    // {{{ public function decodePrimitiveArray()
-
     /**
      * decode primitive type array
      *
@@ -660,7 +587,4 @@ abstract class Protocol
 
         return ['length' => $offset, 'data' => $result];
     }
-
-    // }}}
-    // }}}
 }

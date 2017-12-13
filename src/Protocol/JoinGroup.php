@@ -1,35 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Protocol;
-
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol for join group api
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
 
 class JoinGroup extends Protocol
 {
-    // {{{ functions
-    // {{{ public function encode()
 
     /**
      * join group request encode
@@ -73,9 +46,6 @@ class JoinGroup extends Protocol
         return $data;
     }
 
-    // }}}
-    // {{{ public function decode()
-
     /**
      * decode join group response
      *
@@ -108,9 +78,6 @@ class JoinGroup extends Protocol
             'members' => $members['data'],
         ];
     }
-
-    // }}}
-    // {{{ protected function encodeGroupProtocol()
 
     /**
      * encode group protocol
@@ -145,9 +112,6 @@ class JoinGroup extends Protocol
         return $protocolName . self::encodeString($data, self::PACK_INT32);
     }
 
-    // }}}
-    // {{{ protected function encodeGroupProtocolMetaTopic()
-
     /**
      * encode group protocol metadata topic
      *
@@ -160,9 +124,6 @@ class JoinGroup extends Protocol
         $topic = self::encodeString($values, self::PACK_INT16);
         return $topic;
     }
-
-    // }}}
-    // {{{ protected function joinGroupMember()
 
     /**
      * decode join group member response
@@ -198,7 +159,4 @@ class JoinGroup extends Protocol
             ]
         ];
     }
-
-    // }}}
-    // }}}
 }

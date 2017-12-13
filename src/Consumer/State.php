@@ -1,37 +1,11 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
-// +---------------------------------------------------------------------------
-// | SWAN [ $_SWANBR_SLOGAN_$ ]
-// +---------------------------------------------------------------------------
-// | Copyright $_SWANBR_COPYRIGHT_$
-// +---------------------------------------------------------------------------
-// | Version  $_SWANBR_VERSION_$
-// +---------------------------------------------------------------------------
-// | Licensed ( $_SWANBR_LICENSED_URL_$ )
-// +---------------------------------------------------------------------------
-// | $_SWANBR_WEB_DOMAIN_$
-// +---------------------------------------------------------------------------
-
 namespace Kafka\Consumer;
 
 use Amp\Loop;
 
-/**
-+------------------------------------------------------------------------------
-* Kafka protocol since Kafka v0.8
-+------------------------------------------------------------------------------
-*
-* @package
-* @version $_SWANBR_VERSION_$
-* @copyright Copyleft
-* @author $_SWANBR_AUTHOR_$
-+------------------------------------------------------------------------------
-*/
-
 class State
 {
     use \Kafka\SingletonTrait;
-    // {{{ consts
 
     const REQUEST_METADATA      = 1;
     const REQUEST_GETGROUP      = 2;
@@ -62,16 +36,9 @@ class State
         self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
     ];
 
-    // }}}
-    // {{{ members
-
     private $callStatus = [];
 
     private $requests = self::CLEAN_REQUEST_STATE;
-
-    // }}}
-    // {{{ functions
-    // {{{ public function init()
 
     public function init()
     {
@@ -101,9 +68,6 @@ class State
             }
         }
     }
-
-    // }}}
-    // {{{ public function start()
 
     public function start()
     {
@@ -149,9 +113,6 @@ class State
             Loop::cancel($this->requests[$request]['watcher']);
         }
     }
-
-    // }}}
-    // {{{ public function succRun()
 
     public function succRun($key, $context = null)
     {
@@ -202,9 +163,6 @@ class State
         }
     }
 
-    // }}}
-    // {{{ public function failRun()
-
     public function failRun($key, $context = null)
     {
         if (! isset($this->callStatus[$key])) {
@@ -223,18 +181,12 @@ class State
         }
     }
 
-    // }}}
-    // {{{ public function setCallback()
-
     public function setCallback($callbacks)
     {
         foreach ($callbacks as $request => $callback) {
             $this->requests[$request]['func'] = $callback;
         }
     }
-
-    // }}}
-    // {{{ public function rejoin()
 
     public function rejoin()
     {
@@ -256,9 +208,6 @@ class State
         ];
     }
 
-    // }}}
-    // {{{ public function recover()
-
     public function recover()
     {
         $this->callStatus = [
@@ -273,9 +222,6 @@ class State
             self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
     }
-
-    // }}}
-    // {{{ protected function checkRun()
 
     protected function checkRun($key)
     {
@@ -377,9 +323,6 @@ class State
         }
     }
 
-    // }}}
-    // {{{ protected function processing()
-
     protected function processing($key, $context)
     {
         if (! isset($this->callStatus[$key])) {
@@ -410,14 +353,8 @@ class State
         }
     }
 
-    // }}}
-    // {{{ protected function report()
-
     protected function report()
     {
         //var_dump($this->callStatus[self::REQUEST_COMMIT_OFFSET]);
     }
-
-    // }}}
-    // }}}
 }
