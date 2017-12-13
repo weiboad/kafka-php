@@ -39,6 +39,8 @@ class Gssapi extends Mechanism
     private $principal;
 
     private $gssapi;
+    
+    private static $ccache;
 
     /**
      *
@@ -68,11 +70,11 @@ class Gssapi extends Mechanism
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
         
-        $ccache = new \KRB5CCache();
-        $ccache->initKeytab($principal, $keytab);
+        self::$ccache = new \KRB5CCache();
+        self::$ccache->initKeytab($principal, $keytab);
 
         $gssapi = new \GSSAPIContext();
-        $gssapi->acquireCredentials($ccache, $principal, \GSS_C_INITIATE);
+        $gssapi->acquireCredentials(self::$ccache, $principal, \GSS_C_INITIATE);
         return new self($gssapi, $principal);
     }
 

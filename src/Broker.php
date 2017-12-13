@@ -288,7 +288,7 @@ class Broker
                 $provider = new Plain($username, $password);
                 break;
             case Config::SASL_MECHANISMS_GSSAPI:
-                $provider = new Gssapi($this->config->getSaslKeytab(), $this->config->getSaslPrincipal());
+                $provider = Gssapi::fromKeytab($this->config->getSaslKeytab(), $this->config->getSaslPrincipal());
                 break;
             case Config::SASL_MECHANISMS_SCRAM_SHA_256:
                 $provider = new Scram($username, $password, Scram::SCRAM_SHA_256);

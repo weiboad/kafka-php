@@ -272,6 +272,12 @@ abstract class CommonSocket
     }
 
     // }}}
+    public function getSocket()
+    {
+        return $this->stream;
+    }
+
+    // }}}
 
     /**
      * Encapsulation of stream_select
