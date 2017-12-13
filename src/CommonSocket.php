@@ -252,6 +252,13 @@ abstract class CommonSocket
     // }}}
     // {{{ protected function createSocket()
 
+    /**
+     * Encapsulation of stream_socket_client
+     *
+     * Because `stream_socket_client` in stream wrapper mock no effect, if don't create this function will never be testable
+     *
+     * @codeCoverageIgnore
+     */
     protected function createSocket($remoteSocket, $context, &$errno, &$errstr)
     {
         return stream_socket_client(
@@ -265,6 +272,14 @@ abstract class CommonSocket
     }
 
     // }}}
+
+    /**
+     * Encapsulation of stream_select
+     *
+     * Because `stream_select` in stream wrapper mock no effect, if don't create this function will never be testable
+     *
+     * @codeCoverageIgnore
+     */
     protected function select($sockets, $timeoutSec, $timeoutUsec, $isRead = true)
     {
         $null = null;
@@ -275,6 +290,13 @@ abstract class CommonSocket
         }
     }
 
+    /**
+     * Encapsulation of stream_get_meta_data
+     *
+     * Because `stream_get_meta_data` in stream wrapper mock no effect, if don't create this function will never be testable
+     *
+     * @codeCoverageIgnore
+     */
     protected function getMetaData()
     {
         return stream_get_meta_data($this->stream);
@@ -288,12 +310,11 @@ abstract class CommonSocket
      * soon as any data is received.
      *
      * @param integer $len               Maximum number of bytes to read.
-     * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
      *
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function readBlocking(int $len, bool $verifyExactLength = false) : string
+    public function readBlocking(int $len) : string
     {
         if ($len > self::READ_MAX_LENGTH) {
             throw new \Kafka\Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
@@ -336,12 +357,6 @@ abstract class CommonSocket
             $data           .= $chunk;
             $remainingBytes -= strlen($chunk);
         }
-        if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
-            // couldn't read anything at all OR reached EOF sooner than expected
-            $this->close();
-            throw new \Kafka\Exception('Read ' . strlen($data) . ' bytes instead of the requested ' . $len . ' bytes');
-        }
-
         return $data;
     }
 

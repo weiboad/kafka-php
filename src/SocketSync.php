@@ -103,14 +103,13 @@ class SocketSync extends CommonSocket
      * soon as any data is received.
      *
      * @param integer $len               Maximum number of bytes to read.
-     * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
      *
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read(int $len, bool $verifyExactLength = false) : string
+    public function read(int $len) : string
     {
-        return $this->readBlocking($len, $verifyExactLength);
+        return $this->readBlocking($len);
     }
 
     // }}}

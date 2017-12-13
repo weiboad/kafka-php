@@ -304,6 +304,69 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     }
 
     // }}}
+    // {{{ public function testReadBlockingReadFailureTryTimeout()
+
+    /**
+     * testReadBlockingReadFailureTryTimeout
+     *
+     * @expectedException \Kafka\Exception
+     * @expectedExceptionMessage Timed out while reading 4 bytes from socket, 4 bytes are still needed
+     * @access public
+     * @return void
+     */
+    public function testReadBlockingReadFailureTryTimeout()
+    {
+        $host      = '127.0.0.1';
+        $port      = 9192;
+        $transport = 'tcp';
+
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')->will($this->returnValue(false));
+        $streamMock->method('read')->will($this->returnValue(''));
+
+        $socket = $this->createStream($host, $port, 1);
+        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
+        $socket->expects($this->exactly(2))
+               ->method('select')
+            ->will($this->onConsecutiveCalls(
+                1,
+                0
+            ));
+        $socket->connect();
+        $socket->readBlocking(4);
+    }
+
+    // }}}
+    // {{{ public function testRecvTimeout()
+
+    /**
+     * testRecvTimeout
+     *
+     * @access public
+     * @return void
+     */
+    public function testRecvTimeout()
+    {
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $streamMock->method('read')
+                   ->will($this->returnValue('xxxx'));
+        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
+        $socket->setRecvTimeoutSec(3000);
+        $socket->setRecvTimeoutUsec(30001);
+        $socket->method('select')
+               ->with($this->isType('array'), $this->equalTo(3000), $this->equalTo(30001), $this->equalTo(true))
+               ->will($this->returnValue(1));
+        $socket->connect();
+        $data = $socket->readBlocking(4);
+        $this->assertEquals('xxxx', $data);
+    }
+
+    // }}}
     // {{{ public function testWriteBlockingFailure()
 
     /**
@@ -428,6 +491,36 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
         $socket = $this->createStream($host, $port, 1);
         $socket->writeBlocking($str);
+    }
+
+    // }}}
+    // {{{ public function testSendTimeout()
+
+    /**
+     * testSendTimeout
+     *
+     * @access public
+     * @return void
+     */
+    public function testSendTimeout()
+    {
+        $host       = '127.0.0.1';
+        $port       = 9192;
+        $transport  = 'tcp';
+        $streamMock = $this->initStreamStub($transport, $host, $port);
+        $streamMock->method('eof')
+                   ->will($this->returnValue(false));
+        $streamMock->method('write')
+                   ->will($this->returnValue(4));
+        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
+        $socket->setSendTimeoutSec(3000);
+        $socket->setSendTimeoutUsec(30001);
+        $socket->method('select')
+               ->with($this->isType('array'), $this->equalTo(3000), $this->equalTo(30001), $this->equalTo(false))
+               ->will($this->returnValue(1));
+        $socket->connect();
+        $data = $socket->writeBlocking('xxxx');
+        $this->assertEquals(4, $data);
     }
 
     // }}}
