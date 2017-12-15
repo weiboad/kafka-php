@@ -207,8 +207,9 @@ class Process implements ProcessInterface
         $this->logger->debug('Start sync metadata request');
 
         $brokerHost = [];
+        $brokerList = $this->brokerConfig->getMetadataBrokerList();
 
-        foreach (explode(',', $this->brokerConfig->getMetadataBrokerList()) as $key => $val) {
+        foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
                 $brokerHost[] = $val;
             }

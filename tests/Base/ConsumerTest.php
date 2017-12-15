@@ -5,7 +5,7 @@ namespace KafkaTest\Base;
 
 use Amp\Loop;
 use Kafka\Consumer;
-use Kafka\Contracts\Consumer\StopStrategy;
+use Kafka\Contracts\StopStrategy;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class ConsumerTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
         $builder = new \DI\ContainerBuilder();
         $builder->useAnnotations(false);
         $definions = array_merge([
-            \Kafka\Contracts\Consumer\StopStrategy::class => null,
+            \Kafka\Contracts\StopStrategy::class => null,
             \Psr\Log\LoggerInterface::class => \DI\object(\Psr\Log\NullLogger::class)
         ], $definions);
         $builder->addDefinitions($definions);

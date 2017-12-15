@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kafka\Consumer\StopStrategy;
+namespace Kafka\StopStrategy;
 
 use Amp\Loop;
-use Kafka\Consumer;
-use Kafka\Contracts\Consumer\StopStrategy;
+use Kafka\Contracts\AsynchronousProcess;
+use Kafka\Contracts\StopStrategy;
 
 final class Callback implements StopStrategy
 {
@@ -31,18 +31,18 @@ final class Callback implements StopStrategy
         $this->interval = $interval;
     }
 
-    public function setup(Consumer $consumer): void
+    public function setup(AsynchronousProcess $process): void
     {
         Loop::repeat(
             $this->interval,
-            function (string $watcherId) use ($consumer): void {
+            function (string $watcherId) use ($process): void {
                 $shouldStop = (bool) ($this->callback)();
 
                 if (! $shouldStop) {
                     return;
                 }
 
-                $consumer->stop();
+                $process->stop();
                 Loop::cancel($watcherId);
             }
         );

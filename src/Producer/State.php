@@ -2,6 +2,9 @@
 namespace Kafka\Producer;
 
 use Amp\Loop;
+use Psr\Log\LoggerInterface;
+use Kafka\Contracts\Config\Broker as BrokerConfigInterface;
+use Kafka\Contracts\Config\Producer as ProducerConfigInterface;
 
 class State
 {
@@ -23,6 +26,17 @@ class State
         self::REQUEST_PRODUCE => [],
     ];
 
+    private $brokerConfig;
+    private $producerConfig;
+    private $logger;
+
+    public function __construct(BrokerConfigInterface $brokerConfig, ProducerConfigInterface $producerConfig, LoggerInterface $logger)
+    {
+        $this->brokerConfig   = $brokerConfig;
+        $this->producerConfig = $producerConfig;
+        $this->logger         = $logger;
+    }
+
     public function init()
     {
         $this->callStatus = [
@@ -37,19 +51,13 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:
-                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                    $this->requests[$request]['interval'] = $this->brokerConfig->getMetadataRefreshIntervalMs();
                     break;
                 default:
-                    $isAsyn = $config->getIsAsyn();
-                    if ($isAsyn) {
-                        $this->requests[$request]['interval'] = $config->getProduceInterval();
-                    } else {
-                        $this->requests[$request]['interval'] = 1;
-                    }
+                    $this->requests[$request]['interval'] = $this->producerConfig->getProduceInterval();
             }
         }
     }
@@ -80,8 +88,6 @@ class State
 
     public function succRun($key, $context = null)
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $isAsyn = $config->getIsAsyn();
         if (! isset($this->callStatus[$key])) {
             return false;
         }
@@ -95,23 +101,13 @@ class State
                 break;
             case self::REQUEST_PRODUCE:
                 if ($context == null) {
-                    if (! $isAsyn) {
-                        $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        Loop::stop();
-                    } else {
-                        $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                    }
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     break;
                 }
                 unset($this->callStatus[$key]['context'][$context]);
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {
-                    if (! $isAsyn) {
-                        $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        Loop::stop();
-                    } else {
-                        $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                    }
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                 }
                 break;
         }

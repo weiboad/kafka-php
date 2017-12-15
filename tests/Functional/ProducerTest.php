@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace KafkaTest\Functional;
 
-use Kafka\Consumer\StopStrategy\Callback;
+use Kafka\StopStrategy\Callback;
+use Kafka\Contracts\Config\Broker;
 
 abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,6 +25,8 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
      */
     private $topic;
 
+    protected $container;
+
     /**
      * @before
      */
@@ -38,52 +41,53 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
                 'Environment variables "KAFKA_VERSION", "KAFKA_TOPIC", and "KAFKA_BROKERS" must be provided'
             );
         }
-    }
 
-    protected function configureProducer(): void
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setMetadataBrokerList($this->brokers);
-        $config->setBrokerVersion($this->version);
+        $this->container = \Kafka\Producer::getContainer([
+            \Kafka\Contracts\Config\Broker::class => function () {
+                $config = new \Kafka\Config\Broker();
+                $config->setMetadataBrokerList($this->brokers);
+                $config->setVersion($this->version);
+                return $config;
+            },
+            // configure sasl
+            \Kafka\Contracts\Config\Sasl::class => function () {
+                $config = new \Kafka\Config\Sasl();
+                $config->setUsername('nmred');
+                $config->setPassword('123456');
+                return $config;
+            },
+            \Kafka\Contracts\Config\Consumer::class => function () {
+                $config = new \Kafka\Config\Consumer();
+                $config->setTopics([$this->topic]);
+                $config->setGroupId('kafka-php-tests');
+                $config->setOffsetReset('earliest');
+                return $config;
+            },
+        ]);
     }
 
     /**
      * @test
-     *
      * @runInSeparateProcess
      */
     public function consumeProducedMessages(): void
     {
-        $this->configureConsumer();
-
         $consumedMessages = 0;
         $executionEnd     = new \DateTimeImmutable('+1 minute');
 
-        $consumer = new \Kafka\Consumer(
-            new Callback(
-                function () use (&$consumedMessages, $executionEnd): bool {
-                    return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
-                }
-            )
+        $stop = new Callback(
+            function () use (&$consumedMessages, $executionEnd): bool {
+                return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
+            }
         );
-
+        $consumer = $this->container->make(\Kafka\Consumer::class, ['stopStrategy' => $stop]);
         $consumer->start(
             function () use (&$consumedMessages) {
                 ++$consumedMessages;
             }
         );
 
-        self::assertSame(self::MESSAGES_TO_SEND, $consumedMessages);
-    }
-
-    private function configureConsumer(): void
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList($this->brokers);
-        $config->setBrokerVersion($this->version);
-        $config->setGroupId('kafka-php-tests');
-        $config->setOffsetReset('earliest');
-        $config->setTopics([$this->topic]);
+        $this->assertEquals(self::MESSAGES_TO_SEND, $consumedMessages);
     }
 
     public function createMessages(int $amount = self::MESSAGES_TO_SEND): array

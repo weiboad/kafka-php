@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kafka\Consumer\StopStrategy;
+namespace Kafka\StopStrategy;
 
 use Amp\Loop;
-use Kafka\Consumer;
-use Kafka\Contracts\Consumer\StopStrategy;
+use Kafka\Contracts\AsynchronousProcess;
+use Kafka\Contracts\StopStrategy;
 
 final class Delay implements StopStrategy
 {
@@ -21,12 +21,12 @@ final class Delay implements StopStrategy
         $this->delay = $delay;
     }
 
-    public function setup(Consumer $consumer): void
+    public function setup(AsynchronousProcess $process): void
     {
         Loop::delay(
             $this->delay,
-            function () use ($consumer): void {
-                $consumer->stop();
+            function () use ($process): void {
+                $process->stop();
             }
         );
     }

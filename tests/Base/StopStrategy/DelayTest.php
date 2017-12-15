@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace KafkaTest\Base\Consumer\StopStrategy;
+namespace KafkaTest\Base\StopStrategy;
 
 use Amp\Loop;
 use Kafka\Consumer;
-use Kafka\Consumer\StopStrategy\Delay;
+use Kafka\StopStrategy\Delay;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class DelayTest extends \PHPUnit\Framework\TestCase

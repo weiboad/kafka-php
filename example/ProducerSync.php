@@ -1,39 +1,45 @@
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
+
+use Kafka\Producer;
+use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StdoutHandler;
 
-// Create the logger
-$logger = new Logger('my_logger');
-// Now add some handlers
-$logger->pushHandler(new StdoutHandler());
+$container = Producer::getContainer([
+    // configure logger
+    LoggerInterface::class => function () {
+        // Create the logger
+        $logger = new Logger('my_logger');
+        // Now add some handlers
+        $logger->pushHandler(new StdoutHandler());
+        return $logger;
+    },
+    // configure broker
+    \Kafka\Contracts\Config\Broker::class => function () {
+        $config = new \Kafka\Config\Broker();
+        $config->setMetadataBrokerList('127.0.0.1:9092');
+        return $config;
+    },
+    // configure sasl
+    \Kafka\Contracts\Config\Sasl::class => function () {
+        $config = new \Kafka\Config\Sasl();
+        $config->setUsername('nmred');
+        $config->setPassword('123456');
+        return $config;
+    }
+]);
 
-$config = \Kafka\ProducerConfig::getInstance();
-$config->setMetadataRefreshIntervalMs(10000);
-$config->setMetadataBrokerList('127.0.0.1:9093');
-$config->setBrokerVersion('0.10.2.1');
-$config->setRequiredAck(1);
-$config->setIsAsyn(false);
-$config->setProduceInterval(500);
-
-// if use ssl connect
-//$config->setSslLocalCert('/home/vagrant/code/kafka-php/ca-cert');
-//$config->setSslLocalPk('/home/vagrant/code/kafka-php/ca-key');
-//$config->setSslEnable(true);
-//$config->setSslPassphrase('123456');
-//$config->setSslPeerName('nmred');
-
-$producer = new \Kafka\Producer();
-$producer->setLogger($logger);
-
-for ($i = 0; $i < 100; $i++) {
-    $result = $producer->send([
-        [
-            'topic' => 'test',
-            'value' => 'test1....message.',
-            'key' => '',
-        ],
-    ]);
-    var_dump($result);
-}
+$saslConfig = $container->get(Kafka\Contracts\Config\Sasl::class);
+$producer   = $container->make(Producer::class, ['producer' => null]);
+$ret        = $producer->send(
+    [
+       [
+           'topic' => 'test',
+           'value' => 'test....message.',
+           'key' => '',
+       ],
+    ]
+);
+var_dump($ret);

@@ -114,45 +114,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     /**
      * testGetConnect
      *
-     * @access public
-     * @return void
-     */
-    public function getConnect()
-    {
-        $broker = \Kafka\Broker::getInstance();
-        $data   = [
-            [
-                'host' => '127.0.0.1',
-                'port' => '9092',
-                'nodeId' => '0',
-            ],
-            [
-                'host' => '127.0.0.1',
-                'port' => '9193',
-                'nodeId' => '1',
-            ],
-            [
-                'host' => '127.0.0.1',
-                'port' => '9292',
-                'nodeId' => '2',
-            ],
-        ];
-        $broker->setData([], $data);
-
-        $socket = $this->getMockBuilder(\Kafka\Socket::class)
-            ->setConstructorArgs(['127.0.0.1', '9192'])
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->setMethods(['connect', 'setOnReadable', 'close'])
-            ->getMock();
-
-        $result = $broker->getMetaConnect('1');
-        $this->assertFalse($result);
-    }
-
-    /**
-     * testGetConnect
-     *
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid broker list, must call in after setData
      * @access public

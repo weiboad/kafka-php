@@ -112,7 +112,7 @@ class State implements StateInterface
     private function removeWatchers(): void
     {
         foreach (array_keys($this->requests) as $request) {
-            if ($this->requests[$request]['watcher'] === null) {
+            if (! isset($this->requests[$request]['watcher']) || $this->requests[$request]['watcher'] === null) {
                 return;
             }
 

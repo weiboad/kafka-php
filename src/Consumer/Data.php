@@ -41,11 +41,6 @@ class Data
         return $this->generationId;
     }
 
-    public function getAssignments()
-    {
-        return $this->assignments;
-    }
-
     public function setTopics($topics)
     {
         $this->topics = $topics;

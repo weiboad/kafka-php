@@ -5,9 +5,10 @@ use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use DI\FactoryInterface;
 use Kafka\Contracts\Consumer\Process;
-use Kafka\Contracts\Consumer\StopStrategy;
+use Kafka\Contracts\StopStrategy;
+use Kafka\Contracts\AsynchronousProcess;
 
-class Consumer extends Bootstrap
+class Consumer extends Bootstrap implements AsynchronousProcess
 {
     /**
      * @var StopStrategy|null
