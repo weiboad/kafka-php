@@ -3,6 +3,7 @@ namespace Kafka;
 
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
+use DI\FactoryInterface;
 use Kafka\Contracts\Consumer\Process;
 use Kafka\Contracts\Consumer\StopStrategy;
 
@@ -18,13 +19,15 @@ class Consumer extends Bootstrap
      */
     private $process;
 
-	private $logger;
+    private $logger;
 
-    public function __construct(Process $process, ?StopStrategy $stopStrategy = null, LoggerInterface $logger)
+    private $container;
+
+    public function __construct(FactoryInterface $container, ?StopStrategy $stopStrategy = null, LoggerInterface $logger)
     {
-        $this->process = $process;
         $this->stopStrategy = $stopStrategy;
-		$this->logger = $logger;
+        $this->logger       = $logger;
+        $this->container    = $container;
     }
 
     /**
@@ -38,8 +41,12 @@ class Consumer extends Bootstrap
      */
     public function start(?callable $consumer = null): void
     {
+        if ($this->process !== null) {
+            $this->logger->error('Consumer is already being executed');
+            return;
+        }
         $this->setupStopStrategy();
-
+        $this->process = $this->container->make(Consumer\Process::class, ['consumer' => $consumer]);
         $this->process->start();
 
         Loop::run();
@@ -57,7 +64,7 @@ class Consumer extends Bootstrap
     public function stop(): void
     {
         if ($this->process === null) {
-            $this->error('Consumer is not running');
+            $this->logger->error('Consumer is not running');
             return;
         }
 

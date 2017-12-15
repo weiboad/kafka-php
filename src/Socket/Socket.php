@@ -56,7 +56,7 @@ abstract class Socket implements SocketInterface
      */
     private $saslMechanismProvider;
 
-	private $sslConfig;
+    private $sslConfig;
 
     /**
      * __construct
@@ -66,10 +66,13 @@ abstract class Socket implements SocketInterface
      * @param $port
      * @param Object $config
      */
-	public function __construct(string $host, int $port, SocketConfigInterface $config, 
-		SaslMechanism $saslProvider,
-		SslConfigInterface $sslConfig)
-    {
+    public function __construct(
+        string $host,
+        int $port,
+        SocketConfigInterface $config,
+        SaslMechanism $saslProvider,
+        SslConfigInterface $sslConfig
+    ) {
         $this->host                  = $host;
         $this->port                  = $port;
         $this->config                = $config;
@@ -77,10 +80,10 @@ abstract class Socket implements SocketInterface
         $this->saslMechanismProvider = $saslProvider;
     }
 
-	public function connect() : void
-	{
-		$this->preformConnect();	
-	}
+    public function connect() : void
+    {
+        $this->preformConnect();
+    }
 
 
     /**
@@ -218,8 +221,11 @@ abstract class Socket implements SocketInterface
                     throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
                 }
                 // Otherwise wait for bytes
-				$readable = $this->select($read, $this->config->getRecvTimeoutSec(), 
-										  $this->config->getRecvTimeoutUsec());
+                $readable = $this->select(
+                    $read,
+                    $this->config->getRecvTimeoutSec(),
+                    $this->config->getRecvTimeoutUsec()
+                );
                 if ($readable !== 1) {
                     throw new \Kafka\Exception('Timed out while reading ' . $len . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
                 }
@@ -251,8 +257,12 @@ abstract class Socket implements SocketInterface
         $bytesToWrite   = strlen($buf);
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
-			$writable = $this->select($write, $this->config->getSendTimeoutSec(),
-									  $this->config->getSendTimeoutUsec(), false);
+            $writable = $this->select(
+                $write,
+                $this->config->getSendTimeoutSec(),
+                $this->config->getSendTimeoutUsec(),
+                false
+            );
             if (false === $writable) {
                 throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
@@ -297,5 +307,5 @@ abstract class Socket implements SocketInterface
      * @return void
      */
     abstract public function close() : void;
-	abstract protected function preformConnect() : void;
+    abstract protected function preformConnect() : void;
 }

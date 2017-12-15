@@ -12,42 +12,46 @@ use Psr\Log\LoggerInterface;
 
 class Process implements ProcessInterface
 {
-	private $broker;
+    private $broker;
 
-	private $brokerConfig;
+    private $brokerConfig;
 
-	private $consumerConfig;
+    private $consumerConfig;
 
     protected $consumer = null;
 
-	private $state;
+    private $state;
 
-	private $logger;
+    private $logger;
 
-	private $data;
+    private $data;
 
-	private $container;
+    private $container;
 
-	private $assign;
+    private $assign;
 
     protected $messages = [];
 
-	public function __construct(BrokerConfigInterface $brokerConfig,
-		ConsumerConfigInterface $consumerConfig, 
-		BrokerInterface $broker, LoggerInterface $logger,
-		Data $data, FactoryInterface $container, 
-		Assignment $assign,	
-		State $state, callable $consumer = null)
-    {
-		$this->consumerConfig = $consumerConfig;
-        $this->broker = $broker;
-        $this->brokerConfig = $brokerConfig;
-        $this->state = $state;
-        $this->consumer = $consumer;
-		$this->logger = $logger;
-		$this->data = $data;
-		$this->container = $container;
-		$this->assign = $assign;
+    public function __construct(
+        BrokerConfigInterface $brokerConfig,
+        ConsumerConfigInterface $consumerConfig,
+        BrokerInterface $broker,
+        LoggerInterface $logger,
+        Data $data,
+        FactoryInterface $container,
+        Assignment $assign,
+        State $state,
+        callable $consumer = null
+    ) {
+        $this->consumerConfig = $consumerConfig;
+        $this->broker         = $broker;
+        $this->brokerConfig   = $brokerConfig;
+        $this->state          = $state;
+        $this->consumer       = $consumer;
+        $this->logger         = $logger;
+        $this->data           = $data;
+        $this->container      = $container;
+        $this->assign         = $assign;
     }
 
     /**
@@ -218,7 +222,7 @@ class Process implements ProcessInterface
         foreach ($brokerHost as $host) {
             $socket = $this->broker->getMetaConnect($host);
             if ($socket) {
-				$params = $this->consumerConfig->getTopics();
+                $params = $this->consumerConfig->getTopics();
                 $this->logger->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
@@ -241,7 +245,7 @@ class Process implements ProcessInterface
             return;
         }
         $params      = [
-			'group_id' => $this->consumerConfig->getGroupId(),
+            'group_id' => $this->consumerConfig->getGroupId(),
         ];
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $params);
         $connect->write($requestData);
@@ -256,8 +260,8 @@ class Process implements ProcessInterface
         }
         $memberId    = $this->data->getMemberId();
         $params      = [
-			'group_id' => $this->consumerConfig->getGroupId(),
-			'session_timeout' => $this->consumerConfig->getSessionTimeout(),
+            'group_id' => $this->consumerConfig->getGroupId(),
+            'session_timeout' => $this->consumerConfig->getSessionTimeout(),
             'rebalance_timeout' => $this->consumerConfig->getRebalanceTimeout(),
             'member_id' => ($memberId == null) ? '' : $memberId,
             'data' => [

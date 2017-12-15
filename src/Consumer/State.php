@@ -40,12 +40,12 @@ class State implements StateInterface
 
     private $requests = self::CLEAN_REQUEST_STATE;
 
-	private $brokerConfig;
+    private $brokerConfig;
 
-	public function __construct(Broker $brokerConfig) 
-	{
-		$this->brokerConfig = $brokerConfig;	
-	}
+    public function __construct(Broker $brokerConfig)
+    {
+        $this->brokerConfig = $brokerConfig;
+    }
 
     public function init() : void
     {

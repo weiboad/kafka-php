@@ -5,8 +5,6 @@ use Amp\Loop;
 
 class State
 {
-    use \Kafka\SingletonTrait;
-
     const REQUEST_METADATA = 1;
     const REQUEST_PRODUCE  = 2;
 

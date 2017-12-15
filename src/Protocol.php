@@ -3,7 +3,6 @@ namespace Kafka;
 
 class Protocol
 {
-
     /**
      * protocol request code
      */

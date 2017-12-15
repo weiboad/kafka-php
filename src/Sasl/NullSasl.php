@@ -33,8 +33,8 @@ class NullSasl extends Mechanism
         return self::MECHANISM_NAME;
     }
 
-	// @overwrite
-	public function authenticate(SocketInterface $socket): void
-	{
-	}
+    // @overwrite
+    public function authenticate(SocketInterface $socket): void
+    {
+    }
 }

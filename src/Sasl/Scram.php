@@ -2,7 +2,7 @@
 namespace Kafka\Sasl;
 
 use Kafka\Contracts\SocketInterface;
-use Kafka\SaslMechanism;
+use Kafka\Contracts\SaslMechanism;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;

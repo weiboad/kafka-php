@@ -45,30 +45,30 @@ class Socket implements SocketInterface
      */
     protected $maxWriteAttempts = 3;
 
-	public function getSendTimeoutSec() : int
-	{
-		return $this->sendTimeoutSec;
-	}
+    public function getSendTimeoutSec() : int
+    {
+        return $this->sendTimeoutSec;
+    }
 
-	public function getSendTimeoutUsec() : int
-	{
-		return $this->sendTimeoutUsec;
-	}
+    public function getSendTimeoutUsec() : int
+    {
+        return $this->sendTimeoutUsec;
+    }
 
-	public function getRecvTimeoutSec() : int
-	{
-		return $this->recvTimeoutSec;	
-	}
+    public function getRecvTimeoutSec() : int
+    {
+        return $this->recvTimeoutSec;
+    }
 
-	public function getRecvTimeoutUsec() : int
-	{
-		return $this->recvTimeoutUsec;	
-	}
+    public function getRecvTimeoutUsec() : int
+    {
+        return $this->recvTimeoutUsec;
+    }
 
-	public function getMaxWriteAttempts() : int
-	{
-		return $this->maxWriteAttempts;
-	}
+    public function getMaxWriteAttempts() : int
+    {
+        return $this->maxWriteAttempts;
+    }
 
     /**
      * @param float $sendTimeoutSec
@@ -94,7 +94,6 @@ class Socket implements SocketInterface
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
     
-
     /**
      * @param float $recvTimeoutUsec
      */
@@ -102,7 +101,6 @@ class Socket implements SocketInterface
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
-    
 
     /**
      * @param int $number

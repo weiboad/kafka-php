@@ -1,19 +1,19 @@
 <?php
 namespace Kafka\Contracts\Config;
 
-interface Broker 
+interface Broker
 {
-	public function getClientId() : string;
+    public function getClientId() : string;
 
-	public function getVersion() : string;
+    public function getVersion() : string;
 
-	public function getMetadataBrokerList() : string;
+    public function getMetadataBrokerList() : string;
 
-	public function getMetadataRequestTimeoutMs() : int;
+    public function getMetadataRequestTimeoutMs() : int;
 
-	public function getMetadataRefreshIntervalMs() : int;
+    public function getMetadataRefreshIntervalMs() : int;
 
-	public function getMetadataMaxAgeMs() : int;
+    public function getMetadataMaxAgeMs() : int;
 
-	public function getMessageMaxBytes() : int;
+    public function getMessageMaxBytes() : int;
 }

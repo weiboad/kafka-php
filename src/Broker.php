@@ -5,6 +5,7 @@ use DI\FactoryInterface;
 
 use Kafka\Contracts\BrokerInterface;
 use Kafka\Contracts\SocketInterface;
+use Psr\Log\LoggerInterface;
 use Kafka\Exception;
 
 class Broker implements BrokerInterface
@@ -21,12 +22,15 @@ class Broker implements BrokerInterface
 
     private $process;
 
-	private $container;
+    private $logger;
 
-	public function __construct(FactoryInterface $container)
-	{
-		$this->container = $container;	
-	}
+    private $container;
+
+    public function __construct(FactoryInterface $container, LoggerInterface $logger)
+    {
+        $this->container = $container;
+        $this->logger    = $logger;
+    }
 
     public function setProcess(callable $process) : void
     {
@@ -61,7 +65,7 @@ class Broker implements BrokerInterface
         $newTopics = [];
         foreach ($topics as $topic) {
             if ($topic['errorCode'] != \Kafka\Protocol::NO_ERROR) {
-                $this->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
+                $this->logger->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
                 continue;
             }
             $item = [];
@@ -99,7 +103,7 @@ class Broker implements BrokerInterface
         $nodeIds = array_keys($this->brokers);
         shuffle($nodeIds);
         if (! isset($nodeIds[0])) {
-			throw new Exception('Invalid broker list, must call in after setData');
+            throw new Exception('Invalid broker list, must call in after setData');
         }
         return $this->getMetaConnect($nodeIds[0]);
     }
@@ -134,15 +138,15 @@ class Broker implements BrokerInterface
         }
 
         if (! $host || ! $port) {
-			throw new Exception('Invalid broker list, must give host and port');
+            throw new Exception('Invalid broker list, must give host and port');
         }
 
-		$socket = $this->getSocket($host, $port);
-		$socket->setOnReadable($this->process);
-		$socket->connect();
-		$this->{$type}[$key] = $socket;
+        $socket = $this->getSocket($host, $port);
+        $socket->setOnReadable($this->process);
+        $socket->connect();
+        $this->{$type}[$key] = $socket;
 
-		return $socket;
+        return $socket;
     }
 
     public function clear() : void
@@ -158,9 +162,9 @@ class Broker implements BrokerInterface
 
     private function getSocket($host, $port) : SocketInterface
     {
-		return $this->container->make(SocketInterface::class, [
-			'host' => $host,
-			'port' => $port,
-		]);
+        return $this->container->make(SocketInterface::class, [
+            'host' => $host,
+            'port' => $port,
+        ]);
     }
 }

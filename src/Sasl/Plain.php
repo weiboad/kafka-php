@@ -23,7 +23,7 @@ class Plain extends Mechanism
      */
     public function __construct(Sasl $config)
     {
-		$this->config = $config;
+        $this->config = $config;
     }
 
     /**

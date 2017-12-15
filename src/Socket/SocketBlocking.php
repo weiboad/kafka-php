@@ -16,7 +16,7 @@ class SocketBlocking extends Socket
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read(int $len) : string
+    public function read($len)
     {
         return $this->readBlocking($len);
     }
@@ -29,14 +29,14 @@ class SocketBlocking extends Socket
      * @return integer
      * @throws \Kafka\Exception
      */
-    public function write(string $buf) : int
+    public function write($buf)
     {
         return $this->writeBlocking($buf);
     }
 
-	public function setOnReadable(?callable $read) : void
-	{
-	}
+    public function setOnReadable(?callable $read) : void
+    {
+    }
 
     /**
      * Connects the socket

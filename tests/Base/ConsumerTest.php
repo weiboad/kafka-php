@@ -5,6 +5,7 @@ namespace KafkaTest\Base;
 
 use Amp\Loop;
 use Kafka\Consumer;
+use Kafka\Contracts\Consumer\StopStrategy;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class ConsumerTest extends \PHPUnit\Framework\TestCase
@@ -17,16 +18,17 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @before
      */
-    public function createConsumer(?Consumer\StopStrategy $stopStrategy = null): void
+    public function createConsumer($definions = []): void
     {
-
-        $this->consumer = $this->getMockBuilder(Consumer::class)
-                               ->disableOriginalClone()
-                               ->disableArgumentCloning()
-                               ->disallowMockingUnknownTypes()
-                               ->setConstructorArgs([$stopStrategy])
-                               ->setMethods(['createProcess', 'error'])
-                               ->getMock();
+        $builder = new \DI\ContainerBuilder();
+        $builder->useAnnotations(false);
+        $definions = array_merge([
+            \Kafka\Contracts\Consumer\StopStrategy::class => null,
+            \Psr\Log\LoggerInterface::class => \DI\object(\Psr\Log\NullLogger::class)
+        ], $definions);
+        $builder->addDefinitions($definions);
+        $container      = $builder->build();
+        $this->consumer = $container->get(\Kafka\Consumer::class);
     }
 
     /**
@@ -43,11 +45,11 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
             $executed = true;
             Loop::stop();
         };
-
-        $this->consumer->expects($this->once())
-                       ->method('createProcess')
-                       ->with($callback)
-                       ->willReturn($this->createProcess($startCallback));
+        $this->createConsumer([
+            \Kafka\Consumer\Process::class => function () use ($startCallback) {
+                return $this->createProcess($startCallback);
+            },
+        ]);
 
         $this->consumer->start($callback);
 
@@ -59,24 +61,27 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function startShouldLogErrorWhenSomeoneTriesToDoItTwice(): void
     {
-        $callback = function () {
-        };
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects($this->once())
+               ->method('error')
+               ->with('Consumer is already being executed');
 
         $startCallback = function () {
             $this->consumer->start();
             Loop::stop();
         };
 
-        $this->consumer->expects($this->once())
-                       ->method('error')
-                       ->with('Consumer is already being executed');
+        $this->createConsumer([
+            \Kafka\Consumer\Process::class => function () use ($startCallback) {
+                return $this->createProcess($startCallback);
+            },
+            \Psr\Log\LoggerInterface::class => function () use ($logger) {
+                return $logger;
+            },
+        ]);
 
-        $this->consumer->expects($this->once())
-                       ->method('createProcess')
-                       ->with($callback)
-                       ->willReturn($this->createProcess($startCallback));
-
-        $this->consumer->start($callback);
+        $this->consumer->start(function () {
+        });
     }
 
     /**
@@ -84,31 +89,19 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function startShouldRunTheProcessUntilTheStopVerifierSaysSo(): void
     {
-        $executed = false;
-
-        $callback = function () {
+        $startCallback = function () {
+            $this->consumer->stop();
         };
 
-        $startCallback = function () use (&$executed) {
-            $executed = true;
-        };
 
-        $this->createConsumer(
-            new Consumer\StopStrategy\Callback(
-                function () use (&$executed): bool {
-                    return $executed;
-                }
-            )
-        );
+        $this->createConsumer([
+            \Kafka\Consumer\Process::class => function () use ($startCallback) {
+                return $this->createProcess($startCallback, true);
+            },
+        ]);
 
-        $this->consumer->expects($this->once())
-                       ->method('createProcess')
-                       ->with($callback)
-                       ->willReturn($this->createProcess($startCallback, true));
-
-        $this->consumer->start($callback);
-
-        self::assertTrue($executed);
+        $this->consumer->start(function () {
+        });
     }
 
     /**
@@ -123,10 +116,11 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
             $this->consumer->stop();
         };
 
-        $this->consumer->expects($this->once())
-                       ->method('createProcess')
-                       ->with($callback)
-                       ->willReturn($this->createProcess($startCallback, true));
+        $this->createConsumer([
+            \Kafka\Consumer\Process::class => function () use ($startCallback) {
+                return $this->createProcess($startCallback, true);
+            },
+        ]);
 
         $this->consumer->start($callback);
     }
@@ -136,10 +130,15 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function stopShouldLogErrorWhenConsumerIsNotRunning(): void
     {
-        $this->consumer->expects($this->once())
-                       ->method('error')
-                       ->with('Consumer is not running');
-
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects($this->once())
+               ->method('error')
+               ->with('Consumer is not running');
+        $this->createConsumer([
+            \Psr\Log\LoggerInterface::class => function () use ($logger) {
+                return $logger;
+            },
+        ]);
         $this->consumer->stop();
     }
 

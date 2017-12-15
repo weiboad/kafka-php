@@ -5,7 +5,7 @@ namespace Kafka\Consumer\StopStrategy;
 
 use Amp\Loop;
 use Kafka\Consumer;
-use Kafka\Consumer\StopStrategy;
+use Kafka\Contracts\Consumer\StopStrategy;
 
 final class Delay implements StopStrategy
 {

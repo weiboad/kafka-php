@@ -9,22 +9,24 @@ use Kafka\Contracts\Producer\SyncInterface;
 
 class SyncProcess implements SyncInterface
 {
-	private $brokerConfig;
+    private $brokerConfig;
 
-	private $producerConfig;
+    private $producerConfig;
 
-	private $broker;
+    private $broker;
 
-	private $logger;
+    private $logger;
 
-	public function __construct(BrokerInterface $broker, BrokerConfigInterface $brokerConfig,
-								ProducerConfigInterface $producerConfig,
-								LoggerInterface $logger)
-    {
-		$this->logger = $logger;
-		$this->broker = $broker;
-		$this->brokerConfig = $brokerConfig;
-		$this->producerConfig = $producerConfig;
+    public function __construct(
+        BrokerInterface $broker,
+        BrokerConfigInterface $brokerConfig,
+        ProducerConfigInterface $producerConfig,
+        LoggerInterface $logger
+    ) {
+        $this->logger         = $logger;
+        $this->broker         = $broker;
+        $this->brokerConfig   = $brokerConfig;
+        $this->producerConfig = $producerConfig;
 
         // init protocol
         \Kafka\Protocol::init($this->brokerConfig->getVersion());
@@ -55,7 +57,7 @@ class SyncProcess implements SyncInterface
                 return false;
             }
 
-            $params      = [
+            $params = [
                 'required_ack' => $requiredAck,
                 'timeout' => $timeout,
                 'data' => $topicList,

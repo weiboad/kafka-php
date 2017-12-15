@@ -7,5 +7,5 @@ interface Assignment
 {
     public function assign(FactoryInterface $container, array $members): void;
 
-	public function getAssignments() : array;
+    public function getAssignments() : array;
 }

@@ -6,11 +6,11 @@ use Kafka\Contracts\Consumer\Assignment as AssignmentInterface;
 
 class Assignment implements AssignmentInterface
 {
-	private $assignments = [];
+    private $assignments = [];
 
     public function assign(FactoryInterface $container, array $memberInfos) : void
     {
-		$broker = $container->get(\Kafka\Contracts\BrokerInterface::class);
+        $broker = $container->get(\Kafka\Contracts\BrokerInterface::class);
         $topics = $broker->getTopics();
 
         $memberCount = count($memberInfos);
@@ -44,11 +44,11 @@ class Assignment implements AssignmentInterface
             ];
             $data[] = $item;
         }
-		$this->assignments = $data;
+        $this->assignments = $data;
     }
 
-	public function getAssignments() : array
-	{
-		return $this->assignments;
-	}
+    public function getAssignments() : array
+    {
+        return $this->assignments;
+    }
 }

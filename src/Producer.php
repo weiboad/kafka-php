@@ -17,7 +17,7 @@ class Producer extends Bootstrap
      */
     public function __construct(SyncInterface $process)
     {
-		$this->process = $process;
+        $this->process = $process;
     }
 
     /**

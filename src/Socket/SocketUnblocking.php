@@ -193,10 +193,10 @@ class SocketUnblocking extends Socket
         $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
 
-	public function getSocket()
-	{
-		return $this->stream;
-	}
+    public function getSocket()
+    {
+        return $this->stream;
+    }
 
     /**
      * check the stream is close
