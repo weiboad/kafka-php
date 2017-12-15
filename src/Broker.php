@@ -37,7 +37,7 @@ class Broker implements BrokerInterface
         $this->process = $process;
     }
 
-    public function setGroupBrokerId($brokerId) : void
+    public function setGroupBrokerId(int $brokerId) : void
     {
         $this->groupBrokerId = $brokerId;
     }
