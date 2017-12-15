@@ -1,11 +1,11 @@
 <?php
 namespace Kafka;
 
-class Producer
-{
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+use Psr\Log\LoggerInterface;
+use Kafka\Contracts\Producer\SyncInterface;
 
+class Producer extends Bootstrap
+{
     private $process = null;
 
     /**
@@ -15,13 +15,9 @@ class Producer
      * @param $hostList
      * @param null $timeout
      */
-    public function __construct(callable $producer = null)
+    public function __construct(SyncInterface $process)
     {
-        if (is_null($producer)) {
-            $this->process = new \Kafka\Producer\SyncProcess();
-        } else {
-            $this->process = new \Kafka\Producer\Process($producer);
-        }
+		$this->process = $process;
     }
 
     /**
@@ -31,19 +27,9 @@ class Producer
      * @data is data is boolean that is async process, thus it is sync process
      * @return void
      */
-    public function send($data = true)
+    public function send($data)
     {
-        if ($this->logger) {
-            $this->process->setLogger($this->logger);
-        }
-        if (is_bool($data)) {
-            $this->process->start();
-            if ($data) {
-                \Amp\Loop::run();
-            }
-        } else {
-            return $this->process->send($data);
-        }
+        return $this->process->send($data);
     }
 
     /**
@@ -55,27 +41,5 @@ class Producer
     public function syncMeta()
     {
         return $this->process->syncMeta();
-    }
-
-    /**
-     * producer success
-     *
-     * @access public
-     * @return void
-     */
-    public function success(callable $success = null)
-    {
-        $this->process->setSuccess($success);
-    }
-
-    /**
-     * producer error
-     *
-     * @access public
-     * @return void
-     */
-    public function error(callable $error = null)
-    {
-        $this->process->setError($error);
     }
 }

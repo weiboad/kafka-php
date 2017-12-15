@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
+use Kafka\Contracts\SocketInterface;
 use Kafka\SaslMechanism;
 use Kafka\Exception;
 use Kafka\Protocol;
@@ -59,7 +59,7 @@ class Gssapi extends Mechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(SocketInterface $socket) : void
     {
         $token = $this->initSecurityContext();
 

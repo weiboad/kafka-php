@@ -1,10 +1,14 @@
 <?php
-namespace Kafka;
+namespace Kafka\Socket;
 
-abstract class CommonSocket
+use Kafka\Contracts\SocketInterface;
+use Kafka\Contracts\SaslMechanism;
+use Kafka\Contracts\Config\Socket as SocketConfigInterface;
+use Kafka\Contracts\Config\Ssl as SslConfigInterface;
+
+abstract class Socket implements SocketInterface
 {
-
-    const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
+    protected const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
 
     /**
      * max write socket buffer
@@ -12,39 +16,7 @@ abstract class CommonSocket
      * fixed:'fwrite(): send of ???? bytes failed with errno=35 Resource temporarily unavailable'
      * unavailable error info
      */
-    const MAX_WRITE_BUFFER = 2048;
-
-    /**
-     * Send timeout in seconds.
-     *
-     * @var float
-     * @access protected
-     */
-    protected $sendTimeoutSec = 0;
-
-    /**
-     * Send timeout in microseconds.
-     *
-     * @var float
-     * @access protected
-     */
-    protected $sendTimeoutUsec = 100000;
-
-    /**
-     * Recv timeout in seconds
-     *
-     * @var float
-     * @access protected
-     */
-    protected $recvTimeoutSec = 0;
-
-    /**
-     * Recv timeout in microseconds
-     *
-     * @var float
-     * @access protected
-     */
-    protected $recvTimeoutUsec = 750000;
+    protected const MAX_WRITE_BUFFER = 2048;
 
     /**
      * Stream resource
@@ -71,13 +43,6 @@ abstract class CommonSocket
     protected $port = -1;
 
     /**
-     * Max Write Attempts
-     * @var int
-     * @access protected
-     */
-    protected $maxWriteAttempts = 3;
-
-    /**
      * Config socket connect params
      * @var Object
      * @access protected
@@ -89,7 +54,9 @@ abstract class CommonSocket
      * @var SaslMechanism
      * @access private
      */
-    private $saslMechanismProvider = null;
+    private $saslMechanismProvider;
+
+	private $sslConfig;
 
     /**
      * __construct
@@ -99,55 +66,22 @@ abstract class CommonSocket
      * @param $port
      * @param Object $config
      */
-    public function __construct(string $host, int $port, ?Config $config = null, ?SaslMechanism $saslProvider = null)
+	public function __construct(string $host, int $port, SocketConfigInterface $config, 
+		SaslMechanism $saslProvider,
+		SslConfigInterface $sslConfig)
     {
         $this->host                  = $host;
         $this->port                  = $port;
         $this->config                = $config;
+        $this->sslConfig             = $sslConfig;
         $this->saslMechanismProvider = $saslProvider;
     }
 
-    /**
-     * @param float $sendTimeoutSec
-     */
-    public function setSendTimeoutSec(float $sendTimeoutSec) : void
-    {
-        $this->sendTimeoutSec = $sendTimeoutSec;
-    }
+	public function connect() : void
+	{
+		$this->preformConnect();	
+	}
 
-    /**
-     * @param float $sendTimeoutUsec
-     */
-    public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
-    {
-        $this->sendTimeoutUsec = $sendTimeoutUsec;
-    }
-
-    /**
-     * @param float $recvTimeoutSec
-     */
-    public function setRecvTimeoutSec(float $recvTimeoutSec) : void
-    {
-        $this->recvTimeoutSec = $recvTimeoutSec;
-    }
-    
-
-    /**
-     * @param float $recvTimeoutUsec
-     */
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
-    {
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-    }
-    
-
-    /**
-     * @param int $number
-     */
-    public function setMaxWriteAttempts(int $number) : void
-    {
-        $this->maxWriteAttempts = $number;
-    }
 
     /**
      * create the socket stream
@@ -167,22 +101,16 @@ abstract class CommonSocket
         $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
 
         $context = stream_context_create([]);
-        if ($this->config != null && $this->config->getSslEnable()) { // ssl connection
+        if ($this->sslConfig->getEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
-            $localCert    = $this->config->getSslLocalCert();
-            $localKey     = $this->config->getSslLocalPk();
-            $verifyPeer   = $this->config->getSslVerifyPeer();
-            $passphrase   = $this->config->getSslPassphrase();
-            $cafile       = $this->config->getSslCafile();
-            $peerName     = $this->config->getSslPeerName();
 
             $context = stream_context_create(['ssl' => [
-                'local_cert' => $localCert,
-                'local_pk' => $localKey,
-                'verify_peer' => $verifyPeer,
-                'passphrase' => $passphrase,
-                'cafile' => $cafile,
-                'peer_name' => $peerName
+                'local_cert' => $this->sslConfig->getLocalCert(),
+                'local_pk' => $this->sslConfig->getLocalPk(),
+                'verify_peer' => $this->sslConfig->getVerifyPeer(),
+                'passphrase' => $this->sslConfig->getPassphrase(),
+                'cafile' => $this->sslConfig->getCafile(),
+                'peer_name' => $this->sslConfig->getPeerName()
             ]]);
         }
         
@@ -194,10 +122,7 @@ abstract class CommonSocket
                     . ' (' . $errstr . ' [' . $errno . '])';
             throw new \Kafka\Exception($error);
         }
-        // SASL auth
-        if ($this->saslMechanismProvider !== null) {
-            $this->saslMechanismProvider->authenticate($this);
-        }
+        $this->saslMechanismProvider->authenticate($this);
     }
 
     /**
@@ -213,15 +138,10 @@ abstract class CommonSocket
             $remoteSocket,
             $errno,
             $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
+            $this->config->getSendTimeoutSec() + ($this->config->getSendTimeoutUsec() / 1000000),
             STREAM_CLIENT_CONNECT,
             $context
         );
-    }
-
-    public function getSocket()
-    {
-        return $this->stream;
     }
 
     /**
@@ -272,7 +192,7 @@ abstract class CommonSocket
 
         $null     = null;
         $read     = [$this->stream];
-        $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        $readable = $this->select($read, $this->config->getRecvTimeoutSec(), $this->config->getRecvTimeoutUsec());
         if ($readable === false) {
             $this->close();
             throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
@@ -298,7 +218,8 @@ abstract class CommonSocket
                     throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
                 }
                 // Otherwise wait for bytes
-                $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+				$readable = $this->select($read, $this->config->getRecvTimeoutSec(), 
+										  $this->config->getRecvTimeoutUsec());
                 if ($readable !== 1) {
                     throw new \Kafka\Exception('Timed out while reading ' . $len . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
                 }
@@ -330,7 +251,8 @@ abstract class CommonSocket
         $bytesToWrite   = strlen($buf);
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
-            $writable = $this->select($write, $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
+			$writable = $this->select($write, $this->config->getSendTimeoutSec(),
+									  $this->config->getSendTimeoutUsec(), false);
             if (false === $writable) {
                 throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
@@ -356,7 +278,7 @@ abstract class CommonSocket
             } elseif ($wrote === 0) {
                 // Increment the number of times we have failed
                 $failedAttempts++;
-                if ($failedAttempts > $this->maxWriteAttempts) {
+                if ($failedAttempts > $this->config->getMaxWriteAttempts()) {
                     throw new \Kafka\Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
                 }
             } else {
@@ -375,4 +297,5 @@ abstract class CommonSocket
      * @return void
      */
     abstract public function close() : void;
+	abstract protected function preformConnect() : void;
 }

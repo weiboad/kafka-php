@@ -1,15 +1,15 @@
 <?php
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
+use Kafka\Contracts\SocketInterface;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
 
-abstract class Mechanism implements \Kafka\SaslMechanism
+abstract class Mechanism implements \Kafka\Contracts\SaslMechanism
 {
 
-    public function authenticate(CommonSocket $socket): void
+    public function authenticate(SocketInterface $socket): void
     {
         $this->handShake($socket, $this->getName());
         $this->performAuthentication($socket);
@@ -22,7 +22,7 @@ abstract class Mechanism implements \Kafka\SaslMechanism
      * @access protected
      * @return void
      */
-    protected function handShake(CommonSocket $socket, string $mechanism) : void
+    protected function handShake(SocketInterface $socket, string $mechanism) : void
     {
         $requestData = Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, $mechanism);
         $socket->writeBlocking($requestData);
@@ -37,6 +37,6 @@ abstract class Mechanism implements \Kafka\SaslMechanism
         }
     }
 
-    abstract protected function performAuthentication(CommonSocket $socket): void;
+    abstract protected function performAuthentication(SocketInterface $socket): void;
     abstract public function getName(): string;
 }

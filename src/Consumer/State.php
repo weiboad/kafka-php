@@ -2,11 +2,11 @@
 namespace Kafka\Consumer;
 
 use Amp\Loop;
+use Kafka\Contracts\Consumer\State as StateInterface;
+use Kafka\Contracts\Config\Broker;
 
-class State
+class State implements StateInterface
 {
-    use \Kafka\SingletonTrait;
-
     const REQUEST_METADATA      = 1;
     const REQUEST_GETGROUP      = 2;
     const REQUEST_JOINGROUP     = 3;
@@ -40,7 +40,14 @@ class State
 
     private $requests = self::CLEAN_REQUEST_STATE;
 
-    public function init()
+	private $brokerConfig;
+
+	public function __construct(Broker $brokerConfig) 
+	{
+		$this->brokerConfig = $brokerConfig;	
+	}
+
+    public function init() : void
     {
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
@@ -57,11 +64,10 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:
-                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                    $this->requests[$request]['interval'] = $this->brokerConfig->getMetadataRefreshIntervalMs();
                     break;
                 default:
                     $this->requests[$request]['interval'] = 1000;
@@ -69,7 +75,7 @@ class State
         }
     }
 
-    public function start()
+    public function start() : void
     {
         foreach ($this->requests as $request => $option) {
             if (isset($option['norepeat']) && $option['norepeat']) {
@@ -95,7 +101,7 @@ class State
         });
     }
 
-    public function stop()
+    public function stop() : void
     {
         $this->removeWatchers();
 
@@ -114,10 +120,10 @@ class State
         }
     }
 
-    public function succRun($key, $context = null)
+    public function succRun(int $key, $context = null) : void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
@@ -163,10 +169,10 @@ class State
         }
     }
 
-    public function failRun($key, $context = null)
+    public function failRun(int $key, $context = null) : void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {

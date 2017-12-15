@@ -2,14 +2,12 @@
 namespace Kafka;
 
 use Amp\Loop;
-use Kafka\Consumer\Process;
-use Kafka\Consumer\StopStrategy;
+use Psr\Log\LoggerInterface;
+use Kafka\Contracts\Consumer\Process;
+use Kafka\Contracts\Consumer\StopStrategy;
 
-class Consumer
+class Consumer extends Bootstrap
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     /**
      * @var StopStrategy|null
      */
@@ -20,9 +18,13 @@ class Consumer
      */
     private $process;
 
-    public function __construct(?StopStrategy $stopStrategy = null)
+	private $logger;
+
+    public function __construct(Process $process, ?StopStrategy $stopStrategy = null, LoggerInterface $logger)
     {
+        $this->process = $process;
         $this->stopStrategy = $stopStrategy;
+		$this->logger = $logger;
     }
 
     /**
@@ -36,36 +38,11 @@ class Consumer
      */
     public function start(?callable $consumer = null): void
     {
-        if ($this->process !== null) {
-            $this->error('Consumer is already being executed');
-            return;
-        }
-
         $this->setupStopStrategy();
 
-        $this->process = $this->createProcess($consumer);
         $this->process->start();
 
         Loop::run();
-    }
-
-    /**
-     * FIXME: remove it when we implement dependency injection
-     *
-     * This is a very bad practice, but if we don't create this method
-     * this class will never be testable...
-     *
-     * @codeCoverageIgnore
-     */
-    protected function createProcess(?callable $consumer): Process
-    {
-        $process = new Process($consumer);
-
-        if ($this->logger) {
-            $process->setLogger($this->logger);
-        }
-
-        return $process;
     }
 
     private function setupStopStrategy(): void

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kafka\Consumer;
+namespace Kafka\Contracts\Consumer;
 
 use Kafka\Consumer;
 

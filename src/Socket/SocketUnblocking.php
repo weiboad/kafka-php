@@ -1,9 +1,9 @@
 <?php
-namespace Kafka;
+namespace Kafka\Socket;
 
 use Amp\Loop;
 
-class Socket extends CommonSocket
+class SocketUnblocking extends Socket
 {
 
     /**
@@ -47,7 +47,7 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function connect()
+    protected function preformConnect() : void
     {
         if (! $this->isSocketDead()) {
             return;
@@ -83,20 +83,21 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function reconnect()
+    private function reconnect()
     {
         $this->close();
         $this->connect();
     }
 
     public $onReadable;
+
     /**
      * set on readable callback function
      *
      * @access public
      * @return void
      */
-    public function setOnReadable(callable $read)
+    public function setOnReadable(callable $read) : void
     {
         $this->onReadable = $read;
     }
@@ -191,6 +192,11 @@ class Socket extends CommonSocket
         }
         $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
+
+	public function getSocket()
+	{
+		return $this->stream;
+	}
 
     /**
      * check the stream is close
