@@ -57,13 +57,13 @@ class SocketSync extends CommonSocket
      */
     public function connect()
     {
-        if (is_resource($this->getSocket())) {
+        if (is_resource($this->stream)) {
             return;
         }
 
         $this->createStream();
 
-        stream_set_blocking($this->getSocket(), 0);
+        stream_set_blocking($this->stream, 0);
     }
 
     // }}}
@@ -75,10 +75,10 @@ class SocketSync extends CommonSocket
      * @access public
      * @return void
      */
-    public function close()
+    public function close() : void
     {
-        if (is_resource($this->getSocket())) {
-            fclose($this->getSocket());
+        if (is_resource($this->stream)) {
+            fclose($this->stream);
         }
     }
 
@@ -90,7 +90,7 @@ class SocketSync extends CommonSocket
      */
     public function isResource()
     {
-        return is_resource($this->getSocket());
+        return is_resource($this->stream);
     }
 
     // }}}
@@ -103,62 +103,13 @@ class SocketSync extends CommonSocket
      * soon as any data is received.
      *
      * @param integer $len               Maximum number of bytes to read.
-     * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
      *
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read($len, $verifyExactLength = false)
+    public function read(int $len) : string
     {
-        if ($len > self::READ_MAX_LEN) {
-            throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream, length too longer.');
-        }
-
-        $null     = null;
-        $read     = [$this->getSocket()];
-        $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-        if ($readable > 0) {
-            $remainingBytes = $len;
-            $data           = $chunk = '';
-            while ($remainingBytes > 0) {
-                $chunk = fread($this->getSocket(), $remainingBytes);
-                if ($chunk === false) {
-                    $this->close();
-                    throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (no data)');
-                }
-                if (strlen($chunk) === 0) {
-                    // Zero bytes because of EOF?
-                    if (feof($this->getSocket())) {
-                        $this->close();
-                        throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
-                    }
-                    // Otherwise wait for bytes
-                    $readable = @stream_select($read, $null, $null, $this->recvTimeoutSec, $this->recvTimeoutUsec);
-                    if ($readable !== 1) {
-                        throw new \Kafka\Exception('Timed out reading socket while reading ' . $len . ' bytes with ' . $remainingBytes . ' bytes to go');
-                    }
-                    continue; // attempt another read
-                }
-                $data           .= $chunk;
-                $remainingBytes -= strlen($chunk);
-            }
-            if ($len === $remainingBytes || ($verifyExactLength && $len !== strlen($data))) {
-                // couldn't read anything at all OR reached EOF sooner than expected
-                $this->close();
-                throw new \Kafka\Exception('Read ' . strlen($data) . ' bytes instead of the requested ' . $len . ' bytes');
-            }
-
-            return $data;
-        }
-        if (false !== $readable) {
-            $res = stream_get_meta_data($this->getSocket());
-            if (! empty($res['timed_out'])) {
-                $this->close();
-                throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
-            }
-        }
-        $this->close();
-        throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
+        return $this->readBlocking($len);
     }
 
     // }}}
@@ -172,51 +123,9 @@ class SocketSync extends CommonSocket
      * @return integer
      * @throws \Kafka\Exception
      */
-    public function write($buf)
+    public function write(string $buf) : int
     {
-        $null  = null;
-        $write = [$this->getSocket()];
-
-        // fwrite to a socket may be partial, so loop until we
-        // are done with the entire buffer
-        $failedWriteAttempts = 0;
-        $written             = 0;
-        $buflen              = strlen($buf);
-        while ($written < $buflen) {
-            // wait for stream to become available for writing
-            $writable = stream_select($null, $write, $null, $this->sendTimeoutSec, $this->sendTimeoutUsec);
-            if ($writable > 0) {
-                if ($buflen - $written > self::MAX_WRITE_BUFFER) {
-                    // write max buffer size
-                    $wrote = fwrite($this->getSocket(), substr($buf, $written, self::MAX_WRITE_BUFFER));
-                } else {
-                    // write remaining buffer bytes to stream
-                    $wrote = fwrite($this->getSocket(), substr($buf, $written));
-                }
-                if ($wrote === -1 || $wrote === false) {
-                    throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
-                } elseif ($wrote === 0) {
-                    // Increment the number of times we have failed
-                    $failedWriteAttempts++;
-                    if ($failedWriteAttempts > $this->maxWriteAttempts) {
-                        throw new \Kafka\Exception\Socket('After ' . $failedWriteAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $written . ' bytes');
-                    }
-                } else {
-                    // If we wrote something, reset our failed attempt counter
-                    $failedWriteAttempts = 0;
-                }
-                $written += $wrote;
-                continue;
-            }
-            if (false !== $writable) {
-                $res = stream_get_meta_data($this->getSocket());
-                if (! empty($res['timed_out'])) {
-                    throw new \Kafka\Exception('Timed out writing ' . strlen($buf) . ' bytes to stream after writing ' . $written . ' bytes');
-                }
-            }
-            throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream');
-        }
-        return $written;
+        return $this->writeBlocking($buf);
     }
 
     // }}}
@@ -229,8 +138,8 @@ class SocketSync extends CommonSocket
      */
     public function rewind()
     {
-        if (is_resource($this->getSocket())) {
-            rewind($this->getSocket());
+        if (is_resource($this->stream)) {
+            rewind($this->stream);
         }
     }
 

@@ -33,5 +33,8 @@
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
         <exclude-pattern>*/example/*</exclude-pattern>
     </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests\/Base\/StreamStub/*</exclude-pattern>
+    </rule>
 </ruleset>
 

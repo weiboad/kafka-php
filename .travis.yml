@@ -12,6 +12,7 @@ cache:
     - $HOME/.composer/cache
 
 before_install:
+  - pecl install -f krb5-1.1.2
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
 
 install: travis_retry composer install --no-interaction
@@ -33,7 +34,7 @@ jobs:
       script:
         - ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       after_script:
-        - ./vendor/bin/coveralls  -v
+        - ./vendor/bin/php-coveralls  -v
 
     - stage: Code Quality
       env: CODE_STANDARD=1
@@ -50,7 +51,7 @@ jobs:
       script:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
-        - ./vendor/bin/infection --min-msi=41 --min-covered-msi=77 --threads=4
+        - ./vendor/bin/infection --min-msi=49 --min-covered-msi=82 --threads=4
 
     - stage: Functional tests
       services:

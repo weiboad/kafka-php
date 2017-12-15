@@ -85,13 +85,13 @@ class Socket extends CommonSocket
 
         $this->createStream();
 
-        stream_set_blocking($this->getSocket(), 0);
-        stream_set_read_buffer($this->getSocket(), 0);
+        stream_set_blocking($this->stream, 0);
+        stream_set_read_buffer($this->stream, 0);
 
-        $this->readWatcher = Loop::onReadable($this->getSocket(), function () {
+        $this->readWatcher = Loop::onReadable($this->stream, function () {
             do {
                 if (! $this->isSocketDead()) {
-                    $newData = @fread($this->getSocket(), self::READ_MAX_LEN);
+                    $newData = @fread($this->stream, self::READ_MAX_LENGTH);
                 } else {
                     $this->reconnect();
                     return;
@@ -102,7 +102,7 @@ class Socket extends CommonSocket
             } while ($newData);
         });
 
-        $this->writeWatcher = Loop::onWritable($this->getSocket(), function () {
+        $this->writeWatcher = Loop::onWritable($this->stream, function () {
             $this->write();
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
@@ -146,12 +146,12 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function close()
+    public function close() : void
     {
         Loop::cancel($this->readWatcher);
         Loop::cancel($this->writeWatcher);
-        if (is_resource($this->getSocket())) {
-            fclose($this->getSocket());
+        if (is_resource($this->stream)) {
+            fclose($this->stream);
         }
         $this->readBuffer     = '';
         $this->writeBuffer    = '';
@@ -166,7 +166,7 @@ class Socket extends CommonSocket
      */
     public function isResource()
     {
-        return is_resource($this->getSocket());
+        return is_resource($this->stream);
     }
 
     // }}}
@@ -204,7 +204,7 @@ class Socket extends CommonSocket
 
             $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
-            call_user_func($this->onReadable, $data, (int) $this->getSocket());
+            call_user_func($this->onReadable, $data, (int) $this->stream);
         } while (strlen($this->readBuffer));
     }
 
@@ -225,7 +225,7 @@ class Socket extends CommonSocket
             $this->writeBuffer .= $data;
         }
         $bytesToWrite = strlen($this->writeBuffer);
-        $bytesWritten = @fwrite($this->getSocket(), $this->writeBuffer);
+        $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
             Loop::disable($this->writeWatcher);
@@ -247,7 +247,7 @@ class Socket extends CommonSocket
      */
     protected function isSocketDead()
     {
-        return ! is_resource($this->getSocket()) || @feof($this->getSocket());
+        return ! is_resource($this->stream) || @feof($this->stream);
     }
 
     // }}}
