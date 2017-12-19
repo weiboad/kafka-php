@@ -1,8 +1,18 @@
 <?php
 namespace KafkaTest\Base;
 
+use Psr\Log\NullLogger;
+
 class ProtocolTest extends \PHPUnit\Framework\TestCase
 {
+
+    private $logger;
+
+    protected function setUp()
+    {
+        $this->logger = new NullLogger();
+        \Kafka\Protocol::init('0.9.0.1', $this->logger);
+    }
 
     /**
      * testEncode
@@ -12,7 +22,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncode()
     {
-        \Kafka\Protocol::init('0.9.0.1');
         $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
@@ -32,7 +41,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoKey()
     {
-        \Kafka\Protocol::init('0.9.0.1');
         $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
@@ -51,7 +59,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecodeNoKey()
     {
-        \Kafka\Protocol::init('0.9.0.1');
         $data = '';
         $test = \Kafka\Protocol::decode(999, $data);
     }
@@ -64,7 +71,6 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-        \Kafka\Protocol::init('0.9.0.1');
         $test   = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
         $result = '{"errorCode":0}';
         $this->assertEquals(json_encode($test), $result);

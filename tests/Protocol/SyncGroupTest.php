@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class SyncGroupTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->sync = new \Kafka\Protocol\SyncGroup('0.9.0.1');
+        $this->sync->setLogger(new NullLogger());
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->group = new \Kafka\Protocol\GroupCoordinator('0.9.0.1');
+        $this->group->setLogger(new NullLogger());
     }
 
     /**

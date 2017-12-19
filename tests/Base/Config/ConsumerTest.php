@@ -173,4 +173,14 @@ class ConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $this->config->getTopics();
     }
+
+    public function testGetSet()
+    {
+        $this->config->setMaxBytes(1024);
+        $this->assertEquals(1024, $this->config->getMaxBytes());
+        $this->config->setMaxWaitTime(1024);
+        $this->assertEquals(1024, $this->config->getMaxWaitTime());
+        $this->config->setConsumeMode(\Kafka\Config\Consumer::CONSUME_BEFORE_COMMIT_OFFSET);
+        $this->assertEquals(\Kafka\Config\Consumer::CONSUME_BEFORE_COMMIT_OFFSET, $this->config->getConsumeMode());
+    }
 }

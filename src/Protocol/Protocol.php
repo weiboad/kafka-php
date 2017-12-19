@@ -4,7 +4,6 @@ namespace Kafka\Protocol;
 abstract class Protocol
 {
     use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
 
     /**
      *  Default kafka broker verion
@@ -400,7 +399,7 @@ abstract class Protocol
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
         $msg      = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
-        $this->debug('Start Request ' . $msg);
+        $this->logger->debug('Start Request ' . $msg);
 
         return $binData;
     }
