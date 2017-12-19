@@ -28,7 +28,7 @@ class Bootstrap
             \Kafka\Contracts\Consumer\State::class => \DI\object(\Kafka\Consumer\State::class),
             \Kafka\Contracts\Consumer\Assignment::class => \DI\object(\Kafka\Consumer\Assignment::class),
             \Kafka\Contracts\BrokerInterface::class => \DI\object(\Kafka\Broker::class),
-            \Kafka\Contracts\SaslMechanism::class => \DI\object(\Kafka\Sasl\Plain::class),
+            \Kafka\Contracts\SaslMechanism::class => \DI\object(\Kafka\Sasl\NullSasl::class),
             \Kafka\Contracts\SocketInterface::class => \DI\object(\Kafka\Socket\SocketUnblocking::class),
             \Kafka\Contracts\Config\Broker::class => \DI\object(\Kafka\Config\Broker::class),
             \Kafka\Contracts\Config\Socket::class => \DI\object(\Kafka\Config\Socket::class),

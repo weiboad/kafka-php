@@ -49,13 +49,6 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
                 $config->setVersion($this->version);
                 return $config;
             },
-            // configure sasl
-            \Kafka\Contracts\Config\Sasl::class => function () {
-                $config = new \Kafka\Config\Sasl();
-                $config->setUsername('nmred');
-                $config->setPassword('123456');
-                return $config;
-            },
             \Kafka\Contracts\Config\Consumer::class => function () {
                 $config = new \Kafka\Config\Consumer();
                 $config->setTopics([$this->topic]);
