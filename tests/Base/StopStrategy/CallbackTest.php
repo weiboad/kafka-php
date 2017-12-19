@@ -29,10 +29,10 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
     public function setupShouldStopTheConsumerOnceTheCallbackReturnsTrue(): void
     {
         $this->consumer->expects($this->once())
-			->method('stop')
-			->will($this->returnCallback(function() {
-				Loop::stop();	
-			}));
+            ->method('stop')
+            ->will($this->returnCallback(function () {
+                Loop::stop();
+            }));
 
         $executionCount = 0;
 
