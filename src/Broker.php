@@ -93,7 +93,7 @@ class Broker implements BrokerInterface
         return $this->brokers;
     }
 
-    public function getMetaConnect($key) : SocketInterface
+    public function getMetaConnect(string $key) : SocketInterface
     {
         return $this->getConnect($key, 'metaSockets');
     }
@@ -108,7 +108,7 @@ class Broker implements BrokerInterface
         return $this->getMetaConnect($nodeIds[0]);
     }
 
-    public function getDataConnect($key) : SocketInterface
+    public function getDataConnect(string $key) : SocketInterface
     {
         return $this->getConnect($key, 'dataSockets');
     }

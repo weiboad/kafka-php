@@ -17,6 +17,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testGssapi
      *
+     * @requires extension krb5 1.1.2
      * @access public
      * @return void
      */
@@ -31,6 +32,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testKeytabIsNotExists
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid keytab, keytab file not exists.
      * @access public
@@ -44,6 +46,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testKeytabIsNotReadable
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid keytab, keytab file disable read.
      * @access public
@@ -59,6 +62,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testGetMechanismName
      *
+     * @requires extension krb5 1.1.2
      * @access public
      * @return void
      */
@@ -72,6 +76,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testInitSecurityContext
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Init security context failure.
      * @access public
