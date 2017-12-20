@@ -42,8 +42,8 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
             function () use (&$executionCount): bool {
                 return ++$executionCount === 5;
             },
-            10,
-            $this->loop
+            $this->loop,
+            10
         );
         $strategy->setup($this->consumer);
 

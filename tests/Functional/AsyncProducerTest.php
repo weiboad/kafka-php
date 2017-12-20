@@ -21,8 +21,8 @@ final class AsyncProducerTest extends ProducerTest
             function () use (&$messagesSent, $executionEnd): bool {
                 return $messagesSent || new \DateTimeImmutable() > $executionEnd;
             },
-            10,
-            $this->container->get(\Kafka\Loop::class)
+            $this->container->get(\Kafka\Loop::class),
+            10
         );
 
         $producer = $this->container->make(\Kafka\Producer::class, ['producer' => [$this, 'createMessages'], 'stopStrategy' => $stop]);

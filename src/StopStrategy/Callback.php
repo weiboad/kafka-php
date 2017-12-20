@@ -26,7 +26,7 @@ final class Callback implements StopStrategy
     private $interval;
     private $loop;
 
-    public function __construct(callable $callback, int $interval = self::DEFAULT_INTERVAL, Loop $loop)
+    public function __construct(callable $callback, Loop $loop, int $interval = self::DEFAULT_INTERVAL)
     {
         $this->callback = $callback;
         $this->interval = $interval;

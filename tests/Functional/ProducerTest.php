@@ -72,8 +72,8 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
             function () use (&$consumedMessages, $executionEnd): bool {
                 return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
             },
-            10,
-            $this->container->get(\Kafka\Loop::class)
+            $this->container->get(\Kafka\Loop::class),
+            10
         );
         $consumer = $this->container->make(\Kafka\Consumer::class, ['stopStrategy' => $stop]);
         $consumer->start(
