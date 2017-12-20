@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Producer;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Psr\Log\LoggerInterface;
 use Kafka\Contracts\Config\Broker as BrokerConfigInterface;
 use Kafka\Contracts\Config\Producer as ProducerConfigInterface;
@@ -29,12 +29,14 @@ class State
     private $brokerConfig;
     private $producerConfig;
     private $logger;
+    private $loop;
 
-    public function __construct(BrokerConfigInterface $brokerConfig, ProducerConfigInterface $producerConfig, LoggerInterface $logger)
+    public function __construct(BrokerConfigInterface $brokerConfig, ProducerConfigInterface $producerConfig, LoggerInterface $logger, Loop $loop)
     {
         $this->brokerConfig   = $brokerConfig;
         $this->producerConfig = $producerConfig;
         $this->logger         = $logger;
+        $this->loop           = $loop;
     }
 
     public function init()
@@ -66,7 +68,7 @@ class State
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            $this->loop->repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -81,7 +83,7 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        Loop::repeat(1000, function ($watcherId) {
+        $this->loop->repeat(1000, function ($watcherId) {
             $this->report();
         });
     }

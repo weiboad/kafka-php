@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Consumer;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Contracts\Consumer\State as StateInterface;
 use Kafka\Contracts\Config\Broker;
 
@@ -42,9 +42,12 @@ class State implements StateInterface
 
     private $brokerConfig;
 
-    public function __construct(Broker $brokerConfig)
+    private $loop;
+
+    public function __construct(Broker $brokerConfig, Loop $loop)
     {
         $this->brokerConfig = $brokerConfig;
+        $this->loop         = $loop;
     }
 
     public function init() : void
@@ -82,7 +85,7 @@ class State implements StateInterface
                 continue;
             }
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            $this->loop->repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -96,7 +99,7 @@ class State implements StateInterface
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        Loop::repeat(1000, function ($watcherId) {
+        $this->loop->repeat(1000, function ($watcherId) {
             $this->report();
         });
     }
@@ -116,7 +119,7 @@ class State implements StateInterface
                 return;
             }
 
-            Loop::cancel($this->requests[$request]['watcher']);
+            $this->loop->cancel($this->requests[$request]['watcher']);
         }
     }
 

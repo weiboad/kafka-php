@@ -55,15 +55,13 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
                 $config->setGroupId('kafka-php-tests');
                 $config->setOffsetReset('earliest');
                 return $config;
-            },
+            }
         ]);
     }
 
     /**
      * @test
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @backupGlobals disabled
+     * @depends sendMessages
      */
     public function consumeProducedMessages(): void
     {
@@ -73,7 +71,9 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $stop = new Callback(
             function () use (&$consumedMessages, $executionEnd): bool {
                 return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
-            }
+            },
+            10,
+            $this->container->get(\Kafka\Loop::class)
         );
         $consumer = $this->container->make(\Kafka\Consumer::class, ['stopStrategy' => $stop]);
         $consumer->start(
@@ -95,4 +95,9 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
         return $messages;
     }
+
+    /**
+     * @test
+     */
+    abstract public function sendMessages() : void;
 }

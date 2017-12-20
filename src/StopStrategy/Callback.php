@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kafka\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Contracts\AsynchronousProcess;
 use Kafka\Contracts\StopStrategy;
 
@@ -24,16 +24,18 @@ final class Callback implements StopStrategy
      * @var int
      */
     private $interval;
+    private $loop;
 
-    public function __construct(callable $callback, int $interval = self::DEFAULT_INTERVAL)
+    public function __construct(callable $callback, int $interval = self::DEFAULT_INTERVAL, Loop $loop)
     {
         $this->callback = $callback;
         $this->interval = $interval;
+        $this->loop     = $loop;
     }
 
     public function setup(AsynchronousProcess $process): void
     {
-        Loop::repeat(
+        $this->loop->repeat(
             $this->interval,
             function (string $watcherId) use ($process): void {
                 $shouldStop = (bool) ($this->callback)();
@@ -43,7 +45,7 @@ final class Callback implements StopStrategy
                 }
 
                 $process->stop();
-                Loop::cancel($watcherId);
+                $this->loop->cancel($watcherId);
             }
         );
     }

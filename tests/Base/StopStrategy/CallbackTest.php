@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace KafkaTest\Base\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
 use Kafka\StopStrategy\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,6 +14,7 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
      * @var Consumer|MockObject
      */
     private $consumer;
+    private $loop;
 
     /**
      * @before
@@ -21,6 +22,7 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
     public function createConsumer(): void
     {
         $this->consumer = $this->createPartialMock(Consumer::class, ['stop']);
+        $this->loop     = new Loop();
     }
 
     /**
@@ -31,7 +33,7 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
         $this->consumer->expects($this->once())
             ->method('stop')
             ->will($this->returnCallback(function () {
-                Loop::stop();
+                $this->loop->stop();
             }));
 
         $executionCount = 0;
@@ -40,14 +42,15 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
             function () use (&$executionCount): bool {
                 return ++$executionCount === 5;
             },
-            10
+            10,
+            $this->loop
         );
         $strategy->setup($this->consumer);
 
-        self::assertSame(1, Loop::getInfo()['repeat']['enabled']);
+        self::assertSame(1, $this->loop->getInfo()['repeat']['enabled']);
 
-        Loop::run();
+        $this->loop->run();
 
-        self::assertSame(0, Loop::getInfo()['repeat']['enabled']);
+        self::assertSame(0, $this->loop->getInfo()['repeat']['enabled']);
     }
 }

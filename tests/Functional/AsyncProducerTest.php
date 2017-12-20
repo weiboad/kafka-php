@@ -10,10 +10,8 @@ final class AsyncProducerTest extends ProducerTest
 {
     /**
      * @test
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
-    public function sendAsyncMessages(): void
+    public function sendMessages(): void
     {
         $messagesSent = false;
         $error        = null;
@@ -22,7 +20,9 @@ final class AsyncProducerTest extends ProducerTest
         $stop         =  new Callback(
             function () use (&$messagesSent, $executionEnd): bool {
                 return $messagesSent || new \DateTimeImmutable() > $executionEnd;
-            }
+            },
+            10,
+            $this->container->get(\Kafka\Loop::class)
         );
 
         $producer = $this->container->make(\Kafka\Producer::class, ['producer' => [$this, 'createMessages'], 'stopStrategy' => $stop]);

@@ -1,8 +1,6 @@
 <?php
 namespace Kafka\Producer;
 
-use Amp\Loop;
-
 use Psr\Log\LoggerInterface;
 use Kafka\Contracts\Config\Broker as BrokerConfigInterface;
 use Kafka\Contracts\Config\Producer as ProducerConfigInterface;

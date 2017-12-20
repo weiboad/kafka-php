@@ -7,10 +7,8 @@ final class SyncProducerTest extends ProducerTest
 {
     /**
      * @test
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
-    public function sendSyncMessages(): void
+    public function sendMessages(): void
     {
         $producer = $this->container->make(\Kafka\Producer::class, ['producer' => null]);
         $messages = $this->createMessages();

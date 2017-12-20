@@ -1,6 +1,7 @@
 <?php
 namespace Kafka;
 
+use Kafka\Loop;
 use DI\FactoryInterface;
 use Psr\Log\LoggerInterface;
 use Kafka\Contracts\Producer\SyncInterface;
@@ -15,6 +16,8 @@ class Producer extends Bootstrap implements AsynchronousProcess
 
     private $logger;
 
+    private $loop;
+
     private $stopStrategy = null;
 
     /**
@@ -22,10 +25,11 @@ class Producer extends Bootstrap implements AsynchronousProcess
      *
      * @access public
      */
-    public function __construct(?callable $producer = null, FactoryInterface $container, LoggerInterface $logger, ?StopStrategy $stopStrategy = null)
+    public function __construct(?callable $producer = null, FactoryInterface $container, LoggerInterface $logger, Loop $loop, ?StopStrategy $stopStrategy = null)
     {
         $this->container = $container;
         $this->logger    = $logger;
+        $this->loop      = $loop;
         if (is_null($producer)) {
             $this->container->set(\Kafka\Contracts\SocketInterface::class, \DI\object(\Kafka\Socket\SocketBlocking::class));
             $this->process = $this->container->make(\Kafka\Producer\SyncProcess::class);
@@ -49,7 +53,7 @@ class Producer extends Bootstrap implements AsynchronousProcess
             $this->setupStopStrategy();
             $this->process->start();
             if ($data) {
-                \Amp\Loop::run();
+                $this->loop->run();
             }
         } else {
             return $this->process->send($data);
@@ -74,7 +78,7 @@ class Producer extends Bootstrap implements AsynchronousProcess
 
         $this->process->stop();
         $this->process = null;
-        \Amp\Loop::stop();
+        $this->loop->stop();
     }
 
     /**

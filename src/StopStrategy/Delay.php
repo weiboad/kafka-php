@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kafka\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Contracts\AsynchronousProcess;
 use Kafka\Contracts\StopStrategy;
 
@@ -15,15 +15,17 @@ final class Delay implements StopStrategy
      * @var int
      */
     private $delay;
+    private $loop;
 
-    public function __construct(int $delay)
+    public function __construct(int $delay, Loop $loop)
     {
         $this->delay = $delay;
+        $this->loop  = $loop;
     }
 
     public function setup(AsynchronousProcess $process): void
     {
-        Loop::delay(
+        $this->loop->delay(
             $this->delay,
             function () use ($process): void {
                 $process->stop();

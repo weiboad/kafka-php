@@ -1,7 +1,7 @@
 <?php
 namespace Kafka;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Psr\Log\LoggerInterface;
 use DI\FactoryInterface;
 use Kafka\Contracts\Consumer\Process;
@@ -24,11 +24,14 @@ class Consumer extends Bootstrap implements AsynchronousProcess
 
     private $container;
 
-    public function __construct(FactoryInterface $container, ?StopStrategy $stopStrategy = null, LoggerInterface $logger)
+    private $loop;
+
+    public function __construct(FactoryInterface $container, ?StopStrategy $stopStrategy = null, LoggerInterface $logger, Loop $loop)
     {
         $this->stopStrategy = $stopStrategy;
         $this->logger       = $logger;
         $this->container    = $container;
+        $this->loop         = $loop;
     }
 
     /**
@@ -50,7 +53,7 @@ class Consumer extends Bootstrap implements AsynchronousProcess
         $this->process = $this->container->make(Consumer\Process::class, ['consumer' => $consumer]);
         $this->process->start();
 
-        Loop::run();
+        $this->loop->run();
     }
 
     private function setupStopStrategy(): void
@@ -72,6 +75,6 @@ class Consumer extends Bootstrap implements AsynchronousProcess
         $this->process->stop();
         $this->process = null;
 
-        Loop::stop();
+        $this->loop->stop();
     }
 }
