@@ -62,6 +62,8 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     * @backupGlobals disabled
      */
     public function consumeProducedMessages(): void
     {

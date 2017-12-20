@@ -29,7 +29,7 @@ class SyncProcess implements SyncInterface
         $this->producerConfig = $producerConfig;
 
         // init protocol
-        \Kafka\Protocol::init($this->brokerConfig->getVersion());
+        \Kafka\Protocol::init($this->brokerConfig->getVersion(), $this->logger);
         // init broker
         $this->syncMeta();
     }

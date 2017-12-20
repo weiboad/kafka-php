@@ -20,16 +20,16 @@ $container = Producer::getContainer([
     // configure broker
     \Kafka\Contracts\Config\Broker::class => function () {
         $config = new \Kafka\Config\Broker();
-        $config->setMetadataBrokerList('127.0.0.1:9092');
+        $config->setMetadataBrokerList(getenv('KAFKA_BROKERS'));
         return $config;
     },
     // configure sasl
-    \Kafka\Contracts\Config\Sasl::class => function () {
-        $config = new \Kafka\Config\Sasl();
-        $config->setUsername('nmred');
-        $config->setPassword('123456');
-        return $config;
-    }
+    //\Kafka\Contracts\Config\Sasl::class => function () {
+    //    $config = new \Kafka\Config\Sasl();
+    //    $config->setUsername('nmred');
+    //    $config->setPassword('123456');
+    //    return $config;
+    //}
 ]);
 
 $messagesSent = false;

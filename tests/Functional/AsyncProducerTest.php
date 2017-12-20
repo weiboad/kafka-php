@@ -11,6 +11,7 @@ final class AsyncProducerTest extends ProducerTest
     /**
      * @test
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function sendAsyncMessages(): void
     {

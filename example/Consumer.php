@@ -19,7 +19,7 @@ $container = Consumer::getContainer([
     // configure broker
     \Kafka\Contracts\Config\Broker::class => function () {
         $config = new \Kafka\Config\Broker();
-        $config->setMetadataBrokerList('127.0.0.1:9092');
+        $config->setMetadataBrokerList(getenv('KAFKA_BROKERS'));
         return $config;
     },
     // configure sasl
