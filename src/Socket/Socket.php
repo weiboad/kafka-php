@@ -85,6 +85,11 @@ abstract class Socket implements SocketInterface
         $this->preformConnect();
     }
 
+    public function getSocket()
+    {
+        return $this->stream;
+    }
+
 
     /**
      * create the socket stream

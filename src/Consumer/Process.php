@@ -138,14 +138,9 @@ class Process implements ProcessInterface
         $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         switch ($correlationId) {
             case \Kafka\Protocol::METADATA_REQUEST:
-                $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
-                if (! isset($result['brokers']) || ! isset($result['topics'])) {
-                    $this->logger->error('Get metadata is fail, brokers or topics is null.');
-                    $this->state->failRun(\Kafka\Consumer\State::REQUEST_METADATA);
-                } else {
-                    $isChange = $this->broker->setData($result['topics'], $result['brokers']);
-                    $this->state->succRun(\Kafka\Consumer\State::REQUEST_METADATA, $isChange);
-                }
+                $result   = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
+                $isChange = $this->broker->setData($result['topics'], $result['brokers']);
+                $this->state->succRun(\Kafka\Consumer\State::REQUEST_METADATA, $isChange);
                 break;
             case \Kafka\Protocol::GROUP_COORDINATOR_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
@@ -215,20 +210,19 @@ class Process implements ProcessInterface
             }
         }
 
-        if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('No valid broker configured');
-        }
-
         shuffle($brokerHost);
         foreach ($brokerHost as $host) {
-            $socket = $this->broker->getMetaConnect($host);
-            if ($socket) {
-                $params = $this->consumerConfig->getTopics();
-                $this->logger->debug('Start sync metadata request params:' . json_encode($params));
-                $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
-                $socket->write($requestData);
-                return;
+            try {
+                $socket = $this->broker->getMetaConnect($host);
+            } catch (\Kafka\Exception $e) {
+                $this->logger->error($e->getMessage());
+                continue;
             }
+            $params = $this->consumerConfig->getTopics();
+            $this->logger->debug('Start sync metadata request params:' . json_encode($params));
+            $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
+            $socket->write($requestData);
+            return;
         }
 
         throw new \Kafka\Exception(
@@ -256,11 +250,8 @@ class Process implements ProcessInterface
     {
         $groupBrokerId = $this->broker->getGroupBrokerId();
         $connect       = $this->broker->getMetaConnect($groupBrokerId);
-        if (! $connect) {
-            return false;
-        }
-        $memberId    = $this->data->getMemberId();
-        $params      = [
+        $memberId      = $this->data->getMemberId();
+        $params        = [
             'group_id' => $this->consumerConfig->getGroupId(),
             'session_timeout' => $this->consumerConfig->getSessionTimeout(),
             'rebalance_timeout' => $this->consumerConfig->getRebalanceTimeout(),
@@ -274,12 +265,12 @@ class Process implements ProcessInterface
                 ],
             ],
         ];
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $params);
+        $requestData   = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $params);
         $connect->write($requestData);
         $this->logger->debug("Join group start, params:" . json_encode($params));
     }
 
-    public function failJoinGroup($errorCode)
+    protected function failJoinGroup($errorCode)
     {
         $memberId = $this->data->getMemberId();
         $error    = sprintf('Join group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId);
@@ -287,7 +278,7 @@ class Process implements ProcessInterface
         $this->stateConvert($errorCode);
     }
 
-    public function succJoinGroup($result)
+    protected function succJoinGroup($result)
     {
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_JOINGROUP);
         $this->data->setMemberId($result['memberId']);
@@ -299,34 +290,31 @@ class Process implements ProcessInterface
         $this->logger->debug($msg);
     }
 
-    public function syncGroup()
+    protected function syncGroup()
     {
         $groupBrokerId = $this->broker->getGroupBrokerId();
         $connect       = $this->broker->getMetaConnect($groupBrokerId);
-        if (! $connect) {
-            return;
-        }
-        $memberId     = $this->data->getMemberId();
-        $generationId = $this->data->getGenerationId();
-        $params       = [
+        $memberId      = $this->data->getMemberId();
+        $generationId  = $this->data->getGenerationId();
+        $params        = [
             'group_id' => $this->consumerConfig->getGroupId(),
             'generation_id' => $generationId,
             'member_id' => $memberId,
             'data' => $this->assign->getAssignments(),
         ];
-        $requestData  = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $params);
+        $requestData   = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $params);
         $this->logger->debug("Sync group start, params:" . json_encode($params));
         $connect->write($requestData);
     }
 
-    public function failSyncGroup($errorCode)
+    protected function failSyncGroup($errorCode)
     {
         $error = sprintf('Sync group fail, need rejoin, errorCode %d', $errorCode);
         $this->logger->error($error);
         $this->stateConvert($errorCode);
     }
 
-    public function succSyncGroup($result)
+    protected function succSyncGroup($result)
     {
         $msg = sprintf('Sync group sucess, params: %s', json_encode($result));
         $this->logger->debug($msg);
@@ -360,10 +348,7 @@ class Process implements ProcessInterface
     {
         $groupBrokerId = $this->broker->getGroupBrokerId();
         $connect       = $this->broker->getMetaConnect($groupBrokerId);
-        if (! $connect) {
-            return;
-        }
-        $memberId = $this->data->getMemberId();
+        $memberId      = $this->data->getMemberId();
         if (! $memberId) {
             return;
         }
@@ -390,10 +375,7 @@ class Process implements ProcessInterface
         $topics  = $this->data->getTopics();
         foreach ($topics as $brokerId => $topicList) {
             $connect = $this->broker->getMetaConnect($brokerId);
-            if (! $connect) {
-                return;
-            }
-            $data = [];
+            $data    = [];
             foreach ($topicList as $topic) {
                 $item = [
                     'topic_name' => $topic['topic_name'],
@@ -422,7 +404,7 @@ class Process implements ProcessInterface
         return $context;
     }
 
-    public function succOffset($result, $fd)
+    protected function succOffset($result, $fd)
     {
         $msg = sprintf('Get current offset sucess, result: %s', json_encode($result));
         //$this->logger->debug($msg);
@@ -449,9 +431,6 @@ class Process implements ProcessInterface
     {
         $groupBrokerId = $this->broker->getGroupBrokerId();
         $connect       = $this->broker->getMetaConnect($groupBrokerId);
-        if (! $connect) {
-            return;
-        }
 
         $topics = $this->data->getTopics();
         $data   = [];
@@ -520,11 +499,7 @@ class Process implements ProcessInterface
         $consumerOffsets = $this->data->getConsumerOffsets();
         foreach ($topics as $brokerId => $topicList) {
             $connect = $this->broker->getDataConnect($brokerId);
-            if (! $connect) {
-                return;
-            }
-
-            $data = [];
+            $data    = [];
             foreach ($topicList as $topic) {
                 $item = [
                     'topic_name' => $topic['topic_name'],
@@ -610,9 +585,6 @@ class Process implements ProcessInterface
 
         $groupBrokerId = $this->broker->getGroupBrokerId();
         $connect       = $this->broker->getMetaConnect($groupBrokerId);
-        if (! $connect) {
-            return;
-        }
 
         $commitOffsets = $this->data->getCommitOffsets();
         $topics        = $this->data->getTopics();

@@ -9,4 +9,5 @@ interface SocketInterface
     public function readBlocking(int $len) : string;
     public function writeBlocking(string $data) : int;
     public function setOnReadable(callable $process) : void;
+    public function getSocket();
 }
