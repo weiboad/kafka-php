@@ -46,11 +46,10 @@ class Produce extends Protocol
         $data  .= self::encodeArray(
             $payloads['data'],
             [$this, 'encodeProduceTopic'],
-            self::COMPRESSION_NONE
+            $payloads['compression'] ?? self::COMPRESSION_NONE
         );
-        $data   = self::encodeString($header . $data, self::PACK_INT32);
 
-        return $data;
+        return self::encodeString($header . $data, self::PACK_INT32);
     }
 
     public function decode(string $data): array
