@@ -4,9 +4,11 @@ namespace KafkaTest\Base\Sasl;
 use \Kafka\Sasl\Gssapi;
 use org\bovigo\vfs\vfsStream;
 
+/**
+ * @requires extension krb5 1.1.2
+ */
 class GssapiTest extends \PHPUnit\Framework\TestCase
 {
-
     private $root;
 
     protected function setUp()
