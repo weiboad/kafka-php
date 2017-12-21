@@ -81,6 +81,11 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
                 self::assertArrayHasKey('value', $message['message']);
                 self::assertContains('msg-', $message['message']['value']);
 
+                if (version_compare($this->version, '0.10.0', '>=')) {
+                    self::assertArrayHasKey('timestamp', $message['message']);
+                    self::assertNotEquals(-1, $message['message']['timestamp']);
+                }
+
                 ++$consumedMessages;
             }
         );
