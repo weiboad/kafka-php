@@ -1,4 +1,5 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class FetchOffset extends Protocol
@@ -53,7 +54,7 @@ class FetchOffset extends Protocol
      * @access protected
      * @return string
      */
-    protected function encodeOffsetPartion($values)
+    protected function encodeOffsetPartition($values)
     {
         return self::pack(self::BIT_B32, $values);
     }
@@ -76,7 +77,7 @@ class FetchOffset extends Protocol
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartion']);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartition']);
 
         return $topic . $partitions;
     }

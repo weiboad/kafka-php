@@ -53,7 +53,7 @@ class Offset extends Protocol
      * @access protected
      * @return string
      */
-    protected function encodeOffsetPartion($values)
+    protected function encodeOffsetPartition($values)
     {
         if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
@@ -95,7 +95,7 @@ class Offset extends Protocol
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartion']);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartition']);
 
         return $topic . $partitions;
     }

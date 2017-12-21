@@ -30,7 +30,7 @@ class Produce extends Protocol
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
         $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
         $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeProcudeTopic'], self::COMPRESSION_NONE);
+        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeProduceTopic'], self::COMPRESSION_NONE);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
@@ -130,7 +130,7 @@ class Produce extends Protocol
      * @internal param $partions
      * @access protected
      */
-    protected function encodeProcudePartion($values, $compression)
+    protected function encodeProducePartition($values, $compression)
     {
         if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
@@ -155,7 +155,7 @@ class Produce extends Protocol
      * @internal param $partions
      * @access protected
      */
-    protected function encodeProcudeTopic($values, $compression)
+    protected function encodeProduceTopic($values, $compression)
     {
         if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');
@@ -166,7 +166,7 @@ class Produce extends Protocol
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeProcudePartion'], $compression);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeProducePartition'], $compression);
 
         return $topic . $partitions;
     }

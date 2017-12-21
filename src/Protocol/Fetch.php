@@ -1,4 +1,5 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class Fetch extends Protocol
@@ -279,7 +280,7 @@ class Fetch extends Protocol
      * @access protected
      * @return string
      */
-    protected function encodeFetchPartion($values)
+    protected function encodeFetchPartition($values)
     {
         if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given fetch data invalid. `partition_id` is undefined.');
@@ -318,7 +319,7 @@ class Fetch extends Protocol
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeFetchPartion']);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeFetchPartition']);
 
         return $topic . $partitions;
     }

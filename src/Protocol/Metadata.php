@@ -85,21 +85,21 @@ class Metadata extends Protocol
      */
     protected function metaTopicMetaData($data, $version)
     {
-        $offset          = 0;
-        $topicErrCode    = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
-        $offset         += 2;
-        $topicInfo       = $this->decodeString(substr($data, $offset), self::BIT_B16);
-        $offset         += $topicInfo['length'];
-        $partionsMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaPartitionMetaData'], $version);
-        $offset         += $partionsMetaRet['length'];
+        $offset         = 0;
+        $topicErrCode   = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $offset        += 2;
+        $topicInfo      = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $offset        += $topicInfo['length'];
+        $partitionsMeta = $this->decodeArray(substr($data, $offset), [$this, 'metaPartitionMetaData'], $version);
+        $offset        += $partitionsMeta['length'];
 
         return [
             'length' => $offset,
-            'data' => [
-                'topicName' => $topicInfo['data'],
-                'errorCode' => $topicErrCode,
-                'partitions' => $partionsMetaRet['data'],
-            ]
+            'data'   => [
+                'topicName'  => $topicInfo['data'],
+                'errorCode'  => $topicErrCode,
+                'partitions' => $partitionsMeta['data'],
+            ],
         ];
     }
 
