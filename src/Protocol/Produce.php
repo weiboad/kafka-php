@@ -59,21 +59,12 @@ class Produce extends Protocol
      * encode message set
      * N.B., MessageSets are not preceded by an int32 like other array elements
      * in the protocol.
-     *
-     * @param array $messages
-     * @param int $compression
-     * @return string
-     * @static
-     * @access public
      */
-    protected function encodeMessageSet($messages, $compression = self::COMPRESSION_NONE)
+    protected function encodeMessageSet(array $messages, int $compression = self::COMPRESSION_NONE): string
     {
-        if (! is_array($messages)) {
-            $messages = [$messages];
-        }
-
         $data = '';
         $next = 0;
+
         foreach ($messages as $message) {
             $tmpMessage = $this->encodeMessage($message, $compression);
 
@@ -88,13 +79,9 @@ class Produce extends Protocol
     /**
      * encode signal message
      *
-     * @param string $message
-     * @param int $compression
-     * @return string
-     * @static
-     * @access protected
+     * @param array|string $message
      */
-    protected function encodeMessage($message, $compression = self::COMPRESSION_NONE)
+    protected function encodeMessage($message, int $compression = self::COMPRESSION_NONE): string
     {
         // int8 -- magic  int8 -- attribute
         $version = $this->getApiVersion(self::PRODUCE_REQUEST);
@@ -123,14 +110,8 @@ class Produce extends Protocol
 
     /**
      * encode signal part
-     *
-     * @param $values
-     * @param $compression
-     * @return string
-     * @internal param $partions
-     * @access protected
      */
-    protected function encodeProducePartition($values, $compression)
+    protected function encodeProducePartition(array $values, int $compression): string
     {
         if (! isset($values['partition_id'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
@@ -141,21 +122,15 @@ class Produce extends Protocol
         }
 
         $data  = self::pack(self::BIT_B32, $values['partition_id']);
-        $data .= self::encodeString($this->encodeMessageSet($values['messages'], $compression), self::PACK_INT32);
+        $data .= self::encodeString($this->encodeMessageSet((array) $values['messages'], $compression), self::PACK_INT32);
 
         return $data;
     }
 
     /**
      * encode signal topic
-     *
-     * @param $values
-     * @param $compression
-     * @return string
-     * @internal param $partions
-     * @access protected
      */
-    protected function encodeProduceTopic($values, $compression)
+    protected function encodeProduceTopic(array $values, int $compression): string
     {
         if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');

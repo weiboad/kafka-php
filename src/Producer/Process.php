@@ -187,7 +187,7 @@ class Process
         }
     }
 
-    protected function produce()
+    protected function produce(): array
     {
         $context     = [];
         $broker      = \Kafka\Broker::getInstance();
@@ -201,25 +201,29 @@ class Process
         //  key:
         //  value:
         $data = call_user_func($this->producer);
+
         if (empty($data)) {
             return $context;
         }
 
         $sendData = $this->convertMessage($data);
+
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId);
+
             if (! $connect) {
-                return;
+                return $context;
             }
 
-            $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params      = [
+            $params = [
                 'required_ack' => $requiredAck,
-                'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
-                'data' => $topicList,
+                'timeout'      => $timeout,
+                'data'         => $topicList,
             ];
+
             $this->debug("Send message start, params:" . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
+
             if ($requiredAck == 0) { // If it is 0 the server will not send any response
                 $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE);
             } else {
