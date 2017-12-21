@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class JoinGroupTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -28,8 +30,11 @@ class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $this->group9  = new \Kafka\Protocol\JoinGroup('0.9.0.1');
+        $nullLogger   = new NullLogger();
+        $this->group9 = new \Kafka\Protocol\JoinGroup('0.9.0.1');
+        $this->group9->setLogger($nullLogger);
         $this->group10 = new \Kafka\Protocol\JoinGroup('0.10.1.0');
+        $this->group10->setLogger($nullLogger);
     }
 
     /**

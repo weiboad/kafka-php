@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class FetchTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class FetchTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->fetch = new \Kafka\Protocol\Fetch('0.9.0.1');
+        $this->fetch->setLogger(new NullLogger());
     }
 
     /**

@@ -1,8 +1,21 @@
 <?php
 namespace KafkaTest\Base\Sasl;
 
+use \Kafka\Sasl\Plain;
+use \Kafka\Config\Sasl;
+
 class PlainTest extends \PHPUnit\Framework\TestCase
 {
+
+    private $plain;
+
+    public function setUp()
+    {
+        $config = new Sasl();
+        $config->setUsername('nmred');
+        $config->setPassword('123456');
+        $this->plain = new Plain($config);
+    }
 
     /**
      * testHandShake
@@ -13,7 +26,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
     public function testHandShake()
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(\Kafka\Socket\SocketBlocking::class);
 
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.
@@ -26,8 +39,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo(\hex2bin('0000000d006e6d72656400313233343536'))]
             );
 
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
-        $provider->authenticate($socket);
+        $this->plain->authenticate($socket);
     }
 
     /**
@@ -41,7 +53,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
     public function testHandShakeNotSupport()
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(\Kafka\Socket\SocketBlocking::class);
 
         $handShakeData = \hex2bin('00000011002100000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.
@@ -53,8 +65,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo(\hex2bin('0000001a001100000000001100096b61666b612d7068700005504c41494e'))]
             );
 
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
-        $provider->authenticate($socket);
+        $this->plain->authenticate($socket);
     }
 
     /**
@@ -65,7 +76,6 @@ class PlainTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetMechanismName()
     {
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
-        $this->assertSame('PLAIN', $provider->getName());
+        $this->assertSame('PLAIN', $this->plain->getName());
     }
 }

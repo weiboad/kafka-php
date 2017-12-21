@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class ProduceTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -28,8 +30,10 @@ class ProduceTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $this->produce   = new \Kafka\Protocol\Produce('0.9.0.1');
+        $this->produce = new \Kafka\Protocol\Produce('0.9.0.1');
+        $this->produce->setLogger(new NullLogger());
         $this->produce10 = new \Kafka\Protocol\Produce('0.10.1.0');
+        $this->produce10->setLogger(new NullLogger());
     }
 
     /**

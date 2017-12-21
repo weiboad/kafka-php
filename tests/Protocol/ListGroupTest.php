@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class ListGroupTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class ListGroupTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->list = new \Kafka\Protocol\ListGroup('0.9.0.1');
+        $this->list->setLogger(new NullLogger());
     }
 
     /**

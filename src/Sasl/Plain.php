@@ -2,7 +2,8 @@
 
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
+use Kafka\Contracts\Config\Sasl;
+use Kafka\Contracts\SocketInterface;
 use Kafka\SaslMechanism;
 use Kafka\Exception;
 
@@ -10,9 +11,7 @@ class Plain extends Mechanism
 {
     private const MECHANISM_NAME = "PLAIN";
 
-    private $username;
-
-    private $password;
+    private $config;
 
     
     /**
@@ -22,10 +21,9 @@ class Plain extends Mechanism
      * @access public
      * @return void
      */
-    public function __construct(string $username, string $password)
+    public function __construct(Sasl $config)
     {
-        $this->username = trim($username);
-        $this->password = trim($password);
+        $this->config = $config;
     }
 
     /**
@@ -35,10 +33,10 @@ class Plain extends Mechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(SocketInterface $socket) : void
     {
         $split = \Kafka\Protocol\Protocol::pack(\Kafka\Protocol\Protocol::BIT_B8, 0);
-        $data  = $split . $this->username . $split . $this->password;
+        $data  = $split . $this->config->getUsername() . $split . $this->config->getPassword();
         $data  = \Kafka\Protocol\Protocol::encodeString($data, \Kafka\Protocol\Protocol::PACK_INT32);
         $socket->writeBlocking($data);
         $socket->readBlocking(4, true);

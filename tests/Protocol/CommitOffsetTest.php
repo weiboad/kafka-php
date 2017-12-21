@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class CommitOffsetTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->commit = new \Kafka\Protocol\CommitOffset('0.9.0.1');
+        $this->commit->setLogger(new NullLogger());
     }
 
     /**

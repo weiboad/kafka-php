@@ -1,5 +1,5 @@
 <?php
-namespace Kafka;
+namespace Kafka\Contracts;
 
 interface SaslMechanism
 {
@@ -10,5 +10,5 @@ interface SaslMechanism
      * @access public
      * @return void
      */
-    public function authenticate(CommonSocket $socket) : void;
+    public function authenticate(SocketInterface $socket) : void;
 }

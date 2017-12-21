@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->sasl = new \Kafka\Protocol\SaslHandShake('0.10.0.0');
+        $this->sasl->setLogger(new NullLogger());
     }
 
     /**

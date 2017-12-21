@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class FetchOffsetTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->offset = new \Kafka\Protocol\FetchOffset('0.9.0.1');
+        $this->offset->setLogger(new NullLogger());
     }
 
     /**

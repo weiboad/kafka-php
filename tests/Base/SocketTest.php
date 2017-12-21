@@ -1,7 +1,9 @@
 <?php
 namespace KafkaTest\Base;
 
-use \Kafka\Socket;
+use \Kafka\Socket\SocketBlocking;
+use \Kafka\Config\Socket as SocketConfig;
+use \Kafka\Config\Ssl as SslConfig;
 use \Kafka\Config;
 use \KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use \KafkaTest\Base\StreamStub\Stream;
@@ -32,8 +34,13 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamHostName()
     {
-        $socket = new Socket('', -99);
+        $socket = $this->createSocket('', -99);
         $socket->connect();
+    }
+
+    private function createSocket($host, $port)
+    {
+        return new SocketBlocking($host, $port, new SocketConfig(), new \Kafka\Sasl\NullSasl(), new SslConfig());
     }
 
     /**
@@ -46,7 +53,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateStreamPort()
     {
-        $socket = new Socket('123', -99);
+        $socket = $this->createSocket('123', -99);
         $socket->connect();
     }
 
@@ -67,8 +74,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $sasl = $this->createMock(\Kafka\Sasl\Plain::class);
         $sasl->expects($this->once())
              ->method('authenticate')
-             ->with($this->isInstanceOf(Socket::class));
-        $socket = $this->mockStreamSocketClient($host, $port, null, $sasl);
+             ->with($this->isInstanceOf(SocketBlocking::class));
+        $socket = $this->mockStreamSocketClient($host, $port, $sasl);
         $socket->connect();
     }
 
@@ -123,20 +130,20 @@ class SocketTest extends \PHPUnit\Framework\TestCase
                    ->method('context')
                    ->with($this->equalTo(stream_context_get_options($context)));
 
-        $config = $this->getMockForAbstractClass(\Kafka\Config::class);
-        $config->setSslEnable(true);
-        $config->setSslLocalPk($localKey);
-        $config->setSslLocalCert($localCert);
-        $config->setSslCafile($cafile);
-        $config->setSslPassphrase($passphrase);
-        $config->setSslVerifyPeer($verifyPeer);
-        $config->setSslPeerName($peerName);
+        $config = new SslConfig();
+        $config->setEnable(true);
+        $config->setLocalPk($localKey);
+        $config->setLocalCert($localCert);
+        $config->setCafile($cafile);
+        $config->setPassphrase($passphrase);
+        $config->setVerifyPeer($verifyPeer);
+        $config->setPeerName($peerName);
 
         $sasl = $this->createMock(\Kafka\Sasl\Plain::class);
         $sasl->expects($this->once())
              ->method('authenticate')
-             ->with($this->isInstanceOf(Socket::class));
-        $socket = $this->mockStreamSocketClient($host, $port, $config, $sasl);
+             ->with($this->isInstanceOf(SocketBlocking::class));
+        $socket = $this->mockStreamSocketClient($host, $port, $sasl, [], $config);
         $socket->connect();
     }
 
@@ -154,7 +161,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $port      = 9192;
         $transport = 'tcp';
         $socket    = $this->mockStreamSocketClient($host, $port);
-        $socket->readBlocking(Socket::READ_MAX_LENGTH + 1);
+        $socket->readBlocking(5242880 + 1);
     }
 
     /**
@@ -257,7 +264,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $streamMock->method('read')->will($this->returnValue(''));
 
         $socket = $this->createStream($host, $port, 1);
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
+        $socket = $this->mockStreamSocketClient($host, $port, null, ['select']);
         $socket->expects($this->exactly(2))
                ->method('select')
             ->will($this->onConsecutiveCalls(
@@ -266,33 +273,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
             ));
         $socket->connect();
         $socket->readBlocking(4);
-    }
-
-    /**
-     * testRecvTimeout
-     *
-     * @access public
-     * @return void
-     */
-    public function testRecvTimeout()
-    {
-        $host       = '127.0.0.1';
-        $port       = 9192;
-        $transport  = 'tcp';
-        $streamMock = $this->initStreamStub($transport, $host, $port);
-        $streamMock->method('eof')
-                   ->will($this->returnValue(false));
-        $streamMock->method('read')
-                   ->will($this->returnValue('xxxx'));
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setRecvTimeoutSec(3000);
-        $socket->setRecvTimeoutUsec(30001);
-        $socket->method('select')
-               ->with($this->isType('array'), $this->equalTo(3000), $this->equalTo(30001), $this->equalTo(true))
-               ->will($this->returnValue(1));
-        $socket->connect();
-        $data = $socket->readBlocking(4);
-        $this->assertEquals('xxxx', $data);
     }
 
     /**
@@ -363,22 +343,22 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingMaxBuffer()
     {
-        $str       = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str       = str_pad('', 2048 * 2, "*");
         $host      = '127.0.0.1';
         $port      = 9192;
         $transport = 'tcp';
 
         $streamMock = $this->initStreamStub($transport, $host, $port);
         $streamMock->method('write')->will($this->onConsecutiveCalls(
-            Socket::MAX_WRITE_BUFFER,
-            Socket::MAX_WRITE_BUFFER
+            2048,
+            2048
         ))->withConsecutive(
-            [substr($str, 0, Socket::MAX_WRITE_BUFFER)],
-            [substr($str, Socket::MAX_WRITE_BUFFER)]
+            [substr($str, 0, 2048)],
+            [substr($str, 2048)]
         );
 
         $socket = $this->createStream($host, $port, 1);
-        $this->assertEquals(Socket::MAX_WRITE_BUFFER * 2, $socket->writeBlocking($str));
+        $this->assertEquals(2048 * 2, $socket->writeBlocking($str));
     }
 
     /**
@@ -391,7 +371,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingReturnFalse()
     {
-        $str       = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str       = str_pad('', 2048 * 2, "*");
         $host      = '127.0.0.1';
         $port      = 9192;
         $transport = 'tcp';
@@ -400,51 +380,30 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $streamMock->method('write')->will($this->onConsecutiveCalls(
             0
         ))->withConsecutive(
-            [substr($str, 0, Socket::MAX_WRITE_BUFFER)]
+            [substr($str, 0, 2048)]
         );
 
         $socket = $this->createStream($host, $port, 1);
         $socket->writeBlocking($str);
     }
 
-    /**
-     * testSendTimeout
-     *
-     * @access public
-     * @return void
-     */
-    public function testSendTimeout()
+    private function mockStreamSocketClient($host, $port, $sasl = null, $mockMethod = [], $ssl = null)
     {
-        $host       = '127.0.0.1';
-        $port       = 9192;
-        $transport  = 'tcp';
-        $streamMock = $this->initStreamStub($transport, $host, $port);
-        $streamMock->method('eof')
-                   ->will($this->returnValue(false));
-        $streamMock->method('write')
-                   ->will($this->returnValue(4));
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setSendTimeoutSec(3000);
-        $socket->setSendTimeoutUsec(30001);
-        $socket->method('select')
-               ->with($this->isType('array'), $this->equalTo(3000), $this->equalTo(30001), $this->equalTo(false))
-               ->will($this->returnValue(1));
-        $socket->connect();
-        $data = $socket->writeBlocking('xxxx');
-        $this->assertEquals(4, $data);
-    }
-
-    private function mockStreamSocketClient($host, $port, $config = null, $sasl = null, $mockMethod = [])
-    {
+        if ($sasl == null) {
+            $sasl = new \Kafka\Sasl\NullSasl();
+        }
+        if ($ssl == null) {
+            $ssl = new SslConfig();
+        }
         if (empty($mockMethod)) {
             $mockMethod = ['createSocket'];
         } else {
             $mockMethod = array_merge(['createSocket'], $mockMethod);
         }
         
-        $socket = $this->getMockBuilder(Socket::class)
+        $socket = $this->getMockBuilder(SocketBlocking::class)
             ->setMethods($mockMethod)
-            ->setConstructorArgs([$host, $port, $config, $sasl])
+            ->setConstructorArgs([$host, $port, new SocketConfig(), $sasl, $ssl])
             ->getMock();
 
         $socket->method('createSocket')
@@ -471,7 +430,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
     private function createStream($host, $port, $select, $metaData = [])
     {
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select', 'getMetaData']);
+        $socket = $this->mockStreamSocketClient($host, $port, null, ['select', 'getMetaData']);
         $socket->method('select')
                ->will($this->returnValue($select));
         $socket->method('getMetaData')

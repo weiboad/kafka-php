@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class LeaveGroupTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class LeaveGroupTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->leave = new \Kafka\Protocol\LeaveGroup('0.9.0.1');
+        $this->leave->setLogger(new NullLogger());
     }
 
     /**

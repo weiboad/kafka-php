@@ -1,9 +1,13 @@
 <?php
-namespace Kafka;
+namespace Kafka\Socket;
 
-use Amp\Loop;
+use Kafka\Loop;
+use Kafka\Contracts\SocketInterface;
+use Kafka\Contracts\SaslMechanism;
+use Kafka\Contracts\Config\Socket as SocketConfigInterface;
+use Kafka\Contracts\Config\Ssl as SslConfigInterface;
 
-class Socket extends CommonSocket
+class SocketUnblocking extends Socket
 {
 
     /**
@@ -41,13 +45,27 @@ class Socket extends CommonSocket
      */
     private $readNeedLength = 0;
 
+    private $loop;
+
+    public function __construct(
+        string $host,
+        int $port,
+        SocketConfigInterface $config,
+        SaslMechanism $saslProvider,
+        SslConfigInterface $sslConfig,
+        Loop $loop
+    ) {
+        parent::__construct($host, $port, $config, $saslProvider, $sslConfig);
+        $this->loop = $loop;
+    }
+
     /**
      * Connects the socket
      *
      * @access public
      * @return void
      */
-    public function connect()
+    protected function preformConnect() : void
     {
         if (! $this->isSocketDead()) {
             return;
@@ -58,7 +76,7 @@ class Socket extends CommonSocket
         stream_set_blocking($this->stream, 0);
         stream_set_read_buffer($this->stream, 0);
 
-        $this->readWatcher = Loop::onReadable($this->stream, function () {
+        $this->readWatcher = $this->loop->onReadable($this->stream, function () {
             do {
                 if (! $this->isSocketDead()) {
                     $newData = @fread($this->stream, self::READ_MAX_LENGTH);
@@ -72,7 +90,7 @@ class Socket extends CommonSocket
             } while ($newData);
         });
 
-        $this->writeWatcher = Loop::onWritable($this->stream, function () {
+        $this->writeWatcher = $this->loop->onWritable($this->stream, function () {
             $this->write();
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
@@ -83,20 +101,21 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function reconnect()
+    private function reconnect()
     {
         $this->close();
         $this->connect();
     }
 
     public $onReadable;
+
     /**
      * set on readable callback function
      *
      * @access public
      * @return void
      */
-    public function setOnReadable(callable $read)
+    public function setOnReadable(callable $read) : void
     {
         $this->onReadable = $read;
     }
@@ -109,8 +128,8 @@ class Socket extends CommonSocket
      */
     public function close() : void
     {
-        Loop::cancel($this->readWatcher);
-        Loop::cancel($this->writeWatcher);
+        $this->loop->cancel($this->readWatcher);
+        $this->loop->cancel($this->writeWatcher);
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
@@ -183,9 +202,9 @@ class Socket extends CommonSocket
         $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
-            Loop::disable($this->writeWatcher);
+            $this->loop->disable($this->writeWatcher);
         } elseif ($bytesWritten >= 0) {
-            Loop::enable($this->writeWatcher);
+            $this->loop->enable($this->writeWatcher);
         } elseif ($this->isSocketDead()) {
             $this->reconnect();
         }

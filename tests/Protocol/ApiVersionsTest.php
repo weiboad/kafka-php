@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class ApiVersionsTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class ApiVersionsTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->apiVersion = new \Kafka\Protocol\ApiVersions('0.10.0.0');
+        $this->apiVersion->setLogger(new NullLogger());
     }
 
     /**

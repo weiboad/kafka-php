@@ -1,13 +1,13 @@
 <?php
 namespace Kafka\Producer;
 
-use Amp\Loop;
+use Psr\Log\LoggerInterface;
+use Kafka\Contracts\Config\Broker as BrokerConfigInterface;
+use Kafka\Contracts\Config\Producer as ProducerConfigInterface;
+use Kafka\Contracts\BrokerInterface;
 
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     protected $producer = null;
 
     protected $isRunning = true;
@@ -16,11 +16,30 @@ class Process
 
     protected $error = null;
 
+    private $logger;
+
+    private $brokerConfig;
+
+    private $broker;
+
     private $state;
 
-    public function __construct(callable $producer = null)
-    {
-        $this->producer = $producer;
+    private $producerConfig;
+
+    public function __construct(
+        BrokerConfigInterface $brokerConfig,
+        BrokerInterface $broker,
+        State $state,
+        ProducerConfigInterface $producerConfig,
+        LoggerInterface $logger,
+        callable $producer
+    ) {
+        $this->producer       = $producer;
+        $this->brokerConfig   = $brokerConfig;
+        $this->broker         = $broker;
+        $this->logger         = $logger;
+        $this->state          = $state;
+        $this->producerConfig = $producerConfig;
     }
 
     /**
@@ -32,21 +51,13 @@ class Process
     public function init()
     {
         // init protocol
-        $config = \Kafka\ProducerConfig::getInstance();
-        \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
+        \Kafka\Protocol::init($this->brokerConfig->getVersion(), $this->logger);
 
         // init process request
-        $broker = \Kafka\Broker::getInstance();
-        $broker->setConfig($config);
-        $broker->setProcess(function ($data, $fd) {
+        $this->broker->setProcess(function ($data, $fd) {
             $this->processRequest($data, $fd);
         });
 
-        // init state
-        $this->state = \Kafka\Producer\State::getInstance();
-        if ($this->logger) {
-            $this->state->setLogger($this->logger);
-        }
         $this->state->setCallback([
             \Kafka\Producer\State::REQUEST_METADATA => function () {
                 return $this->syncMeta();
@@ -57,7 +68,7 @@ class Process
         ]);
         $this->state->init();
 
-        $topics = $broker->getTopics();
+        $topics = $this->broker->getTopics();
         if (! empty($topics)) {
             $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA);
         }
@@ -73,17 +84,6 @@ class Process
     {
         $this->init();
         $this->state->start();
-        $config = \Kafka\ProducerConfig::getInstance();
-        $isAsyn = $config->getIsAsyn();
-        if (! $isAsyn) {
-            Loop::repeat($config->getRequestTimeout(), function ($watcherId) {
-                if ($this->error) {
-                    call_user_func($this->error, 1000);
-                }
-                Loop::cancel($watcherId);
-                Loop::stop();
-            });
-        };
     }
 
     /**
@@ -121,10 +121,10 @@ class Process
 
     public function syncMeta()
     {
-        $this->debug('Start sync metadata request');
+        $this->logger->debug('Start sync metadata request');
 
-        $brokerList = \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
+        $brokerList = $this->brokerConfig->getMetadataBrokerList();
 
         foreach (explode(',', $brokerList) as $key => $val) {
             if (trim($val)) {
@@ -137,12 +137,11 @@ class Process
         }
 
         shuffle($brokerHost);
-        $broker = \Kafka\Broker::getInstance();
         foreach ($brokerHost as $host) {
-            $socket = $broker->getMetaConnect($host);
+            $socket = $this->broker->getMetaConnect($host);
             if ($socket) {
                 $params = [];
-                $this->debug('Start sync metadata request params:' . json_encode($params));
+                $this->logger->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
                 return;
@@ -170,11 +169,10 @@ class Process
             case \Kafka\Protocol::METADATA_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
                 if (! isset($result['brokers']) || ! isset($result['topics'])) {
-                    $this->error('Get metadata is fail, brokers or topics is null.');
+                    $this->logger->error('Get metadata is fail, brokers or topics is null.');
                     $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
                 } else {
-                    $broker   = \Kafka\Broker::getInstance();
-                    $isChange = $broker->setData($result['topics'], $result['brokers']);
+                    $isChange = $this->broker->setData($result['topics'], $result['brokers']);
                     $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA, $isChange);
                 }
                 break;
@@ -183,16 +181,15 @@ class Process
                 $this->succProduce($result, $fd);
                 break;
             default:
-                $this->error('Error request, correlationId:' . $correlationId);
+                $this->logger->error('Error request, correlationId:' . $correlationId);
         }
     }
 
     protected function produce()
     {
         $context     = [];
-        $broker      = \Kafka\Broker::getInstance();
-        $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-        $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
+        $requiredAck = $this->producerConfig->getRequiredAck();
+        $timeout     = $this->producerConfig->getTimeout();
 
         // get send message
         // data struct
@@ -207,18 +204,17 @@ class Process
 
         $sendData = $this->convertMessage($data);
         foreach ($sendData as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect($brokerId);
+            $connect = $this->broker->getDataConnect($brokerId);
             if (! $connect) {
                 return;
             }
 
-            $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-            $params      = [
+            $params = [
                 'required_ack' => $requiredAck,
-                'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
+                'timeout' => $timeout,
                 'data' => $topicList,
             ];
-            $this->debug("Send message start, params:" . json_encode($params));
+            $this->logger->debug("Send message start, params:" . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             if ($requiredAck == 0) { // If it is 0 the server will not send any response
                 $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE);
@@ -234,7 +230,7 @@ class Process
     protected function succProduce($result, $fd)
     {
         $msg = sprintf('Send message sucess, result: %s', json_encode($result));
-        $this->debug($msg);
+        $this->logger->debug($msg);
         if ($this->success) {
             call_user_func($this->success, $result);
         }
@@ -244,7 +240,7 @@ class Process
     protected function stateConvert($errorCode, $context = null)
     {
         $retry = false;
-        $this->error(\Kafka\Protocol::getError($errorCode));
+        $this->logger->error(\Kafka\Protocol::getError($errorCode));
         if ($this->error) {
             call_user_func($this->error, $errorCode);
         }
@@ -273,8 +269,7 @@ class Process
     protected function convertMessage($data)
     {
         $sendData   = [];
-        $broker     = \Kafka\Broker::getInstance();
-        $topicInfos = $broker->getTopics();
+        $topicInfos = $this->broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {
                 continue;

@@ -17,6 +17,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testGssapi
      *
+     * @requires extension krb5 1.1.2
      * @access public
      * @return void
      */
@@ -31,6 +32,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testKeytabIsNotExists
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid keytab, keytab file not exists.
      * @access public
@@ -44,6 +46,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testKeytabIsNotReadable
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid keytab, keytab file disable read.
      * @access public
@@ -59,6 +62,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testGetMechanismName
      *
+     * @requires extension krb5 1.1.2
      * @access public
      * @return void
      */
@@ -72,6 +76,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
     /**
      * testInitSecurityContext
      *
+     * @requires extension krb5 1.1.2
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Init security context failure.
      * @access public
@@ -87,7 +92,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
 
     private function getSocketForTestGssapi($writeTimes = 3)
     {
-        $socket        = $this->createMock(\Kafka\Socket::class);
+        $socket        = $this->createPartialMock(\Kafka\Socket\SocketBlocking::class, ['readBlocking', 'writeBlocking']);
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         $stokenLength  = \hex2bin('00000020');
         $stokenData    = \hex2bin('050401ff000c0000000000003661d1c10101000011e9d2da795b1800cdf2ffc7');

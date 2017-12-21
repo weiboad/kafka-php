@@ -1,8 +1,8 @@
 <?php
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
-use Kafka\SaslMechanism;
+use Kafka\Contracts\SocketInterface;
+use Kafka\Contracts\SaslMechanism;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
@@ -60,7 +60,7 @@ class Scram extends Mechanism implements SaslMechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(SocketInterface $socket) : void
     {
         $firstMessage = $this->firstMessage();
         $data         = ProtocolTool::encodeString($firstMessage, ProtocolTool::PACK_INT32);

@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class HeartbeatTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class HeartbeatTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->heart = new \Kafka\Protocol\Heartbeat('0.9.0.1');
+        $this->heart->setLogger(new NullLogger());
     }
 
     /**

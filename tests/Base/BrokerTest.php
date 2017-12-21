@@ -1,18 +1,25 @@
 <?php
 namespace KafkaTest\Base;
 
+use Kafka\Broker;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 class BrokerTest extends \PHPUnit\Framework\TestCase
 {
 
-    /**
-     * setDown
-     *
-     * @access public
-     * @return void
-     */
-    public function tearDown()
+    private $broker;
+
+    public function setUp()
     {
-        \Kafka\Broker::getInstance()->clear();
+        $builder = new \DI\ContainerBuilder();
+        $builder->useAnnotations(false);
+        $builder->addDefinitions([
+            LoggerInterface::class => \DI\object(NullLogger::class),
+            \Kafka\Contracts\BrokerInterface::class => \DI\object(\Kafka\Broker::class),
+        ]);
+        $container    = $builder->build();
+        $this->broker = $container->get(\Kafka\Broker::class);
     }
 
     /**
@@ -23,9 +30,8 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGroupBrokerId()
     {
-        $broker = \Kafka\Broker::getInstance();
-        $broker->setGroupBrokerId(1);
-        $this->assertEquals($broker->getGroupBrokerId(), 1);
+        $this->broker->setGroupBrokerId(1);
+        $this->assertEquals($this->broker->getGroupBrokerId(), 1);
     }
 
     /**
@@ -36,8 +42,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
      */
     public function testData()
     {
-        $broker = \Kafka\Broker::getInstance();
-        $data   = [
+        $data = [
             'brokers' => [
                 [
                     'host' => '127.0.0.1',
@@ -90,7 +95,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-        $broker->setData($data['topics'], $data['brokers']);
+        $this->broker->setData($data['topics'], $data['brokers']);
         $brokers = [
             0 => '127.0.0.1:9092',
             1 => '127.0.0.1:9192',
@@ -102,61 +107,21 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
                 1 => 2,
             ]
         ];
-        $this->assertEquals($brokers, $broker->getBrokers());
-        $this->assertEquals($topics, $broker->getTopics());
+        $this->assertEquals($brokers, $this->broker->getBrokers());
+        $this->assertEquals($topics, $this->broker->getTopics());
     }
 
     /**
      * testGetConnect
      *
-     * @access public
-     * @return void
-     */
-    public function getConnect()
-    {
-        $broker = \Kafka\Broker::getInstance();
-        $data   = [
-            [
-                'host' => '127.0.0.1',
-                'port' => '9092',
-                'nodeId' => '0',
-            ],
-            [
-                'host' => '127.0.0.1',
-                'port' => '9193',
-                'nodeId' => '1',
-            ],
-            [
-                'host' => '127.0.0.1',
-                'port' => '9292',
-                'nodeId' => '2',
-            ],
-        ];
-        $broker->setData([], $data);
-
-        $socket = $this->getMockBuilder(\Kafka\Socket::class)
-            ->setConstructorArgs(['127.0.0.1', '9192'])
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->setMethods(['connect', 'setOnReadable', 'close'])
-            ->getMock();
-
-        $result = $broker->getMetaConnect('1');
-        $this->assertFalse($result);
-    }
-
-    /**
-     * testGetConnect
-     *
+     * @expectedException \Kafka\Exception
+     * @expectedExceptionMessage Invalid broker list, must call in after setData
      * @access public
      * @return void
      */
     public function testConnectRandFalse()
     {
-        $broker = \Kafka\Broker::getInstance();
-
-        $result = $broker->getRandConnect();
-        $this->assertFalse($result);
+        $this->broker->getRandConnect();
     }
 
     /**
@@ -167,11 +132,40 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSocketNotSetConfig()
     {
-        $broker   = \Kafka\Broker::getInstance();
-        $hostname = '127.0.0.1';
-        $port     = '9092';
-        $socket   = $broker->getSocket($hostname, $port, true);
+        $hostname   = '127.0.0.1';
+        $port       = '9092';
+        $mockSocket = $this->createMock(\Kafka\Socket\SocketBlocking::class);
 
-        $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
+        $builder = new \DI\ContainerBuilder();
+        $builder->useAnnotations(false);
+        $builder->addDefinitions([
+            LoggerInterface::class => \DI\object(NullLogger::class),
+            \Kafka\Contracts\BrokerInterface::class => \DI\object(\Kafka\Broker::class),
+            \Kafka\Contracts\SocketInterface::class => function () use ($mockSocket) {
+                return $mockSocket;
+            }
+        ]);
+        $brokers   = [
+            [
+                'host' => '127.0.0.1',
+                'port' => '9092',
+                'nodeId' => '0',
+            ],
+            [
+                'host' => '127.0.0.1',
+                'port' => '9192',
+                'nodeId' => '1',
+            ],
+            [
+                'host' => '127.0.0.1',
+                'port' => '9292',
+                'nodeId' => '2',
+            ],
+        ];
+        $container = $builder->build();
+        $broker    = $container->get(\Kafka\Broker::class);
+        $broker->setData([], $brokers);
+        $stream = $broker->getDataConnect($hostname . ':' . $port);
+        $this->assertInstanceOf(\Kafka\Contracts\SocketInterface::class, $stream);
     }
 }

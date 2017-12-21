@@ -1,6 +1,8 @@
 <?php
 namespace KafkaTest\Protocol;
 
+use Psr\Log\NullLogger;
+
 class MetadataTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -21,6 +23,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->meta = new \Kafka\Protocol\Metadata('0.9.0.1');
+        $this->meta->setLogger(new NullLogger());
     }
 
     /**

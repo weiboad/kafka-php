@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace KafkaTest\Base\Consumer\StopStrategy;
+namespace KafkaTest\Base\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
-use Kafka\Consumer\StopStrategy\Delay;
+use Kafka\StopStrategy\Delay;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class DelayTest extends \PHPUnit\Framework\TestCase
@@ -14,6 +14,7 @@ final class DelayTest extends \PHPUnit\Framework\TestCase
      * @var Consumer|MockObject
      */
     private $consumer;
+    private $loop;
 
     /**
      * @before
@@ -21,6 +22,7 @@ final class DelayTest extends \PHPUnit\Framework\TestCase
     public function createConsumer(): void
     {
         $this->consumer = $this->createPartialMock(Consumer::class, ['stop']);
+        $this->loop     = new Loop();
     }
 
     /**
@@ -31,14 +33,14 @@ final class DelayTest extends \PHPUnit\Framework\TestCase
         $this->consumer->expects($this->once())
                        ->method('stop');
 
-        $strategy = new Delay(10);
+        $strategy = new Delay(10, $this->loop);
         $strategy->setup($this->consumer);
 
-        self::assertSame(1, Loop::getInfo()['delay']['enabled']);
+        self::assertSame(1, $this->loop->getInfo()['delay']['enabled']);
 
-        Loop::delay(20, [Loop::class, 'stop']);
-        Loop::run();
+        $this->loop->delay(20, [$this->loop, 'stop']);
+        $this->loop->run();
 
-        self::assertSame(0, Loop::getInfo()['delay']['enabled']);
+        self::assertSame(0, $this->loop->getInfo()['delay']['enabled']);
     }
 }

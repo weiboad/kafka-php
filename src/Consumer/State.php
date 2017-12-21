@@ -1,12 +1,12 @@
 <?php
 namespace Kafka\Consumer;
 
-use Amp\Loop;
+use Kafka\Loop;
+use Kafka\Contracts\Consumer\State as StateInterface;
+use Kafka\Contracts\Config\Broker;
 
-class State
+class State implements StateInterface
 {
-    use \Kafka\SingletonTrait;
-
     const REQUEST_METADATA      = 1;
     const REQUEST_GETGROUP      = 2;
     const REQUEST_JOINGROUP     = 3;
@@ -40,7 +40,17 @@ class State
 
     private $requests = self::CLEAN_REQUEST_STATE;
 
-    public function init()
+    private $brokerConfig;
+
+    private $loop;
+
+    public function __construct(Broker $brokerConfig, Loop $loop)
+    {
+        $this->brokerConfig = $brokerConfig;
+        $this->loop         = $loop;
+    }
+
+    public function init() : void
     {
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
@@ -57,11 +67,10 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:
-                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                    $this->requests[$request]['interval'] = $this->brokerConfig->getMetadataRefreshIntervalMs();
                     break;
                 default:
                     $this->requests[$request]['interval'] = 1000;
@@ -69,14 +78,14 @@ class State
         }
     }
 
-    public function start()
+    public function start() : void
     {
         foreach ($this->requests as $request => $option) {
             if (isset($option['norepeat']) && $option['norepeat']) {
                 continue;
             }
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            $this->loop->repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -90,12 +99,12 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        Loop::repeat(1000, function ($watcherId) {
+        $this->loop->repeat(1000, function ($watcherId) {
             $this->report();
         });
     }
 
-    public function stop()
+    public function stop() : void
     {
         $this->removeWatchers();
 
@@ -106,18 +115,18 @@ class State
     private function removeWatchers(): void
     {
         foreach (array_keys($this->requests) as $request) {
-            if ($this->requests[$request]['watcher'] === null) {
+            if (! isset($this->requests[$request]['watcher']) || $this->requests[$request]['watcher'] === null) {
                 return;
             }
 
-            Loop::cancel($this->requests[$request]['watcher']);
+            $this->loop->cancel($this->requests[$request]['watcher']);
         }
     }
 
-    public function succRun($key, $context = null)
+    public function succRun(int $key, $context = null) : void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
@@ -163,10 +172,10 @@ class State
         }
     }
 
-    public function failRun($key, $context = null)
+    public function failRun(int $key, $context = null) : void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {

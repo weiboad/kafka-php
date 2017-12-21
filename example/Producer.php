@@ -1,37 +1,48 @@
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
+
+use Kafka\Producer;
+use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StdoutHandler;
 
-// Create the logger
-$logger = new Logger('my_logger');
-// Now add some handlers
-$logger->pushHandler(new StdoutHandler());
+$container = Producer::getContainer([
+    \Kafka\Contracts\SocketInterface::class => \DI\object(\Kafka\Socket\SocketUnblocking::class),
+    // configure logger
+    LoggerInterface::class => function () {
+        // Create the logger
+        $logger = new Logger('my_logger');
+        // Now add some handlers
+        $logger->pushHandler(new StdoutHandler());
+        return $logger;
+    },
+    // configure broker
+    \Kafka\Contracts\Config\Broker::class => function () {
+        $config = new \Kafka\Config\Broker();
+        $config->setMetadataBrokerList(getenv('KAFKA_BROKERS'));
+        return $config;
+    },
+    // configure sasl
+    //\Kafka\Contracts\Config\Sasl::class => function () {
+    //    $config = new \Kafka\Config\Sasl();
+    //    $config->setUsername('nmred');
+    //    $config->setPassword('123456');
+    //    return $config;
+    //}
+]);
 
-$config = \Kafka\ProducerConfig::getInstance();
-$config->setMetadataRefreshIntervalMs(10000);
-$config->setMetadataBrokerList('127.0.0.1:9093');
-$config->setBrokerVersion('1.0.0');
-$config->setRequiredAck(1);
-$config->setIsAsyn(false);
-$config->setProduceInterval(500);
-$config->setSecurityProtocol(\Kafka\Config::SECURITY_PROTOCOL_SASL_SSL);
-$config->setSaslMechanism(\Kafka\Config::SASL_MECHANISMS_SCRAM_SHA_256);
-$config->setSaslUsername('nmred');
-$config->setSaslPassword('123456');
-$config->setSaslUsername('alice');
-$config->setSaslPassword('alice-secret');
-$config->setSaslKeytab('/etc/security/keytabs/kafkaclient.keytab');
-$config->setSaslPrincipal('kafka/node1@NMREDKAFKA.COM');
+$messagesSent = false;
 
-// if use ssl connect
-$config->setSslLocalCert('/home/vagrant/code/kafka-php/ca-cert');
-$config->setSslLocalPk('/home/vagrant/code/kafka-php/ca-key');
-$config->setSslPassphrase('123456');
-$config->setSslPeerName('nmred');
+$stop = new \Kafka\StopStrategy\Callback(
+    function () use (&$messagesSent): bool {
+            return $messagesSent;
+    },
+    10
+);
 
-$producer = new \Kafka\Producer(function () {
+
+$producer = $container->make(Producer::class, ['producer' => function () {
     return [
         [
             'topic' => 'test',
@@ -39,9 +50,10 @@ $producer = new \Kafka\Producer(function () {
             'key' => '',
         ],
     ];
-});
-$producer->setLogger($logger);
-$producer->success(function ($result) {
+},  'stopStrategy' => $stop]);
+
+$producer->success(function ($result) use (&$messagesSent) {
+    $messagesSent = true;
     var_dump($result);
 });
 $producer->error(function ($errorCode) {

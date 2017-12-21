@@ -1,15 +1,15 @@
 <?php
 namespace Kafka;
 
-use Amp\Loop;
-use Kafka\Consumer\Process;
-use Kafka\Consumer\StopStrategy;
+use Kafka\Loop;
+use Psr\Log\LoggerInterface;
+use DI\FactoryInterface;
+use Kafka\Contracts\Consumer\Process;
+use Kafka\Contracts\StopStrategy;
+use Kafka\Contracts\AsynchronousProcess;
 
-class Consumer
+class Consumer extends Bootstrap implements AsynchronousProcess
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
-
     /**
      * @var StopStrategy|null
      */
@@ -20,9 +20,18 @@ class Consumer
      */
     private $process;
 
-    public function __construct(?StopStrategy $stopStrategy = null)
+    private $logger;
+
+    private $container;
+
+    private $loop;
+
+    public function __construct(FactoryInterface $container, ?StopStrategy $stopStrategy = null, LoggerInterface $logger, Loop $loop)
     {
         $this->stopStrategy = $stopStrategy;
+        $this->logger       = $logger;
+        $this->container    = $container;
+        $this->loop         = $loop;
     }
 
     /**
@@ -37,35 +46,14 @@ class Consumer
     public function start(?callable $consumer = null): void
     {
         if ($this->process !== null) {
-            $this->error('Consumer is already being executed');
+            $this->logger->error('Consumer is already being executed');
             return;
         }
-
         $this->setupStopStrategy();
-
-        $this->process = $this->createProcess($consumer);
+        $this->process = $this->container->make(Consumer\Process::class, ['consumer' => $consumer]);
         $this->process->start();
 
-        Loop::run();
-    }
-
-    /**
-     * FIXME: remove it when we implement dependency injection
-     *
-     * This is a very bad practice, but if we don't create this method
-     * this class will never be testable...
-     *
-     * @codeCoverageIgnore
-     */
-    protected function createProcess(?callable $consumer): Process
-    {
-        $process = new Process($consumer);
-
-        if ($this->logger) {
-            $process->setLogger($this->logger);
-        }
-
-        return $process;
+        $this->loop->run();
     }
 
     private function setupStopStrategy(): void
@@ -80,13 +68,13 @@ class Consumer
     public function stop(): void
     {
         if ($this->process === null) {
-            $this->error('Consumer is not running');
+            $this->logger->error('Consumer is not running');
             return;
         }
 
         $this->process->stop();
         $this->process = null;
 
-        Loop::stop();
+        $this->loop->stop();
     }
 }

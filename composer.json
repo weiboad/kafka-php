@@ -18,7 +18,8 @@
     "require": {
         "php": "^7.1",
         "amphp/amp": "^2.0.3",
-        "psr/log": "^1.0"
+        "psr/log": "^1.0",
+		"php-di/php-di": "^5.4.6"
     },
     "autoload": {
         "psr-4": {
