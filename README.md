@@ -19,7 +19,7 @@ Kafka-php is a pure PHP kafka client that currently supports greater than 0.8.x 
 
 ## Requirements
 
-* Minimum PHP version: 5.5
+* Minimum PHP version: 7.1
 * Kafka version greater than 0.8
 * The consumer module needs kafka broker version  greater than 0.9.0
 
@@ -86,7 +86,7 @@ $producer->send(true);
 
 ### Synchronous mode
 
-```
+```php
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');

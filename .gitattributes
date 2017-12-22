@@ -6,3 +6,6 @@ build.xml export-ignore
 composer.json export-ignore
 example/ export-ignore
 tests/ export-ignore
+/infection.json.dist export-ignore
+/*.xml.dist export-ignore
+/phpstan.neon export-ignore

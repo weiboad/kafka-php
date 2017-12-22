@@ -1,0 +1,52 @@
+version: '3.2'
+
+services:
+  zookeeper:
+    image: zookeeper:3.4
+
+  kafka-0.9.0.1:
+    image: wurstmeister/kafka:0.9.0.1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka-0.9.0.1
+      KAFKA_ADVERTISED_PORT: 9092
+    ports:
+      - "9092"
+
+  kafka-0.10.2.1:
+    image: wurstmeister/kafka:0.10.2.1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka-0.10.2.1
+      KAFKA_ADVERTISED_PORT: 9092
+    ports:
+      - "9092"
+
+  kafka-0.11.0.1:
+    image: wurstmeister/kafka:0.11.0.1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka-0.11.0.1
+    ports:
+      - "9092"
+
+  kafka-1.0.0:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka-1.0.0
+    ports:
+      - "9092"
+
+  test-runner:
+    build: .
+    volumes:
+       - .:/opt/kafka-php

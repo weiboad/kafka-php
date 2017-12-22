@@ -13,3 +13,5 @@ tmp/
 php-cs-fixer.phar
 vendor/*
 .php_cs.cache
+/phpunit.xml
+/infection-log.txt
