@@ -1,6 +1,32 @@
 <?php
 namespace Kafka;
 
+/**
+ * @method string getClientId()
+ * @method string getBrokerVersion()
+ * @method string getMetadataBrokerList()
+ * @method string getMessageMaxBytes()
+ * @method string getMetadataRequestTimeoutMs()
+ * @method string getMetadataRefreshIntervalMs()
+ * @method string getMetadataMaxAgeMs()
+ * @method string getSecurityProtocol()
+ * @method bool getSslEnable()
+ * @method void setSslEnable(bool $sslEnable)
+ * @method string getSslLocalCert()
+ * @method string getSslLocalPk()
+ * @method bool getSslVerifyPeer()
+ * @method void setSslVerifyPeer(bool $sslVerifyPeer)
+ * @method string getSslPassphrase()
+ * @method void setSslPassphrase(string $sslPassphrase)
+ * @method string getSslCafile()
+ * @method string getSslPeerName()
+ * @method void setSslPeerName(string $sslPeerName)
+ * @method string getSaslMechanism()
+ * @method string getSaslUsername()
+ * @method string getSaslPassword()
+ * @method string getSaslKeytab()
+ * @method string getSaslPrincipal()
+ */
 abstract class Config
 {
     public const SECURITY_PROTOCOL_PLAINTEXT      = 'PLAINTEXT';
@@ -30,26 +56,26 @@ abstract class Config
     protected static $options = [];
 
     private static $defaults = [
-        'clientId'           => 'kafka-php',
-        'brokerVersion'      => '0.10.1.0',
-        'metadataBrokerList' => '',
-        'messageMaxBytes'    => '1000000',
+        'clientId'                  => 'kafka-php',
+        'brokerVersion'             => '0.10.1.0',
+        'metadataBrokerList'        => '',
+        'messageMaxBytes'           => '1000000',
         'metadataRequestTimeoutMs'  => '60000',
         'metadataRefreshIntervalMs' => '300000',
-        'metadataMaxAgeMs' => -1,
-        'securityProtocol' => self::SECURITY_PROTOCOL_PLAINTEXT,
-        'sslEnable'     => false, // this config item will override, don't config it.
-        'sslLocalCert'  => '',
-        'sslLocalPk'    => '',
-        'sslVerifyPeer' => false,
-        'sslPassphrase' => '',
-        'sslCafile'     => '',
-        'sslPeerName'   => '',
-        'saslMechanism' => self::SASL_MECHANISMS_PLAIN,
-        'saslUsername'  => '',
-        'saslPassword'  => '',
-        'saslKeytab'    => '',
-        'saslPrincipal' => '',
+        'metadataMaxAgeMs'          => -1,
+        'securityProtocol'          => self::SECURITY_PROTOCOL_PLAINTEXT,
+        'sslEnable'                 => false, // this config item will override, don't config it.
+        'sslLocalCert'              => '',
+        'sslLocalPk'                => '',
+        'sslVerifyPeer'             => false,
+        'sslPassphrase'             => '',
+        'sslCafile'                 => '',
+        'sslPeerName'               => '',
+        'saslMechanism'             => self::SASL_MECHANISMS_PLAIN,
+        'saslUsername'              => '',
+        'saslPassword'              => '',
+        'saslKeytab'                => '',
+        'saslPrincipal'             => '',
     ];
 
     public function __call($name, $args)
@@ -80,139 +106,136 @@ abstract class Config
         }
     }
 
-    public function setClientId($val)
+    public function setClientId(string $val): void
     {
         $client = trim($val);
-        if ($client == '') {
-            throw new \Kafka\Exception\Config('Set clientId value is invalid, must is not empty string.');
+
+        if ($client === '') {
+            throw new Exception\Config('Set clientId value is invalid, must is not empty string.');
         }
+
         static::$options['clientId'] = $client;
     }
 
-    public function setBrokerVersion($version)
+    public function setBrokerVersion(string $version): void
     {
         $version = trim($version);
-        if ($version == '' || version_compare($version, '0.8.0') < 0) {
-            throw new \Kafka\Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
+
+        if ($version === '' || version_compare($version, '0.8.0', '<')) {
+            throw new Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
         }
+
         static::$options['brokerVersion'] = $version;
     }
 
-    public function setMetadataBrokerList($list)
+    public function setMetadataBrokerList(string $brokerList): void
     {
-        if (trim($list) == '') {
-            throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
-        }
-        $tmp   = explode(',', trim($list));
-        $lists = [];
-        foreach ($tmp as $key => $val) {
-            if (trim($val) != '') {
-                $lists[] = $val;
+        $brokerList = trim($brokerList);
+
+        $brokers = array_filter(
+            explode(',', $brokerList),
+            function (string $broker): bool {
+                return preg_match('/^(.*:[\d]+)$/', $broker) === 1;
             }
-        }
-        if (empty($lists)) {
-            throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
-        }
-        foreach ($lists as $val) {
-            $hostinfo = explode(':', $val);
-            foreach ($hostinfo as $key => $val) {
-                if (trim($val) == '') {
-                    unset($hostinfo[$key]);
-                }
-            }
-            if (count($hostinfo) != 2) {
-                throw new \Kafka\Exception\Config('Set broker list value is invalid, must is not empty string');
-            }
+        );
+
+        if (empty($brokers)) {
+            throw new Exception\Config(
+                'Broker list must be a comma-separated list of brokers (format: "host:port"), with at least one broker'
+            );
         }
 
-        static::$options['metadataBrokerList'] = $list;
+        static::$options['metadataBrokerList'] = $brokerList;
     }
 
-    public function clear()
+    public function clear(): void
     {
         static::$options = [];
     }
 
-    public function setMessageMaxBytes($messageMaxBytes)
+    public function setMessageMaxBytes($messageMaxBytes): void
     {
         if (! is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
-            throw new \Kafka\Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
+            throw new Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
         }
         static::$options['messageMaxBytes'] = $messageMaxBytes;
     }
 
-    public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs)
+    public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs): void
     {
         if (! is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
             || $metadataRequestTimeoutMs > 900000) {
-            throw new \Kafka\Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
+            throw new Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
         }
         static::$options['metadataRequestTimeoutMs'] = $metadataRequestTimeoutMs;
     }
 
-    public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs)
+    public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs): void
     {
         if (! is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
             || $metadataRefreshIntervalMs > 3600000) {
-            throw new \Kafka\Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
+            throw new Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
         }
         static::$options['metadataRefreshIntervalMs'] = $metadataRefreshIntervalMs;
     }
 
-    public function setMetadataMaxAgeMs($metadataMaxAgeMs)
+    public function setMetadataMaxAgeMs($metadataMaxAgeMs): void
     {
-        if (! is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1
-            || $metadataMaxAgeMs > 86400000) {
-            throw new \Kafka\Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
+        if (! is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {
+            throw new Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
     }
 
-    public function setSslLocalCert(string $localCert)
+    public function setSslLocalCert(string $localCert): void
     {
         if (! file_exists($localCert) || ! is_file($localCert)) {
-            throw new \Kafka\Exception\Config('Set ssl local cert file is invalid');
+            throw new Exception\Config('Set ssl local cert file is invalid');
         }
+
         static::$options['sslLocalCert'] = $localCert;
     }
 
-    public function setSslLocalPk(string $localPk)
+    public function setSslLocalPk(string $localPk): void
     {
         if (! file_exists($localPk) || ! is_file($localPk)) {
-            throw new \Kafka\Exception\Config('Set ssl local private key file is invalid');
+            throw new Exception\Config('Set ssl local private key file is invalid');
         }
+
         static::$options['sslLocalPk'] = $localPk;
     }
 
-    public function setSslCafile(string $cafile)
+    public function setSslCafile(string $cafile): void
     {
         if (! file_exists($cafile) || ! is_file($cafile)) {
-            throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
+            throw new Exception\Config('Set ssl ca file is invalid');
         }
+
         static::$options['sslCafile'] = $cafile;
     }
 
-    public function setSaslKeytab(string $keytab)
+    public function setSaslKeytab(string $keytab): void
     {
         if (! file_exists($keytab) || ! is_file($keytab)) {
-            throw new \Kafka\Exception\Config('Set sasl gssapi keytab file is invalid');
+            throw new Exception\Config('Set sasl gssapi keytab file is invalid');
         }
+
         static::$options['saslKeytab'] = $keytab;
     }
 
-    public function setSecurityProtocol($protocol)
+    public function setSecurityProtocol(string $protocol): void
     {
-        if (! in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
-            throw new \Kafka\Exception\Config('Invalid security protocol given.');
+        if (! \in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
+            throw new Exception\Config('Invalid security protocol given.');
         }
 
         static::$options['securityProtocol'] = $protocol;
     }
 
-    public function setSaslMechanism($mechanism)
+    public function setSaslMechanism(string $mechanism): void
     {
-        if (! in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
-            throw new \Kafka\Exception\Config('Invalid security sasl mechanism given.');
+        if (! \in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
+            throw new Exception\Config('Invalid security sasl mechanism given.');
         }
 
         static::$options['saslMechanism'] = $mechanism;

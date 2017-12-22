@@ -1,428 +1,278 @@
 <?php
+
 namespace KafkaTest\Base;
 
-class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
+use Kafka\ConsumerConfig;
+
+final class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var ConsumerConfig
+     */
+    private $config;
 
     /**
-     * setDown
-     *
-     * @access public
-     * @return void
+     * @before
      */
-    public function tearDown()
+    public function configureInstance(): void
     {
-        \Kafka\ConsumerConfig::getInstance()->clear();
+        $this->config = ConsumerConfig::getInstance();
     }
 
     /**
-     * testDefaultConfig
-     *
-     * @access public
-     * @return void
+     * @after
      */
-    public function testDefaultConfig()
+    public function cleanUpInstance(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $this->assertEquals($config->getClientId(), 'kafka-php');
-        $this->assertEquals($config->getSessionTimeout(), 30000);
-        $this->assertFalse($config->setValidKey('xxx', '222'));
-        $this->assertFalse($config->getValidKey());
-        $config->setValidKey('222');
-        $this->assertEquals($config->getValidKey(), '222');
+        ConsumerConfig::getInstance()->clear();
+    }
+
+    public function testDefaultConfig(): void
+    {
+        self::assertSame($this->config->getClientId(), 'kafka-php');
+        self::assertSame($this->config->getSessionTimeout(), 30000);
+
+        self::assertFalse($this->config->setValidKey('xxx', '222'));
+        self::assertFalse($this->config->getValidKey());
+
+        $this->config->setValidKey('222');
+        self::assertSame($this->config->getValidKey(), '222');
+    }
+
+    public function testSetClientId(): void
+    {
+        $this->config->setClientId('kafka-php1');
+
+        self::assertSame($this->config->getClientId(), 'kafka-php1');
     }
 
     /**
-     * testSetClientId
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetClientId()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setClientId('kafka-php1');
-        $this->assertEquals($config->getClientId(), 'kafka-php1');
-    }
-
-    /**
-     * testSetClientIdEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set clientId value is invalid, must is not empty string.
-     * @access public
-     * @return void
      */
-    public function testSetClientIdEmpty()
+    public function testSetClientIdEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setClientId('');
+        $this->config->setClientId('');
+    }
+
+    public function testSetBrokerVersion(): void
+    {
+        $this->config->setBrokerVersion('0.9.0.1');
+
+        self::assertSame($this->config->getBrokerVersion(), '0.9.0.1');
     }
 
     /**
-     * testSetBrokerVersion
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetBrokerVersion()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setBrokerVersion('0.9.0.1');
-        $this->assertEquals($config->getBrokerVersion(), '0.9.0.1');
-    }
-
-    /**
-     * testSetBrokerVersionEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set broker version value is invalid, must is not empty string and gt 0.8.0.
-     * @access public
-     * @return void
      */
-    public function testSetBrokerVersionEmpty()
+    public function testSetBrokerVersionEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setBrokerVersion('');
+        $this->config->setBrokerVersion('');
     }
 
     /**
-     * testSetBrokerVersionValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set broker version value is invalid, must is not empty string and gt 0.8.0.
-     * @access public
-     * @return void
      */
-    public function testSetBrokerVersionValid()
+    public function testSetBrokerVersionInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setBrokerVersion('0.1');
+        $this->config->setBrokerVersion('0.1');
+    }
+
+    public function testSetMetadataBrokerList(): void
+    {
+        $this->config->setMetadataBrokerList(' 127.0.0.1:9192,127.0.0.1:9292'); // with whitespace to ensure that the list is trimmed
+
+        self::assertSame($this->config->getMetadataBrokerList(), '127.0.0.1:9192,127.0.0.1:9292');
     }
 
     /**
-     * testSetMetadataBrokerList
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetMetadataBrokerList()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList('127.0.0.1:9192,127.0.0.1:9292');
-        $this->assertEquals($config->getMetadataBrokerList(), '127.0.0.1:9192,127.0.0.1:9292');
-    }
-
-    /**
-     * testSetMetadataBrokerListEmpty
-     *
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker list value is invalid, must is not empty string
-     * @access public
-     * @return void
+     * @expectedExceptionMessage Broker list must be a comma-separated list of brokers (format: "host:port"), with at least one broker
      */
-    public function testSetMetadataBrokerListEmpty()
+    public function testSetMetadataBrokerListEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList('');
+        $this->config->setMetadataBrokerList('');
     }
 
     /**
-     * testSetMetadataBrokerListEmpty
-     *
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker list value is invalid, must is not empty string
-     * @access public
-     * @return void
+     * @expectedExceptionMessage Broker list must be a comma-separated list of brokers (format: "host:port"), with at least one broker
      */
-    public function testSetMetadataBrokerListEmpty1()
+    public function testSetMetadataBrokerListEmpty1(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList(',');
+        $this->config->setMetadataBrokerList(',');
     }
 
     /**
-     * testSetMetadataBrokerListEmpty2
-     *
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker list value is invalid, must is not empty string
-     * @access public
-     * @return void
+     * @expectedExceptionMessage Broker list must be a comma-separated list of brokers (format: "host:port"), with at least one broker
      */
-    public function testSetMetadataBrokerListEmpty2()
+    public function testSetMetadataBrokerListEmpty2(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataBrokerList('127.0.0.1: , : ');
+        $this->config->setMetadataBrokerList('127.0.0.1: , : ');
+    }
+
+    public function testSetGroupId(): void
+    {
+        $this->config->setGroupId('test');
+
+        self::assertSame($this->config->getGroupId(), 'test');
     }
 
     /**
-     * testSetGroupId
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetGroupId()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setGroupId('test');
-        $this->assertEquals($config->getGroupId(), 'test');
-    }
-
-    /**
-     * testSetGroupIdEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set group id value is invalid, must set it not empty string
-     * @access public
-     * @return void
      */
-    public function testSetGroupIdEmpty()
+    public function testSetGroupIdEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setGroupId('');
+        $this->config->setGroupId('');
     }
 
     /**
-     * testGetGroupIdEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Get group id value is invalid, must set it not empty string
-     * @access public
-     * @return void
      */
-    public function testGetGroupIdEmpty()
+    public function testGetGroupIdEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->getGroupId();
+        $this->config->getGroupId();
+    }
+
+    public function testSetSessionTimeout(): void
+    {
+        $this->config->setSessionTimeout(2000);
+
+        self::assertSame($this->config->getSessionTimeout(), 2000);
     }
 
     /**
-     * testSetSessionTimeout
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSessionTimeout()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setSessionTimeout(2000);
-        $this->assertEquals($config->getSessionTimeout(), 2000);
-    }
-
-    /**
-     * testSetSessionTimeoutValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set session timeout value is invalid, must set it 1 .. 3600000
-     * @access public
-     * @return void
      */
-    public function testSetSessionTimeoutValid()
+    public function testSetSessionTimeoutInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setSessionTimeout('-1');
+        $this->config->setSessionTimeout('-1');
+    }
+
+    public function testSetRebalanceTimeout(): void
+    {
+        $this->config->setRebalanceTimeout(2000);
+
+        self::assertSame($this->config->getRebalanceTimeout(), 2000);
     }
 
     /**
-     * testSetRebalanceTimeout
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetRebalanceTimeout()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setRebalanceTimeout(2000);
-        $this->assertEquals($config->getRebalanceTimeout(), 2000);
-    }
-
-    /**
-     * testSetRebalanceTimeoutValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set rebalance timeout value is invalid, must set it 1 .. 3600000
-     * @access public
-     * @return void
      */
-    public function testSetRebalanceTimeoutValid()
+    public function testSetRebalanceTimeoutInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setRebalanceTimeout('-1');
+        $this->config->setRebalanceTimeout('-1');
+    }
+
+    public function testSetOffsetReset(): void
+    {
+        $this->config->setOffsetReset('earliest');
+
+        self::assertSame($this->config->getOffsetReset(), 'earliest');
     }
 
     /**
-     * testSetOffsetReset
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetOffsetReset()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setOffsetReset('earliest');
-        $this->assertEquals($config->getOffsetReset(), 'earliest');
-    }
-
-    /**
-     * testSetOffsetResetValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set offset reset value is invalid, must set it `latest` or `earliest`
-     * @access public
-     * @return void
      */
-    public function testSetOffsetResetValid()
+    public function testSetOffsetResetInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setOffsetReset('xxxx');
+        $this->config->setOffsetReset('xxxx');
+    }
+
+    public function testSetTopics(): void
+    {
+        $this->config->setTopics(['test']);
+
+        self::assertSame($this->config->getTopics(), ['test']);
     }
 
     /**
-     * testSetTopics
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetTopics()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setTopics(['test']);
-        $this->assertEquals($config->getTopics(), ['test']);
-    }
-
-    /**
-     * testSetTopicsEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set consumer topics value is invalid, must set it not empty array
-     * @access public
-     * @return void
      */
-    public function testSetTopicsEmpty()
+    public function testSetTopicsEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setTopics('');
+        $this->config->setTopics([]);
     }
 
     /**
-     * testGetTopicsEmpty
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Get consumer topics value is invalid, must set it not empty
-     * @access public
-     * @return void
      */
-    public function testGetTopicsEmpty()
+    public function testGetTopicsEmpty(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->getTopics();
+        $this->config->getTopics();
+    }
+
+    public function testSetMessageMaxBytes(): void
+    {
+        $this->config->setMessageMaxBytes(1011);
+
+        self::assertSame($this->config->getMessageMaxBytes(), 1011);
     }
 
     /**
-     * testSetMessageMaxBytes
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetMessageMaxBytes()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMessageMaxBytes(1011);
-        $this->assertEquals($config->getMessageMaxBytes(), 1011);
-    }
-
-    /**
-     * testSetMessageMaxBytesValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set message max bytes value is invalid, must set it 1000 .. 1000000000
-     * @access public
-     * @return void
      */
-    public function testSetMessageMaxBytesValid()
+    public function testSetMessageMaxBytesInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMessageMaxBytes('999');
+        $this->config->setMessageMaxBytes('999');
+    }
+
+    public function testSetMetadataRequestTimeoutMs(): void
+    {
+        $this->config->setMetadataRequestTimeoutMs(1011);
+
+        self::assertSame($this->config->getMetadataRequestTimeoutMs(), 1011);
     }
 
     /**
-     * testSetMetadataRequestTimeoutMs
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetMetadataRequestTimeoutMs()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataRequestTimeoutMs(1011);
-        $this->assertEquals($config->getMetadataRequestTimeoutMs(), 1011);
-    }
-
-    /**
-     * testSetMetadataRequestTimeoutMsValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set metadata request timeout value is invalid, must set it 10 .. 900000
-     * @access public
-     * @return void
      */
-    public function testSetMetadataRequestTimeoutMsValid()
+    public function testSetMetadataRequestTimeoutMsInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataRequestTimeoutMs('9');
+        $this->config->setMetadataRequestTimeoutMs('9');
+    }
+
+    public function testSetMetadataRefreshIntervalMs(): void
+    {
+        $this->config->setMetadataRefreshIntervalMs(1011);
+
+        self::assertSame($this->config->getMetadataRefreshIntervalMs(), 1011);
     }
 
     /**
-     * testSetMetadataRefreshIntervalMs
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetMetadataRefreshIntervalMs()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataRefreshIntervalMs(1011);
-        $this->assertEquals($config->getMetadataRefreshIntervalMs(), 1011);
-    }
-
-    /**
-     * testSetMetadataRefreshIntervalMsValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set metadata refresh interval value is invalid, must set it 10 .. 3600000
-     * @access public
-     * @return void
      */
-    public function testSetMetadataRefreshIntervalMsValid()
+    public function testSetMetadataRefreshIntervalMsInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataRefreshIntervalMs('9');
+        $this->config->setMetadataRefreshIntervalMs('9');
+    }
+
+    public function testSetMetadataMaxAgeMs(): void
+    {
+        $this->config->setMetadataMaxAgeMs(1011);
+
+        self::assertSame($this->config->getMetadataMaxAgeMs(), 1011);
     }
 
     /**
-     * testSetMetadataMaxAgeMs
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetMetadataMaxAgeMs()
-    {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataMaxAgeMs(1011);
-        $this->assertEquals($config->getMetadataMaxAgeMs(), 1011);
-    }
-
-    /**
-     * testSetMetadataMaxAgeMsValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set metadata max age value is invalid, must set it 1 .. 86400000
-     * @access public
-     * @return void
      */
-    public function testSetMetadataMaxAgeMsValid()
+    public function testSetMetadataMaxAgeMsInvalid(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
-        $config->setMetadataMaxAgeMs('86400001');
+        $this->config->setMetadataMaxAgeMs('86400001');
     }
 }
