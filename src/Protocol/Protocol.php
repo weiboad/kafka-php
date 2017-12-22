@@ -1,4 +1,5 @@
 <?php
+
 namespace Kafka\Protocol;
 
 abstract class Protocol
@@ -9,87 +10,107 @@ abstract class Protocol
     /**
      *  Default kafka broker verion
      */
-    const DEFAULT_BROKER_VERION = '0.9.0.0';
+    public const DEFAULT_BROKER_VERION = '0.9.0.0';
 
     /**
      *  Kafka server protocol version0
      */
-    const API_VERSION0 = 0;
+    public const API_VERSION0 = 0;
 
     /**
      *  Kafka server protocol version 1
      */
-    const API_VERSION1 = 1;
+    public const API_VERSION1 = 1;
 
     /**
      *  Kafka server protocol version 2
      */
-    const API_VERSION2 = 2;
+    public const API_VERSION2 = 2;
 
     /**
      * use encode message, This is a version id used to allow backwards
      * compatible evolution of the message binary format.
      */
-    const MESSAGE_MAGIC_VERSION0 = 0;
+    public const MESSAGE_MAGIC_VERSION0 = 0;
 
     /**
      * use encode message, This is a version id used to allow backwards
      * compatible evolution of the message binary format.
      */
-    const MESSAGE_MAGIC_VERSION1 = 1;
+    public const MESSAGE_MAGIC_VERSION1 = 1;
 
     /**
      * message no compression
      */
-    const COMPRESSION_NONE = 0;
+    public const COMPRESSION_NONE = 0;
 
     /**
      * Message using gzip compression
      */
-    const COMPRESSION_GZIP = 1;
+    public const COMPRESSION_GZIP = 1;
 
     /**
      * Message using Snappy compression
      */
-    const COMPRESSION_SNAPPY = 2;
+    public const COMPRESSION_SNAPPY = 2;
 
     /**
      *  pack int32 type
      */
-    const PACK_INT32 = 0;
+    public const PACK_INT32 = 0;
 
     /**
      * pack int16 type
      */
-    const PACK_INT16 = 1;
+    public const PACK_INT16 = 1;
 
     /**
      * protocol request code
      */
-    const PRODUCE_REQUEST           = 0;
-    const FETCH_REQUEST             = 1;
-    const OFFSET_REQUEST            = 2;
-    const METADATA_REQUEST          = 3;
-    const OFFSET_COMMIT_REQUEST     = 8;
-    const OFFSET_FETCH_REQUEST      = 9;
-    const GROUP_COORDINATOR_REQUEST = 10;
-    const JOIN_GROUP_REQUEST        = 11;
-    const HEART_BEAT_REQUEST        = 12;
-    const LEAVE_GROUP_REQUEST       = 13;
-    const SYNC_GROUP_REQUEST        = 14;
-    const DESCRIBE_GROUPS_REQUEST   = 15;
-    const LIST_GROUPS_REQUEST       = 16;
-    const SASL_HAND_SHAKE_REQUEST   = 17;
-    const API_VERSIONS_REQUEST      = 18;
-    const CREATE_TOPICS_REQUEST     = 19;
-    const DELETE_TOPICS_REQUEST     = 20;
+    public const PRODUCE_REQUEST = 0;
+
+    public const FETCH_REQUEST = 1;
+
+    public const OFFSET_REQUEST = 2;
+
+    public const METADATA_REQUEST = 3;
+
+    public const OFFSET_COMMIT_REQUEST = 8;
+
+    public const OFFSET_FETCH_REQUEST = 9;
+
+    public const GROUP_COORDINATOR_REQUEST = 10;
+
+    public const JOIN_GROUP_REQUEST = 11;
+
+    public const HEART_BEAT_REQUEST = 12;
+
+    public const LEAVE_GROUP_REQUEST = 13;
+
+    public const SYNC_GROUP_REQUEST = 14;
+
+    public const DESCRIBE_GROUPS_REQUEST = 15;
+
+    public const LIST_GROUPS_REQUEST = 16;
+
+    public const SASL_HAND_SHAKE_REQUEST = 17;
+
+    public const API_VERSIONS_REQUEST = 18;
+
+    public const CREATE_TOPICS_REQUEST = 19;
+
+    public const DELETE_TOPICS_REQUEST = 20;
 
     // unpack/pack bit
-    const BIT_B64        = 'N2';
-    const BIT_B32        = 'N';
-    const BIT_B16        = 'n';
-    const BIT_B16_SIGNED = 's';
-    const BIT_B8         = 'C';
+    public const BIT_B64 = 'N2';
+
+    public const BIT_B32 = 'N';
+
+    public const BIT_B16 = 'n';
+
+    public const BIT_B16_SIGNED = 's';
+
+    public const BIT_B8 = 'C';
 
     /**
      * kafka broker version

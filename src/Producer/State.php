@@ -7,19 +7,18 @@ class State
 {
     use \Kafka\SingletonTrait;
 
-    const REQUEST_METADATA = 1;
-    const REQUEST_PRODUCE  = 2;
+    public const REQUEST_METADATA = 1;
+    public const REQUEST_PRODUCE  = 2;
 
-    const STATUS_INIT    = 0;
-    const STATUS_STOP    = 1;
-    const STATUS_START   = 2;
-    const STATUS_LOOP    = 4;
-    const STATUS_PROCESS = 8;
-    const STATUS_FINISH  = 16;
+    public const STATUS_INIT    = 0;
+    public const STATUS_STOP    = 1;
+    public const STATUS_START   = 2;
+    public const STATUS_LOOP    = 4;
+    public const STATUS_PROCESS = 8;
+    public const STATUS_FINISH  = 16;
 
-    
     private $callStatus = [];
-    
+
     private $requests = [
         self::REQUEST_METADATA => [],
         self::REQUEST_PRODUCE => [],
