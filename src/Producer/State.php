@@ -60,20 +60,21 @@ class State
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
             Loop::repeat($interval, function ($watcherId) use ($request, $option) {
-                if ($this->checkRun($request) && $option['func'] != null) {
-                    $context = call_user_func($option['func']);
-                    $this->processing($request, $context);
+                if ($this->checkRun($request) && $option['func'] !== null) {
+                    $this->processing($request, $option['func']());
                 }
+
                 $this->requests[$request]['watcher'] = $watcherId;
             });
         }
 
         // start sync metadata
         if (isset($this->requests[self::REQUEST_METADATA]['func'])
-            && $this->callStatus[self::REQUEST_METADATA]['status'] == self::STATUS_LOOP) {
-            $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
+            && $this->callStatus[self::REQUEST_METADATA]['status'] === self::STATUS_LOOP) {
+            $context = $this->requests[self::REQUEST_METADATA]['func']();
             $this->processing($request, $context);
         }
+
         Loop::repeat(1000, function ($watcherId) {
             $this->report();
         });

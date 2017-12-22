@@ -563,9 +563,7 @@ class Process
                 }
                 foreach ($part['messages'] as $message) {
                     $this->messages[$topic['topicName']][$part['partition']][] = $message;
-                    //if ($this->consumer != null) {
-                    //    call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
-                    //}
+
                     $offset = $message['offset'];
                 }
 
@@ -580,10 +578,10 @@ class Process
     protected function consumeMessage()
     {
         foreach ($this->messages as $topic => $value) {
-            foreach ($value as $part => $messages) {
+            foreach ($value as $partition => $messages) {
                 foreach ($messages as $message) {
-                    if ($this->consumer != null) {
-                        call_user_func($this->consumer, $topic, $part, $message);
+                    if ($this->consumer !== null) {
+                        ($this->consumer)($topic, $partition, $message);
                     }
                 }
             }

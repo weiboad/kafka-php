@@ -77,18 +77,17 @@ class State
             }
             $interval = isset($option['interval']) ? $option['interval'] : 200;
             Loop::repeat($interval, function ($watcherId) use ($request, $option) {
-                if ($this->checkRun($request) && $option['func'] != null) {
-                    $context = call_user_func($option['func']);
-                    $this->processing($request, $context);
+                if ($this->checkRun($request) && $option['func'] !== null) {
+                    $this->processing($request, $option['func']());
                 }
+
                 $this->requests[$request]['watcher'] = $watcherId;
             });
         }
 
         // start sync metadata
         if (isset($this->requests[self::REQUEST_METADATA]['func'])) {
-            $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
-            $this->processing($request, $context);
+            $this->processing($request, $this->requests[self::REQUEST_METADATA]['func']());
         }
         Loop::repeat(1000, function ($watcherId) {
             $this->report();
@@ -157,7 +156,7 @@ class State
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {
                     $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                    call_user_func($this->requests[self::REQUEST_COMMIT_OFFSET]['func']);
+                    $this->requests[self::REQUEST_COMMIT_OFFSET]['func']();
                 }
                 break;
         }

@@ -162,7 +162,8 @@ class Socket extends CommonSocket
 
             $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
-            call_user_func($this->onReadable, $data, (int) $this->stream);
+
+            ($this->onReadable)($data, (int) $this->stream);
         } while (strlen($this->readBuffer));
     }
 

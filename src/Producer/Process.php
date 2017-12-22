@@ -78,8 +78,9 @@ class Process
         if (! $isAsyn) {
             Loop::repeat($config->getRequestTimeout(), function ($watcherId) {
                 if ($this->error) {
-                    call_user_func($this->error, 1000);
+                    ($this->error)(1000);
                 }
+
                 Loop::cancel($watcherId);
                 Loop::stop();
             });
@@ -200,7 +201,7 @@ class Process
         //  partId:
         //  key:
         //  value:
-        $data = call_user_func($this->producer);
+        $data = ($this->producer)();
 
         if (empty($data)) {
             return $context;
@@ -239,8 +240,9 @@ class Process
     {
         $msg = sprintf('Send message sucess, result: %s', json_encode($result));
         $this->debug($msg);
+
         if ($this->success) {
-            call_user_func($this->success, $result);
+            ($this->success)($result);
         }
         $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE, $fd);
     }
@@ -250,8 +252,9 @@ class Process
         $retry = false;
         $this->error(\Kafka\Protocol::getError($errorCode));
         if ($this->error) {
-            call_user_func($this->error, $errorCode);
+            ($this->error)($errorCode);
         }
+
         $recoverCodes = [
             \Kafka\Protocol::UNKNOWN_TOPIC_OR_PARTITION,
             \Kafka\Protocol::INVALID_REQUIRED_ACKS,
@@ -271,6 +274,7 @@ class Process
             $this->state->recover();
             return false;
         }
+
         return true;
     }
 
