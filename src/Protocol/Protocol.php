@@ -451,21 +451,26 @@ abstract class Protocol
     public static function encodeString(string $string, int $bytes, int $compression = self::COMPRESSION_NONE)
     {
         $packLen = $bytes === self::PACK_INT32 ? self::BIT_B32 : self::BIT_B16;
+        $string  = self::compress($string, $compression);
 
-        switch ($compression) {
-            case self::COMPRESSION_NONE:
-                break;
-            case self::COMPRESSION_GZIP:
-                $string = \gzencode($string);
-                break;
-            case self::COMPRESSION_SNAPPY:
-                // todo
-                throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
-            default:
-                throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        return self::pack($packLen, \strlen($string)) . $string;
+    }
+
+    private static function compress(string $string, int $compression): string
+    {
+        if ($compression === self::COMPRESSION_NONE) {
+            return $string;
         }
 
-        return self::pack($packLen, strlen($string)) . $string;
+        if ($compression === self::COMPRESSION_SNAPPY) {
+            throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+        }
+
+        if ($compression !== self::COMPRESSION_GZIP) {
+            throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        }
+
+        return \gzencode($string);
     }
 
     public static function encodeArray(array $array, $func, ?int $options = null)
@@ -500,19 +505,24 @@ abstract class Protocol
         $data    = (string) substr($data, $offset, $packLen);
         $offset += $packLen;
 
-        switch ($compression) {
-            case self::COMPRESSION_NONE:
-                break;
-            case self::COMPRESSION_GZIP:
-                $data = \gzdecode($data);
-                break;
-            case self::COMPRESSION_SNAPPY:
-                // todo
-                throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
-            default:
-                throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        return ['length' => $offset, 'data' => self::decompress($data, $compression)];
+    }
+
+    private static function decompress(string $string, int $compression): string
+    {
+        if ($compression === self::COMPRESSION_NONE) {
+            return $string;
         }
-        return ['length' => $offset, 'data' => $data];
+
+        if ($compression === self::COMPRESSION_SNAPPY) {
+            throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+        }
+
+        if ($compression !== self::COMPRESSION_GZIP) {
+            throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+        }
+
+        return \gzdecode($string);
     }
 
     public function decodeArray(string $data, callable $func, $options = null)
