@@ -6,7 +6,7 @@ class CommitOffset
     protected $group = [];
     // {{{ functions
     // {{{ protected function joinGroup()
-    
+
     protected function joinGroup()
     {
         $data = [
@@ -24,7 +24,7 @@ class CommitOffset
             ],
         ];
 
-        $protocol    = \Kafka\Protocol::init('0.9.1.0');
+        \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');
@@ -43,7 +43,7 @@ class CommitOffset
 
     // }}}
     // {{{ protected function syncGroup()
-    
+
     protected function syncGroup()
     {
         $this->joinGroup();
@@ -67,7 +67,7 @@ class CommitOffset
             ],
         ];
 
-        $protocol    = \Kafka\Protocol::init('0.9.1.0');
+        \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');
@@ -86,7 +86,7 @@ class CommitOffset
 
     // }}}
     // {{{ public function run()
-    
+
     public function run()
     {
         $this->joinGroup();
@@ -110,7 +110,7 @@ class CommitOffset
             ],
         ];
 
-        $protocol    = \Kafka\Protocol::init('0.9.1.0');
+        \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');

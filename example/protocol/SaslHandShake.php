@@ -1,8 +1,8 @@
 <?php
 require '../../vendor/autoload.php';
 
-$data        = 'PLAIN';
-$protocol    = \Kafka\Protocol::init('1.0.0');
+$data = 'PLAIN';
+\Kafka\Protocol::init('1.0.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, $data);
 
 $socket = new \Kafka\Socket('127.0.0.1', '9092');

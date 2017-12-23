@@ -154,6 +154,9 @@ class Protocol
         60 => 'A partition reassignment is in progress'
     ];
 
+    /**
+     * @var Protocol\Protocol[]
+     */
     protected static $objects = [];
 
     public static function init(string $version, LoggerInterface $logger = null): void

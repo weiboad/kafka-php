@@ -1,35 +1,18 @@
 <?php
 namespace KafkaTest\Protocol;
 
-class FetchOffsetTest extends \PHPUnit\Framework\TestCase
+use Kafka\Protocol\FetchOffset;
+
+final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
 {
+    private $offset;
 
-    /**
-     * offset object
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $offset = null;
-
-    /**
-     * setUp
-     *
-     * @access public
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->offset = new \Kafka\Protocol\FetchOffset('0.9.0.1');
+        $this->offset = new FetchOffset('0.9.0.1');
     }
 
-    /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
+    public function testEncode(): void
     {
         $data = [
             'group_id' => 'test',
@@ -41,73 +24,55 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->offset->encode($data);
-        $this->assertSame(\bin2hex($test), '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000');
+        $expected = '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000';
+        $test     = $this->offset->encode($data);
+
+        self::assertSame($expected, \bin2hex($test));
     }
 
     /**
-     * testEncodeNoData
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given fetch offset data invalid. `data` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoData()
+    public function testEncodeNoData(): void
     {
-        $data = [
-        ];
-
-        $test = $this->offset->encode($data);
+        $this->offset->encode();
     }
 
     /**
-     * testEncodeNoGroupId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given fetch offset data invalid. `group_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoGroupId()
+    public function testEncodeNoGroupId(): void
     {
         $data = [
             'data' => []
         ];
 
-        $test = $this->offset->encode($data);
+        $this->offset->encode($data);
     }
 
     /**
-     * testEncodeNoTopicName
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given fetch offset data invalid. `topic_name` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoTopicName()
+    public function testEncodeNoTopicName(): void
     {
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                ]
+                []
             ],
         ];
 
-        $test = $this->offset->encode($data);
+        $this->offset->encode($data);
     }
 
     /**
-     * testEncodeNoPartitions
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given fetch offset data invalid. `partitions` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartitions()
+    public function testEncodeNoPartitions(): void
     {
         $data = [
             'group_id' => 'test',
@@ -117,7 +82,8 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->offset->encode($data);
+
+        $this->offset->encode($data);
     }
 
     /**
@@ -126,11 +92,12 @@ class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      * @access public
      * @return void
      */
-    public function testDecode()
+    public function testDecode(): void
     {
-        $data   = '000000010004746573740000000100000000ffffffffffffffff00000000';
-        $test   = $this->offset->decode(\hex2bin($data));
-        $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
+        $data     = '000000010004746573740000000100000000ffffffffffffffff00000000';
+        $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
+
+        $test = $this->offset->decode(\hex2bin($data));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

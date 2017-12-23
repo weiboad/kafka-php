@@ -1,57 +1,40 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class Produce extends Protocol
 {
-
-    /**
-     * produce request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given procude data invalid. `data` is undefined.');
         }
 
-        if (! isset($payloads['required_ack'])) {
-            // default server will not send any response
-            // (this is the only case where the server will not reply to a request)
-            $payloads['required_ack'] = 0;
-        }
-
-        if (! isset($payloads['timeout'])) {
-            $payloads['timeout'] = 100; // default timeout 100ms
-        }
-
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
-        $data   = self::pack(self::BIT_B16, $payloads['required_ack']);
-        $data  .= self::pack(self::BIT_B32, $payloads['timeout']);
-        $data  .= self::encodeArray($payloads['data'], [$this, 'encodeProduceTopic'], self::COMPRESSION_NONE);
+        $data   = self::pack(self::BIT_B16, $payloads['required_ack'] ?? 0);
+        $data  .= self::pack(self::BIT_B32, $payloads['timeout'] ?? 100);
+        $data  .= self::encodeArray(
+            $payloads['data'],
+            [$this, 'encodeProduceTopic'],
+            self::COMPRESSION_NONE
+        );
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
         return $data;
     }
 
-    /**
-     * decode produce response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset       = 0;
         $version      = $this->getApiVersion(self::PRODUCE_REQUEST);
         $ret          = $this->decodeArray(substr($data, $offset), [$this, 'produceTopicPair'], $version);
         $offset      += $ret['length'];
         $throttleTime = 0;
-        if ($version == self::API_VERSION2) {
+
+        if ($version === self::API_VERSION2) {
             $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         }
+
         return ['throttleTime' => $throttleTime, 'data' => $ret['data']];
     }
 
@@ -69,31 +52,35 @@ class Produce extends Protocol
             $tmpMessage = $this->encodeMessage($message, $compression);
 
             // int64 -- message offset     Message
-            //This is the offset used in kafka as the log sequence number. When the producer is sending non compressed messages, it can set the offsets to anything. When the producer is sending compressed messages, to avoid server side recompression, each compressed message should have offset starting from 0 and increasing by one for each inner message in the compressed message. (see more details about compressed messages in Kafka below)
+            // This is the offset used in kafka as the log sequence number. When the producer is sending non compressed messages,
+            // it can set the offsets to anything. When the producer is sending compressed messages, to avoid server side recompression,
+            // each compressed message should have offset starting from 0 and increasing by one for each inner message in the compressed
+            // message. (see more details about compressed messages in Kafka below)
             $data .= self::pack(self::BIT_B64, $next) . self::encodeString($tmpMessage, self::PACK_INT32);
             $next++;
         }
+
         return $data;
     }
 
     /**
-     * encode signal message
-     *
      * @param array|string $message
      */
     protected function encodeMessage($message, int $compression = self::COMPRESSION_NONE): string
     {
         // int8 -- magic  int8 -- attribute
         $version = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $magic   = ($version == self::API_VERSION2) ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
+        $magic   = $version === self::API_VERSION2 ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
         $data    = self::pack(self::BIT_B8, $magic);
         $data   .= self::pack(self::BIT_B8, $compression);
 
         $key = '';
+
         if (is_array($message)) {
             $key     = $message['key'];
             $message = $message['value'];
         }
+
         // message key
         $data .= self::encodeString($key, self::PACK_INT32);
 
@@ -122,7 +109,10 @@ class Produce extends Protocol
         }
 
         $data  = self::pack(self::BIT_B32, $values['partition_id']);
-        $data .= self::encodeString($this->encodeMessageSet((array) $values['messages'], $compression), self::PACK_INT32);
+        $data .= self::encodeString(
+            $this->encodeMessageSet((array) $values['messages'], $compression),
+            self::PACK_INT32
+        );
 
         return $data;
     }
@@ -160,10 +150,13 @@ class Produce extends Protocol
         $ret       = $this->decodeArray(substr($data, $offset), [$this, 'producePartitionPair'], $version);
         $offset   += $ret['length'];
 
-        return ['length' => $offset, 'data' => [
-            'topicName' => $topicInfo['data'],
-            'partitions'=> $ret['data'],
-        ]];
+        return [
+            'length' => $offset,
+            'data'   => [
+                'topicName'  => $topicInfo['data'],
+                'partitions' => $ret['data'],
+            ],
+        ];
     }
 
     /**
@@ -192,9 +185,9 @@ class Produce extends Protocol
             'data'   => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
-                'offset' => $offset,
+                'offset'    => $offset,
                 'timestamp' => $timestamp,
-            ]
+            ],
         ];
     }
 }

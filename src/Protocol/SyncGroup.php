@@ -1,27 +1,23 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class SyncGroup extends Protocol
 {
-
-    /**
-     * sync group request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given sync group data invalid. `group_id` is undefined.');
         }
+
         if (! isset($payloads['generation_id'])) {
             throw new \Kafka\Exception\Protocol('given sync group data invalid. `generation_id` is undefined.');
         }
+
         if (! isset($payloads['member_id'])) {
             throw new \Kafka\Exception\Protocol('given sync group data invalid. `member_id` is undefined.');
         }
+
         if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given sync group data invalid. `data` is undefined.');
         }
@@ -32,18 +28,10 @@ class SyncGroup extends Protocol
         $data  .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         $data  .= self::encodeArray($payloads['data'], [$this, 'encodeGroupAssignment']);
 
-        $data = self::encodeString($header . $data, self::PACK_INT32);
-
-        return $data;
+        return self::encodeString($header . $data, self::PACK_INT32);
     }
 
-    /**
-     * decode group response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset    = 0;
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
@@ -53,42 +41,43 @@ class SyncGroup extends Protocol
         $offset           += $memberAssignments['length'];
 
         $memberAssignment = $memberAssignments['data'];
-        if (strlen($memberAssignment)) {
-            $memberAssignmentOffset  = 0;
-            $version                 = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
-            $memberAssignmentOffset += 2;
-            $partitionAssignments    = $this->decodeArray(
-                substr($memberAssignment, $memberAssignmentOffset),
-                [$this, 'syncGroupResponsePartition']
-            );
-            $memberAssignmentOffset += $partitionAssignments['length'];
-            $userData                = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
-        } else {
+
+        if (! \strlen($memberAssignment)) {
             return [
                 'errorCode' => $errorCode,
             ];
         }
 
+        $memberAssignmentOffset  = 0;
+        $version                 = self::unpack(
+            self::BIT_B16_SIGNED,
+            substr($memberAssignment, $memberAssignmentOffset, 2)
+        );
+        $memberAssignmentOffset += 2;
+        $partitionAssignments    = $this->decodeArray(
+            substr($memberAssignment, $memberAssignmentOffset),
+            [$this, 'syncGroupResponsePartition']
+        );
+        $memberAssignmentOffset += $partitionAssignments['length'];
+        $userData                = $this->decodeString(
+            substr($memberAssignment, $memberAssignmentOffset),
+            self::BIT_B32
+        );
+
         return [
-            'errorCode' => $errorCode,
+            'errorCode'            => $errorCode,
             'partitionAssignments' => $partitionAssignments['data'],
-            'version' => $version,
-            'userData' => $userData['data'],
+            'version'              => $version,
+            'userData'             => $userData['data'],
         ];
     }
 
-    /**
-     * encode group assignment protocol
-     *
-     * @param partions
-     * @access protected
-     * @return string
-     */
-    protected function encodeGroupAssignment($values)
+    protected function encodeGroupAssignment(array $values): string
     {
         if (! isset($values['version'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
         }
+
         if (! isset($values['member_id'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `member_id` is undefined.');
         }
@@ -96,6 +85,7 @@ class SyncGroup extends Protocol
         if (! isset($values['assignments'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `assignments` is undefined.');
         }
+
         if (! isset($values['user_data'])) {
             $values['user_data'] = '';
         }
@@ -109,48 +99,28 @@ class SyncGroup extends Protocol
         return $memberId . self::encodeString($data, self::PACK_INT32);
     }
 
-    /**
-     * encode group assignment topic protocol
-     *
-     * @param partions
-     * @access protected
-     * @return string
-     */
-    protected function encodeGroupAssignmentTopic($values)
+    protected function encodeGroupAssignmentTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `topic_name` is undefined.');
         }
+
         if (! isset($values['partitions'])) {
             throw new \Kafka\Exception\Protocol('given data invalid. `partitions` is undefined.');
         }
 
-        $topicName = self::encodeString($values['topic_name'], self::PACK_INT16);
-
+        $topicName  = self::encodeString($values['topic_name'], self::PACK_INT16);
         $partitions = self::encodeArray($values['partitions'], [$this, 'encodeGroupAssignmentTopicPartition']);
 
         return $topicName . $partitions;
     }
 
-    /**
-     * encode group assignment topic protocol
-     *
-     * @param partions
-     * @access protected
-     * @return string
-     */
-    protected function encodeGroupAssignmentTopicPartition($values)
+    protected function encodeGroupAssignmentTopicPartition(int $values): string
     {
         return self::pack(self::BIT_B32, $values);
     }
 
-    /**
-     * decode sync group partition response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function syncGroupResponsePartition($data)
+    protected function syncGroupResponsePartition(string $data): array
     {
         $offset     = 0;
         $topicName  = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -160,10 +130,10 @@ class SyncGroup extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'topicName' => $topicName['data'],
+            'data'   => [
+                'topicName'  => $topicName['data'],
                 'partitions' => $partitions['data'],
-            ]
+            ],
         ];
     }
 }

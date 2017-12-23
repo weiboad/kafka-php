@@ -135,6 +135,7 @@ abstract class Protocol
      * __construct
      *
      * @param string version
+     *
      * @access public
      */
     public function __construct($version = self::DEFAULT_BROKER_VERION)
@@ -147,8 +148,10 @@ abstract class Protocol
      *
      * @static
      * @access public
+     *
      * @param $type
      * @param $bytes
+     *
      * @return int
      */
     public static function unpack($type, $bytes)
@@ -181,8 +184,10 @@ abstract class Protocol
      *
      * @static
      * @access public
+     *
      * @param $type
      * @param $data
+     *
      * @return int
      */
     public static function pack($type, $data)
@@ -212,6 +217,7 @@ abstract class Protocol
      *
      * @param string $type
      * @param string(raw) $bytes
+     *
      * @static
      * @access protected
      * @return void
@@ -237,7 +243,7 @@ abstract class Protocol
                 break;
         }
 
-        if (strlen($bytes) != $len) {
+        if (strlen($bytes) !== $len) {
             throw new \Kafka\Exception\Protocol('unpack failed. string(raw) length is ' . strlen($bytes) . ' , TO ' . $type);
         }
     }
@@ -270,6 +276,7 @@ abstract class Protocol
      * Converts a signed short (16 bits) from little endian to big endian.
      *
      * @param int[] $bits
+     *
      * @access public
      * @return array
      */
@@ -283,13 +290,14 @@ abstract class Protocol
             $msb = $bit >> 8 & 0xff;
 
             // swap bytes
-            $bit = $lsb <<8 | $msb;
+            $bit = $lsb << 8 | $msb;
 
             if ($bit >= 32768) {
                 $bit -= 65536;
             }
             $bits[$index] = $bit;
         }
+
         return $bits;
     }
 
@@ -297,6 +305,7 @@ abstract class Protocol
      * Get kafka api version according to specifiy kafka broker version
      *
      * @param int kafka api key
+     *
      * @access public
      * @return int
      */
@@ -377,37 +386,40 @@ abstract class Protocol
      * Get kafka api text
      *
      * @param int kafka api key
+     *
      * @access public
      * @return string
      */
     public static function getApiText($apikey)
     {
         $apis = [
-            self::PRODUCE_REQUEST => 'ProduceRequest',
-            self::FETCH_REQUEST   => 'FetchRequest',
-            self::OFFSET_REQUEST  => 'OffsetRequest',
-            self::METADATA_REQUEST => 'MetadataRequest',
-            self::OFFSET_COMMIT_REQUEST => 'OffsetCommitRequest',
-            self::OFFSET_FETCH_REQUEST  => 'OffsetFetchRequest',
+            self::PRODUCE_REQUEST           => 'ProduceRequest',
+            self::FETCH_REQUEST             => 'FetchRequest',
+            self::OFFSET_REQUEST            => 'OffsetRequest',
+            self::METADATA_REQUEST          => 'MetadataRequest',
+            self::OFFSET_COMMIT_REQUEST     => 'OffsetCommitRequest',
+            self::OFFSET_FETCH_REQUEST      => 'OffsetFetchRequest',
             self::GROUP_COORDINATOR_REQUEST => 'GroupCoordinatorRequest',
-            self::JOIN_GROUP_REQUEST => 'JoinGroupRequest',
-            self::HEART_BEAT_REQUEST => 'HeartbeatRequest',
-            self::LEAVE_GROUP_REQUEST => 'LeaveGroupRequest',
-            self::SYNC_GROUP_REQUEST  => 'SyncGroupRequest',
-            self::DESCRIBE_GROUPS_REQUEST => 'DescribeGroupsRequest',
-            self::LIST_GROUPS_REQUEST => 'ListGroupsRequest',
-            self::SASL_HAND_SHAKE_REQUEST => 'SaslHandShakeRequest',
-            self::API_VERSIONS_REQUEST => 'ApiVerionsRequest',
+            self::JOIN_GROUP_REQUEST        => 'JoinGroupRequest',
+            self::HEART_BEAT_REQUEST        => 'HeartbeatRequest',
+            self::LEAVE_GROUP_REQUEST       => 'LeaveGroupRequest',
+            self::SYNC_GROUP_REQUEST        => 'SyncGroupRequest',
+            self::DESCRIBE_GROUPS_REQUEST   => 'DescribeGroupsRequest',
+            self::LIST_GROUPS_REQUEST       => 'ListGroupsRequest',
+            self::SASL_HAND_SHAKE_REQUEST   => 'SaslHandShakeRequest',
+            self::API_VERSIONS_REQUEST      => 'ApiVersionsRequest',
         ];
+
         return $apis[$apikey];
     }
 
     /**
      * get request header
      *
-     * @param string $clientId
+     * @param string  $clientId
      * @param integer $correlationId
      * @param integer $apiKey
+     *
      * @access public
      * @return string
      */
@@ -420,25 +432,26 @@ abstract class Protocol
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
-        $msg      = sprintf('ClientId: %s ApiKey: %s  ApiVersion: %s', $clientId, self::getApiText($apiKey), $this->getApiVersion($apiKey));
-        $this->debug('Start Request ' . $msg);
+
+        $this->debug(
+            sprintf(
+                'Start Request ClientId: %s ApiKey: %s  ApiVersion: %s',
+                $clientId,
+                self::getApiText($apiKey),
+                $this->getApiVersion($apiKey)
+            )
+        );
 
         return $binData;
     }
 
     /**
-     * encode pack string type
-     *
-     * @param string $string
-     * @param int $bytes self::PACK_INT32: int32 big endian order. self::PACK_INT16: int16 big endian order.
-     * @param int $compression
-     * @return string
-     * @static
-     * @access public
+     * @throws \Kafka\Exception\NotSupported
      */
-    public static function encodeString($string, $bytes, $compression = self::COMPRESSION_NONE)
+    public static function encodeString(string $string, int $bytes, int $compression = self::COMPRESSION_NONE)
     {
-        $packLen = ($bytes == self::PACK_INT32) ? self::BIT_B32 : self::BIT_B16;
+        $packLen = $bytes === self::PACK_INT32 ? self::BIT_B32 : self::BIT_B16;
+
         switch ($compression) {
             case self::COMPRESSION_NONE:
                 break;
@@ -451,20 +464,11 @@ abstract class Protocol
             default:
                 throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
         }
+
         return self::pack($packLen, strlen($string)) . $string;
     }
 
-    /**
-     * encode key array
-     *
-     * @param array $array
-     * @param Callable $func
-     * @param null $options
-     * @return string
-     * @static
-     * @access public
-     */
-    public static function encodeArray(array $array, $func, $options = null)
+    public static function encodeArray(array $array, $func, ?int $options = null)
     {
         if (! is_callable($func, false)) {
             throw new \Kafka\Exception\Protocol('Encode array failed, given function is not callable.');
@@ -474,38 +478,26 @@ abstract class Protocol
 
         $body = '';
         foreach ($array as $value) {
-            if (! is_null($options)) {
-                $body .= call_user_func($func, $value, $options);
-            } else {
-                $body .= call_user_func($func, $value);
-            }
+            $body .= $options !== null ? $func($value, $options) : $func($value);
         }
 
         return self::pack(self::BIT_B32, $arrayCount) . $body;
     }
 
-    /**
-     * decode unpack string type
-     *
-     * @param string $data bytes to be decoded
-     * @param int $bytes self::BIT_B32: int32 big endian order. self::BIT_B16: int16 big endian order.
-     * @param int $compression
-     * @return array
-     * @access public
-     */
-    public function decodeString($data, $bytes, $compression = self::COMPRESSION_NONE)
+    public function decodeString(string $data, string $bytes, int $compression = self::COMPRESSION_NONE): array
     {
-        $offset  = ($bytes == self::BIT_B32) ? 4 : 2;
+        $offset  = $bytes === self::BIT_B32 ? 4 : 2;
         $packLen = self::unpack($bytes, substr($data, 0, $offset)); // int16 topic name length
-        if ($packLen == 4294967295) { // uint32(4294967295) is int32 (-1)
+
+        if ($packLen === 4294967295) { // uint32(4294967295) is int32 (-1)
             $packLen = 0;
         }
 
-        if ($packLen == 0) {
+        if ($packLen === 0) {
             return ['length' => $offset, 'data' => ''];
         }
 
-        $data    = substr($data, $offset, $packLen);
+        $data    = (string) substr($data, $offset, $packLen);
         $offset += $packLen;
 
         switch ($compression) {
@@ -523,42 +515,26 @@ abstract class Protocol
         return ['length' => $offset, 'data' => $data];
     }
 
-    /**
-     * decode key array
-     *
-     * @param array $array
-     * @param Callable $func
-     * @param null $options
-     * @return array
-     * @access public
-     */
-    public function decodeArray($data, $func, $options = null)
+    public function decodeArray(string $data, callable $func, $options = null)
     {
         $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset    += 4;
 
-        if (! is_callable($func, false)) {
-            throw new \Kafka\Exception\Protocol('Decode array failed, given function is not callable.');
-        }
-
         $result = [];
+
         for ($i = 0; $i < $arrayCount; $i++) {
             $value = substr($data, $offset);
-            if (! is_null($options)) {
-                $ret = call_user_func($func, $value, $options);
-            } else {
-                $ret = call_user_func($func, $value);
-            }
+            $ret   = $options !== null ? $func($value, $options) : $func($value);
 
-            if (! is_array($ret) && $ret === false) {
+            if (! \is_array($ret) && $ret === false) {
                 break;
             }
 
-            if (! isset($ret['length']) || ! isset($ret['data'])) {
-                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invliad');
+            if (! isset($ret['length'], $ret['data'])) {
+                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invalid');
             }
-            if ($ret['length'] == 0) {
+            if ((int) $ret['length'] === 0) {
                 continue;
             }
 
@@ -569,43 +545,44 @@ abstract class Protocol
         return ['length' => $offset, 'data' => $result];
     }
 
-    /**
-     * decode primitive type array
-     *
-     * @param string $data Bytes to be decoded
-     * @param string $bit  Message bit
-     *
-     * @return array
-     * @access public
-     */
-    public function decodePrimitiveArray($data, $bit)
+    public function decodePrimitiveArray(string $data, string $bit): array
     {
         $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset    += 4;
 
-        if ($arrayCount == 4294967295) {
+        if ($arrayCount === 4294967295) {
             $arrayCount = 0;
         }
 
         $result = [];
 
         for ($i = 0; $i < $arrayCount; $i++) {
-            if ($bit == self::BIT_B64) {
+            if ($bit === self::BIT_B64) {
                 $result[] = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset  += 8;
-            } elseif ($bit == self::BIT_B32) {
+            } elseif ($bit === self::BIT_B32) {
                 $result[] = self::unpack(self::BIT_B32, substr($data, $offset, 4));
                 $offset  += 4;
-            } elseif (in_array($bit, [self::BIT_B16, self::BIT_B16_SIGNED])) {
+            } elseif (\in_array($bit, [self::BIT_B16, self::BIT_B16_SIGNED], true)) {
                 $result[] = self::unpack($bit, substr($data, $offset, 2));
                 $offset  += 2;
-            } elseif ($bit == self::BIT_B8) {
+            } elseif ($bit === self::BIT_B8) {
                 $result[] = self::unpack($bit, substr($data, $offset, 1));
-                $offset  += 1;
+                ++$offset;
             }
         }
 
         return ['length' => $offset, 'data' => $result];
     }
+
+    /**
+     * @throws \Kafka\Exception\Protocol
+     */
+    abstract public function encode(array $payloads = []): string;
+
+    /**
+     * @throws \Kafka\Exception\Protocol
+     */
+    abstract public function decode(string $data): array;
 }

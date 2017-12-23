@@ -17,7 +17,7 @@ $data = [
     ],
 ];
 
-$protocol    = \Kafka\Protocol::init('0.9.1.0');
+\Kafka\Protocol::init('0.9.1.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 var_dump(\bin2hex($requestData));
 

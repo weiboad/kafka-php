@@ -1,53 +1,30 @@
 <?php
+
 namespace KafkaTest\Protocol;
 
-class ListGroupTest extends \PHPUnit\Framework\TestCase
+use Kafka\Protocol\ListGroup;
+
+final class ListGroupTest extends \PHPUnit\Framework\TestCase
 {
+    private $list;
 
-    /**
-     * list object
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $list = null;
-
-    /**
-     * setUp
-     *
-     * @access public
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->list = new \Kafka\Protocol\ListGroup('0.9.0.1');
+        $this->list = new ListGroup('0.9.0.1');
     }
 
-    /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
+    public function testEncode(): void
     {
-        $data = [
-        ];
+        $test = $this->list->encode();
 
-        $test = $this->list->encode($data);
-        $this->assertSame(\bin2hex($test), '00000013001000000000001000096b61666b612d706870');
+        self::assertSame('00000013001000000000001000096b61666b612d706870', \bin2hex($test));
     }
 
-    /**
-     * testDecode
-     *
-     * @access public
-     * @return void
-     */
-    public function testDecode()
+    public function testDecode(): void
     {
-        $test   = $this->list->decode(\hex2bin('0000000000010004746573740008636f6e73756d6572'));
-        $result = '{"errorCode":0,"groups":[{"groupId":"test","protocolType":"consumer"}]}';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
+        $test     = $this->list->decode(\hex2bin('0000000000010004746573740008636f6e73756d6572'));
+        $expected = '{"errorCode":0,"groups":[{"groupId":"test","protocolType":"consumer"}]}';
+
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

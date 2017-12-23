@@ -17,7 +17,7 @@ $data = [
     ],
 ];
 
-$protocol    = \Kafka\Protocol::init('0.10.1.0');
+\Kafka\Protocol::init('0.10.1.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_REQUEST, $data);
 
 $socket = new \Kafka\Socket('127.0.0.1', '9292');

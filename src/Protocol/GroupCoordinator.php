@@ -3,15 +3,7 @@ namespace Kafka\Protocol;
 
 class GroupCoordinator extends Protocol
 {
-
-    /**
-     * group coordinator request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given group coordinator invalid. `group_id` is undefined.');
@@ -24,13 +16,7 @@ class GroupCoordinator extends Protocol
         return $data;
     }
 
-    /**
-     * decode group response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset          = 0;
         $errorCode       = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
@@ -43,10 +29,10 @@ class GroupCoordinator extends Protocol
         $offset         += 4;
 
         return [
-            'errorCode' => $errorCode,
-            'coordinatorId' => $coordinatorId,
+            'errorCode'       => $errorCode,
+            'coordinatorId'   => $coordinatorId,
             'coordinatorHost' => $hosts['data'],
-            'coordinatorPort' => $coordinatorPort
+            'coordinatorPort' => $coordinatorPort,
         ];
     }
 }

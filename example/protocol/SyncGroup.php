@@ -6,7 +6,7 @@ class SyncGroup
     protected $group = [];
     // {{{ functions
     // {{{ protected function joinGroup()
-    
+
     protected function joinGroup()
     {
         $data = [
@@ -24,7 +24,7 @@ class SyncGroup
             ],
         ];
 
-        $protocol    = \Kafka\Protocol::init('0.9.1.0');
+        \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');
@@ -43,7 +43,7 @@ class SyncGroup
 
     // }}}
     // {{{ public function run()
-    
+
     public function run()
     {
         $this->joinGroup();
@@ -67,7 +67,7 @@ class SyncGroup
             ],
         ];
 
-        $protocol    = \Kafka\Protocol::init('0.9.1.0');
+        \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');

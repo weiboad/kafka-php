@@ -3,15 +3,7 @@ namespace Kafka\Protocol;
 
 class CommitOffset extends Protocol
 {
-
-    /**
-     * commit offset request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given commit offset data invalid. `group_id` is undefined.');
@@ -34,15 +26,16 @@ class CommitOffset extends Protocol
         }
 
         $version = $this->getApiVersion(self::OFFSET_COMMIT_REQUEST);
-
-        $header = $this->requestHeader('kafka-php', self::OFFSET_COMMIT_REQUEST, self::OFFSET_COMMIT_REQUEST);
+        $header  = $this->requestHeader('kafka-php', self::OFFSET_COMMIT_REQUEST, self::OFFSET_COMMIT_REQUEST);
 
         $data = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        if ($version == self::API_VERSION1) {
+
+        if ($version === self::API_VERSION1) {
             $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
             $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         }
-        if ($version == self::API_VERSION2) {
+
+        if ($version === self::API_VERSION2) {
             $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
             $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
             $data .= self::pack(self::BIT_B64, $payloads['retention_time']);
@@ -54,13 +47,7 @@ class CommitOffset extends Protocol
         return $data;
     }
 
-    /**
-     * decode group response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset  = 0;
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
@@ -70,14 +57,7 @@ class CommitOffset extends Protocol
         return $topics['data'];
     }
 
-    /**
-     * encode commit offset topic array
-     *
-     * @param array $values
-     * @access public
-     * @return array
-     */
-    protected function encodeTopic($values)
+    protected function encodeTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given commit offset data invalid. `topic_name` is undefined.');
@@ -92,49 +72,39 @@ class CommitOffset extends Protocol
         return $data;
     }
 
-    /**
-     * encode commit offset partition array
-     *
-     * @param array $values
-     * @access public
-     * @return array
-     */
-    protected function encodePartition($values)
+    protected function encodePartition(array $values): string
     {
         if (! isset($values['partition'])) {
             throw new \Kafka\Exception\Protocol('given commit offset data invalid. `partition` is undefined.');
         }
+
         if (! isset($values['offset'])) {
             throw new \Kafka\Exception\Protocol('given commit offset data invalid. `offset` is undefined.');
         }
+
         if (! isset($values['metadata'])) {
             $values['metadata'] = '';
         }
+
         if (! isset($values['timestamp'])) {
             $values['timestamp'] = time() * 1000;
         }
+
         $version = $this->getApiVersion(self::OFFSET_COMMIT_REQUEST);
 
         $data  = self::pack(self::BIT_B32, $values['partition']);
         $data .= self::pack(self::BIT_B64, $values['offset']);
-        if ($version == self::API_VERSION1) {
+
+        if ($version === self::API_VERSION1) {
             $data .= self::pack(self::BIT_B64, $values['timestamp']);
         }
+
         $data .= self::encodeString($values['metadata'], self::PACK_INT16);
 
         return $data;
     }
 
-    /**
-     * decode commit offset topic response
-     *
-     * @param string $data Bytes to be decoded
-     * @param string $version
-     *
-     * @access protected
-     * @return array
-     */
-    protected function decodeTopic($data, $version)
+    protected function decodeTopic(string $data, string $version): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -145,23 +115,14 @@ class CommitOffset extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'topicName' => $topicInfo['data'],
-                'partitions'  => $partitions['data'],
-            ]
+            'data'   => [
+                'topicName'  => $topicInfo['data'],
+                'partitions' => $partitions['data'],
+            ],
         ];
     }
 
-    /**
-     * decode commit offset partition response
-     *
-     * @param string $data Bytes to be decoded
-     * @param string $version
-     *
-     * @access protected
-     * @return array
-     */
-    protected function decodePartition($data, $version)
+    protected function decodePartition(string $data, string $version): array
     {
         $offset = 0;
 
@@ -173,10 +134,10 @@ class CommitOffset extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
+            'data'   => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
-            ]
+            ],
         ];
     }
 }

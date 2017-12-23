@@ -1,101 +1,70 @@
 <?php
 namespace KafkaTest\Protocol;
 
-class SyncGroupTest extends \PHPUnit\Framework\TestCase
+use Kafka\Protocol\SyncGroup;
+
+final class SyncGroupTest extends \PHPUnit\Framework\TestCase
 {
+    private $sync;
 
-    /**
-     * sync object
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $sync = null;
-
-    /**
-     * setUp
-     *
-     * @access public
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->sync = new \Kafka\Protocol\SyncGroup('0.9.0.1');
+        $this->sync = new SyncGroup('0.9.0.1');
+    }
+
+    public function testEncode(): void
+    {
+        $data = json_decode(
+            '{"group_id":"test","generation_id":1,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","data":[{"version":0,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","assignments":[{"topic_name":"test","partitions":[0]}]}]}',
+            true
+        );
+
+        $expected = '0000009d000e00000000000e00096b61666b612d70687000047465737400000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000018000000000001000474657374000000010000000000000000';
+
+        self::assertSame($expected, \bin2hex($this->sync->encode($data)));
     }
 
     /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
-    {
-        $data = json_decode('{"group_id":"test","generation_id":1,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","data":[{"version":0,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","assignments":[{"topic_name":"test","partitions":[0]}]}]}', true);
-
-        $test = $this->sync->encode($data);
-        $this->assertSame(\bin2hex($test), '0000009d000e00000000000e00096b61666b612d70687000047465737400000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000001002e6b61666b612d7068702d62643564356262322d326131662d343364342d623833312d62313531306438316163356300000018000000000001000474657374000000010000000000000000');
-    }
-
-    /**
-     * testEncodeNoGroupId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given sync group data invalid. `group_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoGroupId()
+    public function testEncodeNoGroupId(): void
     {
-        $data = [];
-
-        $test = $this->sync->encode($data);
+        $this->sync->encode();
     }
 
     /**
-     * testEncodeNoGenerationId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given sync group data invalid. `generation_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoGenerationId()
+    public function testEncodeNoGenerationId(): void
     {
         $data = [
             'group_id' => 'test',
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoMemberId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given sync group data invalid. `member_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoMemberId()
+    public function testEncodeNoMemberId(): void
     {
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoData
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given sync group data invalid. `data` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoData()
+    public function testEncodeNoData(): void
     {
         $data = [
             'group_id' => 'test',
@@ -103,18 +72,14 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c'
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoVersion
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given data invalid. `version` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoVersion()
+    public function testEncodeNoVersion(): void
     {
         $data = [
             'group_id' => 'test',
@@ -127,18 +92,14 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoDataMemberId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given data invalid. `member_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoDataMemberId()
+    public function testEncodeNoDataMemberId(): void
     {
         $data = [
             'group_id' => 'test',
@@ -151,18 +112,14 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoDataAssignments
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given data invalid. `assignments` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoDataAssignments()
+    public function testEncodeNoDataAssignments(): void
     {
         $data = [
             'group_id' => 'test',
@@ -176,18 +133,14 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoTopicName
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given data invalid. `topic_name` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoTopicName()
+    public function testEncodeNoTopicName(): void
     {
         $data = [
             'group_id' => 'test',
@@ -204,18 +157,14 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
     /**
-     * testEncodeNoPartitions
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given data invalid. `partitions` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartitions()
+    public function testEncodeNoPartitions(): void
     {
         $data = [
             'group_id' => 'test',
@@ -234,23 +183,15 @@ class SyncGroupTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->sync->encode($data);
+        $this->sync->encode($data);
     }
 
-    /**
-     * testDecode
-     *
-     * @access public
-     * @return void
-     */
-    public function testDecode()
+    public function testDecode(): void
     {
-        $data   = '000000000018000000000001000474657374000000010000000000000000';
-        $test   = $this->sync->decode(\hex2bin($data));
-        $result = '{"errorCode":0,"partitionAssignments":[{"topicName":"test","partitions":[0]}],"version":0,"userData":""}';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
-        $test   = $this->sync->decode(\hex2bin('000000000000'));
-        $result = '{"errorCode":0}';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
+        $data     = '000000000018000000000001000474657374000000010000000000000000';
+        $expected = '{"errorCode":0,"partitionAssignments":[{"topicName":"test","partitions":[0]}],"version":0,"userData":""}';
+
+        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sync->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($this->sync->decode(\hex2bin('000000000000'))));
     }
 }
