@@ -21,7 +21,13 @@ final class AsyncProducerTest extends ProducerTest
 
         $producer = new \Kafka\Producer([$this, 'createMessages']);
         $producer->success(
-            function () use (&$messagesSent): void {
+            function (array $response) use (&$messagesSent): void {
+                self::assertNotEmpty($response);
+
+                foreach ($response['data'][0]['partitions'] as $partition) {
+                    self::assertSame(0, $partition['errorCode']);
+                }
+
                 $messagesSent = true;
             }
         );

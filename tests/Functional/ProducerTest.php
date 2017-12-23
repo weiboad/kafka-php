@@ -68,7 +68,19 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         );
 
         $consumer->start(
-            function () use (&$consumedMessages) {
+            function (string $topic, int $partition, array $message) use (&$consumedMessages) {
+                self::assertSame($this->topic, $topic);
+                self::assertLessThan(3, $partition);
+                self::assertArrayHasKey('offset', $message);
+                self::assertArrayHasKey('size', $message);
+                self::assertArrayHasKey('message', $message);
+                self::assertArrayHasKey('crc', $message['message']);
+                self::assertArrayHasKey('magic', $message['message']);
+                self::assertArrayHasKey('attr', $message['message']);
+                self::assertArrayHasKey('key', $message['message']);
+                self::assertArrayHasKey('value', $message['message']);
+                self::assertContains('msg-', $message['message']['value']);
+
                 ++$consumedMessages;
             }
         );
@@ -91,7 +103,10 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $messages = [];
 
         for ($i = 0; $i < $amount; ++$i) {
-            $messages[] = ['topic' => $this->topic, 'value' => 'msg-' . $i];
+            $messages[] = [
+                'topic' => $this->topic,
+                'value' => 'msg-' . str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT)
+            ];
         }
 
         return $messages;
