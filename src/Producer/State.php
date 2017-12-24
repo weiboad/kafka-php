@@ -38,7 +38,7 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\ProducerConfig::getInstance();
 
         foreach ($this->requests as $request => $option) {
             switch ($request) {
@@ -80,7 +80,7 @@ class State
 
     public function succRun($key, $context = null)
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\ProducerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
 
         if (! isset($this->callStatus[$key])) {
