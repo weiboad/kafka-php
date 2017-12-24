@@ -138,7 +138,7 @@ abstract class Protocol
      *
      * @access public
      */
-    public function __construct($version = self::DEFAULT_BROKER_VERION)
+    public function __construct(string $version = self::DEFAULT_BROKER_VERION)
     {
         $this->version = $version;
     }

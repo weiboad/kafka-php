@@ -2,6 +2,9 @@
 
 namespace Kafka\Protocol;
 
+use Lcobucci\Clock\Clock;
+use Lcobucci\Clock\SystemClock;
+
 class Produce extends Protocol
 {
     /**
@@ -18,6 +21,18 @@ class Produce extends Protocol
     private const TIMESTAMP_NONE            = -1;
     private const TIMESTAMP_CREATE_TIME     = 0;
     private const TIMESTAMP_LOG_APPEND_TIME = 1;
+
+    /**
+     * @var Clock
+     */
+    private $clock;
+
+    public function __construct(string $version = self::DEFAULT_BROKER_VERION, ?Clock $clock = null)
+    {
+        parent::__construct($version);
+
+        $this->clock = $clock ?: new SystemClock();
+    }
 
     public function encode(array $payloads = []): string
     {
@@ -88,6 +103,10 @@ class Produce extends Protocol
 
         $data  = self::pack(self::BIT_B8, $magic);
         $data .= self::pack(self::BIT_B8, $attributes);
+
+        if ($magic >= self::MESSAGE_MAGIC_VERSION1) {
+            $data .= self::pack(self::BIT_B64, $this->clock->now()->format('Uv'));
+        }
 
         $key = '';
 
