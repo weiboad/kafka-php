@@ -1,80 +1,57 @@
 <?php
 namespace Kafka;
 
+use Kafka\Producer\Process;
+use Kafka\Producer\SyncProcess;
+
 class Producer
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
-    private $process = null;
-
     /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
+     * @var Process|SyncProcess
      */
-    public function __construct(callable $producer = null)
+    private $process;
+
+    public function __construct(?callable $producer = null)
     {
-        if (is_null($producer)) {
-            $this->process = new \Kafka\Producer\SyncProcess();
-        } else {
-            $this->process = new \Kafka\Producer\Process($producer);
-        }
+        $this->process = $producer === null ? new SyncProcess() : new Process($producer);
     }
 
     /**
-     * start producer
-     *
-     * @access public
-     * @data is data is boolean that is async process, thus it is sync process
-     * @return void
+     * @param array|bool $data
      */
-    public function send($data = true)
+    public function send($data = true): ?array
     {
         if ($this->logger) {
             $this->process->setLogger($this->logger);
         }
-        if (is_bool($data)) {
-            $this->process->start();
-            if ($data) {
-                \Amp\Loop::run();
-            }
-        } else {
+
+        if (! \is_bool($data)) {
             return $this->process->send($data);
         }
+
+        $this->process->start();
+
+        if ($data) {
+            \Amp\Loop::run();
+        }
+
+        return null;
     }
 
-    /**
-     * syncMeta producer
-     *
-     * @access public
-     * @return void
-     */
-    public function syncMeta()
+    public function syncMeta(): void
     {
-        return $this->process->syncMeta();
+        $this->process->syncMeta();
     }
 
-    /**
-     * producer success
-     *
-     * @access public
-     * @return void
-     */
-    public function success(callable $success = null)
+    public function success(callable $success = null): void
     {
         $this->process->setSuccess($success);
     }
 
-    /**
-     * producer error
-     *
-     * @access public
-     * @return void
-     */
-    public function error(callable $error = null)
+    public function error(callable $error = null): void
     {
         $this->process->setError($error);
     }

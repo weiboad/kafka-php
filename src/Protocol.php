@@ -189,14 +189,9 @@ class Protocol
     }
 
     /**
-     * request encode
-     *
-     * @param key $appkey
-     * @param array $payloads
-     * @access public
-     * @return string
+     * @throws \Kafka\Exception
      */
-    public static function encode($key, $payloads)
+    public static function encode(int $key, array $payloads): string
     {
         if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);
@@ -206,12 +201,9 @@ class Protocol
     }
 
     /**
-     * decode response
-     *
-     * @access public
-     * @return array
+     * @throws \Kafka\Exception
      */
-    public static function decode($key, $data)
+    public static function decode(int $key, string $data): array
     {
         if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);

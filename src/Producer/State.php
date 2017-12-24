@@ -39,18 +39,16 @@ class State
 
         // init requests
         $config = \Kafka\ConsumerConfig::getInstance();
+
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:
                     $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
                     break;
                 default:
-                    $isAsyn = $config->getIsAsyn();
-                    if ($isAsyn) {
-                        $this->requests[$request]['interval'] = $config->getProduceInterval();
-                    } else {
-                        $this->requests[$request]['interval'] = 1;
-                    }
+                    $interval = $config->getIsAsyn() ? $config->getProduceInterval() : 1;
+
+                    $this->requests[$request]['interval'] = $interval;
             }
         }
     }
@@ -84,6 +82,7 @@ class State
     {
         $config = \Kafka\ConsumerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
+
         if (! isset($this->callStatus[$key])) {
             return false;
         }
@@ -96,7 +95,7 @@ class State
                 }
                 break;
             case self::REQUEST_PRODUCE:
-                if ($context == null) {
+                if ($context === null) {
                     if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
                         Loop::stop();
@@ -107,6 +106,7 @@ class State
                 }
                 unset($this->callStatus[$key]['context'][$context]);
                 $contextStatus = $this->callStatus[$key]['context'];
+
                 if (empty($contextStatus)) {
                     if (! $isAsyn) {
                         $this->callStatus[$key]['status'] = self::STATUS_FINISH;
@@ -119,10 +119,10 @@ class State
         }
     }
 
-    public function failRun($key, $context = null)
+    public function failRun($key, $context = null): void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
@@ -159,26 +159,33 @@ class State
         }
 
         $status = $this->callStatus[$key]['status'];
+
         switch ($key) {
             case self::REQUEST_METADATA:
-                if ($status & self::STATUS_PROCESS == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
+
                 return false;
             case self::REQUEST_PRODUCE:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
+
                 $syncStatus = $this->callStatus[self::REQUEST_METADATA]['status'];
-                if (($syncStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+
+                if (($syncStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
+
                 return false;
         }
     }
