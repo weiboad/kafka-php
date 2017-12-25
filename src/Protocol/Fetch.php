@@ -157,7 +157,7 @@ class Fetch extends Protocol
         $offset     += 4;
         $ret         = $this->decodeMessage(substr($data, $offset), $messageSize);
 
-        if (! is_array($ret) && $ret == false) {
+        if ($ret === null) {
             return null;
         }
 
