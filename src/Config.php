@@ -3,16 +3,15 @@ namespace Kafka;
 
 abstract class Config
 {
+    public const SECURITY_PROTOCOL_PLAINTEXT      = 'PLAINTEXT';
+    public const SECURITY_PROTOCOL_SSL            = 'SSL';
+    public const SECURITY_PROTOCOL_SASL_PLAINTEXT = 'SASL_PLAINTEXT';
+    public const SECURITY_PROTOCOL_SASL_SSL       = 'SASL_SSL';
 
-    const SECURITY_PROTOCOL_PLAINTEXT      = 'PLAINTEXT';
-    const SECURITY_PROTOCOL_SSL            = 'SSL';
-    const SECURITY_PROTOCOL_SASL_PLAINTEXT = 'SASL_PLAINTEXT';
-    const SECURITY_PROTOCOL_SASL_SSL       = 'SASL_SSL';
-
-    const SASL_MECHANISMS_PLAIN         = 'PLAIN';
-    const SASL_MECHANISMS_GSSAPI        = 'GSSAPI';
-    const SASL_MECHANISMS_SCRAM_SHA_256 = 'SCRAM_SHA_256';
-    const SASL_MECHANISMS_SCRAM_SHA_512 = 'SCRAM_SHA_512';
+    public const SASL_MECHANISMS_PLAIN         = 'PLAIN';
+    public const SASL_MECHANISMS_GSSAPI        = 'GSSAPI';
+    public const SASL_MECHANISMS_SCRAM_SHA_256 = 'SCRAM_SHA_256';
+    public const SASL_MECHANISMS_SCRAM_SHA_512 = 'SCRAM_SHA_512';
 
     private const ALLOW_SECURITY_PROTOCOLS = [
         self::SECURITY_PROTOCOL_PLAINTEXT,
