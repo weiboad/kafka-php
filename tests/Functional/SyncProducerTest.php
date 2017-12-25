@@ -18,9 +18,13 @@ final class SyncProducerTest extends ProducerTest
         $messages = $this->createMessages();
 
         foreach ($messages as $message) {
-            $result = $producer->send([$message]);
+            $response = $producer->send([$message]);
 
-            self::assertNotEmpty($result);
+            self::assertNotEmpty($response);
+
+            foreach ($response[0]['data'][0]['partitions'] as $partition) {
+                self::assertSame(0, $partition['errorCode']);
+            }
         }
     }
 }

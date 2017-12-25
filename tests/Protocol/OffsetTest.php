@@ -1,44 +1,22 @@
 <?php
+
 namespace KafkaTest\Protocol;
 
-class OffsetTest extends \PHPUnit\Framework\TestCase
+use Kafka\Protocol\Offset;
+
+final class OffsetTest extends \PHPUnit\Framework\TestCase
 {
+    private $offset;
 
-    /**
-     * offset object
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $offset = null;
+    private $offset10;
 
-    /**
-     * offset object v0.10
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $offset10 = null;
-
-    /**
-     * setUp
-     *
-     * @access public
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->offset   = new \Kafka\Protocol\Offset('0.9.0.1');
-        $this->offset10 = new \Kafka\Protocol\Offset('0.10.1.0');
+        $this->offset   = new Offset('0.9.0.1');
+        $this->offset10 = new Offset('0.10.1.0');
     }
 
-    /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
+    public function testEncode(): void
     {
         $data = [
             'data' => [
@@ -47,64 +25,48 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
                     'partitions' => [
                         [
                             'partition_id' => 0,
-                            'offset' => 100,
+                            'offset'       => 100,
                         ],
                     ],
                 ],
             ],
         ];
 
-        $test = $this->offset->encode($data);
-        $this->assertSame(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
-        $test = $this->offset10->encode($data);
-        $this->assertSame(\bin2hex($test), '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0');
+        $expected = '00000035000200000000000200096b61666b612d706870ffffffff000000010004746573740000000100000000ffffffffffffffff000186a0';
+
+        self::assertSame($expected, \bin2hex($this->offset->encode($data)));
+        self::assertSame($expected, \bin2hex($this->offset10->encode($data)));
     }
 
     /**
-     * testEncodeNoData
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given offset data invalid. `data` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoData()
+    public function testEncodeNoData(): void
     {
-        $data = [
-        ];
-
-        $test = $this->offset->encode($data);
+        $this->offset->encode();
     }
 
     /**
-     * testEncodeNoTopicName
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given offset data invalid. `topic_name` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoTopicName()
+    public function testEncodeNoTopicName(): void
     {
         $data = [
             'data' => [
-                [
-                ],
+                [],
             ],
         ];
 
-        $test = $this->offset->encode($data);
+        $this->offset->encode($data);
     }
 
     /**
-     * testEncodeNoPartitions
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given offset data invalid. `partitions` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartitions()
+    public function testEncodeNoPartitions(): void
     {
         $data = [
             'data' => [
@@ -114,32 +76,27 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $test = $this->offset->encode($data);
+        $this->offset->encode($data);
     }
 
     /**
-     * testEncodeNoPartitionId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given offset data invalid. `partition_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartitionId()
+    public function testEncodeNoPartitionId(): void
     {
         $data = [
             'data' => [
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                        ],
+                        [],
                     ],
                 ],
             ],
         ];
 
-        $test = $this->offset->encode($data);
+        $this->offset->encode($data);
     }
 
     /**
@@ -148,11 +105,13 @@ class OffsetTest extends \PHPUnit\Framework\TestCase
      * @access public
      * @return void
      */
-    public function testDecode()
+    public function testDecode(): void
     {
-        $data   = '000000010004746573740000000100000000000000000001000000000000002a';
-        $test   = $this->offset->decode(\hex2bin($data));
-        $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"timestamp":0,"offsets":[42]}]}]';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
+        $data     = '000000010004746573740000000100000000000000000001000000000000002a';
+        $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"timestamp":0,"offsets":[42]}]}]';
+
+        $test = $this->offset->decode(\hex2bin($data));
+
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

@@ -1,37 +1,18 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class DescribeGroups extends Protocol
 {
-
-    /**
-     * describe group request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
-        if (! is_array($payloads)) {
-            $payloads = [$payloads];
-        }
-
         $header = $this->requestHeader('kafka-php', self::DESCRIBE_GROUPS_REQUEST, self::DESCRIBE_GROUPS_REQUEST);
         $data   = self::encodeArray($payloads, [$this, 'encodeString'], self::PACK_INT16);
 
-        $data = self::encodeString($header . $data, self::PACK_INT32);
-
-        return $data;
+        return self::encodeString($header . $data, self::PACK_INT32);
     }
 
-    /**
-     * decode group response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset  = 0;
         $groups  = $this->decodeArray(substr($data, $offset), [$this, 'describeGroup']);
@@ -40,13 +21,7 @@ class DescribeGroups extends Protocol
         return $groups['data'];
     }
 
-    /**
-     * decode describe group response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function describeGroup($data)
+    protected function describeGroup(string $data): array
     {
         $offset       = 0;
         $errorCode    = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
@@ -65,24 +40,18 @@ class DescribeGroups extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'errorCode' => $errorCode,
-                'groupId' => $groupId['data'],
-                'state' => $state['data'],
+            'data'   => [
+                'errorCode'    => $errorCode,
+                'groupId'      => $groupId['data'],
+                'state'        => $state['data'],
                 'protocolType' => $protocolType['data'],
-                'protocol' => $protocol['data'],
-                'members' => $members['data']
-            ]
+                'protocol'     => $protocol['data'],
+                'members'      => $members['data'],
+            ],
         ];
     }
 
-    /**
-     * decode describe members response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function describeMember($data)
+    protected function describeMember(string $data): array
     {
         $offset     = 0;
         $memberId   = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -100,10 +69,7 @@ class DescribeGroups extends Protocol
         $memberAssignmentOffset  = 0;
         $version                 = self::unpack(self::BIT_B16_SIGNED, substr($memberAssignment, $memberAssignmentOffset, 2));
         $memberAssignmentOffset += 2;
-        $partitionAssignments    = $this->decodeArray(
-            substr($memberAssignment, $memberAssignmentOffset),
-            [$this, 'describeResponsePartition']
-        );
+        $partitionAssignments    = $this->decodeArray(substr($memberAssignment, $memberAssignmentOffset), [$this, 'describeResponsePartition']);
         $memberAssignmentOffset += $partitionAssignments['length'];
         $userData                = $this->decodeString(substr($memberAssignment, $memberAssignmentOffset), self::BIT_B32);
 
@@ -117,31 +83,25 @@ class DescribeGroups extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'memberId' => $memberId['data'],
-                'clientId' => $clientId['data'],
+            'data'   => [
+                'memberId'   => $memberId['data'],
+                'clientId'   => $clientId['data'],
                 'clientHost' => $clientHost['data'],
-                'metadata' => [
-                    'version' => $version,
-                    'topics'  => $topics['data'],
+                'metadata'   => [
+                    'version'  => $version,
+                    'topics'   => $topics['data'],
                     'userData' => $metaUserData['data'],
                 ],
                 'assignment' => [
-                    'version' => $version,
+                    'version'    => $version,
                     'partitions' => $partitionAssignments['data'],
-                    'userData' => $userData['data']
-                ]
-            ]
+                    'userData'   => $userData['data'],
+                ],
+            ],
         ];
     }
 
-    /**
-     * decode describe group partition response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function describeResponsePartition($data)
+    protected function describeResponsePartition(string $data): array
     {
         $offset     = 0;
         $topicName  = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -151,10 +111,10 @@ class DescribeGroups extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'topicName' => $topicName['data'],
+            'data'   => [
+                'topicName'  => $topicName['data'],
                 'partitions' => $partitions['data'],
-            ]
+            ],
         ];
     }
 }

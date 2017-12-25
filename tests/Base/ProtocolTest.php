@@ -1,73 +1,61 @@
 <?php
 namespace KafkaTest\Base;
 
+use Kafka\Protocol;
+
 class ProtocolTest extends \PHPUnit\Framework\TestCase
 {
-
-    /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
+    public function testEncode(): void
     {
-        \Kafka\Protocol::init('0.9.0.1');
+        Protocol::init('0.9.0.1');
+
         $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
             'generation_id' => 2,
         ];
-        $test = \Kafka\Protocol::encode(\Kafka\Protocol::HEART_BEAT_REQUEST, $data);
-        $this->assertEquals(\bin2hex($test), '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937');
+
+        $expected = '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937';
+
+        self::assertSame($expected, \bin2hex(Protocol::encode(Protocol::HEART_BEAT_REQUEST, $data)));
     }
 
     /**
-     * testEncodeNoKey
-     *
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Not support api key, key:999
-     * @access public
-     * @return void
      */
-    public function testEncodeNoKey()
+    public function testEncodeNoKey(): void
     {
-        \Kafka\Protocol::init('0.9.0.1');
+        Protocol::init('0.9.0.1');
+
         $data = [
             'group_id' => 'test',
             'member_id' => 'kafka-php-0e7cbd33-7950-40af-b691-eceaa665d297',
             'generation_id' => 2,
         ];
-        $test = \Kafka\Protocol::encode(999, $data);
+
+        Protocol::encode(999, $data);
     }
 
     /**
-     * testDecodeNoKey
-     *
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Not support api key, key:999
-     * @access public
-     * @return void
      */
-    public function testDecodeNoKey()
+    public function testDecodeNoKey(): void
     {
-        \Kafka\Protocol::init('0.9.0.1');
+        Protocol::init('0.9.0.1');
         $data = '';
-        $test = \Kafka\Protocol::decode(999, $data);
+
+        Protocol::decode(999, $data);
     }
 
-    /**
-     * testDecode
-     *
-     * @access public
-     * @return void
-     */
-    public function testDecode()
+    public function testDecode(): void
     {
-        \Kafka\Protocol::init('0.9.0.1');
-        $test   = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
-        $result = '{"errorCode":0}';
-        $this->assertEquals(json_encode($test), $result);
+        Protocol::init('0.9.0.1');
+
+        $test = Protocol::decode(Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
+
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($test));
     }
 
     /**
@@ -77,7 +65,7 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      */
     public function errorMessageShouldBeCorrectlyGenerated(int $errorCode, string $message): void
     {
-        self::assertSame($message, \Kafka\Protocol::getError($errorCode));
+        self::assertSame($message, Protocol::getError($errorCode));
     }
 
     public function errorCodesAndExpectedMessages(): array

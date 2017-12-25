@@ -1,35 +1,18 @@
 <?php
 namespace KafkaTest\Protocol;
 
-class CommitOffsetTest extends \PHPUnit\Framework\TestCase
+use Kafka\Protocol\CommitOffset;
+
+final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
 {
+    private $commit;
 
-    /**
-     * commit object
-     *
-     * @var mixed
-     * @access protected
-     */
-    protected $commit = null;
-
-    /**
-     * setUp
-     *
-     * @access public
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->commit = new \Kafka\Protocol\CommitOffset('0.9.0.1');
+        $this->commit = new CommitOffset('0.9.0.1');
     }
 
-    /**
-     * testEncode
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncode()
+    public function testEncode(): void
     {
         $data = [
             'group_id' => 'test',
@@ -49,17 +32,14 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->commit->encode($data);
-        $this->assertSame(\bin2hex($test), '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000');
+
+        $expected = '00000071000800020000000800096b61666b612d70687000047465737400000002002e6b61666b612d7068702d63376533643430612d353764382d343232302d393532332d6365626663653961303638350000000000008ca0000000010004746573740000000100000000000000000000002d0000';
+        $test     = $this->commit->encode($data);
+
+        self::assertSame($expected, \bin2hex($test));
     }
 
-    /**
-     * testEncodeDefault
-     *
-     * @access public
-     * @return void
-     */
-    public function testEncodeDefault()
+    public function testEncodeDefault(): void
     {
         $data = [
             'group_id' => 'test',
@@ -75,74 +55,60 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->commit->encode($data);
-        $this->assertSame(\bin2hex($test), '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000');
+
+        $expected = '00000043000800020000000800096b61666b612d706870000474657374ffffffff0000ffffffffffffffff000000010004746573740000000100000000000000000000002d0000';
+        $test     = $this->commit->encode($data);
+
+        self::assertSame($expected, \bin2hex($test));
     }
 
     /**
-     * testEncodeNoData
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit data invalid. `data` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoData()
+    public function testEncodeNoData(): void
     {
         $data = [
             'group_id' => 'test'
         ];
 
-        $test = $this->commit->encode($data);
+        $this->commit->encode($data);
     }
 
     /**
-     * testEncodeNoGroupId
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit offset data invalid. `group_id` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoGroupId()
+    public function testEncodeNoGroupId(): void
     {
         $data = [
             'data' => []
         ];
 
-        $test = $this->commit->encode($data);
+        $this->commit->encode($data);
     }
 
     /**
-     * testEncodeNoTopicName
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit offset data invalid. `topic_name` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoTopicName()
+    public function testEncodeNoTopicName(): void
     {
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                ]
+                []
             ],
         ];
 
-        $test = $this->commit->encode($data);
+        $this->commit->encode($data);
     }
 
     /**
-     * testEncodeNoPartitions
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit offset data invalid. `partitions` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartitions()
+    public function testEncodeNoPartitions(): void
     {
         $data = [
             'group_id' => 'test',
@@ -152,18 +118,15 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->commit->encode($data);
+
+        $this->commit->encode($data);
     }
 
     /**
-     * testEncodeNoPartition
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit offset data invalid. `partition` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoPartition()
+    public function testEncodeNoPartition(): void
     {
         $data = [
             'group_id' => 'test',
@@ -176,18 +139,15 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->commit->encode($data);
+
+        $this->commit->encode($data);
     }
 
     /**
-     * testEncodeNoOffset
-     *
      * @expectedException \Kafka\Exception\Protocol
      * @expectedExceptionMessage given commit offset data invalid. `offset` is undefined.
-     * @access public
-     * @return void
      */
-    public function testEncodeNoOffset()
+    public function testEncodeNoOffset(): void
     {
         $data = [
             'group_id' => 'test',
@@ -202,20 +162,16 @@ class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-        $test = $this->commit->encode($data);
+
+        $this->commit->encode($data);
     }
 
-    /**
-     * testDecode
-     *
-     * @access public
-     * @return void
-     */
-    public function testDecode()
+    public function testDecode(): void
     {
-        $data   = '0000000100047465737400000001000000000000';
-        $test   = $this->commit->decode(\hex2bin($data));
-        $result = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
-        $this->assertJsonStringEqualsJsonString(json_encode($test), $result);
+        $data     = '0000000100047465737400000001000000000000';
+        $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
+
+        $test = $this->commit->decode(\hex2bin($data));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

@@ -5,7 +5,7 @@ $data = [
     'group_id' => 'test',
 ];
 
-$protocol    = \Kafka\Protocol::init('0.9.1.0');
+\Kafka\Protocol::init('0.9.1.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $data);
 
 $socket = new \Kafka\Socket('127.0.0.1', '9092');

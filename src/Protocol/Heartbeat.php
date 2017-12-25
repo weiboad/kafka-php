@@ -1,24 +1,19 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class Heartbeat extends Protocol
 {
-
-    /**
-     * heartbeat request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `group_id` is undefined.');
         }
+
         if (! isset($payloads['generation_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `generation_id` is undefined.');
         }
+
         if (! isset($payloads['member_id'])) {
             throw new \Kafka\Exception\Protocol('given heartbeat data invalid. `member_id` is undefined.');
         }
@@ -33,13 +28,7 @@ class Heartbeat extends Protocol
         return $data;
     }
 
-    /**
-     * decode heart beat response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset    = 0;
         $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));

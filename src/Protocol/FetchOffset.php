@@ -1,17 +1,10 @@
 <?php
+
 namespace Kafka\Protocol;
 
 class FetchOffset extends Protocol
 {
-
-    /**
-     * fetch offset request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode($payloads)
+    public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `data` is undefined.');
@@ -29,14 +22,7 @@ class FetchOffset extends Protocol
         return $data;
     }
 
-    /**
-     * decode group response
-     *
-     * @param string $data Bytes to be decode
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset  = 0;
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
@@ -46,26 +32,12 @@ class FetchOffset extends Protocol
         return $topics['data'];
     }
 
-    /**
-     * encode signal part
-     *
-     * @param byte[] values partions data
-     * @access protected
-     * @return string
-     */
-    protected function encodeOffsetPartion($values)
+    protected function encodeOffsetPartition(int $values): string
     {
         return self::pack(self::BIT_B32, $values);
     }
 
-    /**
-     * encode signal topic
-     *
-     * @param partions
-     * @access protected
-     * @return string
-     */
-    protected function encodeOffsetTopic($values)
+    protected function encodeOffsetTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
             throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `topic_name` is undefined.');
@@ -76,18 +48,12 @@ class FetchOffset extends Protocol
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
-        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartion']);
+        $partitions = self::encodeArray($values['partitions'], [$this, 'encodeOffsetPartition']);
 
         return $topic . $partitions;
     }
 
-    /**
-     * decode offset topic response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function offsetTopic($data, $version)
+    protected function offsetTopic(string $data, string $version): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -98,20 +64,14 @@ class FetchOffset extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
-                'topicName' => $topicInfo['data'],
-                'partitions'  => $partitions['data'],
-            ]
+            'data'   => [
+                'topicName'  => $topicInfo['data'],
+                'partitions' => $partitions['data'],
+            ],
         ];
     }
 
-    /**
-     * decode offset partition response
-     *
-     * @access protected
-     * @return array
-     */
-    protected function offsetPartition($data, $version)
+    protected function offsetPartition(string $data, string $version): array
     {
         $offset = 0;
 
@@ -128,12 +88,12 @@ class FetchOffset extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
+            'data'   => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
-                'metadata' => $metadata['data'],
-                'offset' => $roffset,
-            ]
+                'metadata'  => $metadata['data'],
+                'offset'    => $roffset,
+            ],
         ];
     }
 }

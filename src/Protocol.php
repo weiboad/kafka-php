@@ -1,92 +1,93 @@
 <?php
 namespace Kafka;
 
+use Psr\Log\LoggerInterface;
+
 class Protocol
 {
-
     /**
      * protocol request code
      */
-    const PRODUCE_REQUEST           = 0;
-    const FETCH_REQUEST             = 1;
-    const OFFSET_REQUEST            = 2;
-    const METADATA_REQUEST          = 3;
-    const OFFSET_COMMIT_REQUEST     = 8;
-    const OFFSET_FETCH_REQUEST      = 9;
-    const GROUP_COORDINATOR_REQUEST = 10;
-    const JOIN_GROUP_REQUEST        = 11;
-    const HEART_BEAT_REQUEST        = 12;
-    const LEAVE_GROUP_REQUEST       = 13;
-    const SYNC_GROUP_REQUEST        = 14;
-    const DESCRIBE_GROUPS_REQUEST   = 15;
-    const LIST_GROUPS_REQUEST       = 16;
-    const SASL_HAND_SHAKE_REQUEST   = 17;
-    const API_VERSIONS_REQUEST      = 18;
-    const CREATE_TOPICS_REQUEST     = 19;
-    const DELETE_TOPICS_REQUEST     = 20;
+    public const PRODUCE_REQUEST           = 0;
+    public const FETCH_REQUEST             = 1;
+    public const OFFSET_REQUEST            = 2;
+    public const METADATA_REQUEST          = 3;
+    public const OFFSET_COMMIT_REQUEST     = 8;
+    public const OFFSET_FETCH_REQUEST      = 9;
+    public const GROUP_COORDINATOR_REQUEST = 10;
+    public const JOIN_GROUP_REQUEST        = 11;
+    public const HEART_BEAT_REQUEST        = 12;
+    public const LEAVE_GROUP_REQUEST       = 13;
+    public const SYNC_GROUP_REQUEST        = 14;
+    public const DESCRIBE_GROUPS_REQUEST   = 15;
+    public const LIST_GROUPS_REQUEST       = 16;
+    public const SASL_HAND_SHAKE_REQUEST   = 17;
+    public const API_VERSIONS_REQUEST      = 18;
+    public const CREATE_TOPICS_REQUEST     = 19;
+    public const DELETE_TOPICS_REQUEST     = 20;
 
     // protocol error code
-    const NO_ERROR                              = 0;
-    const ERROR_UNKNOWN                         = -1;
-    const OFFSET_OUT_OF_RANGE                   = 1;
-    const INVALID_MESSAGE                       = 2;
-    const UNKNOWN_TOPIC_OR_PARTITION            = 3;
-    const INVALID_MESSAGE_SIZE                  = 4;
-    const LEADER_NOT_AVAILABLE                  = 5;
-    const NOT_LEADER_FOR_PARTITION              = 6;
-    const REQUEST_TIMED_OUT                     = 7;
-    const BROKER_NOT_AVAILABLE                  = 8;
-    const REPLICA_NOT_AVAILABLE                 = 9;
-    const MESSAGE_SIZE_TOO_LARGE                = 10;
-    const STALE_CONTROLLER_EPOCH                = 11;
-    const OFFSET_METADATA_TOO_LARGE             = 12;
-    const GROUP_LOAD_IN_PROGRESS                = 14;
-    const GROUP_COORDINATOR_NOT_AVAILABLE       = 15;
-    const NOT_COORDINATOR_FOR_GROUP             = 16;
-    const INVALID_TOPIC                         = 17;
-    const RECORD_LIST_TOO_LARGE                 = 18;
-    const NOT_ENOUGH_REPLICAS                   = 19;
-    const NOT_ENOUGH_REPLICAS_AFTER_APPEND      = 20;
-    const INVALID_REQUIRED_ACKS                 = 21;
-    const ILLEGAL_GENERATION                    = 22;
-    const INCONSISTENT_GROUP_PROTOCOL           = 23;
-    const INVALID_GROUP_ID                      = 24;
-    const UNKNOWN_MEMBER_ID                     = 25;
-    const INVALID_SESSION_TIMEOUT               = 26;
-    const REBALANCE_IN_PROGRESS                 = 27;
-    const INVALID_COMMIT_OFFSET_SIZE            = 28;
-    const TOPIC_AUTHORIZATION_FAILED            = 29;
-    const GROUP_AUTHORIZATION_FAILED            = 30;
-    const CLUSTER_AUTHORIZATION_FAILED          = 31;
-    const INVALID_TIMESTAMP                     = 32;
-    const UNSUPPORTED_SASL_MECHANISM            = 33;
-    const ILLEGAL_SASL_STATE                    = 34;
-    const UNSUPPORTED_VERSION                   = 35;
-    const TOPIC_ALREADY_EXISTS                  = 36;
-    const INVALID_PARTITIONS                    = 37;
-    const INVALID_REPLICATION_FACTOR            = 38;
-    const INVALID_REPLICA_ASSIGNMENT            = 39;
-    const INVALID_CONFIG                        = 40;
-    const NOT_CONTROLLER                        = 41;
-    const INVALID_REQUEST                       = 42;
-    const UNSUPPORTED_FOR_MESSAGE_FORMAT        = 43;
-    const POLICY_VIOLATION                      = 44;
-    const OUT_OF_ORDER_SEQUENCE_NUMBER          = 45;
-    const DUPLICATE_SEQUENCE_NUMBER             = 46;
-    const INVALID_PRODUCER_EPOCH                = 47;
-    const INVALID_TXN_STATE                     = 48;
-    const INVALID_PRODUCER_ID_MAPPING           = 49;
-    const INVALID_TRANSACTION_TIMEOUT           = 50;
-    const CONCURRENT_TRANSACTIONS               = 51;
-    const TRANSACTION_COORDINATOR_FENCED        = 52;
-    const TRANSACTIONAL_ID_AUTHORIZATION_FAILED = 53;
-    const SECURITY_DISABLED                     = 54;
-    const OPERATION_NOT_ATTEMPTED               = 55;
-    const KAFKA_STORAGE_ERROR                   = 56;
-    const LOG_DIR_NOT_FOUND                     = 57;
-    const SASL_AUTHENTICATION_FAILED            = 58;
-    const UNKNOWN_PRODUCER_ID                   = 59;
-    const REASSIGNMENT_IN_PROGRESS              = 60;
+    public const NO_ERROR                              = 0;
+    public const ERROR_UNKNOWN                         = -1;
+    public const OFFSET_OUT_OF_RANGE                   = 1;
+    public const INVALID_MESSAGE                       = 2;
+    public const UNKNOWN_TOPIC_OR_PARTITION            = 3;
+    public const INVALID_MESSAGE_SIZE                  = 4;
+    public const LEADER_NOT_AVAILABLE                  = 5;
+    public const NOT_LEADER_FOR_PARTITION              = 6;
+    public const REQUEST_TIMED_OUT                     = 7;
+    public const BROKER_NOT_AVAILABLE                  = 8;
+    public const REPLICA_NOT_AVAILABLE                 = 9;
+    public const MESSAGE_SIZE_TOO_LARGE                = 10;
+    public const STALE_CONTROLLER_EPOCH                = 11;
+    public const OFFSET_METADATA_TOO_LARGE             = 12;
+    public const GROUP_LOAD_IN_PROGRESS                = 14;
+    public const GROUP_COORDINATOR_NOT_AVAILABLE       = 15;
+    public const NOT_COORDINATOR_FOR_GROUP             = 16;
+    public const INVALID_TOPIC                         = 17;
+    public const RECORD_LIST_TOO_LARGE                 = 18;
+    public const NOT_ENOUGH_REPLICAS                   = 19;
+    public const NOT_ENOUGH_REPLICAS_AFTER_APPEND      = 20;
+    public const INVALID_REQUIRED_ACKS                 = 21;
+    public const ILLEGAL_GENERATION                    = 22;
+    public const INCONSISTENT_GROUP_PROTOCOL           = 23;
+    public const INVALID_GROUP_ID                      = 24;
+    public const UNKNOWN_MEMBER_ID                     = 25;
+    public const INVALID_SESSION_TIMEOUT               = 26;
+    public const REBALANCE_IN_PROGRESS                 = 27;
+    public const INVALID_COMMIT_OFFSET_SIZE            = 28;
+    public const TOPIC_AUTHORIZATION_FAILED            = 29;
+    public const GROUP_AUTHORIZATION_FAILED            = 30;
+    public const CLUSTER_AUTHORIZATION_FAILED          = 31;
+    public const INVALID_TIMESTAMP                     = 32;
+    public const UNSUPPORTED_SASL_MECHANISM            = 33;
+    public const ILLEGAL_SASL_STATE                    = 34;
+    public const UNSUPPORTED_VERSION                   = 35;
+    public const TOPIC_ALREADY_EXISTS                  = 36;
+    public const INVALID_PARTITIONS                    = 37;
+    public const INVALID_REPLICATION_FACTOR            = 38;
+    public const INVALID_REPLICA_ASSIGNMENT            = 39;
+    public const INVALID_CONFIG                        = 40;
+    public const NOT_CONTROLLER                        = 41;
+    public const INVALID_REQUEST                       = 42;
+    public const UNSUPPORTED_FOR_MESSAGE_FORMAT        = 43;
+    public const POLICY_VIOLATION                      = 44;
+    public const OUT_OF_ORDER_SEQUENCE_NUMBER          = 45;
+    public const DUPLICATE_SEQUENCE_NUMBER             = 46;
+    public const INVALID_PRODUCER_EPOCH                = 47;
+    public const INVALID_TXN_STATE                     = 48;
+    public const INVALID_PRODUCER_ID_MAPPING           = 49;
+    public const INVALID_TRANSACTION_TIMEOUT           = 50;
+    public const CONCURRENT_TRANSACTIONS               = 51;
+    public const TRANSACTION_COORDINATOR_FENCED        = 52;
+    public const TRANSACTIONAL_ID_AUTHORIZATION_FAILED = 53;
+    public const SECURITY_DISABLED                     = 54;
+    public const OPERATION_NOT_ATTEMPTED               = 55;
+    public const KAFKA_STORAGE_ERROR                   = 56;
+    public const LOG_DIR_NOT_FOUND                     = 57;
+    public const SASL_AUTHENTICATION_FAILED            = 58;
+    public const UNKNOWN_PRODUCER_ID                   = 59;
+    public const REASSIGNMENT_IN_PROGRESS              = 60;
 
     private const PROTOCOL_ERROR_MAP = [
         0  => 'No error--it worked!',
@@ -153,32 +154,34 @@ class Protocol
         60 => 'A partition reassignment is in progress'
     ];
 
+    /**
+     * @var Protocol\Protocol[]
+     */
     protected static $objects = [];
 
-    public static function init($version, $logger = null)
+    public static function init(string $version, LoggerInterface $logger = null): void
     {
         $class = [
-            \Kafka\Protocol\Protocol::PRODUCE_REQUEST => 'Produce',
-            \Kafka\Protocol\Protocol::FETCH_REQUEST => 'Fetch',
-            \Kafka\Protocol\Protocol::OFFSET_REQUEST => 'Offset',
-            \Kafka\Protocol\Protocol::METADATA_REQUEST => 'Metadata',
-            \Kafka\Protocol\Protocol::OFFSET_COMMIT_REQUEST => 'CommitOffset',
-            \Kafka\Protocol\Protocol::OFFSET_FETCH_REQUEST => 'FetchOffset',
-            \Kafka\Protocol\Protocol::GROUP_COORDINATOR_REQUEST => 'GroupCoordinator',
-            \Kafka\Protocol\Protocol::JOIN_GROUP_REQUEST => 'JoinGroup',
-            \Kafka\Protocol\Protocol::HEART_BEAT_REQUEST => 'Heartbeat',
-            \Kafka\Protocol\Protocol::LEAVE_GROUP_REQUEST => 'LeaveGroup',
-            \Kafka\Protocol\Protocol::SYNC_GROUP_REQUEST => 'SyncGroup',
-            \Kafka\Protocol\Protocol::DESCRIBE_GROUPS_REQUEST => 'DescribeGroups',
-            \Kafka\Protocol\Protocol::LIST_GROUPS_REQUEST => 'ListGroup',
-            \Kafka\Protocol\Protocol::SASL_HAND_SHAKE_REQUEST => 'SaslHandShake',
-            \Kafka\Protocol\Protocol::API_VERSIONS_REQUEST => 'ApiVersions',
+            Protocol\Protocol::PRODUCE_REQUEST           => Protocol\Produce::class,
+            Protocol\Protocol::FETCH_REQUEST             => Protocol\Fetch::class,
+            Protocol\Protocol::OFFSET_REQUEST            => Protocol\Offset::class,
+            Protocol\Protocol::METADATA_REQUEST          => Protocol\Metadata::class,
+            Protocol\Protocol::OFFSET_COMMIT_REQUEST     => Protocol\CommitOffset::class,
+            Protocol\Protocol::OFFSET_FETCH_REQUEST      => Protocol\FetchOffset::class,
+            Protocol\Protocol::GROUP_COORDINATOR_REQUEST => Protocol\GroupCoordinator::class,
+            Protocol\Protocol::JOIN_GROUP_REQUEST        => Protocol\JoinGroup::class,
+            Protocol\Protocol::HEART_BEAT_REQUEST        => Protocol\Heartbeat::class,
+            Protocol\Protocol::LEAVE_GROUP_REQUEST       => Protocol\LeaveGroup::class,
+            Protocol\Protocol::SYNC_GROUP_REQUEST        => Protocol\SyncGroup::class,
+            Protocol\Protocol::DESCRIBE_GROUPS_REQUEST   => Protocol\DescribeGroups::class,
+            Protocol\Protocol::LIST_GROUPS_REQUEST       => Protocol\ListGroup::class,
+            Protocol\Protocol::SASL_HAND_SHAKE_REQUEST   => Protocol\SaslHandShake::class,
+            Protocol\Protocol::API_VERSIONS_REQUEST      => Protocol\ApiVersions::class,
         ];
 
-        $namespace = '\\Kafka\\Protocol\\';
         foreach ($class as $key => $className) {
-            $class               = $namespace . $className;
-            self::$objects[$key] = new $class($version);
+            self::$objects[$key] = new $className($version);
+
             if ($logger) {
                 self::$objects[$key]->setLogger($logger);
             }
@@ -186,14 +189,9 @@ class Protocol
     }
 
     /**
-     * request encode
-     *
-     * @param key $appkey
-     * @param array $payloads
-     * @access public
-     * @return string
+     * @throws \Kafka\Exception
      */
-    public static function encode($key, $payloads)
+    public static function encode(int $key, array $payloads): string
     {
         if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);
@@ -203,12 +201,9 @@ class Protocol
     }
 
     /**
-     * decode response
-     *
-     * @access public
-     * @return array
+     * @throws \Kafka\Exception
      */
-    public static function decode($key, $data)
+    public static function decode(int $key, string $data): array
     {
         if (! isset(self::$objects[$key])) {
             throw new \Kafka\Exception('Not support api key, key:' . $key);

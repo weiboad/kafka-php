@@ -3,29 +3,14 @@ namespace Kafka\Protocol;
 
 class ApiVersions extends Protocol
 {
-
-    /**
-     * meta data request encode
-     *
-     * @param array $payloads
-     * @access public
-     * @return string
-     */
-    public function encode()
+    public function encode(array $payloads = []): string
     {
         $header = $this->requestHeader('kafka-php', self::API_VERSIONS_REQUEST, self::API_VERSIONS_REQUEST);
-        $data   = self::encodeString($header, self::PACK_INT32);
 
-        return $data;
+        return self::encodeString($header, self::PACK_INT32);
     }
 
-    /**
-     * decode sasl hand shake response
-     *
-     * @access public
-     * @return array
-     */
-    public function decode($data)
+    public function decode(string $data): array
     {
         $offset      = 0;
         $errcode     = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
@@ -34,18 +19,12 @@ class ApiVersions extends Protocol
         $offset     += $apiVersions['length'];
 
         return [
-            'apiVerions' => $apiVersions['data'],
+            'apiVersions' => $apiVersions['data'],
             'errorCode'  => $errcode,
         ];
     }
 
-    /**
-     * decode api version struct
-     *
-     * @access protected
-     * @return array
-     */
-    protected function apiVersion($data)
+    protected function apiVersion(string $data): array
     {
         $offset     = 0;
         $apiKey     = self::unpack(self::BIT_B16, substr($data, $offset, 2));
@@ -57,10 +36,10 @@ class ApiVersions extends Protocol
 
         return [
             'length' => $offset,
-            'data' => [
+            'data'   => [
                 $apiKey,
                 $minVersion,
-                $maxVersion
+                $maxVersion,
             ],
         ];
     }
