@@ -98,7 +98,7 @@ class Produce extends Protocol
      */
     protected function encodeMessage($message, int $compression = self::COMPRESSION_NONE): string
     {
-        $magic      = $this->computeMagicBit();
+        $magic      = $this->computeMagicByte();
         $attributes = $this->computeAttributes($magic, $compression, $this->computeTimestampType($magic));
 
         $data  = self::pack(self::BIT_B8, $magic);
@@ -129,7 +129,7 @@ class Produce extends Protocol
         return $message;
     }
 
-    private function computeMagicBit(): int
+    private function computeMagicByte(): int
     {
         if ($this->getApiVersion(self::PRODUCE_REQUEST) === self::API_VERSION2) {
             return self::MESSAGE_MAGIC_VERSION1;
