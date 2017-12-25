@@ -198,8 +198,7 @@ class Fetch extends Protocol
         $backOffset = $offset;
 
         try { // try unpack message format v1, falling back to v0 if it fails
-            $version = $this->getApiVersion(self::FETCH_REQUEST);
-            if ($version == self::API_VERSION2) {
+            if ($magic >= self::MESSAGE_MAGIC_VERSION1) {
                 $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset   += 8;
             }
