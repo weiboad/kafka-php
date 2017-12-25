@@ -9,10 +9,9 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 
 class Scram extends Mechanism implements SaslMechanism
 {
+    public const SCRAM_SHA_256 = 256;
+    public const SCRAM_SHA_512 = 512;
 
-    const SCRAM_SHA_256 = 256;
-    const SCRAM_SHA_512 = 512;
-    
     private const MECHANISM_NAME = "SCRAM-SHA-";
 
     private const ALLOW_SHA_ALGORITHM = [
@@ -34,7 +33,6 @@ class Scram extends Mechanism implements SaslMechanism
 
     private $authMessage;
 
-    
     /**
      *
      * __construct
@@ -52,7 +50,6 @@ class Scram extends Mechanism implements SaslMechanism
         $this->password      = trim($password);
     }
 
-    
     /**
      *
      * sasl authenticate
@@ -67,19 +64,19 @@ class Scram extends Mechanism implements SaslMechanism
         $socket->writeBlocking($data);
         $dataLen           = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
         $serverFistMessage = $socket->readBlocking($dataLen);
-        
+
         $finalMessage = $this->finalMessage($serverFistMessage);
         $data         = ProtocolTool::encodeString($finalMessage, ProtocolTool::PACK_INT32);
         $socket->writeBlocking($data);
         $dataLen       = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
         $verifyMessage = $socket->readBlocking($dataLen);
-        
+
         if (! $this->verifyMessage($verifyMessage)) {
             throw new Exception('Verify server final response message is failure');
         }
     }
 
-    
+
     /**
      *
      * get sasl authenticate mechanism name
@@ -149,7 +146,7 @@ class Scram extends Mechanism implements SaslMechanism
          * ServerKey       := HMAC(SaltedPassword, "Server Key")
          * ServerSignature := HMAC(ServerKey, AuthMessage)
          */
-        
+
         $saltedPassword       = $this->hi($this->password, $salt, $i);
         $this->saltedPassword = $saltedPassword;
         $clientKey            = $this->hmac($saltedPassword, 'Client Key', true);

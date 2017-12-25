@@ -3,8 +3,7 @@ namespace Kafka;
 
 abstract class CommonSocket
 {
-
-    const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
+    public const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
 
     /**
      * max write socket buffer
@@ -12,7 +11,7 @@ abstract class CommonSocket
      * fixed:'fwrite(): send of ???? bytes failed with errno=35 Resource temporarily unavailable'
      * unavailable error info
      */
-    const MAX_WRITE_BUFFER = 2048;
+    public const MAX_WRITE_BUFFER = 2048;
 
     /**
      * Send timeout in seconds.
@@ -130,7 +129,7 @@ abstract class CommonSocket
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
-    
+
 
     /**
      * @param float $recvTimeoutUsec
@@ -139,7 +138,7 @@ abstract class CommonSocket
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
-    
+
 
     /**
      * @param int $number
@@ -185,7 +184,7 @@ abstract class CommonSocket
                 'peer_name' => $peerName
             ]]);
         }
-        
+
         $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
 
         if ($this->stream == false) {
@@ -342,7 +341,7 @@ abstract class CommonSocket
                     throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
                 }
             }
-            
+
             if ($bytesToWrite - $bytesWritten > self::MAX_WRITE_BUFFER) {
                 // write max buffer size
                 $wrote = fwrite($this->stream, substr($buf, $bytesWritten, self::MAX_WRITE_BUFFER));
@@ -350,7 +349,7 @@ abstract class CommonSocket
                 // write remaining buffer bytes to stream
                 $wrote = fwrite($this->stream, substr($buf, $bytesWritten));
             }
-            
+
             if ($wrote === -1 || $wrote === false) {
                 throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
             } elseif ($wrote === 0) {
