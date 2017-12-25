@@ -2,8 +2,38 @@
 
 namespace Kafka\Protocol;
 
+use Lcobucci\Clock\Clock;
+use Lcobucci\Clock\SystemClock;
+
 class Produce extends Protocol
 {
+    /**
+     * Specifies the mask for the compression code. 3 bits to hold the compression codec.
+     * 0 is reserved to indicate no compression
+     */
+    private const COMPRESSION_CODEC_MASK = 0x07;
+
+    /**
+     * Specify the mask of timestamp type: 0 for CreateTime, 1 for LogAppendTime.
+     */
+    private const TIMESTAMP_TYPE_MASK = 0x08;
+
+    private const TIMESTAMP_NONE            = -1;
+    private const TIMESTAMP_CREATE_TIME     = 0;
+    private const TIMESTAMP_LOG_APPEND_TIME = 1;
+
+    /**
+     * @var Clock
+     */
+    private $clock;
+
+    public function __construct(string $version = self::DEFAULT_BROKER_VERION, ?Clock $clock = null)
+    {
+        parent::__construct($version);
+
+        $this->clock = $clock ?: new SystemClock();
+    }
+
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
@@ -68,11 +98,15 @@ class Produce extends Protocol
      */
     protected function encodeMessage($message, int $compression = self::COMPRESSION_NONE): string
     {
-        // int8 -- magic  int8 -- attribute
-        $version = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $magic   = $version === self::API_VERSION2 ? self::MESSAGE_MAGIC_VERSION0 : self::MESSAGE_MAGIC_VERSION1;
-        $data    = self::pack(self::BIT_B8, $magic);
-        $data   .= self::pack(self::BIT_B8, $compression);
+        $magic      = $this->computeMagicBit();
+        $attributes = $this->computeAttributes($magic, $compression, $this->computeTimestampType($magic));
+
+        $data  = self::pack(self::BIT_B8, $magic);
+        $data .= self::pack(self::BIT_B8, $attributes);
+
+        if ($magic >= self::MESSAGE_MAGIC_VERSION1) {
+            $data .= self::pack(self::BIT_B64, $this->clock->now()->format('Uv'));
+        }
 
         $key = '';
 
@@ -93,6 +127,43 @@ class Produce extends Protocol
         $message = self::pack(self::BIT_B32, $crc) . $data;
 
         return $message;
+    }
+
+    private function computeMagicBit(): int
+    {
+        if ($this->getApiVersion(self::PRODUCE_REQUEST) === self::API_VERSION2) {
+            return self::MESSAGE_MAGIC_VERSION1;
+        }
+
+        return self::MESSAGE_MAGIC_VERSION0;
+    }
+
+    public function computeTimestampType(int $magic): int
+    {
+        if ($magic === self::MESSAGE_MAGIC_VERSION0) {
+            return self::TIMESTAMP_NONE;
+        }
+
+        return self::TIMESTAMP_CREATE_TIME;
+    }
+
+    private function computeAttributes(int $magic, int $compression, int $timestampType): int
+    {
+        $attributes = 0;
+
+        if ($compression !== self::COMPRESSION_NONE) {
+            $attributes |= self::COMPRESSION_CODEC_MASK & $compression;
+        }
+
+        if ($magic === self::MESSAGE_MAGIC_VERSION0) {
+            return $attributes;
+        }
+
+        if ($timestampType === self::TIMESTAMP_LOG_APPEND_TIME) {
+            $attributes |= self::TIMESTAMP_TYPE_MASK;
+        }
+
+        return $attributes;
     }
 
     /**
@@ -175,7 +246,7 @@ class Produce extends Protocol
         $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
         $offset         += 8;
         $timestamp       = 0;
-        if ($version == self::API_VERSION2) {
+        if ($version === self::API_VERSION2) {
             $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
             $offset   += 8;
         }
