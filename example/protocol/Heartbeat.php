@@ -59,7 +59,7 @@ class Heartbeat
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],

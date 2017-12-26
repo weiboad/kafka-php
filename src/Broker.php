@@ -221,12 +221,12 @@ class Broker
 
         $plainConnections = [
             Config::SECURITY_PROTOCOL_PLAINTEXT,
-            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT,
         ];
 
         $saslConnections = [
             Config::SECURITY_PROTOCOL_SASL_SSL,
-            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT,
         ];
 
         $securityProtocol = $this->config->getSecurityProtocol();

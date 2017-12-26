@@ -59,7 +59,7 @@ class LeaveGroup
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],

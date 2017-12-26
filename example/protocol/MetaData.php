@@ -2,7 +2,7 @@
 require '../../vendor/autoload.php';
 
 $data = [
-    'test'
+    'test',
 ];
 
 \Kafka\Protocol::init('1.0.0');

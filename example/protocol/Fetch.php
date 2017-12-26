@@ -13,7 +13,7 @@ $data = [
                     'partition_id' => 0,
                     'offset' => 45,
                     'max_bytes' => 1024,
-                ]
+                ],
             ],
         ],
     ],

@@ -69,7 +69,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
-            'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c'
+            'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
         ];
 
         $this->sync->encode($data);
@@ -107,7 +107,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => [
                 [
-                    'version' => 0
+                    'version' => 0,
                 ],
             ],
         ];
@@ -152,7 +152,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
                     'assignments' => [
                         [],
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -178,7 +178,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
                         [
                             'topic_name' => 'test',
                         ],
-                    ]
+                    ],
                 ],
             ],
         ];

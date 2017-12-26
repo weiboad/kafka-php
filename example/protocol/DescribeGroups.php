@@ -59,7 +59,7 @@ class DescribeGroups
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],
@@ -92,7 +92,7 @@ class DescribeGroups
         $this->joinGroup();
         $this->syncGroup();
         $data = [
-            'test'
+            'test',
         ];
 
         \Kafka\Protocol::init('0.9.1.0');

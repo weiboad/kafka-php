@@ -59,7 +59,7 @@ class CommitOffset
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],
@@ -104,9 +104,9 @@ class CommitOffset
                             'partition' => 0,
                             'offset' => 45,
                             'metadata' => '',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ];
 

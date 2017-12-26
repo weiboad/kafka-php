@@ -59,7 +59,7 @@ class ListGroup
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],

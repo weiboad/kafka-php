@@ -6,8 +6,8 @@ $data = [
     'data' => [
         [
             'topic_name' => 'test',
-            'partitions' => [0]
-        ]
+            'partitions' => [0],
+        ],
     ],
 ];
 

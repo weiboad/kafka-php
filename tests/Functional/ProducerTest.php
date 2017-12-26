@@ -121,7 +121,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         for ($i = 0; $i < $amount; ++$i) {
             $messages[] = [
                 'topic' => $this->topic,
-                'value' => 'msg-' . str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT)
+                'value' => 'msg-' . str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT),
             ];
         }
 

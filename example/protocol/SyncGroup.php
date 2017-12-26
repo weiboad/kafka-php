@@ -59,7 +59,7 @@ class SyncGroup
                         [
                             'topic_name' => 'test',
                             'partitions' => [
-                                0
+                                0,
                             ],
                         ],
                     ],

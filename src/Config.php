@@ -43,14 +43,14 @@ abstract class Config
         self::SECURITY_PROTOCOL_PLAINTEXT,
         self::SECURITY_PROTOCOL_SSL,
         self::SECURITY_PROTOCOL_SASL_PLAINTEXT,
-        self::SECURITY_PROTOCOL_SASL_SSL
+        self::SECURITY_PROTOCOL_SASL_SSL,
     ];
 
     private const ALLOW_MECHANISMS = [
         self::SASL_MECHANISMS_PLAIN,
         self::SASL_MECHANISMS_GSSAPI,
         self::SASL_MECHANISMS_SCRAM_SHA_256,
-        self::SASL_MECHANISMS_SCRAM_SHA_512
+        self::SASL_MECHANISMS_SCRAM_SHA_512,
     ];
 
     protected static $options = [];

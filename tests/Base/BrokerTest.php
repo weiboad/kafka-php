@@ -94,13 +94,13 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $brokers = [
             0 => '127.0.0.1:9092',
             1 => '127.0.0.1:9192',
-            2 => '127.0.0.1:9292'
+            2 => '127.0.0.1:9292',
         ];
         $topics  = [
             'test' => [
                 0 => 0,
                 1 => 2,
-            ]
+            ],
         ];
         $this->assertEquals($brokers, $broker->getBrokers());
         $this->assertEquals($topics, $broker->getTopics());

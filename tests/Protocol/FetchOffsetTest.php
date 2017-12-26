@@ -19,8 +19,8 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
             'data' => [
                 [
                     'topic_name' => 'test',
-                    'partitions' => [0]
-                ]
+                    'partitions' => [0],
+                ],
             ],
         ];
 
@@ -46,7 +46,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
     public function testEncodeNoGroupId(): void
     {
         $data = [
-            'data' => []
+            'data' => [],
         ];
 
         $this->offset->encode($data);
@@ -61,7 +61,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                []
+                [],
             ],
         ];
 
@@ -79,7 +79,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
             'data' => [
                 [
                     'topic_name' => 'test',
-                ]
+                ],
             ],
         ];
 

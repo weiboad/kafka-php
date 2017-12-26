@@ -151,7 +151,7 @@ class Protocol
         57 => 'The user-specified log directory is not found in the broker config.',
         58 => 'SASL Authentication failed.',
         59 => 'This exception is raised by the broker if it could not locate the producer metadata associated with the producerId in question',
-        60 => 'A partition reassignment is in progress'
+        60 => 'A partition reassignment is in progress',
     ];
 
     /**

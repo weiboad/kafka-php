@@ -57,7 +57,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
                         [
                             'partition_id' => 0,
                             'messages' => [
-                                ['key' => 'testkey', 'value' => 'test...']
+                                ['key' => 'testkey', 'value' => 'test...'],
                             ],
                         ],
                     ],
@@ -81,7 +81,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
                     'partitions' => [
                         [
                             'partition_id' => 0,
-                            'messages' => 'test...'
+                            'messages' => 'test...',
                         ],
                     ],
                 ],

@@ -26,7 +26,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
                             'partition_id' => 0,
                             'offset' => 45,
                             'max_bytes' => 128,
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -59,7 +59,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
                     'partitions' => [
                         [
                             'partition_id' => 0,
-                        ]
+                        ],
                     ],
                 ],
             ],
