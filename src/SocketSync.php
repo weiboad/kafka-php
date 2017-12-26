@@ -3,29 +3,7 @@ namespace Kafka;
 
 class SocketSync extends CommonSocket
 {
-
-    /**
-     * Optional method to set the internal stream handle
-     *
-     * @static
-     * @access public
-     * @param $stream
-     * @return Socket
-     */
-    public static function createFromStream($stream)
-    {
-        $socket = new self('localhost', 0);
-        $socket->setStream($stream);
-        return $socket;
-    }
-
-    /**
-     * Connects the socket
-     *
-     * @access public
-     * @return void
-     */
-    public function connect()
+    public function connect(): void
     {
         if (is_resource($this->stream)) {
             return;

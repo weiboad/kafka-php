@@ -92,7 +92,7 @@ class JoinGroup extends Protocol
             $values['user_data'] = '';
         }
 
-        $data  = self::pack(self::BIT_B16, 0);
+        $data  = self::pack(self::BIT_B16, '0');
         $data .= self::encodeArray($values['subscription'], [$this, 'encodeGroupProtocolMetaTopic']);
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 

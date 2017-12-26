@@ -82,7 +82,7 @@ class Produce extends Protocol
         foreach ($messages as $message) {
             $encodedMessage = $this->encodeMessage($message);
 
-            $data .= self::pack(self::BIT_B64, $next)
+            $data .= self::pack(self::BIT_B64, (string) $next)
                    . self::encodeString($encodedMessage, self::PACK_INT32);
 
             ++$next;
@@ -92,7 +92,7 @@ class Produce extends Protocol
             return $data;
         }
 
-        return self::pack(self::BIT_B64, 0)
+        return self::pack(self::BIT_B64, '0')
              . self::encodeString($this->encodeMessage($data, $compression), self::PACK_INT32);
     }
 
@@ -104,8 +104,8 @@ class Produce extends Protocol
         $magic      = $this->computeMagicByte();
         $attributes = $this->computeAttributes($magic, $compression, $this->computeTimestampType($magic));
 
-        $data  = self::pack(self::BIT_B8, $magic);
-        $data .= self::pack(self::BIT_B8, $attributes);
+        $data  = self::pack(self::BIT_B8, (string) $magic);
+        $data .= self::pack(self::BIT_B8, (string) $attributes);
 
         if ($magic >= self::MESSAGE_MAGIC_VERSION1) {
             $data .= self::pack(self::BIT_B64, $this->clock->now()->format('Uv'));

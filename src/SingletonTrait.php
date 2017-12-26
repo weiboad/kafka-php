@@ -6,32 +6,17 @@ trait SingletonTrait
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
-    protected static $instance = null;
+    protected static $instance;
 
-    /**
-     * set send messages
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     * @return static
-     */
     public static function getInstance()
     {
-        if (is_null(self::$instance)) {
+        if (self::$instance === null) {
             static::$instance = new static();
         }
 
         return static::$instance;
     }
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $hostList
-     * @param null $timeout
-     */
     private function __construct()
     {
     }

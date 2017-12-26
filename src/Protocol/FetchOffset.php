@@ -34,7 +34,7 @@ class FetchOffset extends Protocol
 
     protected function encodeOffsetPartition(int $values): string
     {
-        return self::pack(self::BIT_B32, $values);
+        return self::pack(self::BIT_B32, (string) $values);
     }
 
     protected function encodeOffsetTopic(array $values): string

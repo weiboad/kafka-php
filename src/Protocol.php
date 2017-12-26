@@ -214,13 +214,8 @@ class Protocol
 
     /**
      * get error
-     *
-     * @param integer $errCode
-     * @static
-     * @access public
-     * @return string
      */
-    public static function getError($errCode)
+    public static function getError(int $errCode): string
     {
         if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {
             return 'Unknown error (' . $errCode . ')';

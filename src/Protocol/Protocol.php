@@ -2,6 +2,8 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\Protocol as ProtocolException;
+
 abstract class Protocol
 {
     use \Psr\Log\LoggerAwareTrait;
@@ -113,31 +115,18 @@ abstract class Protocol
     public const BIT_B8 = 'C';
 
     /**
-     * kafka broker version
-     *
-     * @var mixed
-     * @access protected
+     * @var string
      */
     protected $version = self::DEFAULT_BROKER_VERION;
 
     /**
-     * isBigEndianSystem
-     *
      * gets set to true if the computer this code is running is little endian,
      * gets set to false if the computer this code is running on is big endian.
      *
      * @var null|bool
-     * @access private
      */
-    private static $isLittleEndianSystem = null;
+    private static $isLittleEndianSystem;
 
-    /**
-     * __construct
-     *
-     * @param string version
-     *
-     * @access public
-     */
     public function __construct(string $version = self::DEFAULT_BROKER_VERION)
     {
         $this->version = $version;
@@ -145,23 +134,16 @@ abstract class Protocol
 
     /**
      * Unpack a bit integer as big endian long
-     *
-     * @static
-     * @access public
-     *
-     * @param $type
-     * @param $bytes
-     *
-     * @return int
      */
-    public static function unpack($type, $bytes)
+    public static function unpack(string $type, string $bytes)
     {
         $result = [];
         self::checkLen($type, $bytes);
-        if ($type == self::BIT_B64) {
+
+        if ($type === self::BIT_B64) {
             $set    = unpack($type, $bytes);
             $result = ($set[1] & 0xFFFFFFFF) << 32 | ($set[2] & 0xFFFFFFFF);
-        } elseif ($type == self::BIT_B16_SIGNED) {
+        } elseif ($type === self::BIT_B16_SIGNED) {
             // According to PHP docs: 's' = signed short (always 16 bit, machine byte order)
             // So lets unpack it..
             $set = unpack($type, $bytes);
@@ -179,94 +161,73 @@ abstract class Protocol
         return is_array($result) ? array_shift($result) : $result;
     }
 
-    /**
-     * pack a bit integer as big endian long
-     *
-     * @static
-     * @access public
-     *
-     * @param $type
-     * @param $data
-     *
-     * @return int
-     */
-    public static function pack($type, $data)
+    public static function pack(string $type, string $data): string
     {
-        if ($type == self::BIT_B64) {
-            if ($data == -1) { // -1L
-                $data = \hex2bin('ffffffffffffffff');
-            } elseif ($data == -2) { // -2L
-                $data = \hex2bin('fffffffffffffffe');
-            } else {
-                $left  = 0xffffffff00000000;
-                $right = 0x00000000ffffffff;
-
-                $l    = ($data & $left) >> 32;
-                $r    = $data & $right;
-                $data = pack($type, $l, $r);
-            }
-        } else {
-            $data = pack($type, $data);
+        if ($type !== self::BIT_B64) {
+            return pack($type, $data);
         }
 
-        return $data;
+        if ((int) $data === -1) { // -1L
+            return \hex2bin('ffffffffffffffff');
+        }
+
+        if ((int) $data === -2) { // -2L
+            return \hex2bin('fffffffffffffffe');
+        }
+
+        $left  = 0xffffffff00000000;
+        $right = 0x00000000ffffffff;
+
+        $l = ($data & $left) >> 32;
+        $r = $data & $right;
+
+        return pack($type, $l, $r);
     }
 
     /**
      * check unpack bit is valid
      *
-     * @param string $type
-     * @param string(raw) $bytes
-     *
-     * @static
-     * @access protected
-     * @return void
+     * @throws ProtocolException
      */
-    protected static function checkLen($type, $bytes)
+    protected static function checkLen(string $type, string $bytes): void
     {
-        $len = 0;
+        $expectedLength = 0;
+
         switch ($type) {
             case self::BIT_B64:
-                $len = 8;
+                $expectedLength = 8;
                 break;
             case self::BIT_B32:
-                $len = 4;
+                $expectedLength = 4;
                 break;
             case self::BIT_B16:
-                $len = 2;
+                $expectedLength = 2;
                 break;
             case self::BIT_B16_SIGNED:
-                $len = 2;
+                $expectedLength = 2;
                 break;
             case self::BIT_B8:
-                $len = 1;
+                $expectedLength = 1;
                 break;
         }
 
-        if (strlen($bytes) !== $len) {
-            throw new \Kafka\Exception\Protocol('unpack failed. string(raw) length is ' . strlen($bytes) . ' , TO ' . $type);
+        $length = \strlen($bytes);
+
+        if ($length !== $expectedLength) {
+            throw new ProtocolException('unpack failed. string(raw) length is ' . $length . ' , TO ' . $type);
         }
     }
 
     /**
      * Determines if the computer currently running this code is big endian or little endian.
-     *
-     * @access public
-     * @return bool - false if big endian, true if little endian
      */
-    public static function isSystemLittleEndian()
+    public static function isSystemLittleEndian(): bool
     {
         // If we don't know if our system is big endian or not yet...
-        if (is_null(self::$isLittleEndianSystem)) {
-            // Lets find out
-            list($endiantest) = array_values(unpack('L1L', pack('V', 1)));
-            if ($endiantest != 1) {
-                // This is a big endian system
-                self::$isLittleEndianSystem = false;
-            } else {
-                // This is a little endian system
-                self::$isLittleEndianSystem = true;
-            }
+        if (self::$isLittleEndianSystem === null) {
+            [$endianTest] = array_values(unpack('L1L', pack('V', 1)));
+
+            self::$isLittleEndianSystem = (int) $endianTest === 1;
         }
 
         return self::$isLittleEndianSystem;
@@ -302,14 +263,9 @@ abstract class Protocol
     }
 
     /**
-     * Get kafka api version according to specifiy kafka broker version
-     *
-     * @param int kafka api key
-     *
-     * @access public
-     * @return int
+     * Get kafka api version according to specify kafka broker version
      */
-    public function getApiVersion($apikey)
+    public function getApiVersion(int $apikey): int
     {
         switch ($apikey) {
             case self::METADATA_REQUEST:
@@ -384,13 +340,8 @@ abstract class Protocol
 
     /**
      * Get kafka api text
-     *
-     * @param int kafka api key
-     *
-     * @access public
-     * @return string
      */
-    public static function getApiText($apikey)
+    public static function getApiText(int $apikey): string
     {
         $apis = [
             self::PRODUCE_REQUEST           => 'ProduceRequest',
@@ -410,25 +361,18 @@ abstract class Protocol
             self::API_VERSIONS_REQUEST      => 'ApiVersionsRequest',
         ];
 
-        return $apis[$apikey];
+        return $apis[$apikey] ?? 'Unknown message';
     }
 
     /**
-     * get request header
-     *
-     * @param string  $clientId
-     * @param integer $correlationId
-     * @param integer $apiKey
-     *
-     * @access public
-     * @return string
+     * @throws \Kafka\Exception\NotSupported
      */
-    public function requestHeader($clientId, $correlationId, $apiKey)
+    public function requestHeader(string $clientId, int $correlationId, int $apiKey): string
     {
         // int16 -- apiKey int16 -- apiVersion int32 correlationId
-        $binData  = self::pack(self::BIT_B16, $apiKey);
-        $binData .= self::pack(self::BIT_B16, $this->getApiVersion($apiKey));
-        $binData .= self::pack(self::BIT_B32, $correlationId);
+        $binData  = self::pack(self::BIT_B16, (string) $apiKey);
+        $binData .= self::pack(self::BIT_B16, (string) $this->getApiVersion($apiKey));
+        $binData .= self::pack(self::BIT_B32, (string) $correlationId);
 
         // concat client id
         $binData .= self::encodeString($clientId, self::PACK_INT16);
@@ -476,7 +420,7 @@ abstract class Protocol
     public static function encodeArray(array $array, $func, ?int $options = null)
     {
         if (! is_callable($func, false)) {
-            throw new \Kafka\Exception\Protocol('Encode array failed, given function is not callable.');
+            throw new ProtocolException('Encode array failed, given function is not callable.');
         }
 
         $arrayCount = count($array);
@@ -486,7 +430,7 @@ abstract class Protocol
             $body .= $options !== null ? $func($value, $options) : $func($value);
         }
 
-        return self::pack(self::BIT_B32, $arrayCount) . $body;
+        return self::pack(self::BIT_B32, (string) $arrayCount) . $body;
     }
 
     public function decodeString(string $data, string $bytes, int $compression = self::COMPRESSION_NONE): array
@@ -542,7 +486,7 @@ abstract class Protocol
             }
 
             if (! isset($ret['length'], $ret['data'])) {
-                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invalid');
+                throw new ProtocolException('Decode array failed, given function return format is invalid');
             }
             if ((int) $ret['length'] === 0) {
                 continue;
@@ -587,12 +531,12 @@ abstract class Protocol
     }
 
     /**
-     * @throws \Kafka\Exception\Protocol
+     * @throws ProtocolException
      */
     abstract public function encode(array $payloads = []): string;
 
     /**
-     * @throws \Kafka\Exception\Protocol
+     * @throws ProtocolException
      */
     abstract public function decode(string $data): array;
 }

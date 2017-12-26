@@ -40,7 +40,7 @@ final class AsyncProducerTest extends ProducerTest
 
         self::assertTrue(
             $messagesSent,
-            'It was not possible to send the messages, reason: ' . Protocol::getError($error)
+            'It was not possible to send the messages, reason: ' . Protocol::getError((int) $error)
         );
     }
 }
