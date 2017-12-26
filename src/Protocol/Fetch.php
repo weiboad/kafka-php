@@ -43,7 +43,7 @@ class Fetch extends Protocol
             $offset      += 4;
         }
 
-        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic'], $version);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic']);
         $offset += $topics['length'];
 
         return [
@@ -52,13 +52,13 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function fetchTopic(string $data, string $version): array
+    protected function fetchTopic(string $data): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition'], $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -70,7 +70,7 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function fetchPartition(string $data, string $version): array
+    protected function fetchPartition(string $data): array
     {
         $offset              = 0;
         $partitionId         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
