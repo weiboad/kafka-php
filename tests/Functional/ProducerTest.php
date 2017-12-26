@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace KafkaTest\Functional;
 
 use Kafka\Consumer\StopStrategy\Callback;
+use Kafka\Protocol\Protocol;
 
 abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,13 +26,19 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
     private $topic;
 
     /**
+     * @var bool
+     */
+    protected $compress;
+
+    /**
      * @before
      */
     public function prepareEnvironment(): void
     {
-        $this->version = getenv('KAFKA_VERSION');
-        $this->brokers = getenv('KAFKA_BROKERS');
-        $this->topic   = getenv('KAFKA_TOPIC');
+        $this->version  = getenv('KAFKA_VERSION');
+        $this->brokers  = getenv('KAFKA_BROKERS');
+        $this->topic    = getenv('KAFKA_TOPIC');
+        $this->compress = getenv('KAFKA_COMPRESS') === '1';
 
         if (! $this->version || ! $this->brokers || ! $this->topic) {
             self::markTestSkipped(
@@ -45,6 +52,10 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $config = \Kafka\ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
+
+        if ($this->compress) {
+            $config->setCompression(Protocol::COMPRESSION_GZIP);
+        }
     }
 
     /**
