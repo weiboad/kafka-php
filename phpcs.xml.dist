@@ -55,6 +55,7 @@
     <rule ref="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine" />
     <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
     <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing" />
 
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
         <properties>

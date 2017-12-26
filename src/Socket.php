@@ -84,7 +84,7 @@ class Socket extends CommonSocket
         $this->onReadable = $read;
     }
 
-    public function close() : void
+    public function close(): void
     {
         Loop::cancel($this->readWatcherId);
         Loop::cancel($this->writeWatcherId);

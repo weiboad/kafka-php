@@ -70,7 +70,7 @@ class Scram extends Mechanism
      * @throws \Kafka\Exception
      * @throws \Exception
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket): void
     {
         $firstMessage = $this->firstMessage();
         $data         = ProtocolTool::encodeString($firstMessage, ProtocolTool::PACK_INT32);
@@ -90,7 +90,7 @@ class Scram extends Mechanism
     }
 
 
-    public function getName() : string
+    public function getName(): string
     {
         return self::MECHANISM_NAME . $this->hashAlgorithm;
     }
@@ -98,7 +98,7 @@ class Scram extends Mechanism
     /**
      * @throws \Exception
      */
-    protected function firstMessage() : string
+    protected function firstMessage(): string
     {
         $this->cnonce = $this->generateNonce();
         $message      = sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
@@ -111,7 +111,7 @@ class Scram extends Mechanism
     /**
      * @throws \Kafka\Exception
      */
-    protected function finalMessage(string $challenge) : string
+    protected function finalMessage(string $challenge): string
     {
         $challengeArray = explode(',', $challenge);
 
@@ -171,7 +171,7 @@ class Scram extends Mechanism
      *
       * @return bool Whether the server has been authenticated.
       */
-    protected function verifyMessage(string $data) : bool
+    protected function verifyMessage(string $data): bool
     {
         $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9]{3}=|[A-Xa-z0-9]{2}==)?)$#';
 
@@ -192,7 +192,7 @@ class Scram extends Mechanism
     /**
      * @throws \Exception
      */
-    protected function generateNonce() : string
+    protected function generateNonce(): string
     {
         $str = '';
 
@@ -203,12 +203,12 @@ class Scram extends Mechanism
         return base64_encode($str);
     }
 
-    private function hash(string $data) : string
+    private function hash(string $data): string
     {
         return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
     }
 
-    private function hmac(string $key, string $data, bool $raw) : string
+    private function hmac(string $key, string $data, bool $raw): string
     {
         return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
     }
@@ -220,7 +220,7 @@ class Scram extends Mechanism
     * @param string $user a name to be prepared.
     * @return string the reformatted name.
     */
-    private function formatName(string $user) : string
+    private function formatName(string $user): string
     {
         return str_replace(['=', ','], ['=3D', '=2C'], $user);
     }
@@ -228,7 +228,7 @@ class Scram extends Mechanism
   /**
     * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
     */
-    private function hi(string $str, string $salt, int $icnt) : string
+    private function hi(string $str, string $salt, int $icnt): string
     {
         $int1   = "\0\0\0\1";
         $ui     = $this->hmac($str, $salt . $int1, true);

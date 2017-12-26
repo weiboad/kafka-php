@@ -26,7 +26,7 @@ class Plain extends Mechanism
         $this->password = trim($password);
     }
 
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket): void
     {
         $split = Protocol::pack(Protocol::BIT_B8, '0');
 
@@ -39,7 +39,7 @@ class Plain extends Mechanism
         $socket->readBlocking(4);
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return self::MECHANISM_NAME;
     }

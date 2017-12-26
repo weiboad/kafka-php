@@ -49,7 +49,7 @@ class Gssapi extends Mechanism
      * @throws \Kafka\Exception\NotSupported
      * @throws \Kafka\Exception
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket): void
     {
         $token = $this->initSecurityContext();
 
@@ -75,12 +75,12 @@ class Gssapi extends Mechanism
      * @access public
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return self::MECHANISM_NAME;
     }
 
-    private function initSecurityContext() : string
+    private function initSecurityContext(): string
     {
         $token = '';
         $ret   = $this->gssapi->initSecContext($this->principal, null, null, null, $token);
@@ -90,7 +90,7 @@ class Gssapi extends Mechanism
         return $token;
     }
 
-    private function wrapToken(string $token) : string
+    private function wrapToken(string $token): string
     {
         $message = '';
         $this->gssapi->wrap($token, $message);

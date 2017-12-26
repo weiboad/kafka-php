@@ -213,7 +213,7 @@ class Broker
     /**
      * @throws \Kafka\Exception
      */
-    private function judgeConnectionConfig() : ?SaslMechanism
+    private function judgeConnectionConfig(): ?SaslMechanism
     {
         if ($this->config === null) {
             return null;
@@ -243,7 +243,7 @@ class Broker
     /**
      * @throws \Kafka\Exception
      */
-    private function getSaslMechanismProvider(Config $config) : SaslMechanism
+    private function getSaslMechanismProvider(Config $config): SaslMechanism
     {
         $mechanism = $config->getSaslMechanism();
         $username  = $config->getSaslUsername();

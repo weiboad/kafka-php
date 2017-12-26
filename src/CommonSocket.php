@@ -79,27 +79,27 @@ abstract class CommonSocket
         $this->saslProvider = $saslProvider;
     }
 
-    public function setSendTimeoutSec(float $sendTimeoutSec) : void
+    public function setSendTimeoutSec(float $sendTimeoutSec): void
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
 
-    public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
+    public function setSendTimeoutUsec(float $sendTimeoutUsec): void
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
-    public function setRecvTimeoutSec(float $recvTimeoutSec) : void
+    public function setRecvTimeoutSec(float $recvTimeoutSec): void
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
 
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
+    public function setRecvTimeoutUsec(float $recvTimeoutUsec): void
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
 
-    public function setMaxWriteAttempts(int $number) : void
+    public function setMaxWriteAttempts(int $number): void
     {
         $this->maxWriteAttempts = $number;
     }
@@ -107,7 +107,7 @@ abstract class CommonSocket
     /**
      * @throws Exception
      */
-    protected function createStream() : void
+    protected function createStream(): void
     {
         if (trim($this->host) === '') {
             throw new Exception('Cannot open null host.');
@@ -213,7 +213,7 @@ abstract class CommonSocket
      *
      * @throws Exception
      */
-    public function readBlocking(int $length) : string
+    public function readBlocking(int $length): string
     {
         if ($length > self::READ_MAX_LENGTH) {
             throw new Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
@@ -270,7 +270,7 @@ abstract class CommonSocket
      *
      * @throws Exception
      */
-    public function writeBlocking(string $buffer) : int
+    public function writeBlocking(string $buffer): int
     {
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
@@ -326,7 +326,7 @@ abstract class CommonSocket
         return $bytesWritten;
     }
 
-    abstract public function close() : void;
+    abstract public function close(): void;
 
     abstract public function connect(): void;
 }

@@ -22,7 +22,7 @@ abstract class Mechanism implements SaslMechanism
      * @access protected
      * @return void
      */
-    protected function handShake(CommonSocket $socket, string $mechanism) : void
+    protected function handShake(CommonSocket $socket, string $mechanism): void
     {
         $requestData = Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, [$mechanism]);
         $socket->writeBlocking($requestData);
