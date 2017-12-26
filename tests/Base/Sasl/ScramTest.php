@@ -7,7 +7,6 @@ use Kafka\Socket;
 
 class ScramTest extends TestCase
 {
-
     /**
      * testScram
      *

@@ -7,7 +7,6 @@ use Kafka\Sasl\Plain;
 
 class PlainTest extends TestCase
 {
-
     /**
      * testHandShake
      *

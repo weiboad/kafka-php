@@ -64,5 +64,12 @@
             <property name="allowFullyQualifiedNameForCollidingClasses" type="boolean" value="true"/>
         </properties>
     </rule>
+
+    <rule ref="SlevomatCodingStandard.Types.EmptyLinesAroundTypeBraces">
+        <properties>
+            <property name="linesCountAfterOpeningBrace" value="0"/>
+            <property name="linesCountBeforeClosingBrace" value="0"/>
+        </properties>
+    </rule>
 </ruleset>
 

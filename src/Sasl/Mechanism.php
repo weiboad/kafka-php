@@ -9,7 +9,6 @@ use Kafka\SaslMechanism;
 
 abstract class Mechanism implements SaslMechanism
 {
-
     public function authenticate(CommonSocket $socket): void
     {
         $this->handShake($socket, $this->getName());

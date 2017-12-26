@@ -3,7 +3,6 @@ namespace KafkaTest\Base\StreamStub;
 
 class Stream
 {
-
     public function open($path, $mode, $options)
     {
         return true;

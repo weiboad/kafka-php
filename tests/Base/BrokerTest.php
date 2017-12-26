@@ -8,7 +8,6 @@ use Kafka\SocketSync;
 
 class BrokerTest extends TestCase
 {
-
     /**
      * setDown
      *

@@ -3,10 +3,9 @@ namespace KafkaTest\Base\StreamStub;
 
 class Simple
 {
-    
-    public $context = null;
+    public $context;
 
-    protected static $mock = null;
+    protected static $mock;
 
     public function stream_open($path, $mode, $options, &$opened_path)
     {
@@ -14,6 +13,7 @@ class Simple
             self::$mock->context(stream_context_get_options($this->context));
             return self::$mock->open($path, $mode, $options);
         }
+
         return true;
     }
 
@@ -57,7 +57,6 @@ class Simple
         return true;
     }
 
-    
     public static function setMock($mock)
     {
         self::$mock = $mock;
