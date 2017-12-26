@@ -283,11 +283,11 @@ abstract class CommonSocket
             // wait for stream to become available for writing
             $writable = $this->select([$this->stream], $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
 
-            if (false === $writable) {
+            if ($writable === false) {
                 throw new Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
 
-            if (0 === $writable) {
+            if ($writable === 0) {
                 $res = $this->getMetaData();
                 if (! empty($res['timed_out'])) {
                     throw new Exception('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');

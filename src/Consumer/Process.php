@@ -695,7 +695,7 @@ class Process
             return false;
         }
 
-        if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE === $errorCode) {
+        if ($errorCode === \Kafka\Protocol::OFFSET_OUT_OF_RANGE) {
             $resetOffset = \Kafka\ConsumerConfig::getInstance()->getOffsetReset();
             if ($resetOffset === 'latest') {
                 $offsets = $assign->getLastOffsets();
