@@ -159,7 +159,7 @@ class Protocol
      */
     protected static $objects = [];
 
-    public static function init(string $version, LoggerInterface $logger = null): void
+    public static function init(string $version, ?LoggerInterface $logger = null): void
     {
         $class = [
             Protocol\Protocol::PRODUCE_REQUEST           => Protocol\Produce::class,

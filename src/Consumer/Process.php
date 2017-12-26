@@ -8,11 +8,11 @@ class Process
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
-    protected $consumer = null;
+    protected $consumer;
 
     protected $messages = [];
 
-    public function __construct(callable $consumer = null)
+    public function __construct(?callable $consumer = null)
     {
         $this->consumer = $consumer;
     }
