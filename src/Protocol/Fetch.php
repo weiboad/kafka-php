@@ -85,12 +85,8 @@ class Fetch extends Protocol
 
         $messages = [];
 
-        if ($offset < strlen($data) && $messageSetSize) {
-            $messages = $this->decodeMessageSetArray(
-                substr($data, $offset, $messageSetSize),
-                [$this, 'decodeMessageSet'],
-                $messageSetSize
-            );
+        if ($offset < \strlen($data) && $messageSetSize) {
+            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), $messageSetSize);
 
             $offset += $messages['length'];
         }
@@ -107,14 +103,14 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function decodeMessageSetArray(string $data, callable $func, ?int $messageSetSize = null): array
+    protected function decodeMessageSetArray(string $data, int $messageSetSize): array
     {
         $offset = 0;
         $result = [];
 
-        while ($offset < strlen($data)) {
-            $value = substr($data, $offset);
-            $ret   = $messageSetSize !== null ? $func($value, $messageSetSize) : $func($value);
+        while ($offset < \strlen($data)) {
+            $value = \substr($data, $offset);
+            $ret   = $this->decodeMessageSet($value);
 
             if ($ret === null) {
                 break;
