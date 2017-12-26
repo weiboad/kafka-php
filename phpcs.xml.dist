@@ -50,5 +50,6 @@
     <rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints" />
     <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility" />
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing" />
 </ruleset>
 
