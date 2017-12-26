@@ -124,8 +124,15 @@ class Fetch extends Protocol
                 continue;
             }
 
-            $offset  += $ret['length'];
-            $result[] = $ret['data'];
+            $offset += $ret['length'];
+
+            if (($ret['data']['message']['attr'] & Produce::COMPRESSION_CODEC_MASK) === Produce::COMPRESSION_NONE) {
+                $result[] = $ret['data'];
+                continue;
+            }
+
+            $innerMessages = $this->decodeMessageSetArray($ret['data']['message']['value'], $ret['length']);
+            $result        = \array_merge($result, $innerMessages['data']);
         }
 
         if ($offset < $messageSetSize) {
