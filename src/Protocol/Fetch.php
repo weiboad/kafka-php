@@ -202,7 +202,7 @@ class Fetch extends Protocol
             $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 
-            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32, $attr);
+            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
             $offset  += $valueRet['length'];
 
             if ($offset !== $messageSize) {
