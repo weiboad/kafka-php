@@ -43,7 +43,7 @@ class Fetch extends Protocol
             $offset      += 4;
         }
 
-        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic'], $version);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic']);
         $offset += $topics['length'];
 
         return [
@@ -52,13 +52,13 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function fetchTopic(string $data, string $version): array
+    protected function fetchTopic(string $data): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition'], $version);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -70,7 +70,7 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function fetchPartition(string $data, string $version): array
+    protected function fetchPartition(string $data): array
     {
         $offset              = 0;
         $partitionId         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
@@ -85,12 +85,8 @@ class Fetch extends Protocol
 
         $messages = [];
 
-        if ($offset < strlen($data) && $messageSetSize) {
-            $messages = $this->decodeMessageSetArray(
-                substr($data, $offset, $messageSetSize),
-                [$this, 'decodeMessageSet'],
-                $messageSetSize
-            );
+        if ($offset < \strlen($data) && $messageSetSize) {
+            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), $messageSetSize);
 
             $offset += $messages['length'];
         }
@@ -107,14 +103,14 @@ class Fetch extends Protocol
         ];
     }
 
-    protected function decodeMessageSetArray(string $data, callable $func, ?int $messageSetSize = null): array
+    protected function decodeMessageSetArray(string $data, int $messageSetSize): array
     {
         $offset = 0;
         $result = [];
 
-        while ($offset < strlen($data)) {
-            $value = substr($data, $offset);
-            $ret   = $messageSetSize !== null ? $func($value, $messageSetSize) : $func($value);
+        while ($offset < \strlen($data)) {
+            $value = \substr($data, $offset);
+            $ret   = $this->decodeMessageSet($value);
 
             if ($ret === null) {
                 break;
@@ -128,8 +124,15 @@ class Fetch extends Protocol
                 continue;
             }
 
-            $offset  += $ret['length'];
-            $result[] = $ret['data'];
+            $offset += $ret['length'];
+
+            if (($ret['data']['message']['attr'] & Produce::COMPRESSION_CODEC_MASK) === Produce::COMPRESSION_NONE) {
+                $result[] = $ret['data'];
+                continue;
+            }
+
+            $innerMessages = $this->decodeMessageSetArray($ret['data']['message']['value'], $ret['length']);
+            $result        = \array_merge($result, $innerMessages['data']);
         }
 
         if ($offset < $messageSetSize) {
@@ -157,7 +160,7 @@ class Fetch extends Protocol
         $offset     += 4;
         $ret         = $this->decodeMessage(substr($data, $offset), $messageSize);
 
-        if (! is_array($ret) && $ret == false) {
+        if ($ret === null) {
             return null;
         }
 
@@ -206,7 +209,7 @@ class Fetch extends Protocol
             $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 
-            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32, $attr);
+            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
             $offset  += $valueRet['length'];
 
             if ($offset !== $messageSize) {

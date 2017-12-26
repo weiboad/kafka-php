@@ -5,7 +5,6 @@ use Amp\Loop;
 use Kafka\Broker;
 use Kafka\ProducerConfig;
 use Kafka\Protocol;
-use Kafka\Protocol\Produce;
 
 class Process
 {
@@ -189,6 +188,7 @@ class Process
         $broker      = Broker::getInstance();
         $requiredAck = ProducerConfig::getInstance()->getRequiredAck();
         $timeout     = ProducerConfig::getInstance()->getTimeout();
+        $compression = ProducerConfig::getInstance()->getCompression();
 
         // get send message
         // data struct
@@ -215,7 +215,7 @@ class Process
                 'required_ack' => $requiredAck,
                 'timeout'      => $timeout,
                 'data'         => $topicList,
-                'compression'  => Produce::COMPRESSION_NONE,
+                'compression'  => $compression,
             ];
 
             $this->debug("Send message start, params:" . json_encode($params));

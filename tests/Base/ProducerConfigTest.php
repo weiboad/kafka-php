@@ -1,350 +1,259 @@
 <?php
+
 namespace KafkaTest\Base;
 
-class ProducerConfigTest extends \PHPUnit\Framework\TestCase
+use Kafka\Config;
+use Kafka\ProducerConfig;
+use Kafka\Protocol\Produce;
+
+final class ProducerConfigTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var ProducerConfig
+     */
+    private $config;
 
     /**
-     * setDown
-     *
-     * @access public
-     * @return void
+     * @before
      */
-    public function tearDown()
+    public function configureInstance(): void
     {
-        \Kafka\ProducerConfig::getInstance()->clear();
+        $this->config = ProducerConfig::getInstance();
     }
 
     /**
-     * testSetRequestTimeout
-     *
-     * @access public
-     * @return void
+     * @after
      */
-    public function testSetRequestTimeout()
+    public function cleanUpInstance(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setRequestTimeout(1011);
-        $this->assertEquals($config->getRequestTimeout(), 1011);
+        ProducerConfig::getInstance()->clear();
+    }
+
+    public function testSetRequestTimeout(): void
+    {
+        $this->config->setRequestTimeout(1011);
+
+        self::assertSame($this->config->getRequestTimeout(), 1011);
     }
 
     /**
-     * testSetRequestTimeoutValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set request timeout value is invalid, must set it 1 .. 900000
-     * @access public
-     * @return void
      */
-    public function testSetRequestTimeoutValid()
+    public function testSetRequestTimeoutValid(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setRequestTimeout('-1');
+        $this->config->setRequestTimeout('-1');
+    }
+
+    public function testSetProduceInterval(): void
+    {
+        $this->config->setProduceInterval(1011);
+
+        self::assertSame($this->config->getProduceInterval(), 1011);
     }
 
     /**
-     * testSetProduceInterval
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetProduceInterval()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setProduceInterval(1011);
-        $this->assertEquals($config->getProduceInterval(), 1011);
-    }
-
-    /**
-     * testSetProduceIntervalValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set produce interval timeout value is invalid, must set it 1 .. 900000
-     * @access public
-     * @return void
      */
-    public function testSetProduceIntervalValid()
+    public function testSetProduceIntervalValid(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setProduceInterval('-1');
+        $this->config->setProduceInterval('-1');
+    }
+
+    public function testSetTimeout(): void
+    {
+        $this->config->setTimeout(1011);
+
+        self::assertSame($this->config->getTimeout(), 1011);
     }
 
     /**
-     * testSetTimeout
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetTimeout()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setTimeout(1011);
-        $this->assertEquals($config->getTimeout(), 1011);
-    }
-
-    /**
-     * testSetTimeoutValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set timeout value is invalid, must set it 1 .. 900000
-     * @access public
-     * @return void
      */
-    public function testSetTimeoutValid()
+    public function testSetTimeoutValid(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setTimeout('-1');
+        $this->config->setTimeout('-1');
+    }
+
+    public function testSetRequiredAck(): void
+    {
+        $this->config->setRequiredAck(1);
+        self::assertSame($this->config->getRequiredAck(), 1);
     }
 
     /**
-     * testSetRequiredAck
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetRequiredAck()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setRequiredAck(1);
-        $this->assertEquals($config->getRequiredAck(), 1);
-    }
-
-    /**
-     * testSetRequiredAckValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set required ack value is invalid, must set it -1 .. 1000
-     * @access public
-     * @return void
      */
-    public function testSetRequiredAckValid()
+    public function testSetRequiredAckValid(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setRequiredAck('-2');
+        $this->config->setRequiredAck('-2');
+    }
+
+    public function testSetIsAsyn(): void
+    {
+        $this->config->setIsAsyn(true);
+
+        $this->assertTrue($this->config->getIsAsyn());
     }
 
     /**
-     * testSetIsAsyn
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetIsAsyn()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setIsAsyn(true);
-        $this->assertTrue($config->getIsAsyn());
-    }
-
-    /**
-     * testSetIsAsynValid
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set isAsyn value is invalid, must set it bool value
-     * @access public
-     * @return void
      */
-    public function testSetIsAsynValid()
+    public function testSetIsAsynValid(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setIsAsyn('-2');
+        $this->config->setIsAsyn('-2');
     }
 
     /**
-     * testSetSslLocalCert
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set ssl local cert file is invalid
-     * @access public
-     * @return void
      */
-    public function testSetSslLocalCert()
+    public function testSetSslLocalCert(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSslLocalCert('invalid_path');
+        $this->config->setSslLocalCert('invalid_path');
     }
 
     /**
-     * testSetSslLocalCert
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set ssl local cert file is invalid
-     * @access public
-     * @return void
      */
-    public function testSetSslLocalCertNotFile()
+    public function testSetSslLocalCertNotFile(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSslLocalCert('/tmp');
+        $this->config->setSslLocalCert('/tmp');
+    }
+
+    public function testSetSslLocalCertValid(): void
+    {
+        $path = '/etc/passwd';
+        $this->config->setSslLocalCert($path);
+
+        self::assertSame($path, $this->config->getSslLocalCert());
     }
 
     /**
-     * testSetSslLocalCertValid
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSslLocalCertValid()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $path   = '/etc/passwd';
-        $config->setSslLocalCert($path);
-        $this->assertEquals($path, $config->getSslLocalCert());
-    }
-
-    /**
-     * testSetSslLocalPk
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set ssl local private key file is invalid
-     * @access public
-     * @return void
      */
-    public function testSetSslLocalPk()
+    public function testSetSslLocalPk(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSslLocalPk('invalid_path');
+        $this->config->setSslLocalPk('invalid_path');
+    }
+
+    public function testSetSslLocalPkValid(): void
+    {
+        $path = '/etc/passwd';
+        $this->config->setSslLocalPk($path);
+
+        self::assertSame($path, $this->config->getSslLocalPk());
     }
 
     /**
-     * testSetSslLocalPkValid
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSslLocalPkValid()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $path   = '/etc/passwd';
-        $config->setSslLocalPk($path);
-        $this->assertEquals($path, $config->getSslLocalPk());
-    }
-
-    /**
-     * testSetSslCafile
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set ssl ca file is invalid
-     * @access public
-     * @return void
      */
-    public function testSetSslCafile()
+    public function testSetSslCafile(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSslCafile('invalid_path');
+        $this->config->setSslCafile('invalid_path');
+    }
+
+    public function testSetSslCafileValid(): void
+    {
+        $path = '/etc/passwd';
+        $this->config->setSslCafile($path);
+
+        self::assertSame($path, $this->config->getSslCafile());
     }
 
     /**
-     * testSetSslCafile
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSslCafileValid()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $path   = '/etc/passwd';
-        $config->setSslCafile($path);
-        $this->assertEquals($path, $config->getSslCafile());
-    }
-
-    /**
-     * testSetSaslKeytab
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set sasl gssapi keytab file is invalid
-     * @access public
-     * @return void
      */
-    public function testSetSaslKeytab()
+    public function testSetSaslKeytab(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSaslKeytab('invalid_path');
+        $this->config->setSaslKeytab('invalid_path');
+    }
+
+    public function testSetSaslKeytabValid(): void
+    {
+        $path = '/etc/passwd';
+        $this->config->setSaslKeytab($path);
+
+        self::assertSame($path, $this->config->getSaslKeytab());
     }
 
     /**
-     * testSetSaslKeytab
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSaslKeytabValid()
-    {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $path   = '/etc/passwd';
-        $config->setSaslKeytab($path);
-        $this->assertEquals($path, $config->getSaslKeytab());
-    }
-
-    /**
-     * testSetSecurityProtocol
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Invalid security protocol given.
-     * @access public
-     * @return void
      */
-    public function testSetSecurityProtocol()
+    public function testSetSecurityProtocol(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSecurityProtocol('xxxx');
+        $this->config->setSecurityProtocol('xxxx');
+    }
+
+    public function testSetSecurityProtocolValid(): void
+    {
+        $protocol = Config::SECURITY_PROTOCOL_PLAINTEXT;
+        $this->config->setSecurityProtocol($protocol);
+
+        self::assertSame($protocol, $this->config->getSecurityProtocol());
     }
 
     /**
-     * testSetSecurityProtocol
-     *
-     * @access public
-     * @return void
-     */
-    public function testSetSecurityProtocolValid()
-    {
-        $config   = \Kafka\ProducerConfig::getInstance();
-        $protocol = \Kafka\Config::SECURITY_PROTOCOL_PLAINTEXT;
-        $config->setSecurityProtocol($protocol);
-        $this->assertEquals($protocol, $config->getSecurityProtocol());
-    }
-
-    /**
-     * testSetSaslMechanism
-     *
      * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Invalid security sasl mechanism given.
-     * @access public
-     * @return void
      */
-    public function testSetSaslMechanism()
+    public function testSetSaslMechanism(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
-        $config->setSaslMechanism('xxxx');
+        $this->config->setSaslMechanism('xxxx');
+    }
+
+    public function testSetSaslMechanismValid(): void
+    {
+        $mechanism = Config::SASL_MECHANISMS_GSSAPI;
+        $this->config->setSaslMechanism($mechanism);
+
+        self::assertSame($mechanism, $this->config->getSaslMechanism());
     }
 
     /**
-     * testSetSaslMechanism
-     *
-     * @access public
-     * @return void
+     * @test
      */
-    public function testSetSaslMechanismValid()
+    public function defaultValueForCompressionIsNull(): void
     {
-        $config    = \Kafka\ProducerConfig::getInstance();
-        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
-        $config->setSaslMechanism($mechanism);
-        $this->assertEquals($mechanism, $config->getSaslMechanism());
+        self::assertSame(Produce::COMPRESSION_NONE, $this->config->getCompression());
     }
 
     /**
-     * testClear
-     *
-     * @access public
-     * @return void
+     * @test
      */
-    public function testClear()
+    public function compressionCanBeConfigured(): void
     {
-        $config    = \Kafka\ProducerConfig::getInstance();
-        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
-        $config->setSaslMechanism($mechanism);
-        $this->assertEquals($mechanism, $config->getSaslMechanism());
-        $config->clear();
-        $this->assertEquals(\Kafka\Config::SASL_MECHANISMS_PLAIN, $config->getSaslMechanism());
+        $this->config->setCompression(Produce::COMPRESSION_GZIP);
+
+        self::assertSame(Produce::COMPRESSION_GZIP, $this->config->getCompression());
+    }
+
+    /**
+     * @test
+     */
+    public function compressionCanOnlyBeConfiguredUsingAValidOption(): void
+    {
+        $this->config->setCompression(Produce::COMPRESSION_GZIP);
+
+        self::assertSame(Produce::COMPRESSION_GZIP, $this->config->getCompression());
+    }
+
+    public function testClear(): void
+    {
+        $mechanism = Config::SASL_MECHANISMS_GSSAPI;
+        $this->config->setSaslMechanism($mechanism);
+        self::assertSame($mechanism, $this->config->getSaslMechanism());
+        $this->config->clear();
+
+        self::assertSame(Config::SASL_MECHANISMS_PLAIN, $this->config->getSaslMechanism());
     }
 }
