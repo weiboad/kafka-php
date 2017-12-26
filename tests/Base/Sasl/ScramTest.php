@@ -1,7 +1,7 @@
 <?php
 namespace KafkaTest\Base\Sasl;
 
-use \Kafka\Sasl\Scram;
+use Kafka\Sasl\Scram;
 
 class ScramTest extends \PHPUnit\Framework\TestCase
 {
@@ -131,7 +131,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $firstMessage = \hex2bin('000000396e2c2c6e3d616c6963652c723d3546723439426154484b6e306939797444424d773859584e4d4f656d7478624a2b6f70444c2f6d69574b383d');
         // final message: c=biws,r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,p=Ky7+xuihooYxDciXZYCr1j54tmc0y/ZvPN8So/1hi/w=
         $finalMessage = \hex2bin('0000007d633d626977732c723d3546723439426154484b6e306939797444424d773859584e4d4f656d7478624a2b6f70444c2f6d69574b383d6f753774657366656662716f35796d6b3964616a696f7869762c703d4b79372b787569686f6f5978446369585a594372316a3534746d6330792f5a76504e38536f2f3168692f773d');
-        
+
         $socket->expects($this->exactly(3))
             ->method('writeBlocking')
             ->withConsecutive(

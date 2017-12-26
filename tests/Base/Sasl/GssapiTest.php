@@ -1,7 +1,7 @@
 <?php
 namespace KafkaTest\Base\Sasl;
 
-use \Kafka\Sasl\Gssapi;
+use Kafka\Sasl\Gssapi;
 use org\bovigo\vfs\vfsStream;
 
 /**

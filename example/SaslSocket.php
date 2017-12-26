@@ -1,7 +1,7 @@
 <?php
 require '../vendor/autoload.php';
 
-use \Kafka\Sasl\Scram;
+use Kafka\Sasl\Scram;
 
 \Kafka\Protocol::init('1.0.0');
 //$provider = new \Kafka\Sasl\Plain('nmred', '123456');

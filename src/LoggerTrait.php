@@ -1,8 +1,8 @@
 <?php
 namespace Kafka;
 
-use \Psr\Log\NullLogger;
-use \Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use Psr\Log\LogLevel;
 
 trait LoggerTrait
 {
