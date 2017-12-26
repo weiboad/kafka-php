@@ -41,5 +41,6 @@
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowEqualOperators" />
     <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly" />
     <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.LanguageConstructWithParentheses" />
 </ruleset>
 
