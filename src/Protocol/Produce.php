@@ -71,6 +71,8 @@ class Produce extends Protocol
      * encode message set
      * N.B., MessageSets are not preceded by an int32 like other array elements
      * in the protocol.
+     *
+     * @throws \Kafka\Exception\NotSupported
      */
     protected function encodeMessageSet(array $messages, int $compression = self::COMPRESSION_NONE): string
     {
@@ -78,18 +80,20 @@ class Produce extends Protocol
         $next = 0;
 
         foreach ($messages as $message) {
-            $tmpMessage = $this->encodeMessage($message, $compression);
+            $encodedMessage = $this->encodeMessage($message);
 
-            // int64 -- message offset     Message
-            // This is the offset used in kafka as the log sequence number. When the producer is sending non compressed messages,
-            // it can set the offsets to anything. When the producer is sending compressed messages, to avoid server side recompression,
-            // each compressed message should have offset starting from 0 and increasing by one for each inner message in the compressed
-            // message. (see more details about compressed messages in Kafka below)
-            $data .= self::pack(self::BIT_B64, $next) . self::encodeString($tmpMessage, self::PACK_INT32);
-            $next++;
+            $data .= self::pack(self::BIT_B64, $next)
+                   . self::encodeString($encodedMessage, self::PACK_INT32);
+
+            ++$next;
         }
 
-        return $data;
+        if ($compression === self::COMPRESSION_NONE) {
+            return $data;
+        }
+
+        return self::pack(self::BIT_B64, 0)
+             . self::encodeString($this->encodeMessage($data, $compression), self::PACK_INT32);
     }
 
     /**

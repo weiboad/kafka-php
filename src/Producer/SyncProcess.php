@@ -3,7 +3,6 @@ namespace Kafka\Producer;
 
 use Kafka\Broker;
 use Kafka\ProducerConfig;
-use Kafka\Protocol\Produce;
 use Kafka\Protocol\Protocol;
 
 class SyncProcess
@@ -28,6 +27,7 @@ class SyncProcess
         $broker      = Broker::getInstance();
         $requiredAck = ProducerConfig::getInstance()->getRequiredAck();
         $timeout     = ProducerConfig::getInstance()->getTimeout();
+        $compression = ProducerConfig::getInstance()->getCompression();
 
         // get send message
         // data struct
@@ -52,7 +52,7 @@ class SyncProcess
                 'required_ack' => $requiredAck,
                 'timeout'      => $timeout,
                 'data'         => $topicList,
-                'compression'  => Produce::COMPRESSION_NONE,
+                'compression'  => $compression,
             ];
 
             $this->debug("Send message start, params:" . json_encode($params));
