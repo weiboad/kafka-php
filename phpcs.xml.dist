@@ -47,5 +47,6 @@
     <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch" />
     <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma" />
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
+    <rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints" />
 </ruleset>
 

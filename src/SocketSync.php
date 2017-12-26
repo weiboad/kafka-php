@@ -14,12 +14,6 @@ class SocketSync extends CommonSocket
         stream_set_blocking($this->stream, 0);
     }
 
-    /**
-     * close the socket
-     *
-     * @access public
-     * @return void
-     */
     public function close() : void
     {
         if (is_resource($this->stream)) {
@@ -27,12 +21,6 @@ class SocketSync extends CommonSocket
         }
     }
 
-    /**
-     * checks if the socket is a valid resource
-     *
-     * @access public
-     * @return boolean
-     */
     public function isResource()
     {
         return is_resource($this->stream);
@@ -44,34 +32,21 @@ class SocketSync extends CommonSocket
      * This method will not wait for all the requested data, it will return as
      * soon as any data is received.
      *
-     * @param integer $len               Maximum number of bytes to read.
-     *
-     * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read(int $len) : string
+    public function read(int $length) : string
     {
-        return $this->readBlocking($len);
+        return $this->readBlocking($length);
     }
 
     /**
-     * Write to the socket.
-     *
-     * @param string $buf The data to write
-     *
-     * @return integer
      * @throws \Kafka\Exception
      */
-    public function write(string $buf) : int
+    public function write(string $buffer) : int
     {
-        return $this->writeBlocking($buf);
+        return $this->writeBlocking($buffer);
     }
 
-    /**
-     * Rewind the stream
-     *
-     * @return void
-     */
     public function rewind()
     {
         if (is_resource($this->stream)) {
