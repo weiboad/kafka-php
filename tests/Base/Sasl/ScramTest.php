@@ -2,8 +2,10 @@
 namespace KafkaTest\Base\Sasl;
 
 use Kafka\Sasl\Scram;
+use PHPUnit\Framework\TestCase;
+use Kafka\Socket;
 
-class ScramTest extends \PHPUnit\Framework\TestCase
+class ScramTest extends TestCase
 {
 
     /**
@@ -112,7 +114,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
 
     private function getSocketForVerify(string $verifyMessage = '')
     {
-        $socket             = $this->createMock(\Kafka\Socket::class);
+        $socket             = $this->createMock(Socket::class);
         $handShakeData      = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         $firstServerMessage = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $verifyMessage      = ($verifyMessage === '') ? 'v=AM496N+dPKeXeORuChQslmlCo+QHI8wy7CxRWOIMXdY=' : $verifyMessage;

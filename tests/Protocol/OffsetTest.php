@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Offset;
+use PHPUnit\Framework\TestCase;
 
-final class OffsetTest extends \PHPUnit\Framework\TestCase
+final class OffsetTest extends TestCase
 {
     private $offset;
 

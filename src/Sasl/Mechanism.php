@@ -5,8 +5,9 @@ use Kafka\CommonSocket;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
+use Kafka\SaslMechanism;
 
-abstract class Mechanism implements \Kafka\SaslMechanism
+abstract class Mechanism implements SaslMechanism
 {
 
     public function authenticate(CommonSocket $socket): void

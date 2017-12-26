@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\GroupCoordinator;
+use PHPUnit\Framework\TestCase;
 
-final class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
+final class GroupCoordinatorTest extends TestCase
 {
     private $group;
 

@@ -8,8 +8,9 @@ use KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use KafkaTest\Base\StreamStub\Stream;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SocketTest extends \PHPUnit\Framework\TestCase
+class SocketTest extends TestCase
 {
     private $root;
 

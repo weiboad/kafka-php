@@ -3,11 +3,14 @@
 namespace Kafka\Protocol;
 
 use Kafka\Exception\Protocol as ProtocolException;
+use Psr\Log\LoggerAwareTrait;
+use Kafka\LoggerTrait;
+use Kafka\Exception\NotSupported;
 
 abstract class Protocol
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      *  Default kafka broker verion
@@ -407,7 +410,7 @@ abstract class Protocol
         }
 
         if ($compression === self::COMPRESSION_SNAPPY) {
-            throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+            throw new NotSupported('SNAPPY compression not yet implemented');
         }
 
         if ($compression !== self::COMPRESSION_GZIP) {

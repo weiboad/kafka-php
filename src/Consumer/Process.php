@@ -2,11 +2,16 @@
 namespace Kafka\Consumer;
 
 use Kafka\ConsumerConfig;
+use Psr\Log\LoggerAwareTrait;
+use Kafka\LoggerTrait;
+use Kafka\Protocol;
+use Kafka\Broker;
+use Kafka\Exception;
 
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     protected $consumer;
 
@@ -27,17 +32,17 @@ class Process
     {
         // init protocol
         $config = \Kafka\ConsumerConfig::getInstance();
-        \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
+        Protocol::init($config->getBrokerVersion(), $this->logger);
 
         // init process request
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $broker->setConfig($config);
         $broker->setProcess(function ($data, $fd) {
             $this->processRequest($data, $fd);
         });
 
         // init state
-        $this->state = \Kafka\Consumer\State::getInstance();
+        $this->state = State::getInstance();
         if ($this->logger) {
             $this->state->setLogger($this->logger);
         }
@@ -188,7 +193,7 @@ class Process
         }
 
         if (count($brokerHost) === 0) {
-            throw new \Kafka\Exception('No valid broker configured');
+            throw new Exception('No valid broker configured');
         }
 
         shuffle($brokerHost);
@@ -235,7 +240,7 @@ class Process
             return false;
         }
         $topics      = \Kafka\ConsumerConfig::getInstance()->getTopics();
-        $assign      = \Kafka\Consumer\Assignment::getInstance();
+        $assign      = Assignment::getInstance();
         $memberId    = $assign->getMemberId();
         $params      = [
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),

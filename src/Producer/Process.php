@@ -5,11 +5,14 @@ use Amp\Loop;
 use Kafka\Broker;
 use Kafka\ProducerConfig;
 use Kafka\Protocol;
+use Psr\Log\LoggerAwareTrait;
+use Kafka\LoggerTrait;
+use Kafka\Exception;
 
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var callable|null
@@ -128,7 +131,7 @@ class Process
         }
 
         if (count($brokerHost) === 0) {
-            throw new \Kafka\Exception('No valid broker configured');
+            throw new Exception('No valid broker configured');
         }
 
         shuffle($brokerHost);

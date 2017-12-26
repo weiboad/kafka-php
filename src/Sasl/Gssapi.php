@@ -14,16 +14,9 @@ class Gssapi extends Mechanism
     private $principal;
 
     private $gssapi;
-    
+
     private static $ccache;
 
-    /**
-     *
-     * __construct
-     *
-     * @access public
-     * @return void
-     */
     public function __construct(\GSSAPIContext $gssapi, string $principal)
     {
         $this->gssapi    = $gssapi;
@@ -43,7 +36,7 @@ class Gssapi extends Mechanism
         if (! is_readable($keytab)) {
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
-        
+
         self::$ccache = new \KRB5CCache();
         self::$ccache->initKeytab($principal, $keytab);
 
@@ -53,11 +46,8 @@ class Gssapi extends Mechanism
     }
 
     /**
-     *
-     * sasl authenticate
-     *
-     * @access protected
-     * @return void
+     * @throws \Kafka\Exception\NotSupported
+     * @throws \Kafka\Exception
      */
     protected function performAuthentication(CommonSocket $socket) : void
     {
@@ -66,11 +56,15 @@ class Gssapi extends Mechanism
         // send token to server and get server token
         $data = ProtocolTool::encodeString($token, ProtocolTool::PACK_INT32);
         $socket->writeBlocking($data);
+
         $dataLen = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
-        $stoken  = $socket->readBlocking($dataLen);
-        // warp message use server token and send to server authenticate
-        $outputMessage = $this->wrapToken($stoken);
-        $data          = \Kafka\Protocol\Protocol::encodeString($outputMessage, \Kafka\Protocol\Protocol::PACK_INT32);
+
+        // wrap message use server token and send to server authenticate
+        $data = ProtocolTool::encodeString(
+            $this->wrapToken($socket->readBlocking($dataLen)),
+            ProtocolTool::PACK_INT32
+        );
+
         $socket->writeBlocking($data);
     }
 
@@ -95,7 +89,7 @@ class Gssapi extends Mechanism
         }
         return $token;
     }
-    
+
     private function wrapToken(string $token) : string
     {
         $message = '';

@@ -2,8 +2,9 @@
 namespace KafkaTest\Base;
 
 use Kafka\Protocol;
+use PHPUnit\Framework\TestCase;
 
-class ProtocolTest extends \PHPUnit\Framework\TestCase
+class ProtocolTest extends TestCase
 {
     public function testEncode(): void
     {

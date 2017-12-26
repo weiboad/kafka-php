@@ -3,8 +3,9 @@
 namespace KafkaTest\Base;
 
 use Kafka\ConsumerConfig;
+use PHPUnit\Framework\TestCase;
 
-final class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
+final class ConsumerConfigTest extends TestCase
 {
     /**
      * @var ConsumerConfig

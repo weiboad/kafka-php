@@ -4,11 +4,14 @@ namespace Kafka\Producer;
 use Kafka\Broker;
 use Kafka\ProducerConfig;
 use Kafka\Protocol\Protocol;
+use Psr\Log\LoggerAwareTrait;
+use Kafka\LoggerTrait;
+use Kafka\Exception;
 
 class SyncProcess
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     public function __construct()
     {
@@ -86,7 +89,7 @@ class SyncProcess
         }
 
         if (count($brokerHost) === 0) {
-            throw new \Kafka\Exception('No valid broker configured');
+            throw new Exception('No valid broker configured');
         }
 
         shuffle($brokerHost);

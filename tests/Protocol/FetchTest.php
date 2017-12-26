@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Fetch;
+use PHPUnit\Framework\TestCase;
 
-final class FetchTest extends \PHPUnit\Framework\TestCase
+final class FetchTest extends TestCase
 {
     private $fetch;
 

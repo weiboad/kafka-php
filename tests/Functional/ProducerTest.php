@@ -5,8 +5,12 @@ namespace KafkaTest\Functional;
 
 use Kafka\Consumer\StopStrategy\Callback;
 use Kafka\Protocol\Protocol;
+use PHPUnit\Framework\TestCase;
+use Kafka\ProducerConfig;
+use Kafka\Consumer;
+use Kafka\ConsumerConfig;
 
-abstract class ProducerTest extends \PHPUnit\Framework\TestCase
+abstract class ProducerTest extends TestCase
 {
     private const MESSAGES_TO_SEND = 30;
 
@@ -49,7 +53,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     protected function configureProducer(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
 
@@ -70,7 +74,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $consumedMessages = 0;
         $executionEnd     = new \DateTimeImmutable('+1 minute');
 
-        $consumer = new \Kafka\Consumer(
+        $consumer = new Consumer(
             new Callback(
                 function () use (&$consumedMessages, $executionEnd): bool {
                     return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
@@ -106,7 +110,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     private function configureConsumer(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = ConsumerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
         $config->setGroupId('kafka-php-tests');

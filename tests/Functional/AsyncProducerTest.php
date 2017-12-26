@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace KafkaTest\Functional;
 
 use Kafka\Protocol;
+use Kafka\Producer;
 
 final class AsyncProducerTest extends ProducerTest
 {
@@ -19,7 +20,7 @@ final class AsyncProducerTest extends ProducerTest
         $messagesSent = false;
         $error        = null;
 
-        $producer = new \Kafka\Producer([$this, 'createMessages']);
+        $producer = new Producer([$this, 'createMessages']);
         $producer->success(
             function (array $response) use (&$messagesSent): void {
                 self::assertNotEmpty($response);

@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\SaslHandShake;
+use PHPUnit\Framework\TestCase;
 
-final class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
+final class SaslHandShakeTest extends TestCase
 {
     private $sasl;
 

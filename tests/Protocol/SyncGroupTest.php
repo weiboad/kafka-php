@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\SyncGroup;
+use PHPUnit\Framework\TestCase;
 
-final class SyncGroupTest extends \PHPUnit\Framework\TestCase
+final class SyncGroupTest extends TestCase
 {
     private $sync;
 

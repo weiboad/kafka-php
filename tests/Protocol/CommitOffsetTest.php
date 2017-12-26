@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\CommitOffset;
+use PHPUnit\Framework\TestCase;
 
-final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
+final class CommitOffsetTest extends TestCase
 {
     private $commit;
 

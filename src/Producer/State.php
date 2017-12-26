@@ -2,10 +2,12 @@
 namespace Kafka\Producer;
 
 use Amp\Loop;
+use Kafka\SingletonTrait;
+use Kafka\ProducerConfig;
 
 class State
 {
-    use \Kafka\SingletonTrait;
+    use SingletonTrait;
 
     public const REQUEST_METADATA = 1;
     public const REQUEST_PRODUCE  = 2;
@@ -38,7 +40,7 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = ProducerConfig::getInstance();
 
         foreach ($this->requests as $request => $option) {
             switch ($request) {

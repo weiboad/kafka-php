@@ -2,6 +2,8 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception;
+
 class Fetch extends Protocol
 {
     public function encode(array $payloads = []): string
@@ -213,7 +215,7 @@ class Fetch extends Protocol
             $offset  += $valueRet['length'];
 
             if ($offset !== $messageSize) {
-                throw new \Kafka\Exception(
+                throw new Exception(
                     'pack message fail, message len:' . $messageSize . ' , data unpack offset :' . $offset
                 );
             }

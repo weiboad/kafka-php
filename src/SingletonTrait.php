@@ -1,10 +1,12 @@
 <?php
 namespace Kafka;
 
+use Psr\Log\LoggerAwareTrait;
+
 trait SingletonTrait
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     protected static $instance;
 

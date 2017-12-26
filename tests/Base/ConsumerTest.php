@@ -6,8 +6,9 @@ namespace KafkaTest\Base;
 use Amp\Loop;
 use Kafka\Consumer;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class ConsumerTest extends \PHPUnit\Framework\TestCase
+final class ConsumerTest extends TestCase
 {
     /**
      * @var Consumer|MockObject

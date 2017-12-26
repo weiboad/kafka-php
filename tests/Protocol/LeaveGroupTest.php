@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\LeaveGroup;
+use PHPUnit\Framework\TestCase;
 
-final class LeaveGroupTest extends \PHPUnit\Framework\TestCase
+final class LeaveGroupTest extends TestCase
 {
     private $leave;
 

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace KafkaTest\Functional;
 
+use Kafka\Producer;
+
 final class SyncProducerTest extends ProducerTest
 {
     /**
@@ -14,7 +16,7 @@ final class SyncProducerTest extends ProducerTest
     {
         $this->configureProducer();
 
-        $producer = new \Kafka\Producer();
+        $producer = new Producer();
         $messages = $this->createMessages();
 
         foreach ($messages as $message) {

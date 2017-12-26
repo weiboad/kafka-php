@@ -5,8 +5,9 @@ namespace KafkaTest\Base;
 use Kafka\Config;
 use Kafka\ProducerConfig;
 use Kafka\Protocol\Produce;
+use PHPUnit\Framework\TestCase;
 
-final class ProducerConfigTest extends \PHPUnit\Framework\TestCase
+final class ProducerConfigTest extends TestCase
 {
     /**
      * @var ProducerConfig

@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Metadata;
+use PHPUnit\Framework\TestCase;
 
-final class MetadataTest extends \PHPUnit\Framework\TestCase
+final class MetadataTest extends TestCase
 {
     private $meta;
 

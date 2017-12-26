@@ -1,9 +1,12 @@
 <?php
 namespace Kafka\Consumer;
 
+use Kafka\SingletonTrait;
+use Kafka\Broker;
+
 class Assignment
 {
-    use \Kafka\SingletonTrait;
+    use SingletonTrait;
     
     private $memberId = '';
 
@@ -52,7 +55,7 @@ class Assignment
 
     public function assign($result)
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $topics = $broker->getTopics();
 
         $memberCount = count($result);

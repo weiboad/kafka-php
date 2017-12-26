@@ -3,8 +3,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Produce;
 use Lcobucci\Clock\FrozenClock;
+use PHPUnit\Framework\TestCase;
 
-final class ProduceTest extends \PHPUnit\Framework\TestCase
+final class ProduceTest extends TestCase
 {
     private $produce;
 

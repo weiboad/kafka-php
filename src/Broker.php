@@ -84,7 +84,7 @@ class Broker
 
         $newTopics = [];
         foreach ($topics as $topic) {
-            if ((int) $topic['errorCode'] !== \Kafka\Protocol::NO_ERROR) {
+            if ((int) $topic['errorCode'] !== Protocol::NO_ERROR) {
                 $this->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
                 continue;
             }

@@ -194,7 +194,7 @@ class Protocol
     public static function encode(int $key, array $payloads): string
     {
         if (! isset(self::$objects[$key])) {
-            throw new \Kafka\Exception('Not support api key, key:' . $key);
+            throw new Exception('Not support api key, key:' . $key);
         }
 
         return self::$objects[$key]->encode($payloads);

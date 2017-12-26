@@ -2,10 +2,12 @@
 namespace Kafka\Consumer;
 
 use Amp\Loop;
+use Kafka\SingletonTrait;
+use Kafka\ConsumerConfig;
 
 class State
 {
-    use \Kafka\SingletonTrait;
+    use SingletonTrait;
 
     public const REQUEST_METADATA      = 1;
     public const REQUEST_GETGROUP      = 2;
@@ -57,7 +59,7 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:

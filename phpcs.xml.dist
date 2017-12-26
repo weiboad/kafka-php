@@ -55,5 +55,14 @@
     <rule ref="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine" />
     <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
     <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
+
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
+        <properties>
+            <property name="allowFullyQualifiedGlobalClasses" type="boolean" value="true"/>
+            <property name="allowFullyQualifiedGlobalFunctions" type="boolean" value="true"/>
+            <property name="allowFullyQualifiedGlobalConstants" type="boolean" value="true"/>
+            <property name="allowFullyQualifiedNameForCollidingClasses" type="boolean" value="true"/>
+        </properties>
+    </rule>
 </ruleset>
 

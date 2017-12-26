@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\DescribeGroups;
+use PHPUnit\Framework\TestCase;
 
-final class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
+final class DescribeGroupsTest extends TestCase
 {
     private $describe;
 

@@ -4,11 +4,12 @@ namespace Kafka;
 use Amp\Loop;
 use Kafka\Consumer\Process;
 use Kafka\Consumer\StopStrategy;
+use Psr\Log\LoggerAwareTrait;
 
 class Consumer
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var StopStrategy|null

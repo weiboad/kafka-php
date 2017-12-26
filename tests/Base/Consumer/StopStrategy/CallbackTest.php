@@ -7,8 +7,9 @@ use Amp\Loop;
 use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class CallbackTest extends \PHPUnit\Framework\TestCase
+final class CallbackTest extends TestCase
 {
     /**
      * @var Consumer|MockObject

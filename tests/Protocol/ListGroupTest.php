@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\ListGroup;
+use PHPUnit\Framework\TestCase;
 
-final class ListGroupTest extends \PHPUnit\Framework\TestCase
+final class ListGroupTest extends TestCase
 {
     private $list;
 

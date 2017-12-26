@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\ApiVersions;
+use PHPUnit\Framework\TestCase;
 
-final class ApiVersionsTest extends \PHPUnit\Framework\TestCase
+final class ApiVersionsTest extends TestCase
 {
     private $apiVersion;
 

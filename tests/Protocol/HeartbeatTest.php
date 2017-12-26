@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Heartbeat;
+use PHPUnit\Framework\TestCase;
 
-final class HeartbeatTest extends \PHPUnit\Framework\TestCase
+final class HeartbeatTest extends TestCase
 {
     private $heart;
 

@@ -4,11 +4,12 @@ namespace Kafka;
 use Amp\Loop;
 use Kafka\Producer\Process;
 use Kafka\Producer\SyncProcess;
+use Psr\Log\LoggerAwareTrait;
 
 class Producer
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var Process|SyncProcess

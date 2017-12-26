@@ -2,8 +2,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\FetchOffset;
+use PHPUnit\Framework\TestCase;
 
-final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
+final class FetchOffsetTest extends TestCase
 {
     private $offset;
 

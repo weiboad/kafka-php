@@ -1,7 +1,12 @@
 <?php
 namespace KafkaTest\Base;
 
-class BrokerTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+use Kafka\Broker;
+use Kafka\Socket;
+use Kafka\SocketSync;
+
+class BrokerTest extends TestCase
 {
 
     /**
@@ -12,7 +17,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
      */
     public function tearDown()
     {
-        \Kafka\Broker::getInstance()->clear();
+        Broker::getInstance()->clear();
     }
 
     /**
@@ -134,7 +139,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         ];
         $broker->setData([], $data);
 
-        $socket = $this->getMockBuilder(\Kafka\Socket::class)
+        $socket = $this->getMockBuilder(Socket::class)
             ->setConstructorArgs(['127.0.0.1', '9192'])
             ->disableOriginalClone()
             ->disableArgumentCloning()
@@ -172,6 +177,6 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
         $port     = '9092';
         $socket   = $broker->getSocket($hostname, $port, true);
 
-        $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
+        $this->assertInstanceOf(SocketSync::class, $socket);
     }
 }

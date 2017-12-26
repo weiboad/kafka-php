@@ -3,8 +3,9 @@
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\JoinGroup;
+use PHPUnit\Framework\TestCase;
 
-final class JoinGroupTest extends \PHPUnit\Framework\TestCase
+final class JoinGroupTest extends TestCase
 {
     private $group9;
 
