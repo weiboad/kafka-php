@@ -127,7 +127,7 @@ class Process
             }
         }
 
-        if (count($brokerHost) == 0) {
+        if (count($brokerHost) === 0) {
             throw new \Kafka\Exception('No valid broker configured');
         }
 

@@ -187,7 +187,7 @@ class State
     public function rejoin()
     {
         $joinGroupStatus = $this->callStatus[self::REQUEST_JOINGROUP]['status'];
-        if (($joinGroupStatus & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+        if (($joinGroupStatus & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
             return;
         }
 
@@ -228,91 +228,91 @@ class State
         $status = $this->callStatus[$key]['status'];
         switch ($key) {
             case self::REQUEST_METADATA:
-                if ($status & self::STATUS_PROCESS == self::STATUS_PROCESS) {
+                if ($status & self::STATUS_PROCESS === self::STATUS_PROCESS) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
                 return false;
             case self::REQUEST_GETGROUP:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $metaStatus = $this->callStatus[self::REQUEST_METADATA]['status'];
-                if (($metaStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($metaStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_START) == self::STATUS_START) {
+                if (($status & self::STATUS_START) === self::STATUS_START) {
                     return true;
                 }
                 return false;
             case self::REQUEST_JOINGROUP:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $groupStatus = $this->callStatus[self::REQUEST_GETGROUP]['status'];
-                if (($groupStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($groupStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_START) == self::STATUS_START) {
+                if (($status & self::STATUS_START) === self::STATUS_START) {
                     return true;
                 }
                 return false;
             case self::REQUEST_SYNCGROUP:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $joinStatus = $this->callStatus[self::REQUEST_JOINGROUP]['status'];
-                if (($joinStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($joinStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_START) == self::STATUS_START) {
+                if (($status & self::STATUS_START) === self::STATUS_START) {
                     return true;
                 }
                 return false;
             case self::REQUEST_HEARTGROUP:
             case self::REQUEST_OFFSET:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $syncStatus = $this->callStatus[self::REQUEST_SYNCGROUP]['status'];
-                if (($syncStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($syncStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
                 return false;
             case self::REQUEST_FETCH_OFFSET:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $syncStatus = $this->callStatus[self::REQUEST_SYNCGROUP]['status'];
-                if (($syncStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($syncStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
                 $offsetStatus = $this->callStatus[self::REQUEST_OFFSET]['status'];
-                if (($offsetStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($offsetStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
                 return false;
             case self::REQUEST_FETCH:
-                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 $fetchOffsetStatus = $this->callStatus[self::REQUEST_FETCH_OFFSET]['status'];
-                if (($fetchOffsetStatus & self::STATUS_FINISH) != self::STATUS_FINISH) {
+                if (($fetchOffsetStatus & self::STATUS_FINISH) !== self::STATUS_FINISH) {
                     return false;
                 }
                 $commitOffsetStatus = $this->callStatus[self::REQUEST_COMMIT_OFFSET]['status'];
-                if (($commitOffsetStatus & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
+                if (($commitOffsetStatus & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
-                if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
+                if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
                     return true;
                 }
                 return false;

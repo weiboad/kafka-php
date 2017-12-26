@@ -121,7 +121,7 @@ class Process
                 break;
             case \Kafka\Protocol::GROUP_COORDINATOR_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
-                if (isset($result['errorCode']) && $result['errorCode'] == \Kafka\Protocol::NO_ERROR
+                if (isset($result['errorCode']) && $result['errorCode'] === \Kafka\Protocol::NO_ERROR
                 && isset($result['coordinatorId'])) {
                     \Kafka\Broker::getInstance()->setGroupBrokerId($result['coordinatorId']);
                     $this->state->succRun(\Kafka\Consumer\State::REQUEST_GETGROUP);
@@ -131,7 +131,7 @@ class Process
                 break;
             case \Kafka\Protocol::JOIN_GROUP_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
-                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                if (isset($result['errorCode']) && $result['errorCode'] === 0) {
                     $this->succJoinGroup($result);
                 } else {
                     $this->failJoinGroup($result['errorCode']);
@@ -139,7 +139,7 @@ class Process
                 break;
             case \Kafka\Protocol::SYNC_GROUP_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
-                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                if (isset($result['errorCode']) && $result['errorCode'] === 0) {
                     $this->succSyncGroup($result);
                 } else {
                     $this->failSyncGroup($result['errorCode']);
@@ -147,7 +147,7 @@ class Process
                 break;
             case \Kafka\Protocol::HEART_BEAT_REQUEST:
                 $result = \Kafka\Protocol::decode(\Kafka\Protocol::HEART_BEAT_REQUEST, substr($data, 4));
-                if (isset($result['errorCode']) && $result['errorCode'] == 0) {
+                if (isset($result['errorCode']) && $result['errorCode'] === 0) {
                     $this->state->succRun(\Kafka\Consumer\State::REQUEST_HEARTGROUP);
                 } else {
                     $this->failHeartbeat($result['errorCode']);
@@ -187,7 +187,7 @@ class Process
             }
         }
 
-        if (count($brokerHost) == 0) {
+        if (count($brokerHost) === 0) {
             throw new \Kafka\Exception('No valid broker configured');
         }
 
@@ -241,7 +241,7 @@ class Process
             'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
             'session_timeout' => \Kafka\ConsumerConfig::getInstance()->getSessionTimeout(),
             'rebalance_timeout' => \Kafka\ConsumerConfig::getInstance()->getRebalanceTimeout(),
-            'member_id' => ($memberId == null) ? '' : $memberId,
+            'member_id' => ($memberId === null) ? '' : $memberId,
             'data' => [
                 [
                     'protocol_name' => 'range',
@@ -271,7 +271,7 @@ class Process
         $assign = \Kafka\Consumer\Assignment::getInstance();
         $assign->setMemberId($result['memberId']);
         $assign->setGenerationId($result['generationId']);
-        if ($result['leaderId'] == $result['memberId']) { // leader assign partition
+        if ($result['leaderId'] === $result['memberId']) { // leader assign partition
             $assigns = $assign->assign($result['members']);
         }
         $msg = sprintf('Join group sucess, params: %s', json_encode($result));
@@ -417,7 +417,7 @@ class Process
         $lastOffsets = \Kafka\Consumer\Assignment::getInstance()->getLastOffsets();
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
-                if ($part['errorCode'] != 0) {
+                if ($part['errorCode'] !== 0) {
                     $this->stateConvert($part['errorCode']);
                     break 2;
                 }
@@ -473,7 +473,7 @@ class Process
         $offsets = $assign->getFetchOffsets();
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
-                if ($part['errorCode'] != 0) {
+                if ($part['errorCode'] !== 0) {
                     $this->stateConvert($part['errorCode']);
                     break 2;
                 }
@@ -552,7 +552,7 @@ class Process
                     $topic['topicName'],
                     $part['partition'],
                 ];
-                if ($part['errorCode'] != 0) {
+                if ($part['errorCode'] !== 0) {
                     $this->stateConvert($part['errorCode'], $context);
                     continue;
                 }
@@ -593,7 +593,7 @@ class Process
     protected function commit()
     {
         $config = ConsumerConfig::getInstance();
-        if ($config->getConsumeMode() == ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
+        if ($config->getConsumeMode() === ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
             $this->consumeMessage();
         }
 
@@ -615,7 +615,7 @@ class Process
                     $partitions = $data[$topic['topic_name']]['partitions'];
                 }
                 foreach ($topic['partitions'] as $partId) {
-                    if ($commitOffsets[$topic['topic_name']][$partId] == -1) {
+                    if ($commitOffsets[$topic['topic_name']][$partId] === -1) {
                         continue;
                     }
                     $partitions[$partId]['partition'] = $partId;
@@ -646,13 +646,13 @@ class Process
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_COMMIT_OFFSET);
         foreach ($result as $topic) {
             foreach ($topic['partitions'] as $part) {
-                if ($part['errorCode'] != 0) {
+                if ($part['errorCode'] !== 0) {
                     $this->stateConvert($part['errorCode']);
                     return;  // not call user consumer function
                 }
             }
         }
-        if (ConsumerConfig::getInstance()->getConsumeMode() == ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET) {
+        if (ConsumerConfig::getInstance()->getConsumeMode() === ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET) {
             $this->consumeMessage();
         }
     }
@@ -687,7 +687,7 @@ class Process
         }
 
         if (in_array($errorCode, $rejoinCodes, true)) {
-            if ($errorCode == \Kafka\Protocol::UNKNOWN_MEMBER_ID) {
+            if ($errorCode === \Kafka\Protocol::UNKNOWN_MEMBER_ID) {
                 $assign->setMemberId('');
             }
             $assign->clearOffset();
@@ -695,9 +695,9 @@ class Process
             return false;
         }
 
-        if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE == $errorCode) {
+        if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE === $errorCode) {
             $resetOffset = \Kafka\ConsumerConfig::getInstance()->getOffsetReset();
-            if ($resetOffset == 'latest') {
+            if ($resetOffset === 'latest') {
                 $offsets = $assign->getLastOffsets();
             } else {
                 $offsets = $assign->getOffsets();

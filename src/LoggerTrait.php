@@ -132,7 +132,7 @@ trait LoggerTrait
      */
     public function log($level, $message, array $context = [])
     {
-        if ($this->logger == null) {
+        if ($this->logger === null) {
             $this->logger = new NullLogger();
         }
         $this->logger->log($level, $message, $context);

@@ -73,7 +73,7 @@ class Offset extends Protocol
         return $topic . $partitions;
     }
 
-    protected function offsetTopic(string $data, string $version): array
+    protected function offsetTopic(string $data, int $version): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
@@ -91,7 +91,7 @@ class Offset extends Protocol
         ];
     }
 
-    protected function offsetPartition(string $data, string $version): array
+    protected function offsetPartition(string $data, int $version): array
     {
         $offset      = 0;
         $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
@@ -99,10 +99,12 @@ class Offset extends Protocol
         $errorCode   = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset     += 2;
         $timestamp   = 0;
-        if ($version != self::API_VERSION0) {
+
+        if ($version !== self::API_VERSION0) {
             $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
             $offset   += 8;
         }
+
         $offsets = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B64);
         $offset += $offsets['length'];
 

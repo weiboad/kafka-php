@@ -36,5 +36,8 @@
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern>*/tests\/Base\/StreamStub/*</exclude-pattern>
     </rule>
+
+    <!-- strict rules -->
+    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowEqualOperators" />
 </ruleset>
 

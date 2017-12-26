@@ -96,7 +96,7 @@ abstract class Config
         }
 
         if (strpos($name, 'set') === 0) {
-            if (count($args) != 1) {
+            if (count($args) !== 1) {
                 return false;
             }
             $option                   = strtolower(substr($name, 3, 1)) . substr($name, 4);

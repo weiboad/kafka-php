@@ -139,7 +139,7 @@ abstract class CommonSocket
 
         $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
 
-        if ($this->stream === false) {
+        if (! \is_resource($this->stream)) {
             throw new Exception(
                 sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
             );
