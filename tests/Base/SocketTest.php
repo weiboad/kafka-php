@@ -283,7 +283,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $streamMock->method('eof')
                    ->will($this->returnValue(false));
         $socket = $this->createStream($host, $port, 0, ['timed_out' => true]);
-        $socket->writeBlocking(4);
+        $socket->writeBlocking('4');
     }
 
     /**

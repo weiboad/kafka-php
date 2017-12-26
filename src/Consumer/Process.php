@@ -680,13 +680,13 @@ class Process
         ];
 
         $assign = \Kafka\Consumer\Assignment::getInstance();
-        if (in_array($errorCode, $recoverCodes)) {
+        if (in_array($errorCode, $recoverCodes, true)) {
             $this->state->recover();
             $assign->clearOffset();
             return false;
         }
 
-        if (in_array($errorCode, $rejoinCodes)) {
+        if (in_array($errorCode, $rejoinCodes, true)) {
             if ($errorCode == \Kafka\Protocol::UNKNOWN_MEMBER_ID) {
                 $assign->setMemberId('');
             }

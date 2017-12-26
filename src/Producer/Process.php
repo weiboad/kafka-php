@@ -89,7 +89,7 @@ class Process
         Loop::repeat(
             $config->getRequestTimeout(),
             function (string $watcherId): void {
-                if ($this->error) {
+                if ($this->error !== null) {
                     ($this->error)(1000);
                 }
 
@@ -237,7 +237,7 @@ class Process
         $msg = sprintf('Send message sucess, result: %s', json_encode($result));
         $this->debug($msg);
 
-        if ($this->success) {
+        if ($this->success !== null) {
             ($this->success)($result);
         }
 
@@ -248,7 +248,7 @@ class Process
     {
         $this->error(Protocol::getError($errorCode));
 
-        if ($this->error) {
+        if ($this->error !== null) {
             ($this->error)($errorCode);
         }
 

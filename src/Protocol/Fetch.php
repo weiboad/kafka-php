@@ -183,7 +183,7 @@ class Fetch extends Protocol
      */
     protected function decodeMessage(string $data, int $messageSize): ?array
     {
-        if (! $messageSize || \strlen($data) < $messageSize) {
+        if ($messageSize === 0 || \strlen($data) < $messageSize) {
             return null;
         }
 

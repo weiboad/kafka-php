@@ -182,7 +182,7 @@ class Protocol
         foreach ($class as $key => $className) {
             self::$objects[$key] = new $className($version);
 
-            if ($logger) {
+            if ($logger !== null) {
                 self::$objects[$key]->setLogger($logger);
             }
         }

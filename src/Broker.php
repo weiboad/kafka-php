@@ -163,7 +163,7 @@ class Broker
             [$host, $port] = explode(':', $key);
         }
 
-        if (! $host || ! $port || (! $modeSync && ! $this->process)) {
+        if ($host === null || $port === null || (! $modeSync && $this->process === null)) {
             return false;
         }
 
