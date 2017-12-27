@@ -105,7 +105,7 @@ class State
     private function removeWatchers(): void
     {
         foreach (array_keys($this->requests) as $request) {
-            if ($this->requests[$request]['watcher'] === null) {
+            if (! isset($this->requests[$request]['watcher'])) {
                 return;
             }
 
