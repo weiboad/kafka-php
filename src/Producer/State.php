@@ -72,10 +72,6 @@ class State
             $context = $this->requests[self::REQUEST_METADATA]['func']();
             $this->processing($request, $context);
         }
-
-        Loop::repeat(1000, function ($watcherId) {
-            $this->report();
-        });
     }
 
     public function succRun($key, $context = null)
@@ -216,10 +212,5 @@ class State
                 }
                 break;
         }
-    }
-
-    protected function report()
-    {
-        //var_dump($this->callStatus[self::REQUEST_COMMIT_OFFSET]);
     }
 }
