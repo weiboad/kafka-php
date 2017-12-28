@@ -3,11 +3,11 @@ namespace Kafka\Producer;
 
 use Amp\Loop;
 use Kafka\Broker;
+use Kafka\Exception;
+use Kafka\LoggerTrait;
 use Kafka\ProducerConfig;
 use Kafka\Protocol;
 use Psr\Log\LoggerAwareTrait;
-use Kafka\LoggerTrait;
-use Kafka\Exception;
 
 class Process
 {

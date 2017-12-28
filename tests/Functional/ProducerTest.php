@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace KafkaTest\Functional;
 
+use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy\Callback;
+use Kafka\ConsumerConfig;
+use Kafka\ProducerConfig;
 use Kafka\Protocol\Protocol;
 use PHPUnit\Framework\TestCase;
-use Kafka\ProducerConfig;
-use Kafka\Consumer;
-use Kafka\ConsumerConfig;
 
 abstract class ProducerTest extends TestCase
 {

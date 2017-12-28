@@ -2,8 +2,8 @@
 namespace KafkaTest\Base\Sasl;
 
 use Kafka\Sasl\Scram;
-use PHPUnit\Framework\TestCase;
 use Kafka\Socket;
+use PHPUnit\Framework\TestCase;
 
 class ScramTest extends TestCase
 {

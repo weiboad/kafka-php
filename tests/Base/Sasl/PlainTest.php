@@ -1,9 +1,9 @@
 <?php
 namespace KafkaTest\Base\Sasl;
 
-use PHPUnit\Framework\TestCase;
-use Kafka\Socket;
 use Kafka\Sasl\Plain;
+use Kafka\Socket;
+use PHPUnit\Framework\TestCase;
 
 class PlainTest extends TestCase
 {

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace KafkaTest\Functional;
 
-use Kafka\Protocol;
 use Kafka\Producer;
+use Kafka\Protocol;
 
 final class AsyncProducerTest extends ProducerTest
 {

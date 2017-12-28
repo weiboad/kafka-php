@@ -1,8 +1,8 @@
 <?php
 require '../vendor/autoload.php';
 
-use Kafka\Sasl\Scram;
 use Kafka\Protocol;
+use Kafka\Sasl\Scram;
 use Kafka\SocketSync;
 
 Protocol::init('1.0.0');

@@ -1,8 +1,8 @@
 <?php
 namespace Kafka\Consumer;
 
-use Kafka\SingletonTrait;
 use Kafka\Broker;
+use Kafka\SingletonTrait;
 
 class Assignment
 {

@@ -2,10 +2,10 @@
 
 namespace Kafka\Protocol;
 
-use Kafka\Exception\Protocol as ProtocolException;
-use Psr\Log\LoggerAwareTrait;
-use Kafka\LoggerTrait;
 use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+use Kafka\LoggerTrait;
+use Psr\Log\LoggerAwareTrait;
 
 abstract class Protocol
 {

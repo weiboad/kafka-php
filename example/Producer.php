@@ -1,11 +1,11 @@
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
-use Monolog\Logger;
-use Monolog\Handler\StdoutHandler;
-use Kafka\ProducerConfig;
 use Kafka\Config;
 use Kafka\Producer;
+use Kafka\ProducerConfig;
+use Monolog\Handler\StdoutHandler;
+use Monolog\Logger;
 
 // Create the logger
 $logger = new Logger('my_logger');

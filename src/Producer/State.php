@@ -2,8 +2,8 @@
 namespace Kafka\Producer;
 
 use Amp\Loop;
-use Kafka\SingletonTrait;
 use Kafka\ProducerConfig;
+use Kafka\SingletonTrait;
 
 class State
 {
