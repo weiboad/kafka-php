@@ -89,9 +89,6 @@ class State
         if (isset($this->requests[self::REQUEST_METADATA]['func'])) {
             $this->processing($request, $this->requests[self::REQUEST_METADATA]['func']());
         }
-        Loop::repeat(1000, function ($watcherId) {
-            $this->report();
-        });
     }
 
     public function stop()
@@ -350,10 +347,5 @@ class State
                 $this->callStatus[$key]['context'] = $contextStatus;
                 break;
         }
-    }
-
-    protected function report()
-    {
-        //var_dump($this->callStatus[self::REQUEST_COMMIT_OFFSET]);
     }
 }
