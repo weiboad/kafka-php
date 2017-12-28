@@ -21,33 +21,34 @@ class SocketSync extends CommonSocket
         }
     }
 
-    public function isResource()
+    public function isResource(): bool
     {
         return is_resource($this->stream);
     }
 
     /**
-     * Read from the socket at most $len bytes.
-     *
-     * This method will not wait for all the requested data, it will return as
-     * soon as any data is received.
+     * @param string|int $data
      *
      * @throws \Kafka\Exception
      */
-    public function read(int $length): string
+    public function read($data): string
     {
-        return $this->readBlocking($length);
+        return $this->readBlocking((int) $data);
     }
 
     /**
      * @throws \Kafka\Exception
      */
-    public function write(string $buffer): int
+    public function write(?string $buffer = null): int
     {
+        if ($buffer === null) {
+            throw new Exception('You must inform some data to be written');
+        }
+
         return $this->writeBlocking($buffer);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         if (is_resource($this->stream)) {
             rewind($this->stream);

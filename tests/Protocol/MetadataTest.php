@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class MetadataTest extends TestCase
 {
+    /**
+     * @var Metadata
+     */
     private $meta;
 
     public function setUp(): void

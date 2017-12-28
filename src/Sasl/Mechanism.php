@@ -20,7 +20,6 @@ abstract class Mechanism implements SaslMechanism
      * sasl authenticate hand shake
      *
      * @access protected
-     * @return void
      */
     protected function handShake(CommonSocket $socket, string $mechanism): void
     {

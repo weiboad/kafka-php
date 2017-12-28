@@ -3,13 +3,21 @@
 namespace Kafka\Protocol;
 
 use Kafka\Exception;
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
 
 class Fetch extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given fetch kafka data invalid. `data` is undefined.');
+            throw new ProtocolException('given fetch kafka data invalid. `data` is undefined.');
         }
 
         if (! isset($payloads['replica_id'])) {
@@ -34,6 +42,9 @@ class Fetch extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset       = 0;
@@ -54,6 +65,9 @@ class Fetch extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function fetchTopic(string $data): array
     {
         $offset    = 0;
@@ -72,6 +86,11 @@ class Fetch extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
     protected function fetchPartition(string $data): array
     {
         $offset              = 0;
@@ -87,7 +106,7 @@ class Fetch extends Protocol
 
         $messages = [];
 
-        if ($offset < \strlen($data) && $messageSetSize) {
+        if ($messageSetSize > 0 && $offset < \strlen($data)) {
             $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), $messageSetSize);
 
             $offset += $messages['length'];
@@ -105,6 +124,11 @@ class Fetch extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
     protected function decodeMessageSetArray(string $data, int $messageSetSize): array
     {
         $offset = 0;
@@ -119,7 +143,7 @@ class Fetch extends Protocol
             }
 
             if (! isset($ret['length'], $ret['data'])) {
-                throw new \Kafka\Exception\Protocol('Decode array failed, given function return format is invalid');
+                throw new ProtocolException('Decode array failed, given function return format is invalid');
             }
 
             if ((int) $ret['length'] === 0) {
@@ -148,6 +172,8 @@ class Fetch extends Protocol
      * decode message set
      * N.B., MessageSets are not preceded by an int32 like other array elements
      * in the protocol.
+     *
+     * @return mixed[]|null
      */
     protected function decodeMessageSet(string $data): ?array
     {
@@ -182,6 +208,8 @@ class Fetch extends Protocol
      * decode message
      * N.B., MessageSets are not preceded by an int32 like other array elements
      * in the protocol.
+     *
+     * @return mixed[]|null
      */
     protected function decodeMessage(string $data, int $messageSize): ?array
     {
@@ -219,7 +247,7 @@ class Fetch extends Protocol
                     'pack message fail, message len:' . $messageSize . ' , data unpack offset :' . $offset
                 );
             }
-        } catch (\Kafka\Exception $e) { // try unpack message format v0
+        } catch (Exception $e) { // try unpack message format v0
             $offset    = $backOffset;
             $timestamp = 0;
             $keyRet    = $this->decodeString(substr($data, $offset), self::BIT_B32);
@@ -242,10 +270,15 @@ class Fetch extends Protocol
         ];
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws ProtocolException
+     */
     protected function encodeFetchPartition(array $values): string
     {
         if (! isset($values['partition_id'])) {
-            throw new \Kafka\Exception\Protocol('given fetch data invalid. `partition_id` is undefined.');
+            throw new ProtocolException('given fetch data invalid. `partition_id` is undefined.');
         }
 
         if (! isset($values['offset'])) {
@@ -263,14 +296,20 @@ class Fetch extends Protocol
         return $data;
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     protected function encodeFetchTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given fetch data invalid. `topic_name` is undefined.');
+            throw new ProtocolException('given fetch data invalid. `topic_name` is undefined.');
         }
 
         if (! isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given fetch data invalid. `partitions` is undefined.');
+            throw new ProtocolException('given fetch data invalid. `partitions` is undefined.');
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);

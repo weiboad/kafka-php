@@ -3,6 +3,9 @@ namespace Kafka\Protocol;
 
 class ApiVersions extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     */
     public function encode(array $payloads = []): string
     {
         $header = $this->requestHeader('kafka-php', self::API_VERSIONS_REQUEST, self::API_VERSIONS_REQUEST);
@@ -10,6 +13,9 @@ class ApiVersions extends Protocol
         return self::encodeString($header, self::PACK_INT32);
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset      = 0;
@@ -20,10 +26,13 @@ class ApiVersions extends Protocol
 
         return [
             'apiVersions' => $apiVersions['data'],
-            'errorCode'  => $errcode,
+            'errorCode'   => $errcode,
         ];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function apiVersion(string $data): array
     {
         $offset     = 0;
@@ -36,11 +45,7 @@ class ApiVersions extends Protocol
 
         return [
             'length' => $offset,
-            'data'   => [
-                $apiKey,
-                $minVersion,
-                $maxVersion,
-            ],
+            'data'   => [$apiKey, $minVersion, $maxVersion],
         ];
     }
 }

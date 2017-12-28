@@ -44,10 +44,10 @@ $producer = new Producer(function () {
     ];
 });
 $producer->setLogger($logger);
-$producer->success(function ($result) {
+$producer->success(function ($result): void {
     var_dump($result);
 });
-$producer->error(function ($errorCode) {
+$producer->error(function ($errorCode): void {
     var_dump($errorCode);
 });
 $producer->send(true);

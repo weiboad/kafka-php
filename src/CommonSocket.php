@@ -16,28 +16,28 @@ abstract class CommonSocket
     /**
      * Send timeout in seconds.
      *
-     * @var float
+     * @var int
      */
     protected $sendTimeoutSec = 0;
 
     /**
      * Send timeout in microseconds.
      *
-     * @var float
+     * @var int
      */
     protected $sendTimeoutUsec = 100000;
 
     /**
      * Recv timeout in seconds
      *
-     * @var float
+     * @var int
      */
     protected $recvTimeoutSec = 0;
 
     /**
      * Recv timeout in microseconds
      *
-     * @var float
+     * @var int
      */
     protected $recvTimeoutUsec = 750000;
 
@@ -79,22 +79,22 @@ abstract class CommonSocket
         $this->saslProvider = $saslProvider;
     }
 
-    public function setSendTimeoutSec(float $sendTimeoutSec): void
+    public function setSendTimeoutSec(int $sendTimeoutSec): void
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
 
-    public function setSendTimeoutUsec(float $sendTimeoutUsec): void
+    public function setSendTimeoutUsec(int $sendTimeoutUsec): void
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
-    public function setRecvTimeoutSec(float $recvTimeoutSec): void
+    public function setRecvTimeoutSec(int $recvTimeoutSec): void
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
 
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec): void
+    public function setRecvTimeoutUsec(int $recvTimeoutUsec): void
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
@@ -157,6 +157,10 @@ abstract class CommonSocket
      * Because `stream_socket_client` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @param resource $context
+     *
+     * @return resource
      */
     protected function createSocket(string $remoteSocket, $context, ?int &$errno, ?string &$errstr)
     {
@@ -170,6 +174,9 @@ abstract class CommonSocket
         );
     }
 
+    /**
+     * @return resource
+     */
     public function getSocket()
     {
         return $this->stream;
@@ -181,8 +188,12 @@ abstract class CommonSocket
      * Because `stream_select` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @param resource[] $sockets
+     *
+     * @return int|bool
      */
-    protected function select(array $sockets, float $timeoutSec, float $timeoutUsec, bool $isRead = true)
+    protected function select(array $sockets, int $timeoutSec, int $timeoutUsec, bool $isRead = true)
     {
         $null = null;
 
@@ -199,6 +210,8 @@ abstract class CommonSocket
      * Because `stream_get_meta_data` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @return mixed[]
      */
     protected function getMetaData(): array
     {
@@ -329,4 +342,16 @@ abstract class CommonSocket
     abstract public function close(): void;
 
     abstract public function connect(): void;
+
+    /**
+     * @return void|int
+     */
+    abstract public function write(?string $data = null);
+
+    /**
+     * @param string|int $data
+     *
+     * @return mixed
+     */
+    abstract public function read($data);
 }

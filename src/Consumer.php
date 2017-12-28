@@ -31,9 +31,7 @@ class Consumer
      *
      * @access public
      *
-     * @param callable|null $consumer
      *
-     * @return void
      */
     public function start(?callable $consumer = null): void
     {

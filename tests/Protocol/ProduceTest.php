@@ -7,8 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 final class ProduceTest extends TestCase
 {
+    /**
+     * @var Produce
+     */
     private $produce;
 
+    /**
+     * @var Produce
+     */
     private $produce10;
 
     public function setUp(): void

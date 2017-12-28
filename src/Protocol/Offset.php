@@ -2,12 +2,17 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\Protocol as ProtocolException;
+
 class Offset extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `data` is undefined.');
+            throw new ProtocolException('given offset data invalid. `data` is undefined.');
         }
 
         if (! isset($payloads['replica_id'])) {
@@ -22,6 +27,9 @@ class Offset extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset = 0;
@@ -33,10 +41,13 @@ class Offset extends Protocol
         return $topics['data'];
     }
 
+    /**
+     * @param mixed[] $values
+     */
     protected function encodeOffsetPartition(array $values): string
     {
         if (! isset($values['partition_id'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `partition_id` is undefined.');
+            throw new ProtocolException('given offset data invalid. `partition_id` is undefined.');
         }
 
         if (! isset($values['time'])) {
@@ -57,14 +68,17 @@ class Offset extends Protocol
         return $data;
     }
 
+    /**
+     * @param mixed[] $values
+     */
     protected function encodeOffsetTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `topic_name` is undefined.');
+            throw new ProtocolException('given offset data invalid. `topic_name` is undefined.');
         }
 
         if (! isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given offset data invalid. `partitions` is undefined.');
+            throw new ProtocolException('given offset data invalid. `partitions` is undefined.');
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -73,6 +87,9 @@ class Offset extends Protocol
         return $topic . $partitions;
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function offsetTopic(string $data, int $version): array
     {
         $offset    = 0;
@@ -91,6 +108,9 @@ class Offset extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function offsetPartition(string $data, int $version): array
     {
         $offset      = 0;

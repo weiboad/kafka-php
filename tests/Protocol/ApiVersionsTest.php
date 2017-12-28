@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class ApiVersionsTest extends TestCase
 {
+    /**
+     * @var ApiVersions
+     */
     private $apiVersion;
 
     public function setUp(): void

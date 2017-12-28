@@ -2,24 +2,33 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+
 class SyncGroup extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given sync group data invalid. `group_id` is undefined.');
+            throw new ProtocolException('given sync group data invalid. `group_id` is undefined.');
         }
 
         if (! isset($payloads['generation_id'])) {
-            throw new \Kafka\Exception\Protocol('given sync group data invalid. `generation_id` is undefined.');
+            throw new ProtocolException('given sync group data invalid. `generation_id` is undefined.');
         }
 
         if (! isset($payloads['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given sync group data invalid. `member_id` is undefined.');
+            throw new ProtocolException('given sync group data invalid. `member_id` is undefined.');
         }
 
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given sync group data invalid. `data` is undefined.');
+            throw new ProtocolException('given sync group data invalid. `data` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::SYNC_GROUP_REQUEST, self::SYNC_GROUP_REQUEST);
@@ -31,6 +40,9 @@ class SyncGroup extends Protocol
         return self::encodeString($header . $data, self::PACK_INT32);
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset    = 0;
@@ -42,7 +54,7 @@ class SyncGroup extends Protocol
 
         $memberAssignment = $memberAssignments['data'];
 
-        if (! \strlen($memberAssignment)) {
+        if ($memberAssignment === '') {
             return [
                 'errorCode' => $errorCode,
             ];
@@ -72,18 +84,24 @@ class SyncGroup extends Protocol
         ];
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     protected function encodeGroupAssignment(array $values): string
     {
         if (! isset($values['version'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
+            throw new ProtocolException('given data invalid. `version` is undefined.');
         }
 
         if (! isset($values['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `member_id` is undefined.');
+            throw new ProtocolException('given data invalid. `member_id` is undefined.');
         }
 
         if (! isset($values['assignments'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `assignments` is undefined.');
+            throw new ProtocolException('given data invalid. `assignments` is undefined.');
         }
 
         if (! isset($values['user_data'])) {
@@ -99,14 +117,20 @@ class SyncGroup extends Protocol
         return $memberId . self::encodeString($data, self::PACK_INT32);
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws ProtocolException
+     * @throws NotSupported
+     */
     protected function encodeGroupAssignmentTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `topic_name` is undefined.');
+            throw new ProtocolException('given data invalid. `topic_name` is undefined.');
         }
 
         if (! isset($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `partitions` is undefined.');
+            throw new ProtocolException('given data invalid. `partitions` is undefined.');
         }
 
         $topicName  = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -120,6 +144,9 @@ class SyncGroup extends Protocol
         return self::pack(self::BIT_B32, (string) $values);
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function syncGroupResponsePartition(string $data): array
     {
         $offset     = 0;

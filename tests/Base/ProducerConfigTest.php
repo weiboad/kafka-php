@@ -102,15 +102,6 @@ final class ProducerConfigTest extends TestCase
 
     /**
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set isAsyn value is invalid, must set it bool value
-     */
-    public function testSetIsAsynValid(): void
-    {
-        $this->config->setIsAsyn('-2');
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
      * @expectedExceptionMessage Set ssl local cert file is invalid
      */
     public function testSetSslLocalCert(): void

@@ -11,9 +11,8 @@ class ScramTest extends TestCase
      * testScram
      *
      * @access public
-     * @return void
      */
-    public function testScram()
+    public function testScram(): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce'])
@@ -31,9 +30,8 @@ class ScramTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Verify server final response message is failure
      * @access public
-     * @return void
      */
-    public function testScramVerify()
+    public function testScramVerify(): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce'])
@@ -51,9 +49,8 @@ class ScramTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalid()
+    public function testFinalMessageInvalid(): void
     {
         $this->finalMessage();
     }
@@ -64,9 +61,8 @@ class ScramTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid, paser salt is failure.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalidSalt()
+    public function testFinalMessageInvalidSalt(): void
     {
         $message = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=,i=8192';
         $this->finalMessage($message);
@@ -78,9 +74,8 @@ class ScramTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid, cnonce is invalid.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalidCnonce()
+    public function testFinalMessageInvalidCnonce(): void
     {
         $message = 'r=59BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $this->finalMessage($message);
@@ -92,9 +87,8 @@ class ScramTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].
      * @access public
-     * @return void
      */
-    public function testInvalidAlgorithm()
+    public function testInvalidAlgorithm(): void
     {
         new Scram('nmred', '123456', 64);
     }
@@ -103,15 +97,14 @@ class ScramTest extends TestCase
      * testGetMechanismName
      *
      * @access public
-     * @return void
      */
-    public function testGetMechanismName()
+    public function testGetMechanismName(): void
     {
         $provider = new Scram('nmred', '123456', Scram::SCRAM_SHA_256);
         $this->assertSame('SCRAM-SHA-256', $provider->getName());
     }
 
-    private function getSocketForVerify(string $verifyMessage = '')
+    private function getSocketForVerify(string $verifyMessage = ''): Socket
     {
         $socket             = $this->createMock(Socket::class);
         $handShakeData      = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
@@ -144,9 +137,9 @@ class ScramTest extends TestCase
         return $socket;
     }
 
-    private function getSocketForInvalidFinalMessage(string $serverMessage = '')
+    private function getSocketForInvalidFinalMessage(string $serverMessage = ''): Socket
     {
-        $socket        = $this->createMock(\Kafka\Socket::class);
+        $socket        = $this->createMock(Socket::class);
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
 
         if ($serverMessage === '') {
@@ -175,7 +168,7 @@ class ScramTest extends TestCase
         return $socket;
     }
 
-    private function finalMessage(string $message = '')
+    private function finalMessage(string $message = ''): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce', 'verifyMessage'])

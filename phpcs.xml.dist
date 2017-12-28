@@ -72,5 +72,35 @@
             <property name="linesCountBeforeClosingBrace" value="0"/>
         </properties>
     </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
+        <properties>
+            <property name="enableEachParameterAndReturnInspection" value="true"/>
+            <property name="traversableTypeHints" type="array" value="Doctrine\Common\Collections\Collection"/>
+            <property
+                    name="usefulAnnotations"
+                    type="array"
+                    value="
+                    @before,
+                    @beforeClass,
+                    @after,
+                    @afterClass,
+                    @test,
+                    @dataProvider,
+                    @deprecated,
+                    @expectedException,
+                    @expectedExceptionMessage,
+                    @expectedExceptionMessageRegExp,
+                    @expectedExceptionCode,
+                    @expectedDeprecation,
+                    @group,
+                    @internal,
+                    @link,
+                    @see,
+                    @throws
+                "
+            />
+        </properties>
+    </rule>
 </ruleset>
 

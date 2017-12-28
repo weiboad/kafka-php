@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 final class ListGroupTest extends TestCase
 {
+    /**
+     * @var ListGroup
+     */
     private $list;
 
     public function setUp(): void

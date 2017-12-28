@@ -189,6 +189,8 @@ class Protocol
     }
 
     /**
+     * @param mixed[] $payloads
+     *
      * @throws \Kafka\Exception
      */
     public static function encode(int $key, array $payloads): string
@@ -201,6 +203,8 @@ class Protocol
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws \Kafka\Exception
      */
     public static function decode(int $key, string $data): array
@@ -212,9 +216,6 @@ class Protocol
         return self::$objects[$key]->decode($data);
     }
 
-    /**
-     * get error
-     */
     public static function getError(int $errCode): string
     {
         if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {

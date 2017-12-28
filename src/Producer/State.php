@@ -19,47 +19,45 @@ class State
     public const STATUS_PROCESS = 8;
     public const STATUS_FINISH  = 16;
 
+    /**
+     * @var mixed[]
+     */
     private $callStatus = [];
 
+    /**
+     * @var mixed[][]
+     */
     private $requests = [
         self::REQUEST_METADATA => [],
         self::REQUEST_PRODUCE => [],
     ];
 
-    public function init()
+    public function init(): void
     {
         $this->callStatus = [
-            self::REQUEST_METADATA => [
-                'status'=> self::STATUS_LOOP,
-            ],
-            self::REQUEST_PRODUCE => [
-                'status'=> self::STATUS_LOOP,
-            ],
+            self::REQUEST_METADATA => ['status' => self::STATUS_LOOP],
+            self::REQUEST_PRODUCE  => ['status' => self::STATUS_LOOP],
         ];
 
-        // instances clear
+        $config = $this->getConfig();
 
-        // init requests
-        $config = ProducerConfig::getInstance();
-
-        foreach ($this->requests as $request => $option) {
-            switch ($request) {
-                case self::REQUEST_METADATA:
-                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
-                    break;
-                default:
-                    $interval = $config->getIsAsyn() ? $config->getProduceInterval() : 1;
-
-                    $this->requests[$request]['interval'] = $interval;
+        foreach (array_keys($this->requests) as $request) {
+            if ($request === self::REQUEST_METADATA) {
+                $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+                break;
             }
+
+            $interval = $config->getIsAsyn() ? $config->getProduceInterval() : 1;
+
+            $this->requests[$request]['interval'] = $interval;
         }
     }
 
-    public function start()
+    public function start(): void
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            Loop::repeat($interval, function ($watcherId) use ($request, $option): void {
                 if ($this->checkRun($request) && $option['func'] !== null) {
                     $this->processing($request, $option['func']());
                 }
@@ -76,19 +74,23 @@ class State
         }
     }
 
-    public function succRun($key, $context = null)
+    /**
+     * @param mixed|null $context
+     */
+    public function succRun(int $key, $context = null): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = $this->getConfig();
         $isAsyn = $config->getIsAsyn();
 
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
             case self::REQUEST_METADATA:
                 $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                if ($context) { // if kafka broker is change
+
+                if ($context !== null) { // if kafka broker is change
                     $this->recover();
                 }
                 break;
@@ -117,7 +119,7 @@ class State
         }
     }
 
-    public function failRun($key, $context = null): void
+    public function failRun(int $key): void
     {
         if (! isset($this->callStatus[$key])) {
             return;
@@ -133,14 +135,17 @@ class State
         }
     }
 
-    public function setCallback($callbacks)
+    /**
+     * @param callable[] $callbacks
+     */
+    public function setCallback(array $callbacks): void
     {
         foreach ($callbacks as $request => $callback) {
             $this->requests[$request]['func'] = $callback;
         }
     }
 
-    public function recover()
+    public function recover(): void
     {
         $this->callStatus = [
             self::REQUEST_METADATA => $this->callStatus[self::REQUEST_METADATA],
@@ -150,7 +155,7 @@ class State
         ];
     }
 
-    protected function checkRun($key)
+    protected function checkRun(int $key): bool
     {
         if (! isset($this->callStatus[$key])) {
             return false;
@@ -186,12 +191,17 @@ class State
 
                 return false;
         }
+
+        return false;
     }
 
-    protected function processing($key, $context)
+    /**
+     * @param mixed $context
+     */
+    protected function processing(int $key, $context): void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         // set process start time
@@ -204,15 +214,25 @@ class State
                 if (empty($context)) {
                     break;
                 }
+
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
-                $contextStatus                     = [];
+
+                $contextStatus = [];
+
                 if (is_array($context)) {
                     foreach ($context as $fd) {
                         $contextStatus[$fd] = self::STATUS_PROCESS;
                     }
+
                     $this->callStatus[$key]['context'] = $contextStatus;
                 }
+
                 break;
         }
+    }
+
+    private function getConfig(): ProducerConfig
+    {
+        return ProducerConfig::getInstance();
     }
 }

@@ -53,6 +53,7 @@ abstract class ProducerTest extends TestCase
 
     protected function configureProducer(): void
     {
+        /** @var ProducerConfig $config */
         $config = ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
@@ -83,7 +84,7 @@ abstract class ProducerTest extends TestCase
         );
 
         $consumer->start(
-            function (string $topic, int $partition, array $message) use (&$consumedMessages) {
+            function (string $topic, int $partition, array $message) use (&$consumedMessages): void {
                 self::assertSame($this->topic, $topic);
                 self::assertLessThan(3, $partition);
                 self::assertArrayHasKey('offset', $message);
@@ -110,6 +111,7 @@ abstract class ProducerTest extends TestCase
 
     private function configureConsumer(): void
     {
+        /** @var ConsumerConfig $config */
         $config = ConsumerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
@@ -118,6 +120,9 @@ abstract class ProducerTest extends TestCase
         $config->setTopics([$this->topic]);
     }
 
+    /**
+     * @return string[][]
+     */
     public function createMessages(int $amount = self::MESSAGES_TO_SEND): array
     {
         $messages = [];

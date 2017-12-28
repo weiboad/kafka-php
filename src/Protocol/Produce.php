@@ -2,6 +2,8 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
 use Lcobucci\Clock\Clock;
 use Lcobucci\Clock\SystemClock;
 
@@ -34,10 +36,16 @@ class Produce extends Protocol
         $this->clock = $clock ?: new SystemClock();
     }
 
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given procude data invalid. `data` is undefined.');
+            throw new ProtocolException('given procude data invalid. `data` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
@@ -52,6 +60,11 @@ class Produce extends Protocol
         return self::encodeString($header . $data, self::PACK_INT32);
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
     public function decode(string $data): array
     {
         $offset       = 0;
@@ -72,7 +85,9 @@ class Produce extends Protocol
      * N.B., MessageSets are not preceded by an int32 like other array elements
      * in the protocol.
      *
-     * @throws \Kafka\Exception\NotSupported
+     * @param string[]|string[][] $messages
+     *
+     * @throws NotSupported
      */
     protected function encodeMessageSet(array $messages, int $compression = self::COMPRESSION_NONE): string
     {
@@ -97,7 +112,9 @@ class Produce extends Protocol
     }
 
     /**
-     * @param array|string $message
+     * @param string[]|string $message
+     *
+     * @throws NotSupported
      */
     protected function encodeMessage($message, int $compression = self::COMPRESSION_NONE): string
     {
@@ -171,15 +188,20 @@ class Produce extends Protocol
 
     /**
      * encode signal part
+     *
+     * @param mixed[] $values
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
      */
     protected function encodeProducePartition(array $values, int $compression): string
     {
         if (! isset($values['partition_id'])) {
-            throw new \Kafka\Exception\Protocol('given produce data invalid. `partition_id` is undefined.');
+            throw new ProtocolException('given produce data invalid. `partition_id` is undefined.');
         }
 
         if (! isset($values['messages']) || empty($values['messages'])) {
-            throw new \Kafka\Exception\Protocol('given produce data invalid. `messages` is undefined.');
+            throw new ProtocolException('given produce data invalid. `messages` is undefined.');
         }
 
         $data  = self::pack(self::BIT_B32, $values['partition_id']);
@@ -193,15 +215,20 @@ class Produce extends Protocol
 
     /**
      * encode signal topic
+     *
+     * @param mixed[] $values
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
      */
     protected function encodeProduceTopic(array $values, int $compression): string
     {
         if (! isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given produce data invalid. `topic_name` is undefined.');
+            throw new ProtocolException('given produce data invalid. `topic_name` is undefined.');
         }
 
         if (! isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given produce data invalid. `partitions` is undefined.');
+            throw new ProtocolException('given produce data invalid. `partitions` is undefined.');
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -213,10 +240,11 @@ class Produce extends Protocol
     /**
      * decode produce topic pair response
      *
-     * @access protected
-     * @return array
+     * @return mixed[]
+     *
+     * @throws ProtocolException
      */
-    protected function produceTopicPair($data, $version)
+    protected function produceTopicPair(string $data, int $version): array
     {
         $offset    = 0;
         $topicInfo = $this->decodeString($data, self::BIT_B16);
@@ -236,10 +264,11 @@ class Produce extends Protocol
     /**
      * decode produce partition pair response
      *
-     * @access protected
-     * @return array
+     * @return mixed[]
+     *
+     * @throws ProtocolException
      */
-    protected function producePartitionPair($data, $version)
+    protected function producePartitionPair(string $data, int $version): array
     {
         $offset          = 0;
         $partitionId     = self::unpack(self::BIT_B32, substr($data, $offset, 4));
@@ -249,6 +278,7 @@ class Produce extends Protocol
         $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
         $offset         += 8;
         $timestamp       = 0;
+
         if ($version === self::API_VERSION2) {
             $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
             $offset   += 8;

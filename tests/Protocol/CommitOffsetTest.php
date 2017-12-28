@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class CommitOffsetTest extends TestCase
 {
+    /**
+     * @var CommitOffset
+     */
     private $commit;
 
     public function setUp(): void

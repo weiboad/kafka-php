@@ -1,23 +1,32 @@
 <?php
 namespace Kafka\Sasl;
 
+use GSSAPIContext;
 use Kafka\CommonSocket;
-use Kafka\SaslMechanism;
 use Kafka\Exception;
-use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
+use KRB5CCache;
 
 class Gssapi extends Mechanism
 {
     private const MECHANISM_NAME = "GSSAPI";
 
+    /**
+     * @var string
+     */
     private $principal;
 
+    /**
+     * @var GSSAPIContext
+     */
     private $gssapi;
 
+    /**
+     * @var KRB5CCache
+     */
     private static $ccache;
 
-    public function __construct(\GSSAPIContext $gssapi, string $principal)
+    public function __construct(GSSAPIContext $gssapi, string $principal)
     {
         $this->gssapi    = $gssapi;
         $this->principal = $principal;
@@ -37,10 +46,10 @@ class Gssapi extends Mechanism
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
 
-        self::$ccache = new \KRB5CCache();
+        self::$ccache = new KRB5CCache();
         self::$ccache->initKeytab($principal, $keytab);
 
-        $gssapi = new \GSSAPIContext();
+        $gssapi = new GSSAPIContext();
         $gssapi->acquireCredentials(self::$ccache, $principal, \GSS_C_INITIATE);
         return new self($gssapi, $principal);
     }
@@ -73,7 +82,6 @@ class Gssapi extends Mechanism
      * get sasl authenticate mechanism name
      *
      * @access public
-     * @return string
      */
     public function getName(): string
     {

@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class SyncGroupTest extends TestCase
 {
+    /**
+     * @var SyncGroup
+     */
     private $sync;
 
     public function setUp(): void

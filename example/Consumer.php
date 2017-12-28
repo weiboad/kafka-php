@@ -26,6 +26,6 @@ $config->setOffsetReset('earliest');
 //$config->setSslPeerName('nmred');
 $consumer = new Consumer();
 $consumer->setLogger($logger);
-$consumer->start(function ($topic, $part, $message) {
+$consumer->start(function ($topic, $part, $message): void {
     var_dump($message);
 });

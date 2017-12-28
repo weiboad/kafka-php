@@ -69,6 +69,9 @@ class ProtocolTest extends TestCase
         self::assertSame($message, Protocol::getError($errorCode));
     }
 
+    /**
+     * @return int&string[]
+     */
     public function errorCodesAndExpectedMessages(): array
     {
         return [

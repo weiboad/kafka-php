@@ -11,9 +11,8 @@ class PlainTest extends TestCase
      * testHandShake
      *
      * @access public
-     * @return void
      */
-    public function testHandShake()
+    public function testHandShake(): void
     {
         // Create a stub for the SomeClass class.
         $socket = $this->createMock(Socket::class);
@@ -39,9 +38,8 @@ class PlainTest extends TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage The broker does not support the requested SASL mechanism.
      * @access public
-     * @return void
      */
-    public function testHandShakeNotSupport()
+    public function testHandShakeNotSupport(): void
     {
         // Create a stub for the SomeClass class.
         $socket = $this->createMock(\Kafka\Socket::class);
@@ -64,9 +62,8 @@ class PlainTest extends TestCase
      * testGetMechanismName
      *
      * @access public
-     * @return void
      */
-    public function testGetMechanismName()
+    public function testGetMechanismName(): void
     {
         $provider = new \Kafka\Sasl\Plain('nmred', '123456');
         $this->assertSame('PLAIN', $provider->getName());

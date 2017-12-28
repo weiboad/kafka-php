@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class FetchOffsetTest extends TestCase
 {
+    /**
+     * @var FetchOffset
+     */
     private $offset;
 
     public function setUp(): void
@@ -91,7 +94,6 @@ final class FetchOffsetTest extends TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {

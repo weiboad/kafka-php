@@ -8,8 +8,14 @@ trait SingletonTrait
     use LoggerAwareTrait;
     use LoggerTrait;
 
+    /**
+     * @var object
+     */
     protected static $instance;
 
+    /**
+     * @return object
+     */
     public static function getInstance()
     {
         if (self::$instance === null) {

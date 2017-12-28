@@ -38,11 +38,17 @@ class State
         self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
     ];
 
+    /**
+     * @var mixed[]
+     */
     private $callStatus = [];
 
+    /**
+     * @var mixed[]
+     */
     private $requests = self::CLEAN_REQUEST_STATE;
 
-    public function init()
+    public function init(): void
     {
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
@@ -56,35 +62,38 @@ class State
             self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
 
-        // instances clear
-
-        // init requests
+        /** @var ConsumerConfig $config */
         $config = ConsumerConfig::getInstance();
+
         foreach ($this->requests as $request => $option) {
-            switch ($request) {
-                case self::REQUEST_METADATA:
-                    $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
-                    break;
-                default:
-                    $this->requests[$request]['interval'] = 1000;
+            if ($request !== self::REQUEST_METADATA) {
+                $this->requests[$request]['interval'] = 1000;
+                continue;
             }
+
+            $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
         }
     }
 
-    public function start()
+    public function start(): void
     {
         foreach ($this->requests as $request => $option) {
             if (isset($option['norepeat']) && $option['norepeat']) {
                 continue;
             }
-            $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
-                if ($this->checkRun($request) && $option['func'] !== null) {
-                    $this->processing($request, $option['func']());
-                }
 
-                $this->requests[$request]['watcher'] = $watcherId;
-            });
+            $interval = $option['interval'] ?? 200;
+
+            Loop::repeat(
+                $interval,
+                function (string $watcherId) use ($request, $option): void {
+                    if ($this->checkRun($request) && $option['func'] !== null) {
+                        $this->processing($request, $option['func']());
+                    }
+
+                    $this->requests[$request]['watcher'] = $watcherId;
+                }
+            );
         }
 
         // start sync metadata
@@ -93,7 +102,7 @@ class State
         }
     }
 
-    public function stop()
+    public function stop(): void
     {
         $this->removeWatchers();
 
@@ -112,16 +121,19 @@ class State
         }
     }
 
-    public function succRun($key, $context = null)
+    /**
+     * @param mixed|null $context
+     */
+    public function succRun(int $key, $context = null): void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
             case self::REQUEST_METADATA:
                 $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                if ($context) { // if kafka broker is change
+                if ((bool) $context === true) { // if kafka broker is change
                     $this->recover();
                 }
                 break;
@@ -161,10 +173,13 @@ class State
         }
     }
 
-    public function failRun($key, $context = null)
+    /**
+     * @param mixed|null $context
+     */
+    public function failRun(int $key, $context = null): void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         switch ($key) {
@@ -179,16 +194,20 @@ class State
         }
     }
 
-    public function setCallback($callbacks)
+    /**
+     * @param callable[] $callbacks
+     */
+    public function setCallback(array $callbacks): void
     {
         foreach ($callbacks as $request => $callback) {
             $this->requests[$request]['func'] = $callback;
         }
     }
 
-    public function rejoin()
+    public function rejoin(): void
     {
         $joinGroupStatus = $this->callStatus[self::REQUEST_JOINGROUP]['status'];
+
         if (($joinGroupStatus & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
             return;
         }
@@ -206,7 +225,7 @@ class State
         ];
     }
 
-    public function recover()
+    public function recover(): void
     {
         $this->callStatus = [
             self::REQUEST_METADATA      => $this->callStatus[self::REQUEST_METADATA],
@@ -221,16 +240,17 @@ class State
         ];
     }
 
-    protected function checkRun($key)
+    protected function checkRun(int $key): bool
     {
         if (! isset($this->callStatus[$key])) {
             return false;
         }
 
         $status = $this->callStatus[$key]['status'];
+
         switch ($key) {
             case self::REQUEST_METADATA:
-                if ($status & self::STATUS_PROCESS === self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) === self::STATUS_PROCESS) {
                     return false;
                 }
                 if (($status & self::STATUS_LOOP) === self::STATUS_LOOP) {
@@ -319,12 +339,17 @@ class State
                 }
                 return false;
         }
+
+        return false;
     }
 
-    protected function processing($key, $context)
+    /**
+     * @param mixed $context
+     */
+    protected function processing(int $key, $context): void
     {
         if (! isset($this->callStatus[$key])) {
-            return false;
+            return;
         }
 
         // set process start time
@@ -342,7 +367,9 @@ class State
             case self::REQUEST_OFFSET:
             case self::REQUEST_FETCH:
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
-                $contextStatus                     = [];
+
+                $contextStatus = [];
+
                 foreach ($context as $fd) {
                     $contextStatus[$fd] = self::STATUS_PROCESS;
                 }

@@ -7,11 +7,15 @@ use Kafka\Socket;
 use KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use KafkaTest\Base\StreamStub\Stream;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SocketTest extends TestCase
 {
+    /**
+     * @var vfsStreamDirectory
+     */
     private $root;
 
     public function setUp(): void
@@ -364,10 +368,17 @@ class SocketTest extends TestCase
     }
 
     /**
+     * @param string[] $mockMethod
+     *
      * @return Socket|MockObject
      */
-    private function mockStreamSocketClient($host, $port, $config = null, $sasl = null, $mockMethod = []): Socket
-    {
+    private function mockStreamSocketClient(
+        string $host,
+        int $port,
+        ?Config $config = null,
+        ?SaslMechanism $sasl = null,
+        array $mockMethod = []
+    ): Socket {
         $socket = $this->getMockBuilder(Socket::class)
                        ->setMethods(array_merge(['createSocket'], $mockMethod))
                        ->setConstructorArgs([$host, $port, $config, $sasl])
@@ -404,6 +415,9 @@ class SocketTest extends TestCase
     }
 
     /**
+     * @param int|bool $select
+     * @param mixed[] $metaData
+     *
      * @return Socket|MockObject
      */
     private function createStream(string $host, int $port, $select, array $metaData = []): Socket

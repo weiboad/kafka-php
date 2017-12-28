@@ -21,6 +21,9 @@ class ProducerConfig extends Config
         Produce::COMPRESSION_SNAPPY,
     ];
 
+    /**
+     * @var mixed[]
+     */
     protected static $defaults = [
         'requiredAck'     => 1,
         'timeout'         => 5000,
@@ -30,6 +33,11 @@ class ProducerConfig extends Config
         'compression'     => Protocol\Protocol::COMPRESSION_NONE,
     ];
 
+    /**
+     * @param float|int|string $requestTimeout
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setRequestTimeout($requestTimeout): void
     {
         if (! is_numeric($requestTimeout) || $requestTimeout < 1 || $requestTimeout > 900000) {
@@ -39,6 +47,11 @@ class ProducerConfig extends Config
         static::$options['requestTimeout'] = $requestTimeout;
     }
 
+    /**
+     * @param float|int|string $produceInterval
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setProduceInterval($produceInterval): void
     {
         if (! is_numeric($produceInterval) || $produceInterval < 1 || $produceInterval > 900000) {
@@ -48,6 +61,11 @@ class ProducerConfig extends Config
         static::$options['produceInterval'] = $produceInterval;
     }
 
+    /**
+     * @param float|int|string $timeout
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setTimeout($timeout): void
     {
         if (! is_numeric($timeout) || $timeout < 1 || $timeout > 900000) {
@@ -57,6 +75,11 @@ class ProducerConfig extends Config
         static::$options['timeout'] = $timeout;
     }
 
+    /**
+     * @param float|int|string $requiredAck
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setRequiredAck($requiredAck): void
     {
         if (! is_numeric($requiredAck) || $requiredAck < -1 || $requiredAck > 1000) {
@@ -66,12 +89,8 @@ class ProducerConfig extends Config
         static::$options['requiredAck'] = $requiredAck;
     }
 
-    public function setIsAsyn($asyn): void
+    public function setIsAsyn(bool $asyn): void
     {
-        if (! is_bool($asyn)) {
-            throw new Exception\Config('Set isAsyn value is invalid, must set it bool value');
-        }
-
         static::$options['isAsyn'] = $asyn;
     }
 

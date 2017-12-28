@@ -46,18 +46,15 @@ class Process
 
     public function init(): void
     {
-        // init protocol
-        $config = ProducerConfig::getInstance();
+        $config = $this->getConfig();
         Protocol::init($config->getBrokerVersion(), $this->logger);
 
-        // init process request
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
         $broker->setConfig($config);
-        $broker->setProcess(function (string $data, $fd): void {
+        $broker->setProcess(function (string $data, int $fd): void {
             $this->processRequest($data, $fd);
         });
 
-        // init state
         $this->state = State::getInstance();
 
         if ($this->logger) {
@@ -83,7 +80,7 @@ class Process
         $this->init();
         $this->state->start();
 
-        $config = ProducerConfig::getInstance();
+        $config = $this->getConfig();
 
         if ($config->getIsAsyn()) {
             return;
@@ -117,6 +114,9 @@ class Process
         $this->error = $error;
     }
 
+    /**
+     * @throws \Kafka\Exception
+     */
     public function syncMeta(): void
     {
         $this->debug('Start sync metadata request');
@@ -135,10 +135,12 @@ class Process
         }
 
         shuffle($brokerHost);
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
+
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host);
-            if ($socket) {
+
+            if ($socket !== null) {
                 $params = [];
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
@@ -147,7 +149,7 @@ class Process
             }
         }
 
-        throw new \Kafka\Exception(
+        throw new Exception(
             sprintf(
                 'It was not possible to establish a connection for metadata with the brokers "%s"',
                 $brokerList
@@ -157,10 +159,12 @@ class Process
 
     /**
      * process Request
+     *
+     * @throws \Kafka\Exception
      */
-    protected function processRequest(string $data, $fd): void
+    protected function processRequest(string $data, int $fd): void
     {
-        $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+        $correlationId = Protocol\Protocol::unpack(Protocol\Protocol::BIT_B32, substr($data, 0, 4));
         switch ($correlationId) {
             case Protocol::METADATA_REQUEST:
                 $result = Protocol::decode(Protocol::METADATA_REQUEST, substr($data, 4));
@@ -171,7 +175,7 @@ class Process
                     break;
                 }
 
-                $broker   = Broker::getInstance();
+                $broker   = $this->getBroker();
                 $isChange = $broker->setData($result['topics'], $result['brokers']);
                 $this->state->succRun(State::REQUEST_METADATA, $isChange);
 
@@ -185,13 +189,18 @@ class Process
         }
     }
 
+    /**
+     * @return int[]
+     */
     public function produce(): array
     {
-        $context     = [];
-        $broker      = Broker::getInstance();
-        $requiredAck = ProducerConfig::getInstance()->getRequiredAck();
-        $timeout     = ProducerConfig::getInstance()->getTimeout();
-        $compression = ProducerConfig::getInstance()->getCompression();
+        $context = [];
+        $broker  = $this->getBroker();
+        $config  = $this->getConfig();
+
+        $requiredAck = $config->getRequiredAck();
+        $timeout     = $config->getTimeout();
+        $compression = $config->getCompression();
 
         // get send message
         // data struct
@@ -210,7 +219,7 @@ class Process
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect($brokerId);
 
-            if (! $connect) {
+            if ($connect === null) {
                 return $context;
             }
 
@@ -235,7 +244,10 @@ class Process
         return $context;
     }
 
-    protected function succProduce($result, $fd)
+    /**
+     * @param mixed[] $result
+     */
+    protected function succProduce(array $result, int $fd): void
     {
         $msg = sprintf('Send message sucess, result: %s', json_encode($result));
         $this->debug($msg);
@@ -247,7 +259,7 @@ class Process
         $this->state->succRun(State::REQUEST_PRODUCE, $fd);
     }
 
-    protected function stateConvert($errorCode, $context = null)
+    protected function stateConvert(int $errorCode): bool
     {
         $this->error(Protocol::getError($errorCode));
 
@@ -279,10 +291,15 @@ class Process
         return true;
     }
 
+    /**
+     * @param mixed[] $data
+     *
+     * @return mixed[]
+     */
     protected function convertMessage(array $data): array
     {
         $sendData  = [];
-        $broker    = Broker::getInstance();
+        $broker    = $this->getBroker();
         $topicInfo = $broker->getTopics();
 
         foreach ($data as $value) {
@@ -328,5 +345,15 @@ class Process
         }
 
         return $sendData;
+    }
+
+    private function getConfig(): ProducerConfig
+    {
+        return ProducerConfig::getInstance();
+    }
+
+    private function getBroker(): Broker
+    {
+        return Broker::getInstance();
     }
 }

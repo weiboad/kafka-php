@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class DescribeGroupsTest extends TestCase
 {
+    /**
+     * @var DescribeGroups
+     */
     private $describe;
 
     public function setUp(): void

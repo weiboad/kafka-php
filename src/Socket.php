@@ -49,14 +49,15 @@ class Socket extends CommonSocket
 
         $this->readWatcherId = Loop::onReadable(
             $this->stream,
-            function () {
+            function (): void {
                 do {
-                    if (! $this->isSocketDead()) {
-                        $newData = @fread($this->stream, self::READ_MAX_LENGTH);
-                    } else {
+                    if ($this->isSocketDead()) {
                         $this->reconnect();
                         return;
                     }
+
+                    $newData = @fread($this->stream, self::READ_MAX_LENGTH);
+
                     if ($newData) {
                         $this->read($newData);
                     }
@@ -66,7 +67,7 @@ class Socket extends CommonSocket
 
         $this->writeWatcherId = Loop::onWritable(
             $this->stream,
-            function () {
+            function (): void {
                 $this->write();
             },
             ['enable' => false] // <-- let's initialize the watcher as "disabled"
@@ -108,10 +109,12 @@ class Socket extends CommonSocket
      *
      * This method will not wait for all the requested data, it will return as
      * soon as any data is received.
+     *
+     * @param string|int $data
      */
-    public function read(string $data): void
+    public function read($data): void
     {
-        $this->readBuffer .= $data;
+        $this->readBuffer .= (string) $data;
 
         do {
             if ($this->readNeedLength === 0) { // response start

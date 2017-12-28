@@ -1,12 +1,21 @@
 <?php
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+
 class GroupCoordinator extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws ProtocolException
+     * @throws NotSupported
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given group coordinator invalid. `group_id` is undefined.');
+            throw new ProtocolException('given group coordinator invalid. `group_id` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::GROUP_COORDINATOR_REQUEST, self::GROUP_COORDINATOR_REQUEST);
@@ -16,6 +25,9 @@ class GroupCoordinator extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset          = 0;

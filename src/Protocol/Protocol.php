@@ -137,10 +137,12 @@ abstract class Protocol
 
     /**
      * Unpack a bit integer as big endian long
+     *
+     * @return mixed
+     * @throws ProtocolException
      */
     public static function unpack(string $type, string $bytes)
     {
-        $result = [];
         self::checkLen($type, $bytes);
 
         if ($type === self::BIT_B64) {
@@ -241,28 +243,23 @@ abstract class Protocol
      *
      * @param int[] $bits
      *
-     * @access public
-     * @return array
+     * @return int[]
      */
-    public static function convertSignedShortFromLittleEndianToBigEndian($bits)
+    public static function convertSignedShortFromLittleEndianToBigEndian(array $bits): array
     {
-        foreach ($bits as $index => $bit) {
-            // get LSB
+        $convert = function (int $bit): int {
             $lsb = $bit & 0xff;
-
-            // get MSB
             $msb = $bit >> 8 & 0xff;
-
-            // swap bytes
             $bit = $lsb << 8 | $msb;
 
             if ($bit >= 32768) {
                 $bit -= 65536;
             }
-            $bits[$index] = $bit;
-        }
 
-        return $bits;
+            return $bit;
+        };
+
+        return array_map($convert, $bits);
     }
 
     /**
@@ -368,7 +365,7 @@ abstract class Protocol
     }
 
     /**
-     * @throws \Kafka\Exception\NotSupported
+     * @throws NotSupported
      */
     public function requestHeader(string $clientId, int $correlationId, int $apiKey): string
     {
@@ -393,9 +390,9 @@ abstract class Protocol
     }
 
     /**
-     * @throws \Kafka\Exception\NotSupported
+     * @throws NotSupported
      */
-    public static function encodeString(string $string, int $bytes, int $compression = self::COMPRESSION_NONE)
+    public static function encodeString(string $string, int $bytes, int $compression = self::COMPRESSION_NONE): string
     {
         $packLen = $bytes === self::PACK_INT32 ? self::BIT_B32 : self::BIT_B16;
         $string  = self::compress($string, $compression);
@@ -414,18 +411,17 @@ abstract class Protocol
         }
 
         if ($compression !== self::COMPRESSION_GZIP) {
-            throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+            throw new NotSupported('Unknown compression flag: ' . $compression);
         }
 
         return \gzencode($string);
     }
 
-    public static function encodeArray(array $array, $func, ?int $options = null)
+    /**
+     * @param mixed[] $array
+     */
+    public static function encodeArray(array $array, callable $func, ?int $options = null): string
     {
-        if (! is_callable($func, false)) {
-            throw new ProtocolException('Encode array failed, given function is not callable.');
-        }
-
         $arrayCount = count($array);
 
         $body = '';
@@ -436,6 +432,11 @@ abstract class Protocol
         return self::pack(self::BIT_B32, (string) $arrayCount) . $body;
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
     public function decodeString(string $data, string $bytes, int $compression = self::COMPRESSION_NONE): array
     {
         $offset  = $bytes === self::BIT_B32 ? 4 : 2;
@@ -462,17 +463,24 @@ abstract class Protocol
         }
 
         if ($compression === self::COMPRESSION_SNAPPY) {
-            throw new \Kafka\Exception\NotSupported('SNAPPY compression not yet implemented');
+            throw new NotSupported('SNAPPY compression not yet implemented');
         }
 
         if ($compression !== self::COMPRESSION_GZIP) {
-            throw new \Kafka\Exception\NotSupported('Unknown compression flag: ' . $compression);
+            throw new NotSupported('Unknown compression flag: ' . $compression);
         }
 
         return \gzdecode($string);
     }
 
-    public function decodeArray(string $data, callable $func, $options = null)
+    /**
+     * @param mixed|null $options
+     *
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
+    public function decodeArray(string $data, callable $func, $options = null): array
     {
         $offset     = 0;
         $arrayCount = self::unpack(self::BIT_B32, substr($data, $offset, 4));
@@ -502,6 +510,11 @@ abstract class Protocol
         return ['length' => $offset, 'data' => $result];
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ProtocolException
+     */
     public function decodePrimitiveArray(string $data, string $bit): array
     {
         $offset     = 0;
@@ -534,11 +547,15 @@ abstract class Protocol
     }
 
     /**
+     * @param mixed[] $payloads
+     *
      * @throws ProtocolException
      */
     abstract public function encode(array $payloads = []): string;
 
     /**
+     * @return mixed[]
+     *
      * @throws ProtocolException
      */
     abstract public function decode(string $data): array;

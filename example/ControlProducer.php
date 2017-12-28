@@ -22,13 +22,23 @@ $config->setProduceInterval(500);
 
 class Message
 {
+    /**
+     * @var string[]
+     */
     private $message;
 
-    public function getMessage()
+    /**
+     * @return string[]
+     */
+    public function getMessage(): array
     {
         return $this->message;
     }
-    public function setMessage($message)
+
+    /**
+     * @param string[] $message
+     */
+    public function setMessage(array $message): void
     {
         $this->message = $message;
     }
@@ -36,7 +46,7 @@ class Message
 
 // control message send interval time
 $message = new Message;
-Loop::repeat(3000, function () use ($message) {
+Loop::repeat(3000, function () use ($message): void {
     $message->setMessage([
         [
             'topic' => 'test',
@@ -52,10 +62,10 @@ $producer = new Producer(function () use ($message) {
     return $tmp;
 });
 $producer->setLogger($logger);
-$producer->success(function ($result) {
+$producer->success(function ($result): void {
     var_dump($result);
 });
-$producer->error(function ($errorCode, $context) {
+$producer->error(function ($errorCode, $context): void {
     var_dump($errorCode);
 });
 $producer->send();

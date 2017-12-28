@@ -2,24 +2,33 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+
 class JoinGroup extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given join group data invalid. `group_id` is undefined.');
+            throw new ProtocolException('given join group data invalid. `group_id` is undefined.');
         }
 
         if (! isset($payloads['session_timeout'])) {
-            throw new \Kafka\Exception\Protocol('given join group data invalid. `session_timeout` is undefined.');
+            throw new ProtocolException('given join group data invalid. `session_timeout` is undefined.');
         }
 
         if (! isset($payloads['member_id'])) {
-            throw new \Kafka\Exception\Protocol('given join group data invalid. `member_id` is undefined.');
+            throw new ProtocolException('given join group data invalid. `member_id` is undefined.');
         }
 
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given join group data invalid. `data` is undefined.');
+            throw new ProtocolException('given join group data invalid. `data` is undefined.');
         }
 
         if (! isset($payloads['protocol_type'])) {
@@ -46,6 +55,9 @@ class JoinGroup extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset        = 0;
@@ -73,20 +85,26 @@ class JoinGroup extends Protocol
         ];
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws ProtocolException
+     * @throws NotSupported
+     */
     protected function encodeGroupProtocol(array $values): string
     {
         if (! isset($values['protocol_name'])) {
-            throw new \Kafka\Exception\Protocol('given join group data invalid. `protocol_name` is undefined.');
+            throw new ProtocolException('given join group data invalid. `protocol_name` is undefined.');
         }
 
         $protocolName = self::encodeString($values['protocol_name'], self::PACK_INT16);
 
         if (! isset($values['version'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `version` is undefined.');
+            throw new ProtocolException('given data invalid. `version` is undefined.');
         }
 
         if (! isset($values['subscription']) || empty($values['subscription'])) {
-            throw new \Kafka\Exception\Protocol('given data invalid. `subscription` is undefined.');
+            throw new ProtocolException('given data invalid. `subscription` is undefined.');
         }
         if (! isset($values['user_data'])) {
             $values['user_data'] = '';
@@ -99,11 +117,17 @@ class JoinGroup extends Protocol
         return $protocolName . self::encodeString($data, self::PACK_INT32);
     }
 
+    /**
+     * @throws NotSupported
+     */
     protected function encodeGroupProtocolMetaTopic(string $values): string
     {
         return self::encodeString($values, self::PACK_INT16);
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function joinGroupMember(string $data): array
     {
         $offset     = 0;

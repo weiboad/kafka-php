@@ -7,8 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 final class JoinGroupTest extends TestCase
 {
+    /**
+     * @var JoinGroup
+     */
     private $group9;
 
+    /**
+     * @var JoinGroup
+     */
     private $group10;
 
     public function setUp(): void

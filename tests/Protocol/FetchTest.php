@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class FetchTest extends TestCase
 {
+    /**
+     * @var Fetch
+     */
     private $fetch;
 
     public function setUp(): void

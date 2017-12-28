@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 final class HeartbeatTest extends TestCase
 {
+    /**
+     * @var Heartbeat
+     */
     private $heart;
 
     public function setUp(): void
@@ -68,7 +71,6 @@ final class HeartbeatTest extends TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {

@@ -1,46 +1,28 @@
 <?php
 namespace KafkaTest\Base;
 
-use PHPUnit\Framework\TestCase;
 use Kafka\Broker;
 use Kafka\Socket;
 use Kafka\SocketSync;
+use PHPUnit\Framework\TestCase;
 
 class BrokerTest extends TestCase
 {
-    /**
-     * setDown
-     *
-     * @access public
-     * @return void
-     */
-    public function tearDown()
+    public function tearDown(): void
     {
         Broker::getInstance()->clear();
     }
 
-    /**
-     * testGroupBrokerId
-     *
-     * @access public
-     * @return void
-     */
-    public function testGroupBrokerId()
+    public function testGroupBrokerId(): void
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $broker->setGroupBrokerId(1);
         $this->assertEquals($broker->getGroupBrokerId(), 1);
     }
 
-    /**
-     * testData
-     *
-     * @access public
-     * @return void
-     */
-    public function testData()
+    public function testData(): void
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $data   = [
             'brokers' => [
                 [
@@ -110,15 +92,9 @@ class BrokerTest extends TestCase
         $this->assertEquals($topics, $broker->getTopics());
     }
 
-    /**
-     * testGetConnect
-     *
-     * @access public
-     * @return void
-     */
-    public function getConnect()
+    public function getConnect(): void
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $data   = [
             [
                 'host' => '127.0.0.1',
@@ -149,29 +125,17 @@ class BrokerTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * testGetConnect
-     *
-     * @access public
-     * @return void
-     */
-    public function testConnectRandFalse()
+    public function testConnectRandFalse(): void
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
 
         $result = $broker->getRandConnect();
-        $this->assertFalse($result);
+        $this->assertNull($result);
     }
 
-    /**
-     * testGetSocket
-     *
-     * @access public
-     * @return void
-     */
-    public function testGetSocketNotSetConfig()
+    public function testGetSocketNotSetConfig(): void
     {
-        $broker   = \Kafka\Broker::getInstance();
+        $broker   = Broker::getInstance();
         $hostname = '127.0.0.1';
         $port     = '9092';
         $socket   = $broker->getSocket($hostname, $port, true);

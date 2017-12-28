@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 final class SaslHandShakeTest extends TestCase
 {
+    /**
+     * @var SaslHandShake
+     */
     private $sasl;
 
     public function setUp(): void
@@ -43,7 +46,6 @@ final class SaslHandShakeTest extends TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {

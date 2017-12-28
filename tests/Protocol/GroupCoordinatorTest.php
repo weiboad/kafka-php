@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 final class GroupCoordinatorTest extends TestCase
 {
+    /**
+     * @var GroupCoordinator
+     */
     private $group;
 
     public function setUp(): void

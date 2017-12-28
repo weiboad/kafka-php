@@ -53,8 +53,14 @@ abstract class Config
         self::SASL_MECHANISMS_SCRAM_SHA_512,
     ];
 
+    /**
+     * @var mixed[]
+     */
     protected static $options = [];
 
+    /**
+     * @var mixed[]
+     */
     private static $defaults = [
         'clientId'                  => 'kafka-php',
         'brokerVersion'             => '0.10.1.0',
@@ -78,10 +84,23 @@ abstract class Config
         'saslPrincipal'             => '',
     ];
 
-    public function __call($name, $args)
+    /**
+     * @param mixed[] $args
+     *
+     * @return bool|mixed
+     */
+    public function __call(string $name, array $args)
     {
-        if (strpos($name, 'get') === 0 || strpos($name, 'iet') === 0) {
-            $option = strtolower(substr($name, 3, 1)) . substr($name, 4);
+        $isGetter = strpos($name, 'get') === 0 || strpos($name, 'iet') === 0;
+        $isSetter = strpos($name, 'set') === 0;
+
+        if (! $isGetter && ! $isSetter) {
+            return false;
+        }
+
+        $option = lcfirst(substr($name, 3));
+
+        if ($isGetter) {
             if (isset(self::$options[$option])) {
                 return self::$options[$option];
             }
@@ -89,21 +108,22 @@ abstract class Config
             if (isset(self::$defaults[$option])) {
                 return self::$defaults[$option];
             }
+
             if (isset(static::$defaults[$option])) {
                 return static::$defaults[$option];
             }
+
             return false;
         }
 
-        if (strpos($name, 'set') === 0) {
-            if (count($args) !== 1) {
-                return false;
-            }
-            $option                   = strtolower(substr($name, 3, 1)) . substr($name, 4);
-            static::$options[$option] = $args[0];
-            // check todo
-            return true;
+        if (count($args) !== 1) {
+            return false;
         }
+
+        static::$options[$option] = array_shift($args);
+
+        // check todo
+        return true;
     }
 
     public function setClientId(string $val): void
@@ -153,6 +173,9 @@ abstract class Config
         static::$options = [];
     }
 
+    /**
+     * @param int|float|string $messageMaxBytes
+     */
     public function setMessageMaxBytes($messageMaxBytes): void
     {
         if (! is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
@@ -161,6 +184,9 @@ abstract class Config
         static::$options['messageMaxBytes'] = $messageMaxBytes;
     }
 
+    /**
+     * @param int|float|string $metadataRequestTimeoutMs
+     */
     public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs): void
     {
         if (! is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
@@ -170,6 +196,9 @@ abstract class Config
         static::$options['metadataRequestTimeoutMs'] = $metadataRequestTimeoutMs;
     }
 
+    /**
+     * @param int|float|string $metadataRefreshIntervalMs
+     */
     public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs): void
     {
         if (! is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
@@ -179,6 +208,9 @@ abstract class Config
         static::$options['metadataRefreshIntervalMs'] = $metadataRefreshIntervalMs;
     }
 
+    /**
+     * @param int|float|string $metadataMaxAgeMs
+     */
     public function setMetadataMaxAgeMs($metadataMaxAgeMs): void
     {
         if (! is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {

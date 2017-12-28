@@ -5,11 +5,14 @@ use Kafka\Socket;
 
 class ListGroup
 {
+    /**
+     * @var string[]
+     */
     protected $group = [];
     // {{{ functions
     // {{{ protected function joinGroup()
 
-    protected function joinGroup()
+    protected function joinGroup(): void
     {
         $data = [
             'group_id' => 'test',
@@ -30,7 +33,7 @@ class ListGroup
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 
         $socket = new Socket('127.0.0.1', '9192');
-        $socket->setOnReadable(function ($data) {
+        $socket->setOnReadable(function ($data): void {
             $coodid      = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result      = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
             $this->group = $result;
@@ -39,14 +42,14 @@ class ListGroup
 
         $socket->connect();
         $socket->write($requestData);
-        Amp\run(function () use ($socket, $requestData) {
+        Amp\run(function () use ($socket, $requestData): void {
         });
     }
 
     // }}}
     // {{{ protected function syncGroup()
 
-    protected function syncGroup()
+    protected function syncGroup(): void
     {
         $this->joinGroup();
         $data = [
@@ -73,7 +76,7 @@ class ListGroup
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');
-        $socket->setOnReadable(function ($data) {
+        $socket->setOnReadable(function ($data): void {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
             //echo json_encode($result);
@@ -82,14 +85,14 @@ class ListGroup
 
         $socket->connect();
         $socket->write($requestData);
-        Amp\run(function () use ($socket, $requestData) {
+        Amp\run(function () use ($socket, $requestData): void {
         });
     }
 
     // }}}
     // {{{ public function run()
 
-    public function run()
+    public function run(): void
     {
         $this->joinGroup();
         $this->syncGroup();
@@ -100,7 +103,7 @@ class ListGroup
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::LIST_GROUPS_REQUEST, $data);
 
         $socket = new \Kafka\Socket('127.0.0.1', '9192');
-        $socket->setOnReadable(function ($data) {
+        $socket->setOnReadable(function ($data): void {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result = \Kafka\Protocol::decode(\Kafka\Protocol::LIST_GROUPS_REQUEST, substr($data, 4));
             echo json_encode($result);
@@ -109,7 +112,7 @@ class ListGroup
 
         $socket->connect();
         $socket->write($requestData);
-        Amp\run(function () use ($socket, $requestData) {
+        Amp\run(function () use ($socket, $requestData): void {
         });
     }
 

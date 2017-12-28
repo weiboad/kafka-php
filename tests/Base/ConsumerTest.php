@@ -37,10 +37,10 @@ final class ConsumerTest extends TestCase
     {
         $executed = false;
 
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () use (&$executed) {
+        $startCallback = function () use (&$executed): void {
             $executed = true;
             Loop::stop();
         };
@@ -60,10 +60,10 @@ final class ConsumerTest extends TestCase
      */
     public function startShouldLogErrorWhenSomeoneTriesToDoItTwice(): void
     {
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () {
+        $startCallback = function (): void {
             $this->consumer->start();
             Loop::stop();
         };
@@ -87,10 +87,10 @@ final class ConsumerTest extends TestCase
     {
         $executed = false;
 
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () use (&$executed) {
+        $startCallback = function () use (&$executed): void {
             $executed = true;
         };
 
@@ -117,10 +117,10 @@ final class ConsumerTest extends TestCase
      */
     public function stopShouldCleanThingsAndStopTheLoop(): void
     {
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () {
+        $startCallback = function (): void {
             $this->consumer->stop();
         };
 
@@ -149,7 +149,7 @@ final class ConsumerTest extends TestCase
         $process = $this->createMock(Consumer\Process::class);
 
         $process->method('start')->willReturnCallback(
-            function () use ($startCallback) {
+            function () use ($startCallback): void {
                 Loop::defer($startCallback);
             }
         );

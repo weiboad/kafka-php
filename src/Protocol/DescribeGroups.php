@@ -2,8 +2,15 @@
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+
 class DescribeGroups extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     */
     public function encode(array $payloads = []): string
     {
         $header = $this->requestHeader('kafka-php', self::DESCRIBE_GROUPS_REQUEST, self::DESCRIBE_GROUPS_REQUEST);
@@ -12,6 +19,9 @@ class DescribeGroups extends Protocol
         return self::encodeString($header . $data, self::PACK_INT32);
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset  = 0;
@@ -21,6 +31,9 @@ class DescribeGroups extends Protocol
         return $groups['data'];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function describeGroup(string $data): array
     {
         $offset       = 0;
@@ -51,6 +64,9 @@ class DescribeGroups extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function describeMember(string $data): array
     {
         $offset     = 0;
@@ -101,6 +117,9 @@ class DescribeGroups extends Protocol
         ];
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function describeResponsePartition(string $data): array
     {
         $offset     = 0;

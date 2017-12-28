@@ -7,8 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 final class OffsetTest extends TestCase
 {
+    /**
+     * @var Offset
+     */
     private $offset;
 
+    /**
+     * @var Offset
+     */
     private $offset10;
 
     public function setUp(): void
@@ -104,7 +110,6 @@ final class OffsetTest extends TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {

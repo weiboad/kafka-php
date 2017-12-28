@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 final class LeaveGroupTest extends TestCase
 {
+    /**
+     * @var LeaveGroup
+     */
     private $leave;
 
     public function setUp(): void

@@ -17,10 +17,16 @@ class ConsumerConfig extends Config
     public const CONSUME_AFTER_COMMIT_OFFSET  = 1;
     public const CONSUME_BEFORE_COMMIT_OFFSET = 2;
 
+    /**
+     * @var mixed[]
+     */
     protected $runtimeOptions = [
         'consume_mode' => self::CONSUME_AFTER_COMMIT_OFFSET,
     ];
 
+    /**
+     * @var mixed[]
+     */
     protected static $defaults = [
         'groupId'          => '',
         'sessionTimeout'   => 30000,
@@ -31,6 +37,9 @@ class ConsumerConfig extends Config
         'maxWaitTime'      => 100,
     ];
 
+    /**
+     * @throws \Kafka\Exception\Config
+     */
     public function getGroupId(): string
     {
         $groupId = trim($this->ietGroupId());
@@ -42,6 +51,9 @@ class ConsumerConfig extends Config
         return $groupId;
     }
 
+    /**
+     * @throws \Kafka\Exception\Config
+     */
     public function setGroupId(string $groupId): void
     {
         $groupId = trim($groupId);
@@ -53,6 +65,11 @@ class ConsumerConfig extends Config
         static::$options['groupId'] = $groupId;
     }
 
+    /**
+     * @param int|string|float $sessionTimeout
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setSessionTimeout($sessionTimeout): void
     {
         if (! is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
@@ -62,6 +79,11 @@ class ConsumerConfig extends Config
         static::$options['sessionTimeout'] = $sessionTimeout;
     }
 
+    /**
+     * @param int|string|float $rebalanceTimeout
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setRebalanceTimeout($rebalanceTimeout): void
     {
         if (! is_numeric($rebalanceTimeout) || $rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
@@ -71,7 +93,10 @@ class ConsumerConfig extends Config
         static::$options['rebalanceTimeout'] = $rebalanceTimeout;
     }
 
-    public function setOffsetReset($offsetReset): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setOffsetReset(string $offsetReset): void
     {
         if (! \in_array($offsetReset, ['latest', 'earliest'], true)) {
             throw new Exception\Config('Set offset reset value is invalid, must set it `latest` or `earliest`');
@@ -80,6 +105,11 @@ class ConsumerConfig extends Config
         static::$options['offsetReset'] = $offsetReset;
     }
 
+    /**
+     * @return string[]
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function getTopics(): array
     {
         $topics = $this->ietTopics();
@@ -91,6 +121,11 @@ class ConsumerConfig extends Config
         return $topics;
     }
 
+    /**
+     * @param string[] $topics
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setTopics(array $topics): void
     {
         if (empty($topics)) {
@@ -105,7 +140,7 @@ class ConsumerConfig extends Config
         $this->runtimeOptions['consume_mode'] = $mode;
     }
 
-    public function getConsumeMode()
+    public function getConsumeMode(): int
     {
         return $this->runtimeOptions['consume_mode'];
     }
