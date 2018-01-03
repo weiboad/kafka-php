@@ -116,5 +116,10 @@
             <property name="spacesCountAroundEqualsSign" value="0" />
         </properties>
     </rule>
+
+    <rule ref="Squiz.Strings.DoubleQuoteUsage"/>
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
+        <message>Variable "%s" not allowed in double quoted string; use sprintf() or concatenation instead</message>
+    </rule>
 </ruleset>
 

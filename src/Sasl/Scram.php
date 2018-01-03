@@ -12,7 +12,7 @@ class Scram extends Mechanism
     public const SCRAM_SHA_256 = 256;
     public const SCRAM_SHA_512 = 512;
 
-    private const MECHANISM_NAME = "SCRAM-SHA-";
+    private const MECHANISM_NAME = 'SCRAM-SHA-';
 
     private const ALLOW_SHA_ALGORITHM = [
         self::SCRAM_SHA_256 => 'sha256',
@@ -186,7 +186,7 @@ class Scram extends Mechanism
         }
 
         $proposedServerSignature = base64_decode($matches[1]);
-        $serverKey               = $this->hmac($this->saltedPassword, "Server Key", true);
+        $serverKey               = $this->hmac($this->saltedPassword, 'Server Key', true);
         $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
         return hash_equals($proposedServerSignature, $serverSignature);
     }

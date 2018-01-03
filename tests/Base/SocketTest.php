@@ -311,7 +311,7 @@ class SocketTest extends TestCase
 
     public function testWriteBlockingMaxBuffer(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -333,7 +333,7 @@ class SocketTest extends TestCase
      */
     public function testWriteBlockingReturnFalse(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 

@@ -11,7 +11,7 @@ use KRB5CCache;
 
 class Gssapi extends Mechanism
 {
-    private const MECHANISM_NAME = "GSSAPI";
+    private const MECHANISM_NAME = 'GSSAPI';
 
     /**
      * @var string

@@ -8,7 +8,7 @@ use Kafka\Protocol\Protocol;
 
 class Plain extends Mechanism
 {
-    private const MECHANISM_NAME = "PLAIN";
+    private const MECHANISM_NAME = 'PLAIN';
 
     /**
      * @var string

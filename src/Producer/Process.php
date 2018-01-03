@@ -232,7 +232,7 @@ class Process
                 'compression'  => $compression,
             ];
 
-            $this->debug("Send message start, params:" . json_encode($params));
+            $this->debug('Send message start, params:' . json_encode($params));
             $requestData = Protocol::encode(Protocol::PRODUCE_REQUEST, $params);
 
             if ($requiredAck === 0) { // If it is 0 the server will not send any response

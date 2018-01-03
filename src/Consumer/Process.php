@@ -273,7 +273,7 @@ class Process
 
         $requestData = Protocol::encode(Protocol::JOIN_GROUP_REQUEST, $params);
         $connect->write($requestData);
-        $this->debug("Join group start, params:" . json_encode($params));
+        $this->debug('Join group start, params:' . json_encode($params));
     }
 
     public function failJoinGroup(int $errorCode): void
@@ -324,7 +324,7 @@ class Process
         ];
 
         $requestData = Protocol::encode(Protocol::SYNC_GROUP_REQUEST, $params);
-        $this->debug("Sync group start, params:" . json_encode($params));
+        $this->debug('Sync group start, params:' . json_encode($params));
 
         $connect->write($requestData);
     }
@@ -604,7 +604,7 @@ class Process
                 'data' => $data,
             ];
 
-            $this->debug("Fetch message start, params:" . json_encode($params));
+            $this->debug('Fetch message start, params:' . json_encode($params));
             $requestData = Protocol::encode(Protocol::FETCH_REQUEST, $params);
             $connect->write($requestData);
             $context[] = (int) $connect->getSocket();
@@ -719,7 +719,7 @@ class Process
             'data' => $data,
         ];
 
-        $this->debug("Commit current fetch offset start, params:" . json_encode($params));
+        $this->debug('Commit current fetch offset start, params:' . json_encode($params));
         $requestData = Protocol::encode(Protocol::OFFSET_COMMIT_REQUEST, $params);
         $connect->write($requestData);
     }

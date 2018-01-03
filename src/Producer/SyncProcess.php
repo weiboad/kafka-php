@@ -68,7 +68,7 @@ class SyncProcess
                 'compression'  => $compression,
             ];
 
-            $this->debug("Send message start, params:" . json_encode($params));
+            $this->debug('Send message start, params:' . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             $connect->write($requestData);
 
