@@ -92,7 +92,7 @@ class SocketTest extends TestCase
         $cafile     = $this->root->url() . '/cafile';
         $peerName   = 'kafka';
 
-        $context = stream_context_create(
+        $context = \stream_context_create(
             [
                 'ssl' => [
                     'local_cert'  => $localCert,
@@ -109,7 +109,7 @@ class SocketTest extends TestCase
 
         $streamMock->expects($this->once())
                    ->method('context')
-                   ->with(stream_context_get_options($context));
+                   ->with(\stream_context_get_options($context));
 
         $config = $this->getMockForAbstractClass(Config::class);
         $config->setSslEnable(true);
@@ -311,14 +311,14 @@ class SocketTest extends TestCase
 
     public function testWriteBlockingMaxBuffer(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
+        $str  = \str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 
         $streamMock = $this->initStreamStub('tcp', $host, $port);
 
         $streamMock->method('write')
-                   ->withConsecutive([substr($str, 0, Socket::MAX_WRITE_BUFFER)], [substr($str, Socket::MAX_WRITE_BUFFER)])
+                   ->withConsecutive([\substr($str, 0, Socket::MAX_WRITE_BUFFER)], [\substr($str, Socket::MAX_WRITE_BUFFER)])
                    ->willReturnOnConsecutiveCalls(Socket::MAX_WRITE_BUFFER, Socket::MAX_WRITE_BUFFER);
 
         $socket = $this->createStream($host, $port, 1);
@@ -333,14 +333,14 @@ class SocketTest extends TestCase
      */
     public function testWriteBlockingReturnFalse(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
+        $str  = \str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 
         $streamMock = $this->initStreamStub('tcp', $host, $port);
 
         $streamMock->method('write')
-                   ->withConsecutive([substr($str, 0, Socket::MAX_WRITE_BUFFER)])
+                   ->withConsecutive([\substr($str, 0, Socket::MAX_WRITE_BUFFER)])
                    ->willReturnOnConsecutiveCalls(0);
 
         $socket = $this->createStream($host, $port, 1);
@@ -382,7 +382,7 @@ class SocketTest extends TestCase
         array $mockMethod = []
     ): Socket {
         $socket = $this->getMockBuilder(Socket::class)
-                       ->setMethods(array_merge(['createSocket'], $mockMethod))
+                       ->setMethods(\array_merge(['createSocket'], $mockMethod))
                        ->setConstructorArgs([$host, $port, $config, $sasl])
                        ->getMock();
 
@@ -392,7 +392,7 @@ class SocketTest extends TestCase
                         $errno  = 99;
                         $errstr = 'my custom error';
 
-                        return @fopen($remoteSocket, 'r+', false, $context);
+                        return @\fopen($remoteSocket, 'r+', false, $context);
                 }
             );
 
@@ -404,8 +404,8 @@ class SocketTest extends TestCase
      */
     private function initStreamStub(string $transport, string $host, int $port, bool $success = true): Stream
     {
-        $uri = sprintf('%s://%s:%s', $transport, $host, $port);
-        stream_wrapper_register($transport, SimpleStream::class);
+        $uri = \sprintf('%s://%s:%s', $transport, $host, $port);
+        \stream_wrapper_register($transport, SimpleStream::class);
 
         $streamMock = $this->createMock(Stream::class);
         $streamMock->method('open')->with($uri, 'r+', 0)->willReturn($success);
@@ -439,12 +439,12 @@ class SocketTest extends TestCase
 
     private function clearStreamMock(): void
     {
-        if (in_array('ssl', stream_get_wrappers(), true)) {
-            stream_wrapper_unregister('ssl');
+        if (\in_array('ssl', \stream_get_wrappers(), true)) {
+            \stream_wrapper_unregister('ssl');
         }
 
-        if (in_array('tcp', stream_get_wrappers(), true)) {
-            stream_wrapper_unregister('tcp');
+        if (\in_array('tcp', \stream_get_wrappers(), true)) {
+            \stream_wrapper_unregister('tcp');
         }
     }
 }

@@ -53,6 +53,6 @@ final class SaslHandShakeTest extends TestCase
         $data     = '0022000000010006475353415049';
         $expected = '{"mechanisms":["GSSAPI"],"errorCode":34}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sasl->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->sasl->decode(\hex2bin($data))));
     }
 }

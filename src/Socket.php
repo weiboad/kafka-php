@@ -46,8 +46,8 @@ class Socket extends CommonSocket
 
         $this->createStream();
 
-        stream_set_blocking($this->stream, false);
-        stream_set_read_buffer($this->stream, 0);
+        \stream_set_blocking($this->stream, false);
+        \stream_set_read_buffer($this->stream, 0);
 
         $this->readWatcherId = Loop::onReadable(
             $this->stream,
@@ -58,7 +58,7 @@ class Socket extends CommonSocket
                         return;
                     }
 
-                    $newData = @fread($this->stream, self::READ_MAX_LENGTH);
+                    $newData = @\fread($this->stream, self::READ_MAX_LENGTH);
 
                     if ($newData) {
                         $this->read($newData);
@@ -92,8 +92,8 @@ class Socket extends CommonSocket
         Loop::cancel($this->readWatcherId);
         Loop::cancel($this->writeWatcherId);
 
-        if (is_resource($this->stream)) {
-            fclose($this->stream);
+        if (\is_resource($this->stream)) {
+            \fclose($this->stream);
         }
 
         $this->readBuffer     = '';
@@ -103,7 +103,7 @@ class Socket extends CommonSocket
 
     public function isResource(): bool
     {
-        return is_resource($this->stream);
+        return \is_resource($this->stream);
     }
 
     /**
@@ -120,26 +120,26 @@ class Socket extends CommonSocket
 
         do {
             if ($this->readNeedLength === 0) { // response start
-                if (strlen($this->readBuffer) < 4) {
+                if (\strlen($this->readBuffer) < 4) {
                     return;
                 }
 
-                $dataLen              = Protocol::unpack(Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
+                $dataLen              = Protocol::unpack(Protocol::BIT_B32, \substr($this->readBuffer, 0, 4));
                 $this->readNeedLength = $dataLen;
-                $this->readBuffer     = substr($this->readBuffer, 4);
+                $this->readBuffer     = \substr($this->readBuffer, 4);
             }
 
-            if (strlen($this->readBuffer) < $this->readNeedLength) {
+            if (\strlen($this->readBuffer) < $this->readNeedLength) {
                 return;
             }
 
-            $data = (string) substr($this->readBuffer, 0, $this->readNeedLength);
+            $data = (string) \substr($this->readBuffer, 0, $this->readNeedLength);
 
-            $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
+            $this->readBuffer     = \substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
 
             ($this->onReadable)($data, (int) $this->stream);
-        } while (strlen($this->readBuffer));
+        } while (\strlen($this->readBuffer));
     }
 
     /**
@@ -153,8 +153,8 @@ class Socket extends CommonSocket
             $this->writeBuffer .= $data;
         }
 
-        $bytesToWrite = strlen($this->writeBuffer);
-        $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
+        $bytesToWrite = \strlen($this->writeBuffer);
+        $bytesWritten = @\fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
             Loop::disable($this->writeWatcherId);
@@ -164,7 +164,7 @@ class Socket extends CommonSocket
             $this->reconnect();
         }
 
-        $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
+        $this->writeBuffer = \substr($this->writeBuffer, $bytesWritten);
     }
 
     /**
@@ -172,6 +172,6 @@ class Socket extends CommonSocket
      */
     protected function isSocketDead(): bool
     {
-        return ! is_resource($this->stream) || @feof($this->stream);
+        return ! \is_resource($this->stream) || @\feof($this->stream);
     }
 }

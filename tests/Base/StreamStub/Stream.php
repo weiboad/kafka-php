@@ -25,12 +25,12 @@ class Stream
 
     public function read(int $length): string
     {
-        return str_repeat('x', $length);
+        return \str_repeat('x', $length);
     }
 
     public function write(string $data): ?int
     {
-        return strlen($data);
+        return \strlen($data);
     }
 
     /**

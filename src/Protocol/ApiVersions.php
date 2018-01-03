@@ -21,9 +21,9 @@ class ApiVersions extends Protocol
     public function decode(string $data): array
     {
         $offset      = 0;
-        $errcode     = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errcode     = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset     += 2;
-        $apiVersions = $this->decodeArray(substr($data, $offset), [$this, 'apiVersion']);
+        $apiVersions = $this->decodeArray(\substr($data, $offset), [$this, 'apiVersion']);
         $offset     += $apiVersions['length'];
 
         return [
@@ -38,11 +38,11 @@ class ApiVersions extends Protocol
     protected function apiVersion(string $data): array
     {
         $offset     = 0;
-        $apiKey     = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+        $apiKey     = self::unpack(self::BIT_B16, \substr($data, $offset, 2));
         $offset    += 2;
-        $minVersion = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+        $minVersion = self::unpack(self::BIT_B16, \substr($data, $offset, 2));
         $offset    += 2;
-        $maxVersion = self::unpack(self::BIT_B16, substr($data, $offset, 2));
+        $maxVersion = self::unpack(self::BIT_B16, \substr($data, $offset, 2));
         $offset    += 2;
 
         return [

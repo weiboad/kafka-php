@@ -43,7 +43,7 @@ class State
 
         $config = $this->getConfig();
 
-        foreach (array_keys($this->requests) as $request) {
+        foreach (\array_keys($this->requests) as $request) {
             if ($request === self::REQUEST_METADATA) {
                 $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
                 break;
@@ -208,7 +208,7 @@ class State
         }
 
         // set process start time
-        $this->callStatus[$key]['time'] = microtime(true);
+        $this->callStatus[$key]['time'] = \microtime(true);
         switch ($key) {
             case self::REQUEST_METADATA:
                 $this->callStatus[$key]['status'] |= self::STATUS_PROCESS;
@@ -222,7 +222,7 @@ class State
 
                 $contextStatus = [];
 
-                if (is_array($context)) {
+                if (\is_array($context)) {
                     foreach ($context as $fd) {
                         $contextStatus[$fd] = self::STATUS_PROCESS;
                     }

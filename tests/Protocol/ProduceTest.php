@@ -212,7 +212,7 @@ final class ProduceTest extends TestCase
         $data     = '0000000100047465737400000001000000000000000000000000002a00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":14,"timestamp":0}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce->decode(\hex2bin($data))));
     }
 
     public function testDecodeKafka10(): void
@@ -220,6 +220,6 @@ final class ProduceTest extends TestCase
         $data     = '0000000100047465737400000001000000000000000000000000006effffffffffffffff00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":22,"timestamp":-1}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce10->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce10->decode(\hex2bin($data))));
     }
 }

@@ -97,7 +97,7 @@ class Assignment
         $broker = Broker::getInstance();
         $topics = $broker->getTopics();
 
-        $memberCount = count($result);
+        $memberCount = \count($result);
 
         $count   = 0;
         $members = [];

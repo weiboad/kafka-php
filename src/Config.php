@@ -93,14 +93,14 @@ abstract class Config
      */
     public function __call(string $name, array $args)
     {
-        $isGetter = strpos($name, 'get') === 0 || strpos($name, 'iet') === 0;
-        $isSetter = strpos($name, 'set') === 0;
+        $isGetter = \strpos($name, 'get') === 0 || \strpos($name, 'iet') === 0;
+        $isSetter = \strpos($name, 'set') === 0;
 
         if (! $isGetter && ! $isSetter) {
             return false;
         }
 
-        $option = lcfirst(substr($name, 3));
+        $option = \lcfirst(\substr($name, 3));
 
         if ($isGetter) {
             if (isset(self::$options[$option])) {
@@ -118,11 +118,11 @@ abstract class Config
             return false;
         }
 
-        if (count($args) !== 1) {
+        if (\count($args) !== 1) {
             return false;
         }
 
-        static::$options[$option] = array_shift($args);
+        static::$options[$option] = \array_shift($args);
 
         // check todo
         return true;
@@ -130,7 +130,7 @@ abstract class Config
 
     public function setClientId(string $val): void
     {
-        $client = trim($val);
+        $client = \trim($val);
 
         if ($client === '') {
             throw new Exception\Config('Set clientId value is invalid, must is not empty string.');
@@ -141,9 +141,9 @@ abstract class Config
 
     public function setBrokerVersion(string $version): void
     {
-        $version = trim($version);
+        $version = \trim($version);
 
-        if ($version === '' || version_compare($version, '0.8.0', '<')) {
+        if ($version === '' || \version_compare($version, '0.8.0', '<')) {
             throw new Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
         }
 
@@ -152,12 +152,12 @@ abstract class Config
 
     public function setMetadataBrokerList(string $brokerList): void
     {
-        $brokerList = trim($brokerList);
+        $brokerList = \trim($brokerList);
 
-        $brokers = array_filter(
-            explode(',', $brokerList),
+        $brokers = \array_filter(
+            \explode(',', $brokerList),
             function (string $broker): bool {
-                return preg_match('/^(.*:[\d]+)$/', $broker) === 1;
+                return \preg_match('/^(.*:[\d]+)$/', $broker) === 1;
             }
         );
 
@@ -180,7 +180,7 @@ abstract class Config
      */
     public function setMessageMaxBytes($messageMaxBytes): void
     {
-        if (! is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
+        if (! \is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
             throw new Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
         }
         static::$options['messageMaxBytes'] = $messageMaxBytes;
@@ -191,7 +191,7 @@ abstract class Config
      */
     public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs): void
     {
-        if (! is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
+        if (! \is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
             || $metadataRequestTimeoutMs > 900000) {
             throw new Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
         }
@@ -203,7 +203,7 @@ abstract class Config
      */
     public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs): void
     {
-        if (! is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
+        if (! \is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
             || $metadataRefreshIntervalMs > 3600000) {
             throw new Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
         }
@@ -215,7 +215,7 @@ abstract class Config
      */
     public function setMetadataMaxAgeMs($metadataMaxAgeMs): void
     {
-        if (! is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {
+        if (! \is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {
             throw new Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
@@ -223,7 +223,7 @@ abstract class Config
 
     public function setSslLocalCert(string $localCert): void
     {
-        if (! file_exists($localCert) || ! is_file($localCert)) {
+        if (! \file_exists($localCert) || ! \is_file($localCert)) {
             throw new Exception\Config('Set ssl local cert file is invalid');
         }
 
@@ -232,7 +232,7 @@ abstract class Config
 
     public function setSslLocalPk(string $localPk): void
     {
-        if (! file_exists($localPk) || ! is_file($localPk)) {
+        if (! \file_exists($localPk) || ! \is_file($localPk)) {
             throw new Exception\Config('Set ssl local private key file is invalid');
         }
 
@@ -241,7 +241,7 @@ abstract class Config
 
     public function setSslCafile(string $cafile): void
     {
-        if (! file_exists($cafile) || ! is_file($cafile)) {
+        if (! \file_exists($cafile) || ! \is_file($cafile)) {
             throw new Exception\Config('Set ssl ca file is invalid');
         }
 
@@ -250,7 +250,7 @@ abstract class Config
 
     public function setSaslKeytab(string $keytab): void
     {
-        if (! file_exists($keytab) || ! is_file($keytab)) {
+        if (! \file_exists($keytab) || ! \is_file($keytab)) {
             throw new Exception\Config('Set sasl gssapi keytab file is invalid');
         }
 

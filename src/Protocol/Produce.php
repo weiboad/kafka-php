@@ -70,12 +70,12 @@ class Produce extends Protocol
     {
         $offset       = 0;
         $version      = $this->getApiVersion(self::PRODUCE_REQUEST);
-        $ret          = $this->decodeArray(substr($data, $offset), [$this, 'produceTopicPair'], $version);
+        $ret          = $this->decodeArray(\substr($data, $offset), [$this, 'produceTopicPair'], $version);
         $offset      += $ret['length'];
         $throttleTime = 0;
 
         if ($version === self::API_VERSION2) {
-            $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+            $throttleTime = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         }
 
         return ['throttleTime' => $throttleTime, 'data' => $ret['data']];
@@ -131,7 +131,7 @@ class Produce extends Protocol
 
         $key = '';
 
-        if (is_array($message)) {
+        if (\is_array($message)) {
             $key     = $message['key'];
             $message = $message['value'];
         }
@@ -142,7 +142,7 @@ class Produce extends Protocol
         // message value
         $data .= self::encodeString($message, self::PACK_INT32, $compression);
 
-        $crc = (string) crc32($data);
+        $crc = (string) \crc32($data);
 
         // int32 -- crc code  string data
         $message = self::pack(self::BIT_B32, $crc) . $data;
@@ -250,7 +250,7 @@ class Produce extends Protocol
         $offset    = 0;
         $topicInfo = $this->decodeString($data, self::BIT_B16);
         $offset   += $topicInfo['length'];
-        $ret       = $this->decodeArray(substr($data, $offset), [$this, 'producePartitionPair'], $version);
+        $ret       = $this->decodeArray(\substr($data, $offset), [$this, 'producePartitionPair'], $version);
         $offset   += $ret['length'];
 
         return [
@@ -272,16 +272,16 @@ class Produce extends Protocol
     protected function producePartitionPair(string $data, int $version): array
     {
         $offset          = 0;
-        $partitionId     = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $partitionId     = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset         += 4;
-        $errorCode       = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errorCode       = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset         += 2;
-        $partitionOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $partitionOffset = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
         $offset         += 8;
         $timestamp       = 0;
 
         if ($version === self::API_VERSION2) {
-            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+            $timestamp = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
             $offset   += 8;
         }
 

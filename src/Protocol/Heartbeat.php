@@ -44,7 +44,7 @@ class Heartbeat extends Protocol
     public function decode(string $data): array
     {
         $offset    = 0;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset   += 2;
 
         return ['errorCode' => $errorCode];

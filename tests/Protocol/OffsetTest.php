@@ -117,6 +117,6 @@ final class OffsetTest extends TestCase
 
         $test = $this->offset->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

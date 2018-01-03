@@ -101,6 +101,6 @@ final class FetchOffsetTest extends TestCase
         $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
 
         $test = $this->offset->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

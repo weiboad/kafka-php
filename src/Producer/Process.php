@@ -126,17 +126,17 @@ class Process
         $brokerList = ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
 
-        foreach (explode(',', $brokerList) as $key => $val) {
-            if (trim($val)) {
+        foreach (\explode(',', $brokerList) as $key => $val) {
+            if (\trim($val)) {
                 $brokerHost[] = $val;
             }
         }
 
-        if (count($brokerHost) === 0) {
+        if (\count($brokerHost) === 0) {
             throw new Exception('No valid broker configured');
         }
 
-        shuffle($brokerHost);
+        \shuffle($brokerHost);
         $broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
@@ -144,7 +144,7 @@ class Process
 
             if ($socket !== null) {
                 $params = [];
-                $this->debug('Start sync metadata request params:' . json_encode($params));
+                $this->debug('Start sync metadata request params:' . \json_encode($params));
                 $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
                 return;
@@ -152,7 +152,7 @@ class Process
         }
 
         throw new Exception(
-            sprintf(
+            \sprintf(
                 'It was not possible to establish a connection for metadata with the brokers "%s"',
                 $brokerList
             )
@@ -166,10 +166,10 @@ class Process
      */
     protected function processRequest(string $data, int $fd): void
     {
-        $correlationId = Protocol\Protocol::unpack(Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+        $correlationId = Protocol\Protocol::unpack(Protocol\Protocol::BIT_B32, \substr($data, 0, 4));
         switch ($correlationId) {
             case Protocol::METADATA_REQUEST:
-                $result = Protocol::decode(Protocol::METADATA_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::METADATA_REQUEST, \substr($data, 4));
 
                 if (! isset($result['brokers'], $result['topics'])) {
                     $this->error('Get metadata is fail, brokers or topics is null.');
@@ -183,7 +183,7 @@ class Process
 
                 break;
             case Protocol::PRODUCE_REQUEST:
-                $result = Protocol::decode(Protocol::PRODUCE_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::PRODUCE_REQUEST, \substr($data, 4));
                 $this->succProduce($result, $fd);
                 break;
             default:
@@ -232,7 +232,7 @@ class Process
                 'compression'  => $compression,
             ];
 
-            $this->debug('Send message start, params:' . json_encode($params));
+            $this->debug('Send message start, params:' . \json_encode($params));
             $requestData = Protocol::encode(Protocol::PRODUCE_REQUEST, $params);
 
             if ($requiredAck === 0) { // If it is 0 the server will not send any response
@@ -251,7 +251,7 @@ class Process
      */
     protected function succProduce(array $result, int $fd): void
     {
-        $msg = sprintf('Send message sucess, result: %s', json_encode($result));
+        $msg = \sprintf('Send message sucess, result: %s', \json_encode($result));
         $this->debug($msg);
 
         if ($this->success !== null) {
@@ -305,7 +305,7 @@ class Process
         $topicInfo = $broker->getTopics();
 
         foreach ($data as $value) {
-            if (! isset($value['topic']) || ! trim($value['topic'])) {
+            if (! isset($value['topic']) || ! \trim($value['topic'])) {
                 continue;
             }
 
@@ -313,13 +313,13 @@ class Process
                 continue;
             }
 
-            if (! isset($value['value']) || ! trim($value['value'])) {
+            if (! isset($value['value']) || ! \trim($value['value'])) {
                 continue;
             }
 
             $topicMeta = $topicInfo[$value['topic']];
-            $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
+            $partNums  = \array_keys($topicMeta);
+            \shuffle($partNums);
 
             $partId = ! isset($value['partId'], $topicMeta[$value['partId']]) ? $partNums[0] : $value['partId'];
 
@@ -335,7 +335,7 @@ class Process
             }
 
             $partition['partition_id'] = $partId;
-            if (trim($value['key'] ?? '') !== '') {
+            if (\trim($value['key'] ?? '') !== '') {
                 $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
             } else {
                 $partition['messages'][] = $value['value'];

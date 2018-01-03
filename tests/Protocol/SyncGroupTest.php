@@ -20,7 +20,7 @@ final class SyncGroupTest extends TestCase
 
     public function testEncode(): void
     {
-        $data = json_decode(
+        $data = \json_decode(
             '{"group_id":"test","generation_id":1,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","data":[{"version":0,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","assignments":[{"topic_name":"test","partitions":[0]}]}]}',
             true
         );
@@ -189,7 +189,7 @@ final class SyncGroupTest extends TestCase
         $data     = '000000000018000000000001000474657374000000010000000000000000';
         $expected = '{"errorCode":0,"partitionAssignments":[{"topicName":"test","partitions":[0]}],"version":0,"userData":""}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sync->decode(\hex2bin($data))));
-        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($this->sync->decode(\hex2bin('000000000000'))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->sync->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', \json_encode($this->sync->decode(\hex2bin('000000000000'))));
     }
 }

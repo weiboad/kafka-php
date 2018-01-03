@@ -44,7 +44,7 @@ class ConsumerConfig extends Config
      */
     public function getGroupId(): string
     {
-        $groupId = trim($this->ietGroupId());
+        $groupId = \trim($this->ietGroupId());
 
         if ($groupId === false || $groupId === '') {
             throw new Exception\Config('Get group id value is invalid, must set it not empty string');
@@ -58,7 +58,7 @@ class ConsumerConfig extends Config
      */
     public function setGroupId(string $groupId): void
     {
-        $groupId = trim($groupId);
+        $groupId = \trim($groupId);
 
         if ($groupId === false || $groupId === '') {
             throw new Exception\Config('Set group id value is invalid, must set it not empty string');

@@ -30,6 +30,6 @@ final class ListGroupTest extends TestCase
         $test     = $this->list->decode(\hex2bin('0000000000010004746573740008636f6e73756d6572'));
         $expected = '{"errorCode":0,"groups":[{"groupId":"test","protocolType":"consumer"}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

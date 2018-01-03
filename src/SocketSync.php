@@ -7,25 +7,25 @@ class SocketSync extends CommonSocket
 {
     public function connect(): void
     {
-        if (is_resource($this->stream)) {
+        if (\is_resource($this->stream)) {
             return;
         }
 
         $this->createStream();
 
-        stream_set_blocking($this->stream, false);
+        \stream_set_blocking($this->stream, false);
     }
 
     public function close(): void
     {
-        if (is_resource($this->stream)) {
-            fclose($this->stream);
+        if (\is_resource($this->stream)) {
+            \fclose($this->stream);
         }
     }
 
     public function isResource(): bool
     {
-        return is_resource($this->stream);
+        return \is_resource($this->stream);
     }
 
     /**
@@ -52,8 +52,8 @@ class SocketSync extends CommonSocket
 
     public function rewind(): void
     {
-        if (is_resource($this->stream)) {
-            rewind($this->stream);
+        if (\is_resource($this->stream)) {
+            \rewind($this->stream);
         }
     }
 }

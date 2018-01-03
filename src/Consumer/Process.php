@@ -104,11 +104,11 @@ class Process
      */
     protected function processRequest(string $data, int $fd): void
     {
-        $correlationId = ProtocolTool::unpack(ProtocolTool::BIT_B32, substr($data, 0, 4));
+        $correlationId = ProtocolTool::unpack(ProtocolTool::BIT_B32, \substr($data, 0, 4));
 
         switch ($correlationId) {
             case Protocol::METADATA_REQUEST:
-                $result = Protocol::decode(Protocol::METADATA_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::METADATA_REQUEST, \substr($data, 4));
 
                 if (! isset($result['brokers'], $result['topics'])) {
                     $this->error('Get metadata is fail, brokers or topics is null.');
@@ -123,7 +123,7 @@ class Process
 
                 break;
             case Protocol::GROUP_COORDINATOR_REQUEST:
-                $result = Protocol::decode(Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::GROUP_COORDINATOR_REQUEST, \substr($data, 4));
 
                 if (! isset($result['errorCode'], $result['coordinatorId']) || $result['errorCode'] !== Protocol::NO_ERROR) {
                     $this->state->failRun(State::REQUEST_GETGROUP);
@@ -138,7 +138,7 @@ class Process
 
                 break;
             case Protocol::JOIN_GROUP_REQUEST:
-                $result = Protocol::decode(Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::JOIN_GROUP_REQUEST, \substr($data, 4));
                 if (isset($result['errorCode']) && $result['errorCode'] === Protocol::NO_ERROR) {
                     $this->succJoinGroup($result);
                     break;
@@ -147,7 +147,7 @@ class Process
                 $this->failJoinGroup($result['errorCode']);
                 break;
             case Protocol::SYNC_GROUP_REQUEST:
-                $result = Protocol::decode(Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::SYNC_GROUP_REQUEST, \substr($data, 4));
                 if (isset($result['errorCode']) && $result['errorCode'] === Protocol::NO_ERROR) {
                     $this->succSyncGroup($result);
                     break;
@@ -156,7 +156,7 @@ class Process
                 $this->failSyncGroup($result['errorCode']);
                 break;
             case Protocol::HEART_BEAT_REQUEST:
-                $result = Protocol::decode(Protocol::HEART_BEAT_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::HEART_BEAT_REQUEST, \substr($data, 4));
                 if (isset($result['errorCode']) && $result['errorCode'] === Protocol::NO_ERROR) {
                     $this->state->succRun(State::REQUEST_HEARTGROUP);
                     break;
@@ -165,19 +165,19 @@ class Process
                 $this->failHeartbeat($result['errorCode']);
                 break;
             case Protocol::OFFSET_REQUEST:
-                $result = Protocol::decode(Protocol::OFFSET_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::OFFSET_REQUEST, \substr($data, 4));
                 $this->succOffset($result, $fd);
                 break;
             case ProtocolTool::OFFSET_FETCH_REQUEST:
-                $result = Protocol::decode(Protocol::OFFSET_FETCH_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::OFFSET_FETCH_REQUEST, \substr($data, 4));
                 $this->succFetchOffset($result);
                 break;
             case ProtocolTool::FETCH_REQUEST:
-                $result = Protocol::decode(Protocol::FETCH_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::FETCH_REQUEST, \substr($data, 4));
                 $this->succFetch($result, $fd);
                 break;
             case ProtocolTool::OFFSET_COMMIT_REQUEST:
-                $result = Protocol::decode(Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::OFFSET_COMMIT_REQUEST, \substr($data, 4));
                 $this->succCommit($result);
                 break;
             default:
@@ -194,17 +194,17 @@ class Process
         $brokerList = $config->getMetadataBrokerList();
         $brokerHost = [];
 
-        foreach (explode(',', $brokerList) as $key => $val) {
-            if (trim($val)) {
+        foreach (\explode(',', $brokerList) as $key => $val) {
+            if (\trim($val)) {
                 $brokerHost[] = $val;
             }
         }
 
-        if (count($brokerHost) === 0) {
+        if (\count($brokerHost) === 0) {
             throw new Exception('No valid broker configured');
         }
 
-        shuffle($brokerHost);
+        \shuffle($brokerHost);
         $broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
@@ -215,7 +215,7 @@ class Process
             }
 
             $params = $config->getTopics();
-            $this->debug('Start sync metadata request params:' . json_encode($params));
+            $this->debug('Start sync metadata request params:' . \json_encode($params));
             $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
             $socket->write($requestData);
 
@@ -223,7 +223,7 @@ class Process
         }
 
         throw new Exception(
-            sprintf('It was not possible to establish a connection for metadata with the brokers "%s"', $brokerList)
+            \sprintf('It was not possible to establish a connection for metadata with the brokers "%s"', $brokerList)
         );
     }
 
@@ -275,7 +275,7 @@ class Process
 
         $requestData = Protocol::encode(Protocol::JOIN_GROUP_REQUEST, $params);
         $connect->write($requestData);
-        $this->debug('Join group start, params:' . json_encode($params));
+        $this->debug('Join group start, params:' . \json_encode($params));
     }
 
     public function failJoinGroup(int $errorCode): void
@@ -283,7 +283,7 @@ class Process
         $assign   = $this->getAssignment();
         $memberId = $assign->getMemberId();
 
-        $this->error(sprintf('Join group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId));
+        $this->error(\sprintf('Join group fail, need rejoin, errorCode %d, memberId: %s', $errorCode, $memberId));
         $this->stateConvert($errorCode);
     }
 
@@ -301,7 +301,7 @@ class Process
             $assign->assign($result['members']);
         }
 
-        $this->debug(sprintf('Join group sucess, params: %s', json_encode($result)));
+        $this->debug(\sprintf('Join group sucess, params: %s', \json_encode($result)));
     }
 
     public function syncGroup(): void
@@ -326,14 +326,14 @@ class Process
         ];
 
         $requestData = Protocol::encode(Protocol::SYNC_GROUP_REQUEST, $params);
-        $this->debug('Sync group start, params:' . json_encode($params));
+        $this->debug('Sync group start, params:' . \json_encode($params));
 
         $connect->write($requestData);
     }
 
     public function failSyncGroup(int $errorCode): void
     {
-        $this->error(sprintf('Sync group fail, need rejoin, errorCode %d', $errorCode));
+        $this->error(\sprintf('Sync group fail, need rejoin, errorCode %d', $errorCode));
         $this->stateConvert($errorCode);
     }
 
@@ -342,7 +342,7 @@ class Process
      */
     public function succSyncGroup(array $result): void
     {
-        $this->debug(sprintf('Sync group sucess, params: %s', json_encode($result)));
+        $this->debug(\sprintf('Sync group sucess, params: %s', \json_encode($result)));
         $this->state->succRun(State::REQUEST_SYNCGROUP);
 
         $topics = $this->getBroker()->getTopics();
@@ -383,7 +383,7 @@ class Process
         $assign   = $this->getAssignment();
         $memberId = $assign->getMemberId();
 
-        if (trim($memberId) === '') {
+        if (\trim($memberId) === '') {
             return;
         }
 
@@ -468,7 +468,7 @@ class Process
                     break 2;
                 }
 
-                $offsets[$topic['topicName']][$part['partition']]     = end($part['offsets']);
+                $offsets[$topic['topicName']][$part['partition']]     = \end($part['offsets']);
                 $lastOffsets[$topic['topicName']][$part['partition']] = $part['offsets'][0];
             }
         }
@@ -522,7 +522,7 @@ class Process
      */
     public function succFetchOffset(array $result): void
     {
-        $msg = sprintf('Get current fetch offset sucess, result: %s', json_encode($result));
+        $msg = \sprintf('Get current fetch offset sucess, result: %s', \json_encode($result));
         $this->debug($msg);
 
         $assign  = $this->getAssignment();
@@ -606,7 +606,7 @@ class Process
                 'data' => $data,
             ];
 
-            $this->debug('Fetch message start, params:' . json_encode($params));
+            $this->debug('Fetch message start, params:' . \json_encode($params));
             $requestData = Protocol::encode(Protocol::FETCH_REQUEST, $params);
             $connect->write($requestData);
             $context[] = (int) $connect->getSocket();
@@ -621,7 +621,7 @@ class Process
     public function succFetch(array $result, int $fd): void
     {
         $assign = $this->getAssignment();
-        $this->debug('Fetch success, result:' . json_encode($result));
+        $this->debug('Fetch success, result:' . \json_encode($result));
 
         foreach ($result['topics'] as $topic) {
             foreach ($topic['partitions'] as $part) {
@@ -721,7 +721,7 @@ class Process
             'data' => $data,
         ];
 
-        $this->debug('Commit current fetch offset start, params:' . json_encode($params));
+        $this->debug('Commit current fetch offset start, params:' . \json_encode($params));
         $requestData = Protocol::encode(Protocol::OFFSET_COMMIT_REQUEST, $params);
         $connect->write($requestData);
     }
@@ -731,7 +731,7 @@ class Process
      */
     public function succCommit(array $result): void
     {
-        $this->debug('Commit success, result:' . json_encode($result));
+        $this->debug('Commit success, result:' . \json_encode($result));
         $this->state->succRun(State::REQUEST_COMMIT_OFFSET);
 
         foreach ($result as $topic) {
@@ -776,13 +776,13 @@ class Process
 
         $assign = $this->getAssignment();
 
-        if (in_array($errorCode, $recoverCodes, true)) {
+        if (\in_array($errorCode, $recoverCodes, true)) {
             $this->state->recover();
             $assign->clearOffset();
             return false;
         }
 
-        if (in_array($errorCode, $rejoinCodes, true)) {
+        if (\in_array($errorCode, $rejoinCodes, true)) {
             if ($errorCode === Protocol::UNKNOWN_MEMBER_ID) {
                 $assign->setMemberId('');
             }

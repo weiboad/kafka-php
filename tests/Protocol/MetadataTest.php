@@ -48,6 +48,6 @@ final class MetadataTest extends TestCase
 
         $test = $this->meta->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

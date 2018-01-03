@@ -48,7 +48,7 @@ class GssapiTest extends TestCase
     public function testKeytabIsNotReadable(): void
     {
         $keytab = $this->root->url() . '/keytab';
-        chmod($keytab, 0000);
+        \chmod($keytab, 0000);
         Gssapi::fromKeytab($keytab, 'testprincipal');
     }
 

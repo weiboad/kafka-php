@@ -193,6 +193,6 @@ final class JoinGroupTest extends TestCase
 
         $test = $this->group9->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

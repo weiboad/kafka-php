@@ -64,8 +64,8 @@ class Scram extends Mechanism
         }
 
         $this->hashAlgorithm = $algorithm;
-        $this->username      = $this->formatName(trim($username));
-        $this->password      = trim($password);
+        $this->username      = $this->formatName(\trim($username));
+        $this->password      = \trim($password);
     }
 
     /**
@@ -103,9 +103,9 @@ class Scram extends Mechanism
     protected function firstMessage(): string
     {
         $this->cnonce = $this->generateNonce();
-        $message      = sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
+        $message      = \sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
 
-        $this->firstMessageBare = substr($message, 3);
+        $this->firstMessageBare = \substr($message, 3);
 
         return $message;
     }
@@ -115,21 +115,21 @@ class Scram extends Mechanism
      */
     protected function finalMessage(string $challenge): string
     {
-        $challengeArray = explode(',', $challenge);
+        $challengeArray = \explode(',', $challenge);
 
-        if (count($challengeArray) < 3) {
+        if (\count($challengeArray) < 3) {
             throw new Exception('Server response challenge is invalid.');
         }
 
-        $nonce = substr($challengeArray[0], 2);
-        $salt  = base64_decode(substr($challengeArray[1], 2));
+        $nonce = \substr($challengeArray[0], 2);
+        $salt  = \base64_decode(\substr($challengeArray[1], 2));
 
         if (! $salt) {
             throw new Exception('Server response challenge is invalid, paser salt is failure.');
         }
 
-        $i      = (int) substr($challengeArray[2], 2);
-        $cnonce = substr($nonce, 0, strlen($this->cnonce));
+        $i      = (int) \substr($challengeArray[2], 2);
+        $cnonce = \substr($nonce, 0, \strlen($this->cnonce));
 
         if ($cnonce !== $this->cnonce) {
             throw new Exception('Server response challenge is invalid, cnonce is invalid.');
@@ -161,7 +161,7 @@ class Scram extends Mechanism
 
         $clientSignature = $this->hmac($storedKey, $authMessage, true);
         $clientProof     = $clientKey ^ $clientSignature;
-        $proof           = ',p=' . base64_encode($clientProof);
+        $proof           = ',p=' . \base64_encode($clientProof);
 
         return $finalMessage . $proof;
     }
@@ -181,14 +181,14 @@ class Scram extends Mechanism
             return false;
         }
 
-        if (! preg_match($verifierRegexp, $data, $matches)) {
+        if (! \preg_match($verifierRegexp, $data, $matches)) {
             return false;
         }
 
-        $proposedServerSignature = base64_decode($matches[1]);
+        $proposedServerSignature = \base64_decode($matches[1]);
         $serverKey               = $this->hmac($this->saltedPassword, 'Server Key', true);
         $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
-        return hash_equals($proposedServerSignature, $serverSignature);
+        return \hash_equals($proposedServerSignature, $serverSignature);
     }
 
     /**
@@ -202,7 +202,7 @@ class Scram extends Mechanism
             $str .= \chr(\random_int(0, 255));
         }
 
-        return base64_encode($str);
+        return \base64_encode($str);
     }
 
     private function hash(string $data): string
@@ -224,7 +224,7 @@ class Scram extends Mechanism
     */
     private function formatName(string $user): string
     {
-        return str_replace(['=', ','], ['=3D', '=2C'], $user);
+        return \str_replace(['=', ','], ['=3D', '=2C'], $user);
     }
 
   /**

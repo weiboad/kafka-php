@@ -132,7 +132,7 @@ final class FetchTest extends TestCase
 
         $test = $this->fetch->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 
     public function testDecodeCompressedMessage(): void

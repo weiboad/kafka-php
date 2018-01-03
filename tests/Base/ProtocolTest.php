@@ -58,7 +58,7 @@ class ProtocolTest extends TestCase
 
         $test = Protocol::decode(Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
 
-        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($test));
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', \json_encode($test));
     }
 
     /**

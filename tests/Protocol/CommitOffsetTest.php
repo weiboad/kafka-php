@@ -172,6 +172,6 @@ final class CommitOffsetTest extends TestCase
         $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
 
         $test = $this->commit->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

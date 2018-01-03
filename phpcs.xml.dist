@@ -174,5 +174,12 @@
     <rule ref="Generic.PHP.DisallowShortOpenTag"/>
     <rule ref="Generic.PHP.SAPIUsage"/>
     <rule ref="PEAR.Commenting.InlineComment"/>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants">
+        <exclude-pattern>*/example/*</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions">
+        <exclude-pattern>*/example/*</exclude-pattern>
+    </rule>
 </ruleset>
 

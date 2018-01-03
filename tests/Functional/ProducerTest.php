@@ -39,10 +39,10 @@ abstract class ProducerTest extends TestCase
      */
     public function prepareEnvironment(): void
     {
-        $this->version  = getenv('KAFKA_VERSION');
-        $this->brokers  = getenv('KAFKA_BROKERS');
-        $this->topic    = getenv('KAFKA_TOPIC');
-        $this->compress = getenv('KAFKA_COMPRESS') === '1';
+        $this->version  = \getenv('KAFKA_VERSION');
+        $this->brokers  = \getenv('KAFKA_BROKERS');
+        $this->topic    = \getenv('KAFKA_TOPIC');
+        $this->compress = \getenv('KAFKA_COMPRESS') === '1';
 
         if (! $this->version || ! $this->brokers || ! $this->topic) {
             self::markTestSkipped(
@@ -97,7 +97,7 @@ abstract class ProducerTest extends TestCase
                 self::assertArrayHasKey('value', $message['message']);
                 self::assertContains('msg-', $message['message']['value']);
 
-                if (version_compare($this->version, '0.10.0', '>=')) {
+                if (\version_compare($this->version, '0.10.0', '>=')) {
                     self::assertArrayHasKey('timestamp', $message['message']);
                     self::assertNotEquals(-1, $message['message']['timestamp']);
                 }
@@ -130,7 +130,7 @@ abstract class ProducerTest extends TestCase
         for ($i = 0; $i < $amount; ++$i) {
             $messages[] = [
                 'topic' => $this->topic,
-                'value' => 'msg-' . str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT),
+                'value' => 'msg-' . \str_pad((string) ($i + 1), 2, '0', \STR_PAD_LEFT),
             ];
         }
 

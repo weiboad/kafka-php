@@ -36,7 +36,7 @@ class Offset extends Protocol
         $offset = 0;
 
         $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'offsetTopic'], $version);
+        $topics  = $this->decodeArray(\substr($data, $offset), [$this, 'offsetTopic'], $version);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -94,10 +94,10 @@ class Offset extends Protocol
     protected function offsetTopic(string $data, int $version): array
     {
         $offset    = 0;
-        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $topicInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'offsetPartition'], $version);
+        $partitions = $this->decodeArray(\substr($data, $offset), [$this, 'offsetPartition'], $version);
         $offset    += $partitions['length'];
 
         return [
@@ -115,18 +115,18 @@ class Offset extends Protocol
     protected function offsetPartition(string $data, int $version): array
     {
         $offset      = 0;
-        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $partitionId = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset     += 4;
-        $errorCode   = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errorCode   = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset     += 2;
         $timestamp   = 0;
 
         if ($version !== self::API_VERSION0) {
-            $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+            $timestamp = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
             $offset   += 8;
         }
 
-        $offsets = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B64);
+        $offsets = $this->decodePrimitiveArray(\substr($data, $offset), self::BIT_B64);
         $offset += $offsets['length'];
 
         return [

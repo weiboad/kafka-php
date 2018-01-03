@@ -36,15 +36,15 @@ class Gssapi extends Mechanism
 
     public static function fromKeytab(string $keytab, string $principal): self
     {
-        if (! extension_loaded('krb5')) {
+        if (! \extension_loaded('krb5')) {
             throw new Exception('Extension "krb5" is required for "GSSAPI" authentication');
         }
 
-        if (! file_exists($keytab) || ! is_file($keytab)) {
+        if (! \file_exists($keytab) || ! \is_file($keytab)) {
             throw new Exception('Invalid keytab, keytab file not exists.');
         }
 
-        if (! is_readable($keytab)) {
+        if (! \is_readable($keytab)) {
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
 

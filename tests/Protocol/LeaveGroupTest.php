@@ -56,6 +56,6 @@ final class LeaveGroupTest extends TestCase
         $test     = $this->leave->decode(\hex2bin('0000'));
         $expected = '{"errorCode":0}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

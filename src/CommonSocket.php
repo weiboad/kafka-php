@@ -111,7 +111,7 @@ abstract class CommonSocket
      */
     protected function createStream(): void
     {
-        if (trim($this->host) === '') {
+        if (\trim($this->host) === '') {
             throw new Exception('Cannot open null host.');
         }
 
@@ -119,13 +119,13 @@ abstract class CommonSocket
             throw new Exception('Cannot open without port.');
         }
 
-        $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
-        $context      = stream_context_create([]);
+        $remoteSocket = \sprintf('tcp://%s:%s', $this->host, $this->port);
+        $context      = \stream_context_create([]);
 
         if ($this->config !== null && $this->config->getSslEnable()) { // ssl connection
-            $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
+            $remoteSocket = \sprintf('ssl://%s:%s', $this->host, $this->port);
 
-            $context = stream_context_create(
+            $context = \stream_context_create(
                 [
                     'ssl' => [
                         'local_cert'  => $this->config->getSslLocalCert(),
@@ -143,7 +143,7 @@ abstract class CommonSocket
 
         if (! \is_resource($this->stream)) {
             throw new Exception(
-                sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
+                \sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
             );
         }
 
@@ -166,12 +166,12 @@ abstract class CommonSocket
      */
     protected function createSocket(string $remoteSocket, $context, ?int &$errno, ?string &$errstr)
     {
-        return stream_socket_client(
+        return \stream_socket_client(
             $remoteSocket,
             $errno,
             $errstr,
             $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
-            STREAM_CLIENT_CONNECT,
+            \STREAM_CLIENT_CONNECT,
             $context
         );
     }
@@ -200,10 +200,10 @@ abstract class CommonSocket
         $null = null;
 
         if ($isRead) {
-            return @stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
+            return @\stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
         }
 
-        return @stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
+        return @\stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
     }
 
     /**
@@ -217,7 +217,7 @@ abstract class CommonSocket
      */
     protected function getMetaData(): array
     {
-        return stream_get_meta_data($this->stream);
+        return \stream_get_meta_data($this->stream);
     }
 
     /**
@@ -256,11 +256,11 @@ abstract class CommonSocket
         $data           = $chunk = '';
 
         while ($remainingBytes > 0) {
-            $chunk = fread($this->stream, $remainingBytes);
+            $chunk = \fread($this->stream, $remainingBytes);
 
-            if ($chunk === false || strlen($chunk) === 0) {
+            if ($chunk === false || \strlen($chunk) === 0) {
                 // Zero bytes because of EOF?
-                if (feof($this->stream)) {
+                if (\feof($this->stream)) {
                     $this->close();
                     throw new Exception('Unexpected EOF while reading ' . $length . ' bytes from stream (no data)');
                 }
@@ -274,7 +274,7 @@ abstract class CommonSocket
             }
 
             $data           .= $chunk;
-            $remainingBytes -= strlen($chunk);
+            $remainingBytes -= \strlen($chunk);
         }
 
         return $data;
@@ -292,7 +292,7 @@ abstract class CommonSocket
         $failedAttempts = 0;
         $bytesWritten   = 0;
 
-        $bytesToWrite = strlen($buffer);
+        $bytesToWrite = \strlen($buffer);
 
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
@@ -313,14 +313,14 @@ abstract class CommonSocket
 
             if ($bytesToWrite - $bytesWritten > self::MAX_WRITE_BUFFER) {
                 // write max buffer size
-                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten, self::MAX_WRITE_BUFFER));
+                $wrote = \fwrite($this->stream, \substr($buffer, $bytesWritten, self::MAX_WRITE_BUFFER));
             } else {
                 // write remaining buffer bytes to stream
-                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten));
+                $wrote = \fwrite($this->stream, \substr($buffer, $bytesWritten));
             }
 
             if ($wrote === -1 || $wrote === false) {
-                throw new Exception\Socket('Could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+                throw new Exception\Socket('Could not write ' . \strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
             }
 
             if ($wrote === 0) {
@@ -328,7 +328,7 @@ abstract class CommonSocket
                 $failedAttempts++;
 
                 if ($failedAttempts > $this->maxWriteAttempts) {
-                    throw new Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+                    throw new Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . \strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
                 }
             } else {
                 // If we wrote something, reset our failed attempt counter
