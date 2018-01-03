@@ -78,9 +78,7 @@ final class OffsetTest extends TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 

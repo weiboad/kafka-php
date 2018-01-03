@@ -63,9 +63,7 @@ final class FetchTest extends TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition_id' => 0,
-                        ],
+                        ['partition_id' => 0],
                     ],
                 ],
             ],
@@ -100,9 +98,7 @@ final class FetchTest extends TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 

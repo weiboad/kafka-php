@@ -121,5 +121,14 @@
     <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
         <message>Variable "%s" not allowed in double quoted string; use sprintf() or concatenation instead</message>
     </rule>
+
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
+
+    <rule ref="Squiz.Arrays.ArrayDeclaration">
+        <exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.CloseBraceNotAligned"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned"/>
+    </rule>
 </ruleset>
 

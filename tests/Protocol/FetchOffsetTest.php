@@ -83,9 +83,7 @@ final class FetchOffsetTest extends TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 

@@ -47,9 +47,7 @@ final class HeartbeatTest extends TestCase
      */
     public function testEncodeNoGenerationId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->heart->encode($data);
     }

@@ -46,9 +46,7 @@ final class LeaveGroupTest extends TestCase
      */
     public function testEncodeNoMemberId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->leave->encode($data);
     }

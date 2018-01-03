@@ -52,35 +52,37 @@ class Process
         if ($this->logger) {
             $this->state->setLogger($this->logger);
         }
-        $this->state->setCallback([
-            State::REQUEST_METADATA => function (): void {
-                $this->syncMeta();
-            },
-            State::REQUEST_GETGROUP => function (): void {
-                $this->getGroupBrokerId();
-            },
-            State::REQUEST_JOINGROUP => function (): void {
-                $this->joinGroup();
-            },
-            State::REQUEST_SYNCGROUP => function (): void {
-                $this->syncGroup();
-            },
-            State::REQUEST_HEARTGROUP => function (): void {
-                $this->heartbeat();
-            },
-            State::REQUEST_OFFSET => function (): array {
-                return $this->offset();
-            },
-            State::REQUEST_FETCH_OFFSET => function (): void {
-                $this->fetchOffset();
-            },
-            State::REQUEST_FETCH => function (): array {
-                return $this->fetch();
-            },
-            State::REQUEST_COMMIT_OFFSET => function (): void {
-                $this->commit();
-            },
-        ]);
+        $this->state->setCallback(
+            [
+                State::REQUEST_METADATA      => function (): void {
+                    $this->syncMeta();
+                },
+                State::REQUEST_GETGROUP      => function (): void {
+                    $this->getGroupBrokerId();
+                },
+                State::REQUEST_JOINGROUP     => function (): void {
+                    $this->joinGroup();
+                },
+                State::REQUEST_SYNCGROUP     => function (): void {
+                    $this->syncGroup();
+                },
+                State::REQUEST_HEARTGROUP    => function (): void {
+                    $this->heartbeat();
+                },
+                State::REQUEST_OFFSET        => function (): array {
+                    return $this->offset();
+                },
+                State::REQUEST_FETCH_OFFSET  => function (): void {
+                    $this->fetchOffset();
+                },
+                State::REQUEST_FETCH         => function (): array {
+                    return $this->fetch();
+                },
+                State::REQUEST_COMMIT_OFFSET => function (): void {
+                    $this->commit();
+                },
+            ]
+        );
         $this->state->init();
     }
 

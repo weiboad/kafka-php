@@ -20,9 +20,7 @@ final class GroupCoordinatorTest extends TestCase
 
     public function testEncode(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $test = $this->group->encode($data);
         self::assertSame('00000019000a00000000000a00096b61666b612d706870000474657374', \bin2hex($test));

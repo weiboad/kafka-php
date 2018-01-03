@@ -63,9 +63,7 @@ final class JoinGroupTest extends TestCase
      */
     public function testEncodeNoSessionTimeout(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->group9->encode($data);
     }
@@ -159,9 +157,7 @@ final class JoinGroupTest extends TestCase
             'rebalance_timeout' => 6000,
             'member_id'         => '',
             'data'              => [
-                [
-                    'protocol_name' => 'group',
-                ],
+                ['protocol_name' => 'group'],
             ],
         ];
 

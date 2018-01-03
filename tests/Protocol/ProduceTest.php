@@ -158,9 +158,7 @@ final class ProduceTest extends TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -200,9 +198,7 @@ final class ProduceTest extends TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition_id' => 0,
-                        ],
+                        ['partition_id' => 0],
                     ],
                 ],
             ],

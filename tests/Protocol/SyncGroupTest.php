@@ -45,9 +45,7 @@ final class SyncGroupTest extends TestCase
      */
     public function testEncodeNoGenerationId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->sync->encode($data);
     }
@@ -92,9 +90,7 @@ final class SyncGroupTest extends TestCase
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => [
-                [
-
-                ],
+                [],
             ],
         ];
 
@@ -112,9 +108,7 @@ final class SyncGroupTest extends TestCase
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => [
-                [
-                    'version' => 0,
-                ],
+                ['version' => 0],
             ],
         ];
 
@@ -181,9 +175,7 @@ final class SyncGroupTest extends TestCase
                     'version' => 0 ,
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
                     'assignments' => [
-                        [
-                            'topic_name' => 'test',
-                        ],
+                        ['topic_name' => 'test'],
                     ],
                 ],
             ],

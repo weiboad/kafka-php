@@ -66,9 +66,7 @@ class ListGroup
                     'assignments' => [
                         [
                             'topic_name' => 'test',
-                            'partitions' => [
-                                0,
-                            ],
+                            'partitions' => [0],
                         ],
                     ],
                 ],
@@ -99,8 +97,7 @@ class ListGroup
     {
         $this->joinGroup();
         $this->syncGroup();
-        $data = [
-        ];
+        $data = [];
 
         \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::LIST_GROUPS_REQUEST, $data);

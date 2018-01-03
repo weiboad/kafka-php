@@ -66,9 +66,7 @@ class DescribeGroups
                     'assignments' => [
                         [
                             'topic_name' => 'test',
-                            'partitions' => [
-                                0,
-                            ],
+                            'partitions' => [0],
                         ],
                     ],
                 ],
@@ -99,9 +97,7 @@ class DescribeGroups
     {
         $this->joinGroup();
         $this->syncGroup();
-        $data = [
-            'test',
-        ];
+        $data = ['test'];
 
         \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::DESCRIBE_GROUPS_REQUEST, $data);

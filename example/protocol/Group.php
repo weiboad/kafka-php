@@ -6,9 +6,7 @@ require '../../vendor/autoload.php';
 use Kafka\Protocol;
 use Kafka\Socket;
 
-$data = [
-    'group_id' => 'test',
-];
+$data = ['group_id' => 'test'];
 
 Protocol::init('0.9.1.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $data);

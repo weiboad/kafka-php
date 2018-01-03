@@ -6,9 +6,7 @@ require '../../vendor/autoload.php';
 use Kafka\Protocol;
 use Kafka\Socket;
 
-$data = [
-    'test',
-];
+$data = ['test'];
 
 Protocol::init('1.0.0');
 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $data);

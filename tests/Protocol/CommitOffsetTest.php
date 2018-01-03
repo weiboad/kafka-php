@@ -74,9 +74,7 @@ final class CommitOffsetTest extends TestCase
      */
     public function testEncodeNoData(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->commit->encode($data);
     }
@@ -119,9 +117,7 @@ final class CommitOffsetTest extends TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -161,9 +157,7 @@ final class CommitOffsetTest extends TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition' => 0,
-                        ],
+                        ['partition' => 0],
                     ],
                 ],
             ],

@@ -56,9 +56,7 @@ class SyncGroup extends Protocol
         $memberAssignment = $memberAssignments['data'];
 
         if ($memberAssignment === '') {
-            return [
-                'errorCode' => $errorCode,
-            ];
+            return ['errorCode' => $errorCode];
         }
 
         $memberAssignmentOffset  = 0;
