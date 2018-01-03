@@ -7,10 +7,10 @@ namespace Kafka;
  * @method string getClientId()
  * @method string getBrokerVersion()
  * @method string getMetadataBrokerList()
- * @method string getMessageMaxBytes()
- * @method string getMetadataRequestTimeoutMs()
- * @method string getMetadataRefreshIntervalMs()
- * @method string getMetadataMaxAgeMs()
+ * @method int getMessageMaxBytes()
+ * @method int getMetadataRequestTimeoutMs()
+ * @method int getMetadataRefreshIntervalMs()
+ * @method int getMetadataMaxAgeMs()
  * @method string getSecurityProtocol()
  * @method bool getSslEnable()
  * @method void setSslEnable(bool $sslEnable)
@@ -67,9 +67,9 @@ abstract class Config
         'clientId'                  => 'kafka-php',
         'brokerVersion'             => '0.10.1.0',
         'metadataBrokerList'        => '',
-        'messageMaxBytes'           => '1000000',
-        'metadataRequestTimeoutMs'  => '60000',
-        'metadataRefreshIntervalMs' => '300000',
+        'messageMaxBytes'           => 1000000,
+        'metadataRequestTimeoutMs'  => 60000,
+        'metadataRefreshIntervalMs' => 300000,
         'metadataMaxAgeMs'          => -1,
         'securityProtocol'          => self::SECURITY_PROTOCOL_PLAINTEXT,
         'sslEnable'                 => false, // this config item will override, don't config it.
@@ -128,6 +128,9 @@ abstract class Config
         return true;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setClientId(string $val): void
     {
         $client = \trim($val);
@@ -139,6 +142,9 @@ abstract class Config
         static::$options['clientId'] = $client;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setBrokerVersion(string $version): void
     {
         $version = \trim($version);
@@ -150,6 +156,9 @@ abstract class Config
         static::$options['brokerVersion'] = $version;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setMetadataBrokerList(string $brokerList): void
     {
         $brokerList = \trim($brokerList);
@@ -176,87 +185,100 @@ abstract class Config
     }
 
     /**
-     * @param int|float|string $messageMaxBytes
+     * @throws Exception\Config
      */
-    public function setMessageMaxBytes($messageMaxBytes): void
+    public function setMessageMaxBytes(int $messageMaxBytes): void
     {
-        if (! \is_numeric($messageMaxBytes) || $messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
+        if ($messageMaxBytes < 1000 || $messageMaxBytes > 1000000000) {
             throw new Exception\Config('Set message max bytes value is invalid, must set it 1000 .. 1000000000');
         }
         static::$options['messageMaxBytes'] = $messageMaxBytes;
     }
 
     /**
-     * @param int|float|string $metadataRequestTimeoutMs
+     * @throws Exception\Config
      */
-    public function setMetadataRequestTimeoutMs($metadataRequestTimeoutMs): void
+    public function setMetadataRequestTimeoutMs(int $metadataRequestTimeoutMs): void
     {
-        if (! \is_numeric($metadataRequestTimeoutMs) || $metadataRequestTimeoutMs < 10
-            || $metadataRequestTimeoutMs > 900000) {
+        if ($metadataRequestTimeoutMs < 10 || $metadataRequestTimeoutMs > 900000) {
             throw new Exception\Config('Set metadata request timeout value is invalid, must set it 10 .. 900000');
         }
         static::$options['metadataRequestTimeoutMs'] = $metadataRequestTimeoutMs;
     }
 
     /**
-     * @param int|float|string $metadataRefreshIntervalMs
+     * @throws Exception\Config
      */
-    public function setMetadataRefreshIntervalMs($metadataRefreshIntervalMs): void
+    public function setMetadataRefreshIntervalMs(int $metadataRefreshIntervalMs): void
     {
-        if (! \is_numeric($metadataRefreshIntervalMs) || $metadataRefreshIntervalMs < 10
-            || $metadataRefreshIntervalMs > 3600000) {
+        if ($metadataRefreshIntervalMs < 10 || $metadataRefreshIntervalMs > 3600000) {
             throw new Exception\Config('Set metadata refresh interval value is invalid, must set it 10 .. 3600000');
         }
         static::$options['metadataRefreshIntervalMs'] = $metadataRefreshIntervalMs;
     }
 
     /**
-     * @param int|float|string $metadataMaxAgeMs
+     * @throws Exception\Config
      */
-    public function setMetadataMaxAgeMs($metadataMaxAgeMs): void
+    public function setMetadataMaxAgeMs(int $metadataMaxAgeMs): void
     {
-        if (! \is_numeric($metadataMaxAgeMs) || $metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {
+        if ($metadataMaxAgeMs < 1 || $metadataMaxAgeMs > 86400000) {
             throw new Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSslLocalCert(string $localCert): void
     {
-        if (! \file_exists($localCert) || ! \is_file($localCert)) {
+        if (! \is_file($localCert)) {
             throw new Exception\Config('Set ssl local cert file is invalid');
         }
 
         static::$options['sslLocalCert'] = $localCert;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSslLocalPk(string $localPk): void
     {
-        if (! \file_exists($localPk) || ! \is_file($localPk)) {
+        if (! \is_file($localPk)) {
             throw new Exception\Config('Set ssl local private key file is invalid');
         }
 
         static::$options['sslLocalPk'] = $localPk;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSslCafile(string $cafile): void
     {
-        if (! \file_exists($cafile) || ! \is_file($cafile)) {
+        if (! \is_file($cafile)) {
             throw new Exception\Config('Set ssl ca file is invalid');
         }
 
         static::$options['sslCafile'] = $cafile;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSaslKeytab(string $keytab): void
     {
-        if (! \file_exists($keytab) || ! \is_file($keytab)) {
+        if (! \is_file($keytab)) {
             throw new Exception\Config('Set sasl gssapi keytab file is invalid');
         }
 
         static::$options['saslKeytab'] = $keytab;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSecurityProtocol(string $protocol): void
     {
         if (! \in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
@@ -266,6 +288,9 @@ abstract class Config
         static::$options['securityProtocol'] = $protocol;
     }
 
+    /**
+     * @throws Exception\Config
+     */
     public function setSaslMechanism(string $mechanism): void
     {
         if (! \in_array($mechanism, self::ALLOW_MECHANISMS, true)) {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace KafkaTest\Base;
 
-use Kafka\Config;
+use Kafka\Exception\Config;
 use Kafka\ProducerConfig;
 use Kafka\Protocol\Produce;
 use PHPUnit\Framework\TestCase;
@@ -102,117 +102,6 @@ final class ProducerConfigTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl local cert file is invalid
-     */
-    public function testSetSslLocalCert(): void
-    {
-        $this->config->setSslLocalCert('invalid_path');
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl local cert file is invalid
-     */
-    public function testSetSslLocalCertNotFile(): void
-    {
-        $this->config->setSslLocalCert('/tmp');
-    }
-
-    public function testSetSslLocalCertValid(): void
-    {
-        $path = '/etc/passwd';
-        $this->config->setSslLocalCert($path);
-
-        self::assertSame($path, $this->config->getSslLocalCert());
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl local private key file is invalid
-     */
-    public function testSetSslLocalPk(): void
-    {
-        $this->config->setSslLocalPk('invalid_path');
-    }
-
-    public function testSetSslLocalPkValid(): void
-    {
-        $path = '/etc/passwd';
-        $this->config->setSslLocalPk($path);
-
-        self::assertSame($path, $this->config->getSslLocalPk());
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl ca file is invalid
-     */
-    public function testSetSslCafile(): void
-    {
-        $this->config->setSslCafile('invalid_path');
-    }
-
-    public function testSetSslCafileValid(): void
-    {
-        $path = '/etc/passwd';
-        $this->config->setSslCafile($path);
-
-        self::assertSame($path, $this->config->getSslCafile());
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set sasl gssapi keytab file is invalid
-     */
-    public function testSetSaslKeytab(): void
-    {
-        $this->config->setSaslKeytab('invalid_path');
-    }
-
-    public function testSetSaslKeytabValid(): void
-    {
-        $path = '/etc/passwd';
-        $this->config->setSaslKeytab($path);
-
-        self::assertSame($path, $this->config->getSaslKeytab());
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Invalid security protocol given.
-     */
-    public function testSetSecurityProtocol(): void
-    {
-        $this->config->setSecurityProtocol('xxxx');
-    }
-
-    public function testSetSecurityProtocolValid(): void
-    {
-        $protocol = Config::SECURITY_PROTOCOL_PLAINTEXT;
-        $this->config->setSecurityProtocol($protocol);
-
-        self::assertSame($protocol, $this->config->getSecurityProtocol());
-    }
-
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Invalid security sasl mechanism given.
-     */
-    public function testSetSaslMechanism(): void
-    {
-        $this->config->setSaslMechanism('xxxx');
-    }
-
-    public function testSetSaslMechanismValid(): void
-    {
-        $mechanism = Config::SASL_MECHANISMS_GSSAPI;
-        $this->config->setSaslMechanism($mechanism);
-
-        self::assertSame($mechanism, $this->config->getSaslMechanism());
-    }
-
-    /**
      * @test
      */
     public function defaultValueForCompressionIsNull(): void
@@ -240,13 +129,13 @@ final class ProducerConfigTest extends TestCase
         self::assertSame(Produce::COMPRESSION_GZIP, $this->config->getCompression());
     }
 
-    public function testClear(): void
+    /**
+     * @test
+     */
+    public function setCompressionShouldRaiseExceptionWhenInvalidDataIsGiven(): void
     {
-        $mechanism = Config::SASL_MECHANISMS_GSSAPI;
-        $this->config->setSaslMechanism($mechanism);
-        self::assertSame($mechanism, $this->config->getSaslMechanism());
-        $this->config->clear();
+        $this->expectException(Config::class);
 
-        self::assertSame(Config::SASL_MECHANISMS_PLAIN, $this->config->getSaslMechanism());
+        $this->config->setCompression(123);
     }
 }

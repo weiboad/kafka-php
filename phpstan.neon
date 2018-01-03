@@ -4,4 +4,5 @@ includes:
 
 parameters:
     ignoreErrors:
-        - '#Call to an undefined method Kafka\\ConsumerConfig::(g|s)etValidKey\(\)#'
+        - '#Call to an undefined method Kafka\\Config.*::(g|s)etValidKey\(\)#'
+        - '#Call to an undefined method Kafka\\Config.*::pureMagic\(\)#'

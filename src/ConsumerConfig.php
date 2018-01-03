@@ -135,6 +135,13 @@ class ConsumerConfig extends Config
 
     public function setConsumeMode(int $mode): void
     {
+        if (! \in_array($mode, [self::CONSUME_AFTER_COMMIT_OFFSET, self::CONSUME_BEFORE_COMMIT_OFFSET], true)) {
+            throw new Exception\Config(
+                'Invalid consume mode given, it must be either "ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET" or '
+                . '"ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET"'
+            );
+        }
+
         $this->runtimeOptions['consume_mode'] = $mode;
     }
 
