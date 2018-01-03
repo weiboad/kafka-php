@@ -109,5 +109,12 @@
             <property name="searchAnnotations" type="boolean" value="true"/>
         </properties>
     </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+        <properties>
+            <property name="newlinesCountBetweenOpenTagAndDeclare" value="1" />
+            <property name="spacesCountAroundEqualsSign" value="0" />
+        </properties>
+    </rule>
 </ruleset>
 

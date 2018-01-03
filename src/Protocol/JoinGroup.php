@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -41,10 +42,10 @@ class JoinGroup extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::JOIN_GROUP_REQUEST, self::JOIN_GROUP_REQUEST);
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data  .= self::pack(self::BIT_B32, $payloads['session_timeout']);
+        $data  .= self::pack(self::BIT_B32, (string) $payloads['session_timeout']);
 
         if ($this->getApiVersion(self::JOIN_GROUP_REQUEST) === self::API_VERSION1) {
-            $data .= self::pack(self::BIT_B32, $payloads['rebalance_timeout']);
+            $data .= self::pack(self::BIT_B32, (string) $payloads['rebalance_timeout']);
         }
 
         $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 class SocketSync extends CommonSocket
@@ -11,7 +13,7 @@ class SocketSync extends CommonSocket
 
         $this->createStream();
 
-        stream_set_blocking($this->stream, 0);
+        stream_set_blocking($this->stream, false);
     }
 
     public function close(): void

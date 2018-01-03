@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Base;
 
@@ -43,7 +44,7 @@ final class ProducerConfigTest extends TestCase
      */
     public function testSetRequestTimeoutValid(): void
     {
-        $this->config->setRequestTimeout('-1');
+        $this->config->setRequestTimeout(-1);
     }
 
     public function testSetProduceInterval(): void
@@ -59,7 +60,7 @@ final class ProducerConfigTest extends TestCase
      */
     public function testSetProduceIntervalValid(): void
     {
-        $this->config->setProduceInterval('-1');
+        $this->config->setProduceInterval(-1);
     }
 
     public function testSetTimeout(): void
@@ -75,7 +76,7 @@ final class ProducerConfigTest extends TestCase
      */
     public function testSetTimeoutValid(): void
     {
-        $this->config->setTimeout('-1');
+        $this->config->setTimeout(-1);
     }
 
     public function testSetRequiredAck(): void
@@ -90,7 +91,7 @@ final class ProducerConfigTest extends TestCase
      */
     public function testSetRequiredAckValid(): void
     {
-        $this->config->setRequiredAck('-2');
+        $this->config->setRequiredAck(-2);
     }
 
     public function testSetIsAsyn(): void

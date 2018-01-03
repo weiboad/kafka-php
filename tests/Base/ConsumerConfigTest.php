@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Base;
 
@@ -153,7 +154,7 @@ final class ConsumerConfigTest extends TestCase
      */
     public function testSetSessionTimeoutInvalid(): void
     {
-        $this->config->setSessionTimeout('-1');
+        $this->config->setSessionTimeout(-1);
     }
 
     public function testSetRebalanceTimeout(): void
@@ -169,7 +170,7 @@ final class ConsumerConfigTest extends TestCase
      */
     public function testSetRebalanceTimeoutInvalid(): void
     {
-        $this->config->setRebalanceTimeout('-1');
+        $this->config->setRebalanceTimeout(-1);
     }
 
     public function testSetOffsetReset(): void

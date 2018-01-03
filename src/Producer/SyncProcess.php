@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Producer;
 
 use Kafka\Broker;
@@ -53,7 +55,7 @@ class SyncProcess
         $sendData = $this->convertMessage($data);
         $result   = [];
         foreach ($sendData as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect($brokerId, true);
+            $connect = $broker->getDataConnect((string) $brokerId, true);
 
             if ($connect === null) {
                 return [];

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Base;
 
 use Kafka\Broker;
@@ -17,12 +19,13 @@ class BrokerTest extends TestCase
     {
         $broker = Broker::getInstance();
         $broker->setGroupBrokerId(1);
-        $this->assertEquals($broker->getGroupBrokerId(), 1);
+
+        $this->assertSame($broker->getGroupBrokerId(), 1);
     }
 
     public function testData(): void
     {
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
         $data   = [
             'brokers' => [
                 [
@@ -94,7 +97,7 @@ class BrokerTest extends TestCase
 
     public function getConnect(): void
     {
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
         $data   = [
             [
                 'host' => '127.0.0.1',
@@ -122,12 +125,12 @@ class BrokerTest extends TestCase
             ->getMock();
 
         $result = $broker->getMetaConnect('1');
-        $this->assertFalse($result);
+        $this->assertNull($result);
     }
 
     public function testConnectRandFalse(): void
     {
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
 
         $result = $broker->getRandConnect();
         $this->assertNull($result);
@@ -135,11 +138,16 @@ class BrokerTest extends TestCase
 
     public function testGetSocketNotSetConfig(): void
     {
-        $broker   = Broker::getInstance();
+        $broker   = $this->getBroker();
         $hostname = '127.0.0.1';
-        $port     = '9092';
+        $port     = 9092;
         $socket   = $broker->getSocket($hostname, $port, true);
 
         $this->assertInstanceOf(SocketSync::class, $socket);
+    }
+
+    private function getBroker(): Broker
+    {
+        return Broker::getInstance();
     }
 }

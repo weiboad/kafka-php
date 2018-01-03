@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Kafka\Sasl\Gssapi;
@@ -139,7 +141,7 @@ class Broker
             return null;
         }
 
-        return $this->getMetaConnect($nodeIds[0], $modeSync);
+        return $this->getMetaConnect((string) $nodeIds[0], $modeSync);
     }
 
     public function getDataConnect(string $key, bool $modeSync = false): ?CommonSocket
@@ -178,7 +180,7 @@ class Broker
         }
 
         try {
-            $socket = $this->getSocket($host, $port, $modeSync);
+            $socket = $this->getSocket((string) $host, (int) $port, $modeSync);
 
             if ($socket instanceof Socket && $this->process !== null) {
                 $socket->setOnReadable($this->process);

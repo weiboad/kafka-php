@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 /**
@@ -66,13 +68,11 @@ class ConsumerConfig extends Config
     }
 
     /**
-     * @param int|string|float $sessionTimeout
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setSessionTimeout($sessionTimeout): void
+    public function setSessionTimeout(int $sessionTimeout): void
     {
-        if (! is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
+        if ($sessionTimeout < 1 || $sessionTimeout > 3600000) {
             throw new Exception\Config('Set session timeout value is invalid, must set it 1 .. 3600000');
         }
 
@@ -80,13 +80,11 @@ class ConsumerConfig extends Config
     }
 
     /**
-     * @param int|string|float $rebalanceTimeout
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setRebalanceTimeout($rebalanceTimeout): void
+    public function setRebalanceTimeout(int $rebalanceTimeout): void
     {
-        if (! is_numeric($rebalanceTimeout) || $rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
+        if ($rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
             throw new Exception\Config('Set rebalance timeout value is invalid, must set it 1 .. 3600000');
         }
 

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Kafka\Protocol\Produce;
@@ -34,13 +36,11 @@ class ProducerConfig extends Config
     ];
 
     /**
-     * @param float|int|string $requestTimeout
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setRequestTimeout($requestTimeout): void
+    public function setRequestTimeout(int $requestTimeout): void
     {
-        if (! is_numeric($requestTimeout) || $requestTimeout < 1 || $requestTimeout > 900000) {
+        if ($requestTimeout < 1 || $requestTimeout > 900000) {
             throw new Exception\Config('Set request timeout value is invalid, must set it 1 .. 900000');
         }
 
@@ -48,13 +48,11 @@ class ProducerConfig extends Config
     }
 
     /**
-     * @param float|int|string $produceInterval
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setProduceInterval($produceInterval): void
+    public function setProduceInterval(int $produceInterval): void
     {
-        if (! is_numeric($produceInterval) || $produceInterval < 1 || $produceInterval > 900000) {
+        if ($produceInterval < 1 || $produceInterval > 900000) {
             throw new Exception\Config('Set produce interval timeout value is invalid, must set it 1 .. 900000');
         }
 
@@ -62,13 +60,11 @@ class ProducerConfig extends Config
     }
 
     /**
-     * @param float|int|string $timeout
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setTimeout($timeout): void
+    public function setTimeout(int $timeout): void
     {
-        if (! is_numeric($timeout) || $timeout < 1 || $timeout > 900000) {
+        if ($timeout < 1 || $timeout > 900000) {
             throw new Exception\Config('Set timeout value is invalid, must set it 1 .. 900000');
         }
 
@@ -76,13 +72,11 @@ class ProducerConfig extends Config
     }
 
     /**
-     * @param float|int|string $requiredAck
-     *
      * @throws \Kafka\Exception\Config
      */
-    public function setRequiredAck($requiredAck): void
+    public function setRequiredAck(int $requiredAck): void
     {
-        if (! is_numeric($requiredAck) || $requiredAck < -1 || $requiredAck > 1000) {
+        if ($requiredAck < -1 || $requiredAck > 1000) {
             throw new Exception\Config('Set required ack value is invalid, must set it -1 .. 1000');
         }
 

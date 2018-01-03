@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -33,7 +34,7 @@ class SyncGroup extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::SYNC_GROUP_REQUEST, self::SYNC_GROUP_REQUEST);
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data  .= self::pack(self::BIT_B32, $payloads['generation_id']);
+        $data  .= self::pack(self::BIT_B32, (string) $payloads['generation_id']);
         $data  .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         $data  .= self::encodeArray($payloads['data'], [$this, 'encodeGroupAssignment']);
 

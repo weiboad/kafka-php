@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -29,7 +30,7 @@ class Heartbeat extends Protocol
 
         $header = $this->requestHeader('kafka-php', self::HEART_BEAT_REQUEST, self::HEART_BEAT_REQUEST);
         $data   = self::encodeString($payloads['group_id'], self::PACK_INT16);
-        $data  .= self::pack(self::BIT_B32, $payloads['generation_id']);
+        $data  .= self::pack(self::BIT_B32, (string) $payloads['generation_id']);
         $data  .= self::encodeString($payloads['member_id'], self::PACK_INT16);
 
         $data = self::encodeString($header . $data, self::PACK_INT32);

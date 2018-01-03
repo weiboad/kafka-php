@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
@@ -40,14 +42,14 @@ class CommitOffset extends Protocol
         $data = self::encodeString($payloads['group_id'], self::PACK_INT16);
 
         if ($version === self::API_VERSION1) {
-            $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
+            $data .= self::pack(self::BIT_B32, (string) $payloads['generation_id']);
             $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
         }
 
         if ($version === self::API_VERSION2) {
-            $data .= self::pack(self::BIT_B32, $payloads['generation_id']);
+            $data .= self::pack(self::BIT_B32, (string) $payloads['generation_id']);
             $data .= self::encodeString($payloads['member_id'], self::PACK_INT16);
-            $data .= self::pack(self::BIT_B64, $payloads['retention_time']);
+            $data .= self::pack(self::BIT_B64, (string) $payloads['retention_time']);
         }
 
         $data .= self::encodeArray($payloads['data'], [$this, 'encodeTopic']);
@@ -115,11 +117,11 @@ class CommitOffset extends Protocol
 
         $version = $this->getApiVersion(self::OFFSET_COMMIT_REQUEST);
 
-        $data  = self::pack(self::BIT_B32, $values['partition']);
-        $data .= self::pack(self::BIT_B64, $values['offset']);
+        $data  = self::pack(self::BIT_B32, (string) $values['partition']);
+        $data .= self::pack(self::BIT_B64, (string) $values['offset']);
 
         if ($version === self::API_VERSION1) {
-            $data .= self::pack(self::BIT_B64, $values['timestamp']);
+            $data .= self::pack(self::BIT_B64, (string) $values['timestamp']);
         }
 
         $data .= self::encodeString($values['metadata'], self::PACK_INT16);

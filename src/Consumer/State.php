@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Consumer;
 
 use Amp\Loop;
@@ -85,7 +87,7 @@ class State
             $interval = $option['interval'] ?? 200;
 
             Loop::repeat(
-                $interval,
+                (int) $interval,
                 function (string $watcherId) use ($request, $option): void {
                     if ($this->checkRun($request) && $option['func'] !== null) {
                         $this->processing($request, $option['func']());

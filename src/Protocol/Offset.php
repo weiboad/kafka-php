@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -20,7 +21,7 @@ class Offset extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_REQUEST, self::OFFSET_REQUEST);
-        $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
+        $data   = self::pack(self::BIT_B32, (string) $payloads['replica_id']);
         $data  .= self::encodeArray($payloads['data'], [$this, 'encodeOffsetTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -58,11 +59,11 @@ class Offset extends Protocol
             $values['max_offset'] = 100000;
         }
 
-        $data  = self::pack(self::BIT_B32, $values['partition_id']);
-        $data .= self::pack(self::BIT_B64, $values['time']);
+        $data  = self::pack(self::BIT_B32, (string) $values['partition_id']);
+        $data .= self::pack(self::BIT_B64, (string) $values['time']);
 
         if ($this->getApiVersion(self::OFFSET_REQUEST) === self::API_VERSION0) {
-            $data .= self::pack(self::BIT_B32, $values['max_offset']);
+            $data .= self::pack(self::BIT_B32, (string) $values['max_offset']);
         }
 
         return $data;

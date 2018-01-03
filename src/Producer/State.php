@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Producer;
 
 use Amp\Loop;
@@ -56,8 +58,9 @@ class State
     public function start(): void
     {
         foreach ($this->requests as $request => $option) {
-            $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option): void {
+            $interval = $option['interval'] ?? 200;
+
+            Loop::repeat((int) $interval, function (string $watcherId) use ($request, $option): void {
                 if ($this->checkRun($request) && $option['func'] !== null) {
                     $this->processing($request, $option['func']());
                 }

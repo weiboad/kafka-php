@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -33,9 +34,9 @@ class Fetch extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', self::FETCH_REQUEST, self::FETCH_REQUEST);
-        $data   = self::pack(self::BIT_B32, $payloads['replica_id']);
-        $data  .= self::pack(self::BIT_B32, $payloads['max_wait_time']);
-        $data  .= self::pack(self::BIT_B32, $payloads['min_bytes']);
+        $data   = self::pack(self::BIT_B32, (string) $payloads['replica_id']);
+        $data  .= self::pack(self::BIT_B32, (string) $payloads['max_wait_time']);
+        $data  .= self::pack(self::BIT_B32, (string) $payloads['min_bytes']);
         $data  .= self::encodeArray($payloads['data'], [$this, 'encodeFetchTopic']);
         $data   = self::encodeString($header . $data, self::PACK_INT32);
 
@@ -239,7 +240,7 @@ class Fetch extends Protocol
             $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 
-            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
+            $valueRet = $this->decodeString((string) substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
             $offset  += $valueRet['length'];
 
             if ($offset !== $messageSize) {
@@ -289,9 +290,9 @@ class Fetch extends Protocol
             $values['max_bytes'] = 2 * 1024 * 1024;
         }
 
-        $data  = self::pack(self::BIT_B32, $values['partition_id']);
-        $data .= self::pack(self::BIT_B64, $values['offset']);
-        $data .= self::pack(self::BIT_B32, $values['max_bytes']);
+        $data  = self::pack(self::BIT_B32, (string) $values['partition_id']);
+        $data .= self::pack(self::BIT_B64, (string) $values['offset']);
+        $data .= self::pack(self::BIT_B32, (string) $values['max_bytes']);
 
         return $data;
     }

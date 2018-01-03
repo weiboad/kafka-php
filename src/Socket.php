@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Amp\Loop;
@@ -44,7 +46,7 @@ class Socket extends CommonSocket
 
         $this->createStream();
 
-        stream_set_blocking($this->stream, 0);
+        stream_set_blocking($this->stream, false);
         stream_set_read_buffer($this->stream, 0);
 
         $this->readWatcherId = Loop::onReadable(

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Producer;
 
 use Amp\Loop;
@@ -217,7 +219,7 @@ class Process
         $sendData = $this->convertMessage($data);
 
         foreach ($sendData as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect($brokerId);
+            $connect = $broker->getDataConnect((string) $brokerId);
 
             if ($connect === null) {
                 return $context;

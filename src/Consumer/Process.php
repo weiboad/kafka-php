@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Consumer;
 
 use Kafka\Broker;
@@ -411,7 +413,7 @@ class Process
         $topics  = $this->getAssignment()->getTopics();
 
         foreach ($topics as $brokerId => $topicList) {
-            $connect = $broker->getMetaConnect($brokerId);
+            $connect = $broker->getMetaConnect((string) $brokerId);
 
             if ($connect === null) {
                 return [];
@@ -570,7 +572,7 @@ class Process
         $consumerOffsets = $this->getAssignment()->getConsumerOffsets();
 
         foreach ($topics as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect($brokerId);
+            $connect = $broker->getDataConnect((string) $brokerId);
 
             if ($connect === null) {
                 return [];
@@ -795,7 +797,7 @@ class Process
             [$topic, $partId] = $context;
 
             if (isset($offsets[$topic][$partId])) {
-                $assign->setConsumerOffset($topic, $partId, $offsets[$topic][$partId]);
+                $assign->setConsumerOffset($topic, (int) $partId, $offsets[$topic][$partId]);
             }
         }
 

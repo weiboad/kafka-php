@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -397,7 +398,7 @@ abstract class Protocol
         $packLen = $bytes === self::PACK_INT32 ? self::BIT_B32 : self::BIT_B16;
         $string  = self::compress($string, $compression);
 
-        return self::pack($packLen, \strlen($string)) . $string;
+        return self::pack($packLen, (string) \strlen($string)) . $string;
     }
 
     private static function compress(string $string, int $compression): string

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
@@ -49,8 +50,8 @@ class Produce extends Protocol
         }
 
         $header = $this->requestHeader('kafka-php', 0, self::PRODUCE_REQUEST);
-        $data   = self::pack(self::BIT_B16, $payloads['required_ack'] ?? 0);
-        $data  .= self::pack(self::BIT_B32, $payloads['timeout'] ?? 100);
+        $data   = self::pack(self::BIT_B16, (string) ($payloads['required_ack'] ?? 0));
+        $data  .= self::pack(self::BIT_B32, (string) ($payloads['timeout'] ?? 100));
         $data  .= self::encodeArray(
             $payloads['data'],
             [$this, 'encodeProduceTopic'],
@@ -141,7 +142,7 @@ class Produce extends Protocol
         // message value
         $data .= self::encodeString($message, self::PACK_INT32, $compression);
 
-        $crc = crc32($data);
+        $crc = (string) crc32($data);
 
         // int32 -- crc code  string data
         $message = self::pack(self::BIT_B32, $crc) . $data;
@@ -204,7 +205,7 @@ class Produce extends Protocol
             throw new ProtocolException('given produce data invalid. `messages` is undefined.');
         }
 
-        $data  = self::pack(self::BIT_B32, $values['partition_id']);
+        $data  = self::pack(self::BIT_B32, (string) $values['partition_id']);
         $data .= self::encodeString(
             $this->encodeMessageSet((array) $values['messages'], $compression),
             self::PACK_INT32
