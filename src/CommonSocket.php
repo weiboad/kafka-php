@@ -231,7 +231,7 @@ abstract class CommonSocket
     public function readBlocking(int $length): string
     {
         if ($length > self::READ_MAX_LENGTH) {
-            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
+            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self::READ_MAX_LENGTH);
         }
 
         $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);

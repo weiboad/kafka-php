@@ -20,7 +20,6 @@ final class ConsumerTest extends TestCase
      */
     public function createConsumer(?Consumer\StopStrategy $stopStrategy = null): void
     {
-
         $this->consumer = $this->getMockBuilder(Consumer::class)
                                ->disableOriginalClone()
                                ->disableArgumentCloning()
