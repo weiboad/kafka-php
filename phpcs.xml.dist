@@ -157,5 +157,7 @@
     <rule ref="Generic.CodeAnalysis.EmptyStatement">
         <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCATCH"/>
     </rule>
+
+    <rule ref="Squiz.PHP.NonExecutableCode"/>
 </ruleset>
 
