@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 /**
@@ -17,10 +19,16 @@ class ConsumerConfig extends Config
     public const CONSUME_AFTER_COMMIT_OFFSET  = 1;
     public const CONSUME_BEFORE_COMMIT_OFFSET = 2;
 
+    /**
+     * @var mixed[]
+     */
     protected $runtimeOptions = [
         'consume_mode' => self::CONSUME_AFTER_COMMIT_OFFSET,
     ];
 
+    /**
+     * @var mixed[]
+     */
     protected static $defaults = [
         'groupId'          => '',
         'sessionTimeout'   => 30000,
@@ -31,9 +39,12 @@ class ConsumerConfig extends Config
         'maxWaitTime'      => 100,
     ];
 
+    /**
+     * @throws \Kafka\Exception\Config
+     */
     public function getGroupId(): string
     {
-        $groupId = trim($this->ietGroupId());
+        $groupId = \trim($this->ietGroupId());
 
         if ($groupId === false || $groupId === '') {
             throw new Exception\Config('Get group id value is invalid, must set it not empty string');
@@ -42,9 +53,12 @@ class ConsumerConfig extends Config
         return $groupId;
     }
 
+    /**
+     * @throws \Kafka\Exception\Config
+     */
     public function setGroupId(string $groupId): void
     {
-        $groupId = trim($groupId);
+        $groupId = \trim($groupId);
 
         if ($groupId === false || $groupId === '') {
             throw new Exception\Config('Set group id value is invalid, must set it not empty string');
@@ -53,25 +67,34 @@ class ConsumerConfig extends Config
         static::$options['groupId'] = $groupId;
     }
 
-    public function setSessionTimeout($sessionTimeout): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setSessionTimeout(int $sessionTimeout): void
     {
-        if (! is_numeric($sessionTimeout) || $sessionTimeout < 1 || $sessionTimeout > 3600000) {
+        if ($sessionTimeout < 1 || $sessionTimeout > 3600000) {
             throw new Exception\Config('Set session timeout value is invalid, must set it 1 .. 3600000');
         }
 
         static::$options['sessionTimeout'] = $sessionTimeout;
     }
 
-    public function setRebalanceTimeout($rebalanceTimeout): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setRebalanceTimeout(int $rebalanceTimeout): void
     {
-        if (! is_numeric($rebalanceTimeout) || $rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
+        if ($rebalanceTimeout < 1 || $rebalanceTimeout > 3600000) {
             throw new Exception\Config('Set rebalance timeout value is invalid, must set it 1 .. 3600000');
         }
 
         static::$options['rebalanceTimeout'] = $rebalanceTimeout;
     }
 
-    public function setOffsetReset($offsetReset): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setOffsetReset(string $offsetReset): void
     {
         if (! \in_array($offsetReset, ['latest', 'earliest'], true)) {
             throw new Exception\Config('Set offset reset value is invalid, must set it `latest` or `earliest`');
@@ -80,6 +103,11 @@ class ConsumerConfig extends Config
         static::$options['offsetReset'] = $offsetReset;
     }
 
+    /**
+     * @return string[]
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function getTopics(): array
     {
         $topics = $this->ietTopics();
@@ -91,6 +119,11 @@ class ConsumerConfig extends Config
         return $topics;
     }
 
+    /**
+     * @param string[] $topics
+     *
+     * @throws \Kafka\Exception\Config
+     */
     public function setTopics(array $topics): void
     {
         if (empty($topics)) {
@@ -102,10 +135,17 @@ class ConsumerConfig extends Config
 
     public function setConsumeMode(int $mode): void
     {
+        if (! \in_array($mode, [self::CONSUME_AFTER_COMMIT_OFFSET, self::CONSUME_BEFORE_COMMIT_OFFSET], true)) {
+            throw new Exception\Config(
+                'Invalid consume mode given, it must be either "ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET" or '
+                . '"ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET"'
+            );
+        }
+
         $this->runtimeOptions['consume_mode'] = $mode;
     }
 
-    public function getConsumeMode()
+    public function getConsumeMode(): int
     {
         return $this->runtimeOptions['consume_mode'];
     }

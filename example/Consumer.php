@@ -1,15 +1,20 @@
 <?php
+declare(strict_types=1);
+
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
-use Monolog\Logger;
+
+use Kafka\Consumer;
+use Kafka\ConsumerConfig;
 use Monolog\Handler\StdoutHandler;
+use Monolog\Logger;
 
 // Create the logger
 $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$config = \Kafka\ConsumerConfig::getInstance();
+$config = ConsumerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('127.0.0.1:9092');
 $config->setGroupId('test');
@@ -22,8 +27,8 @@ $config->setOffsetReset('earliest');
 //$config->setSslEnable(true);
 //$config->setSslPassphrase('123456');
 //$config->setSslPeerName('nmred');
-$consumer = new \Kafka\Consumer();
+$consumer = new Consumer();
 $consumer->setLogger($logger);
-$consumer->start(function ($topic, $part, $message) {
+$consumer->start(function ($topic, $part, $message): void {
     var_dump($message);
 });

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Kafka\Sasl\Gssapi;
@@ -10,27 +12,27 @@ class Broker
     use SingletonTrait;
 
     /**
-     * @var string
+     * @var int
      */
     private $groupBrokerId;
 
     /**
-     * @var array
+     * @var mixed[][]
      */
     private $topics = [];
 
     /**
-     * @var array
+     * @var string[]
      */
     private $brokers = [];
 
     /**
-     * @var array
+     * @var CommonSocket[]
      */
     private $metaSockets = [];
 
     /**
-     * @var array
+     * @var CommonSocket[]
      */
     private $dataSockets = [];
 
@@ -44,48 +46,50 @@ class Broker
      */
     private $config;
 
-    public function setProcess(callable $process)
+    public function setProcess(callable $process): void
     {
         $this->process = $process;
     }
 
-    public function setConfig(Config $config)
+    public function setConfig(Config $config): void
     {
         $this->config = $config;
     }
 
-    public function setGroupBrokerId($brokerId)
+    public function setGroupBrokerId(int $brokerId): void
     {
         $this->groupBrokerId = $brokerId;
     }
 
-    public function getGroupBrokerId()
+    public function getGroupBrokerId(): int
     {
         return $this->groupBrokerId;
     }
 
+    /**
+     * @param mixed[][] $topics
+     * @param mixed[] $brokersResult
+     */
     public function setData(array $topics, array $brokersResult): bool
     {
         $brokers = [];
 
         foreach ($brokersResult as $value) {
-            $key           = $value['nodeId'];
-            $hostname      = $value['host'] . ':' . $value['port'];
-            $brokers[$key] = $hostname;
+            $brokers[$value['nodeId']] = $value['host'] . ':' . $value['port'];
         }
 
-        $change = false;
+        $changed = false;
 
-        if (serialize($this->brokers) !== serialize($brokers)) {
+        if (\serialize($this->brokers) !== \serialize($brokers)) {
             $this->brokers = $brokers;
 
-            $change = true;
+            $changed = true;
         }
 
         $newTopics = [];
         foreach ($topics as $topic) {
-            if ((int) $topic['errorCode'] !== \Kafka\Protocol::NO_ERROR) {
-                $this->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
+            if ((int) $topic['errorCode'] !== Protocol::NO_ERROR) {
+                $this->error('Parse metadata for topic is error, error:' . Protocol::getError($topic['errorCode']));
                 continue;
             }
 
@@ -98,46 +102,54 @@ class Broker
             $newTopics[$topic['topicName']] = $item;
         }
 
-        if (serialize($this->topics) !== serialize($newTopics)) {
+        if (\serialize($this->topics) !== \serialize($newTopics)) {
             $this->topics = $newTopics;
 
-            $change = true;
+            $changed = true;
         }
 
-        return $change;
+        return $changed;
     }
 
-    public function getTopics()
+    /**
+     * @return mixed[][]
+     */
+    public function getTopics(): array
     {
         return $this->topics;
     }
 
-    public function getBrokers()
+    /**
+     * @return string[]
+     */
+    public function getBrokers(): array
     {
         return $this->brokers;
     }
 
-    public function getMetaConnect($key, $modeSync = false)
+    public function getMetaConnect(string $key, bool $modeSync = false): ?CommonSocket
     {
         return $this->getConnect($key, 'metaSockets', $modeSync);
     }
 
-    public function getRandConnect($modeSync = false)
+    public function getRandConnect(bool $modeSync = false): ?CommonSocket
     {
-        $nodeIds = array_keys($this->brokers);
-        shuffle($nodeIds);
+        $nodeIds = \array_keys($this->brokers);
+        \shuffle($nodeIds);
+
         if (! isset($nodeIds[0])) {
-            return false;
+            return null;
         }
-        return $this->getMetaConnect($nodeIds[0], $modeSync);
+
+        return $this->getMetaConnect((string) $nodeIds[0], $modeSync);
     }
 
-    public function getDataConnect($key, $modeSync = false)
+    public function getDataConnect(string $key, bool $modeSync = false): ?CommonSocket
     {
         return $this->getConnect($key, 'dataSockets', $modeSync);
     }
 
-    public function getConnect($key, $type, $modeSync = false)
+    public function getConnect(string $key, string $type, bool $modeSync = false): ?CommonSocket
     {
         if (isset($this->{$type}[$key])) {
             return $this->{$type}[$key];
@@ -156,19 +168,19 @@ class Broker
         if (isset($this->brokers[$key])) {
             $hostname = $this->brokers[$key];
 
-            [$host, $port] = explode(':', $hostname);
+            [$host, $port] = \explode(':', $hostname);
         }
 
-        if (strpos($key, ':') !== false) {
-            [$host, $port] = explode(':', $key);
+        if (\strpos($key, ':') !== false) {
+            [$host, $port] = \explode(':', $key);
         }
 
         if ($host === null || $port === null || (! $modeSync && $this->process === null)) {
-            return false;
+            return null;
         }
 
         try {
-            $socket = $this->getSocket($host, $port, $modeSync);
+            $socket = $this->getSocket((string) $host, (int) $port, $modeSync);
 
             if ($socket instanceof Socket && $this->process !== null) {
                 $socket->setOnReadable($this->process);
@@ -178,13 +190,13 @@ class Broker
             $this->{$type}[$key] = $socket;
 
             return $socket;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error($e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    public function clear()
+    public function clear(): void
     {
         foreach ($this->metaSockets as $key => $socket) {
             $socket->close();
@@ -213,7 +225,7 @@ class Broker
     /**
      * @throws \Kafka\Exception
      */
-    private function judgeConnectionConfig() : ?SaslMechanism
+    private function judgeConnectionConfig(): ?SaslMechanism
     {
         if ($this->config === null) {
             return null;
@@ -221,12 +233,12 @@ class Broker
 
         $plainConnections = [
             Config::SECURITY_PROTOCOL_PLAINTEXT,
-            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT,
         ];
 
         $saslConnections = [
             Config::SECURITY_PROTOCOL_SASL_SSL,
-            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
+            Config::SECURITY_PROTOCOL_SASL_PLAINTEXT,
         ];
 
         $securityProtocol = $this->config->getSecurityProtocol();
@@ -243,7 +255,7 @@ class Broker
     /**
      * @throws \Kafka\Exception
      */
-    private function getSaslMechanismProvider(Config $config) : SaslMechanism
+    private function getSaslMechanismProvider(Config $config): SaslMechanism
     {
         $mechanism = $config->getSaslMechanism();
         $username  = $config->getSaslUsername();
@@ -260,6 +272,6 @@ class Broker
                 return new Scram($username, $password, Scram::SCRAM_SHA_512);
         }
 
-        throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
+        throw new Exception(\sprintf('"%s" is an invalid SASL mechanism', $mechanism));
     }
 }

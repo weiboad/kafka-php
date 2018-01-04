@@ -6,8 +6,9 @@ namespace KafkaTest\Base;
 use Amp\Loop;
 use Kafka\Consumer;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class ConsumerTest extends \PHPUnit\Framework\TestCase
+final class ConsumerTest extends TestCase
 {
     /**
      * @var Consumer|MockObject
@@ -19,7 +20,6 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function createConsumer(?Consumer\StopStrategy $stopStrategy = null): void
     {
-
         $this->consumer = $this->getMockBuilder(Consumer::class)
                                ->disableOriginalClone()
                                ->disableArgumentCloning()
@@ -36,10 +36,10 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $executed = false;
 
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () use (&$executed) {
+        $startCallback = function () use (&$executed): void {
             $executed = true;
             Loop::stop();
         };
@@ -59,10 +59,10 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function startShouldLogErrorWhenSomeoneTriesToDoItTwice(): void
     {
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () {
+        $startCallback = function (): void {
             $this->consumer->start();
             Loop::stop();
         };
@@ -86,10 +86,10 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $executed = false;
 
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () use (&$executed) {
+        $startCallback = function () use (&$executed): void {
             $executed = true;
         };
 
@@ -116,10 +116,10 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
      */
     public function stopShouldCleanThingsAndStopTheLoop(): void
     {
-        $callback = function () {
+        $callback = function (): void {
         };
 
-        $startCallback = function () {
+        $startCallback = function (): void {
             $this->consumer->stop();
         };
 
@@ -148,7 +148,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
         $process = $this->createMock(Consumer\Process::class);
 
         $process->method('start')->willReturnCallback(
-            function () use ($startCallback) {
+            function () use ($startCallback): void {
                 Loop::defer($startCallback);
             }
         );

@@ -1,13 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Offset;
+use PHPUnit\Framework\TestCase;
 
-final class OffsetTest extends \PHPUnit\Framework\TestCase
+final class OffsetTest extends TestCase
 {
+    /**
+     * @var Offset
+     */
     private $offset;
 
+    /**
+     * @var Offset
+     */
     private $offset10;
 
     public function setUp(): void
@@ -70,9 +78,7 @@ final class OffsetTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -103,7 +109,6 @@ final class OffsetTest extends \PHPUnit\Framework\TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {
@@ -112,6 +117,6 @@ final class OffsetTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->offset->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Base;
 
 use Kafka\Config;
@@ -7,10 +9,15 @@ use Kafka\Socket;
 use KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use KafkaTest\Base\StreamStub\Stream;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SocketTest extends \PHPUnit\Framework\TestCase
+class SocketTest extends TestCase
 {
+    /**
+     * @var vfsStreamDirectory
+     */
     private $root;
 
     public function setUp(): void
@@ -85,7 +92,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $cafile     = $this->root->url() . '/cafile';
         $peerName   = 'kafka';
 
-        $context = stream_context_create(
+        $context = \stream_context_create(
             [
                 'ssl' => [
                     'local_cert'  => $localCert,
@@ -102,7 +109,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
         $streamMock->expects($this->once())
                    ->method('context')
-                   ->with(stream_context_get_options($context));
+                   ->with(\stream_context_get_options($context));
 
         $config = $this->getMockForAbstractClass(Config::class);
         $config->setSslEnable(true);
@@ -304,14 +311,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
     public function testWriteBlockingMaxBuffer(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str  = \str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 
         $streamMock = $this->initStreamStub('tcp', $host, $port);
 
         $streamMock->method('write')
-                   ->withConsecutive([substr($str, 0, Socket::MAX_WRITE_BUFFER)], [substr($str, Socket::MAX_WRITE_BUFFER)])
+                   ->withConsecutive([\substr($str, 0, Socket::MAX_WRITE_BUFFER)], [\substr($str, Socket::MAX_WRITE_BUFFER)])
                    ->willReturnOnConsecutiveCalls(Socket::MAX_WRITE_BUFFER, Socket::MAX_WRITE_BUFFER);
 
         $socket = $this->createStream($host, $port, 1);
@@ -326,14 +333,14 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     public function testWriteBlockingReturnFalse(): void
     {
-        $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, "*");
+        $str  = \str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;
 
         $streamMock = $this->initStreamStub('tcp', $host, $port);
 
         $streamMock->method('write')
-                   ->withConsecutive([substr($str, 0, Socket::MAX_WRITE_BUFFER)])
+                   ->withConsecutive([\substr($str, 0, Socket::MAX_WRITE_BUFFER)])
                    ->willReturnOnConsecutiveCalls(0);
 
         $socket = $this->createStream($host, $port, 1);
@@ -363,12 +370,19 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param string[] $mockMethod
+     *
      * @return Socket|MockObject
      */
-    private function mockStreamSocketClient($host, $port, $config = null, $sasl = null, $mockMethod = []): Socket
-    {
+    private function mockStreamSocketClient(
+        string $host,
+        int $port,
+        ?Config $config = null,
+        ?SaslMechanism $sasl = null,
+        array $mockMethod = []
+    ): Socket {
         $socket = $this->getMockBuilder(Socket::class)
-                       ->setMethods(array_merge(['createSocket'], $mockMethod))
+                       ->setMethods(\array_merge(['createSocket'], $mockMethod))
                        ->setConstructorArgs([$host, $port, $config, $sasl])
                        ->getMock();
 
@@ -378,7 +392,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
                         $errno  = 99;
                         $errstr = 'my custom error';
 
-                        return @fopen($remoteSocket, 'r+', false, $context);
+                        return @\fopen($remoteSocket, 'r+', false, $context);
                 }
             );
 
@@ -390,8 +404,8 @@ class SocketTest extends \PHPUnit\Framework\TestCase
      */
     private function initStreamStub(string $transport, string $host, int $port, bool $success = true): Stream
     {
-        $uri = sprintf('%s://%s:%s', $transport, $host, $port);
-        stream_wrapper_register($transport, SimpleStream::class);
+        $uri = \sprintf('%s://%s:%s', $transport, $host, $port);
+        \stream_wrapper_register($transport, SimpleStream::class);
 
         $streamMock = $this->createMock(Stream::class);
         $streamMock->method('open')->with($uri, 'r+', 0)->willReturn($success);
@@ -403,6 +417,9 @@ class SocketTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int|bool $select
+     * @param mixed[] $metaData
+     *
      * @return Socket|MockObject
      */
     private function createStream(string $host, int $port, $select, array $metaData = []): Socket
@@ -422,12 +439,12 @@ class SocketTest extends \PHPUnit\Framework\TestCase
 
     private function clearStreamMock(): void
     {
-        if (in_array('ssl', stream_get_wrappers(), true)) {
-            stream_wrapper_unregister('ssl');
+        if (\in_array('ssl', \stream_get_wrappers(), true)) {
+            \stream_wrapper_unregister('ssl');
         }
 
-        if (in_array('tcp', stream_get_wrappers(), true)) {
-            stream_wrapper_unregister('tcp');
+        if (\in_array('tcp', \stream_get_wrappers(), true)) {
+            \stream_wrapper_unregister('tcp');
         }
     }
 }

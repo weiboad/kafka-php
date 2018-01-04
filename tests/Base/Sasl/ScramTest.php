@@ -1,18 +1,20 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Base\Sasl;
 
-use \Kafka\Sasl\Scram;
+use Kafka\Sasl\Scram;
+use Kafka\Socket;
+use PHPUnit\Framework\TestCase;
 
-class ScramTest extends \PHPUnit\Framework\TestCase
+class ScramTest extends TestCase
 {
-
     /**
      * testScram
      *
      * @access public
-     * @return void
      */
-    public function testScram()
+    public function testScram(): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce'])
@@ -30,9 +32,8 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Verify server final response message is failure
      * @access public
-     * @return void
      */
-    public function testScramVerify()
+    public function testScramVerify(): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce'])
@@ -50,9 +51,8 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalid()
+    public function testFinalMessageInvalid(): void
     {
         $this->finalMessage();
     }
@@ -63,9 +63,8 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid, paser salt is failure.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalidSalt()
+    public function testFinalMessageInvalidSalt(): void
     {
         $message = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=,i=8192';
         $this->finalMessage($message);
@@ -77,9 +76,8 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Server response challenge is invalid, cnonce is invalid.
      * @access public
-     * @return void
      */
-    public function testFinalMessageInvalidCnonce()
+    public function testFinalMessageInvalidCnonce(): void
     {
         $message = 'r=59BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $this->finalMessage($message);
@@ -91,9 +89,8 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].
      * @access public
-     * @return void
      */
-    public function testInvalidAlgorithm()
+    public function testInvalidAlgorithm(): void
     {
         new Scram('nmred', '123456', 64);
     }
@@ -102,17 +99,16 @@ class ScramTest extends \PHPUnit\Framework\TestCase
      * testGetMechanismName
      *
      * @access public
-     * @return void
      */
-    public function testGetMechanismName()
+    public function testGetMechanismName(): void
     {
         $provider = new Scram('nmred', '123456', Scram::SCRAM_SHA_256);
         $this->assertSame('SCRAM-SHA-256', $provider->getName());
     }
 
-    private function getSocketForVerify(string $verifyMessage = '')
+    private function getSocketForVerify(string $verifyMessage = ''): Socket
     {
-        $socket             = $this->createMock(\Kafka\Socket::class);
+        $socket             = $this->createMock(Socket::class);
         $handShakeData      = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         $firstServerMessage = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $verifyMessage      = ($verifyMessage === '') ? 'v=AM496N+dPKeXeORuChQslmlCo+QHI8wy7CxRWOIMXdY=' : $verifyMessage;
@@ -131,7 +127,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         $firstMessage = \hex2bin('000000396e2c2c6e3d616c6963652c723d3546723439426154484b6e306939797444424d773859584e4d4f656d7478624a2b6f70444c2f6d69574b383d');
         // final message: c=biws,r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,p=Ky7+xuihooYxDciXZYCr1j54tmc0y/ZvPN8So/1hi/w=
         $finalMessage = \hex2bin('0000007d633d626977732c723d3546723439426154484b6e306939797444424d773859584e4d4f656d7478624a2b6f70444c2f6d69574b383d6f753774657366656662716f35796d6b3964616a696f7869762c703d4b79372b787569686f6f5978446369585a594372316a3534746d6330792f5a76504e38536f2f3168692f773d');
-        
+
         $socket->expects($this->exactly(3))
             ->method('writeBlocking')
             ->withConsecutive(
@@ -143,9 +139,9 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         return $socket;
     }
 
-    private function getSocketForInvalidFinalMessage(string $serverMessage = '')
+    private function getSocketForInvalidFinalMessage(string $serverMessage = ''): Socket
     {
-        $socket        = $this->createMock(\Kafka\Socket::class);
+        $socket        = $this->createMock(Socket::class);
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
 
         if ($serverMessage === '') {
@@ -174,7 +170,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
         return $socket;
     }
 
-    private function finalMessage(string $message = '')
+    private function finalMessage(string $message = ''): void
     {
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce', 'verifyMessage'])

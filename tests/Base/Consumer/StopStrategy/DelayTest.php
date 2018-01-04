@@ -7,8 +7,9 @@ use Amp\Loop;
 use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy\Delay;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class DelayTest extends \PHPUnit\Framework\TestCase
+final class DelayTest extends TestCase
 {
     /**
      * @var Consumer|MockObject

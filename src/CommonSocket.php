@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 abstract class CommonSocket
@@ -16,28 +18,28 @@ abstract class CommonSocket
     /**
      * Send timeout in seconds.
      *
-     * @var float
+     * @var int
      */
     protected $sendTimeoutSec = 0;
 
     /**
      * Send timeout in microseconds.
      *
-     * @var float
+     * @var int
      */
     protected $sendTimeoutUsec = 100000;
 
     /**
      * Recv timeout in seconds
      *
-     * @var float
+     * @var int
      */
     protected $recvTimeoutSec = 0;
 
     /**
      * Recv timeout in microseconds
      *
-     * @var float
+     * @var int
      */
     protected $recvTimeoutUsec = 750000;
 
@@ -79,27 +81,27 @@ abstract class CommonSocket
         $this->saslProvider = $saslProvider;
     }
 
-    public function setSendTimeoutSec(float $sendTimeoutSec) : void
+    public function setSendTimeoutSec(int $sendTimeoutSec): void
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
 
-    public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
+    public function setSendTimeoutUsec(int $sendTimeoutUsec): void
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
-    public function setRecvTimeoutSec(float $recvTimeoutSec) : void
+    public function setRecvTimeoutSec(int $recvTimeoutSec): void
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
 
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
+    public function setRecvTimeoutUsec(int $recvTimeoutUsec): void
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
 
-    public function setMaxWriteAttempts(int $number) : void
+    public function setMaxWriteAttempts(int $number): void
     {
         $this->maxWriteAttempts = $number;
     }
@@ -107,9 +109,9 @@ abstract class CommonSocket
     /**
      * @throws Exception
      */
-    protected function createStream() : void
+    protected function createStream(): void
     {
-        if (trim($this->host) === '') {
+        if (\trim($this->host) === '') {
             throw new Exception('Cannot open null host.');
         }
 
@@ -117,13 +119,13 @@ abstract class CommonSocket
             throw new Exception('Cannot open without port.');
         }
 
-        $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
-        $context      = stream_context_create([]);
+        $remoteSocket = \sprintf('tcp://%s:%s', $this->host, $this->port);
+        $context      = \stream_context_create([]);
 
         if ($this->config !== null && $this->config->getSslEnable()) { // ssl connection
-            $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
+            $remoteSocket = \sprintf('ssl://%s:%s', $this->host, $this->port);
 
-            $context = stream_context_create(
+            $context = \stream_context_create(
                 [
                     'ssl' => [
                         'local_cert'  => $this->config->getSslLocalCert(),
@@ -139,9 +141,9 @@ abstract class CommonSocket
 
         $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
 
-        if ($this->stream === false) {
+        if (! \is_resource($this->stream)) {
             throw new Exception(
-                sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
+                \sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
             );
         }
 
@@ -157,19 +159,26 @@ abstract class CommonSocket
      * Because `stream_socket_client` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @param resource $context
+     *
+     * @return resource
      */
     protected function createSocket(string $remoteSocket, $context, ?int &$errno, ?string &$errstr)
     {
-        return stream_socket_client(
+        return \stream_socket_client(
             $remoteSocket,
             $errno,
             $errstr,
             $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
-            STREAM_CLIENT_CONNECT,
+            \STREAM_CLIENT_CONNECT,
             $context
         );
     }
 
+    /**
+     * @return resource
+     */
     public function getSocket()
     {
         return $this->stream;
@@ -181,16 +190,20 @@ abstract class CommonSocket
      * Because `stream_select` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @param resource[] $sockets
+     *
+     * @return int|bool
      */
-    protected function select(array $sockets, float $timeoutSec, float $timeoutUsec, bool $isRead = true)
+    protected function select(array $sockets, int $timeoutSec, int $timeoutUsec, bool $isRead = true)
     {
         $null = null;
 
         if ($isRead) {
-            return @stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
+            return @\stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
         }
 
-        return @stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
+        return @\stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
     }
 
     /**
@@ -199,10 +212,12 @@ abstract class CommonSocket
      * Because `stream_get_meta_data` in stream wrapper mock no effect, if don't create this function will never be testable
      *
      * @codeCoverageIgnore
+     *
+     * @return mixed[]
      */
     protected function getMetaData(): array
     {
-        return stream_get_meta_data($this->stream);
+        return \stream_get_meta_data($this->stream);
     }
 
     /**
@@ -213,10 +228,10 @@ abstract class CommonSocket
      *
      * @throws Exception
      */
-    public function readBlocking(int $length) : string
+    public function readBlocking(int $length): string
     {
         if ($length > self::READ_MAX_LENGTH) {
-            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
+            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self::READ_MAX_LENGTH);
         }
 
         $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
@@ -241,11 +256,11 @@ abstract class CommonSocket
         $data           = $chunk = '';
 
         while ($remainingBytes > 0) {
-            $chunk = fread($this->stream, $remainingBytes);
+            $chunk = \fread($this->stream, $remainingBytes);
 
-            if ($chunk === false || strlen($chunk) === 0) {
+            if ($chunk === false || \strlen($chunk) === 0) {
                 // Zero bytes because of EOF?
-                if (feof($this->stream)) {
+                if (\feof($this->stream)) {
                     $this->close();
                     throw new Exception('Unexpected EOF while reading ' . $length . ' bytes from stream (no data)');
                 }
@@ -259,7 +274,7 @@ abstract class CommonSocket
             }
 
             $data           .= $chunk;
-            $remainingBytes -= strlen($chunk);
+            $remainingBytes -= \strlen($chunk);
         }
 
         return $data;
@@ -270,24 +285,24 @@ abstract class CommonSocket
      *
      * @throws Exception
      */
-    public function writeBlocking(string $buffer) : int
+    public function writeBlocking(string $buffer): int
     {
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
         $failedAttempts = 0;
         $bytesWritten   = 0;
 
-        $bytesToWrite = strlen($buffer);
+        $bytesToWrite = \strlen($buffer);
 
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
             $writable = $this->select([$this->stream], $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
 
-            if (false === $writable) {
+            if ($writable === false) {
                 throw new Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
 
-            if (0 === $writable) {
+            if ($writable === 0) {
                 $res = $this->getMetaData();
                 if (! empty($res['timed_out'])) {
                     throw new Exception('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');
@@ -298,14 +313,14 @@ abstract class CommonSocket
 
             if ($bytesToWrite - $bytesWritten > self::MAX_WRITE_BUFFER) {
                 // write max buffer size
-                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten, self::MAX_WRITE_BUFFER));
+                $wrote = \fwrite($this->stream, \substr($buffer, $bytesWritten, self::MAX_WRITE_BUFFER));
             } else {
                 // write remaining buffer bytes to stream
-                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten));
+                $wrote = \fwrite($this->stream, \substr($buffer, $bytesWritten));
             }
 
             if ($wrote === -1 || $wrote === false) {
-                throw new Exception\Socket('Could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+                throw new Exception\Socket('Could not write ' . \strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
             }
 
             if ($wrote === 0) {
@@ -313,7 +328,7 @@ abstract class CommonSocket
                 $failedAttempts++;
 
                 if ($failedAttempts > $this->maxWriteAttempts) {
-                    throw new Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+                    throw new Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . \strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
                 }
             } else {
                 // If we wrote something, reset our failed attempt counter
@@ -326,7 +341,19 @@ abstract class CommonSocket
         return $bytesWritten;
     }
 
-    abstract public function close() : void;
+    abstract public function close(): void;
 
     abstract public function connect(): void;
+
+    /**
+     * @return void|int
+     */
+    abstract public function write(?string $data = null);
+
+    /**
+     * @param string|int $data
+     *
+     * @return mixed
+     */
+    abstract public function read($data);
 }

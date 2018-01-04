@@ -1,13 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\JoinGroup;
+use PHPUnit\Framework\TestCase;
 
-final class JoinGroupTest extends \PHPUnit\Framework\TestCase
+final class JoinGroupTest extends TestCase
 {
+    /**
+     * @var JoinGroup
+     */
     private $group9;
 
+    /**
+     * @var JoinGroup
+     */
     private $group10;
 
     public function setUp(): void
@@ -55,9 +63,7 @@ final class JoinGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoSessionTimeout(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->group9->encode($data);
     }
@@ -151,9 +157,7 @@ final class JoinGroupTest extends \PHPUnit\Framework\TestCase
             'rebalance_timeout' => 6000,
             'member_id'         => '',
             'data'              => [
-                [
-                    'protocol_name' => 'group',
-                ],
+                ['protocol_name' => 'group'],
             ],
         ];
 
@@ -189,6 +193,6 @@ final class JoinGroupTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group9->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

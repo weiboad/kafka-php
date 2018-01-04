@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\FetchOffset;
+use PHPUnit\Framework\TestCase;
 
-final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
+final class FetchOffsetTest extends TestCase
 {
+    /**
+     * @var FetchOffset
+     */
     private $offset;
 
     public function setUp(): void
@@ -19,8 +25,8 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
             'data' => [
                 [
                     'topic_name' => 'test',
-                    'partitions' => [0]
-                ]
+                    'partitions' => [0],
+                ],
             ],
         ];
 
@@ -46,7 +52,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
     public function testEncodeNoGroupId(): void
     {
         $data = [
-            'data' => []
+            'data' => [],
         ];
 
         $this->offset->encode($data);
@@ -61,7 +67,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                []
+                [],
             ],
         ];
 
@@ -77,9 +83,7 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ]
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -90,7 +94,6 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {
@@ -98,6 +101,6 @@ final class FetchOffsetTest extends \PHPUnit\Framework\TestCase
         $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
 
         $test = $this->offset->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

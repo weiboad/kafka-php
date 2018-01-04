@@ -1,11 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Heartbeat;
+use PHPUnit\Framework\TestCase;
 
-final class HeartbeatTest extends \PHPUnit\Framework\TestCase
+final class HeartbeatTest extends TestCase
 {
+    /**
+     * @var Heartbeat
+     */
     private $heart;
 
     public function setUp(): void
@@ -42,9 +47,7 @@ final class HeartbeatTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGenerationId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->heart->encode($data);
     }
@@ -67,13 +70,12 @@ final class HeartbeatTest extends \PHPUnit\Framework\TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {
         $test     = $this->heart->decode(\hex2bin('0000'));
         $expected = '{"errorCode":0}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

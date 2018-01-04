@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\SyncGroup;
+use PHPUnit\Framework\TestCase;
 
-final class SyncGroupTest extends \PHPUnit\Framework\TestCase
+final class SyncGroupTest extends TestCase
 {
+    /**
+     * @var SyncGroup
+     */
     private $sync;
 
     public function setUp(): void
@@ -14,7 +20,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
 
     public function testEncode(): void
     {
-        $data = json_decode(
+        $data = \json_decode(
             '{"group_id":"test","generation_id":1,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","data":[{"version":0,"member_id":"kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c","assignments":[{"topic_name":"test","partitions":[0]}]}]}',
             true
         );
@@ -39,9 +45,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoGenerationId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->sync->encode($data);
     }
@@ -69,7 +73,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
-            'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c'
+            'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
         ];
 
         $this->sync->encode($data);
@@ -86,9 +90,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => [
-                [
-
-                ],
+                [],
             ],
         ];
 
@@ -106,9 +108,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
             'generation_id' => '1',
             'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
             'data' => [
-                [
-                    'version' => 0
-                ],
+                ['version' => 0],
             ],
         ];
 
@@ -152,7 +152,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
                     'assignments' => [
                         [],
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -175,10 +175,8 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
                     'version' => 0 ,
                     'member_id' => 'kafka-php-bd5d5bb2-2a1f-43d4-b831-b1510d81ac5c',
                     'assignments' => [
-                        [
-                            'topic_name' => 'test',
-                        ],
-                    ]
+                        ['topic_name' => 'test'],
+                    ],
                 ],
             ],
         ];
@@ -191,7 +189,7 @@ final class SyncGroupTest extends \PHPUnit\Framework\TestCase
         $data     = '000000000018000000000001000474657374000000010000000000000000';
         $expected = '{"errorCode":0,"partitionAssignments":[{"topicName":"test","partitions":[0]}],"version":0,"userData":""}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sync->decode(\hex2bin($data))));
-        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($this->sync->decode(\hex2bin('000000000000'))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->sync->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', \json_encode($this->sync->decode(\hex2bin('000000000000'))));
     }
 }

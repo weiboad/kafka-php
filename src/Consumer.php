@@ -1,14 +1,17 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Amp\Loop;
 use Kafka\Consumer\Process;
 use Kafka\Consumer\StopStrategy;
+use Psr\Log\LoggerAwareTrait;
 
 class Consumer
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var StopStrategy|null
@@ -30,9 +33,7 @@ class Consumer
      *
      * @access public
      *
-     * @param callable|null $consumer
      *
-     * @return void
      */
     public function start(?callable $consumer = null): void
     {

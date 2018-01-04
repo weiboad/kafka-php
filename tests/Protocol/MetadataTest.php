@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Metadata;
+use PHPUnit\Framework\TestCase;
 
-final class MetadataTest extends \PHPUnit\Framework\TestCase
+final class MetadataTest extends TestCase
 {
+    /**
+     * @var Metadata
+     */
     private $meta;
 
     public function setUp(): void
@@ -42,6 +48,6 @@ final class MetadataTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->meta->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

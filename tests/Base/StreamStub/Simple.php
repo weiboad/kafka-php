@@ -1,64 +1,88 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Base\StreamStub;
+
+use PHPUnit\Framework\MockObject\MockObject;
 
 class Simple
 {
-    
-    public $context = null;
+    /**
+     * @var resource
+     */
+    public $context;
 
-    protected static $mock = null;
+    /**
+     * @var Stream|MockObject
+     */
+    protected static $mock;
 
-    public function stream_open($path, $mode, $options, &$opened_path)
+    public function stream_open(string $path, string $mode, int $options): bool
     {
         if (self::$mock !== null) {
-            self::$mock->context(stream_context_get_options($this->context));
+            self::$mock->context(\stream_context_get_options($this->context));
+
             return self::$mock->open($path, $mode, $options);
         }
+
         return true;
     }
 
-    public function stream_eof()
+    public function stream_eof(): bool
     {
         if (self::$mock !== null) {
-            return self::$mock->eof();
+            return self::$mock->eof() ?? false;
         }
+
         return false;
     }
 
-    public function stream_read($len)
+    public function stream_read(int $length): string
     {
         if (self::$mock !== null) {
-            return self::$mock->read($len);
+            return self::$mock->read($length) ?? '';
         }
+
+        return '';
+    }
+
+    public function stream_write(string $data): int
+    {
+        if (self::$mock !== null) {
+            return self::$mock->write($data) ?? 0;
+        }
+
+        return 1;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function stream_metadata(string $path, string $option, $value): bool
+    {
+        if (self::$mock !== null) {
+            return self::$mock->metadata($path, $option, $value);
+        }
+
         return true;
     }
 
-    public function stream_write($data)
+    /**
+     * @param mixed ...$options
+     */
+    public function stream_set_option(...$options): bool
     {
         if (self::$mock !== null) {
-            return self::$mock->write($data);
+            return self::$mock->option(...$options);
         }
+
         return true;
     }
 
-    public function stream_metadata($path, $option, $var)
-    {
-        if (self::$mock !== null) {
-            return self::$mock->metadata($path, $option, $var);
-        }
-        return true;
-    }
-
-    public function stream_set_option($option, $arg1, $arg2)
-    {
-        if (self::$mock !== null) {
-            return self::$mock->option($option, $arg1, $arg2);
-        }
-        return true;
-    }
-
-    
-    public static function setMock($mock)
+    /**
+     * @param Stream|MockObject $mock
+     */
+    public static function setMock(Stream $mock): void
     {
         self::$mock = $mock;
     }

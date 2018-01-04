@@ -1,30 +1,34 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Sasl;
 
+use GSSAPIContext;
 use Kafka\CommonSocket;
-use Kafka\SaslMechanism;
 use Kafka\Exception;
-use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
+use KRB5CCache;
 
 class Gssapi extends Mechanism
 {
-    private const MECHANISM_NAME = "GSSAPI";
-
-    private $principal;
-
-    private $gssapi;
-    
-    private static $ccache;
+    private const MECHANISM_NAME = 'GSSAPI';
 
     /**
-     *
-     * __construct
-     *
-     * @access public
-     * @return void
+     * @var string
      */
-    public function __construct(\GSSAPIContext $gssapi, string $principal)
+    private $principal;
+
+    /**
+     * @var GSSAPIContext
+     */
+    private $gssapi;
+
+    /**
+     * @var KRB5CCache
+     */
+    private static $ccache;
+
+    public function __construct(GSSAPIContext $gssapi, string $principal)
     {
         $this->gssapi    = $gssapi;
         $this->principal = $principal;
@@ -32,45 +36,46 @@ class Gssapi extends Mechanism
 
     public static function fromKeytab(string $keytab, string $principal): self
     {
-        if (! extension_loaded('krb5')) {
+        if (! \extension_loaded('krb5')) {
             throw new Exception('Extension "krb5" is required for "GSSAPI" authentication');
         }
 
-        if (! file_exists($keytab) || ! is_file($keytab)) {
+        if (! \file_exists($keytab) || ! \is_file($keytab)) {
             throw new Exception('Invalid keytab, keytab file not exists.');
         }
 
-        if (! is_readable($keytab)) {
+        if (! \is_readable($keytab)) {
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
-        
-        self::$ccache = new \KRB5CCache();
+
+        self::$ccache = new KRB5CCache();
         self::$ccache->initKeytab($principal, $keytab);
 
-        $gssapi = new \GSSAPIContext();
+        $gssapi = new GSSAPIContext();
         $gssapi->acquireCredentials(self::$ccache, $principal, \GSS_C_INITIATE);
         return new self($gssapi, $principal);
     }
 
     /**
-     *
-     * sasl authenticate
-     *
-     * @access protected
-     * @return void
+     * @throws \Kafka\Exception\NotSupported
+     * @throws \Kafka\Exception
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket): void
     {
         $token = $this->initSecurityContext();
 
         // send token to server and get server token
         $data = ProtocolTool::encodeString($token, ProtocolTool::PACK_INT32);
         $socket->writeBlocking($data);
+
         $dataLen = ProtocolTool::unpack(ProtocolTool::BIT_B32, $socket->readBlocking(4));
-        $stoken  = $socket->readBlocking($dataLen);
-        // warp message use server token and send to server authenticate
-        $outputMessage = $this->wrapToken($stoken);
-        $data          = \Kafka\Protocol\Protocol::encodeString($outputMessage, \Kafka\Protocol\Protocol::PACK_INT32);
+
+        // wrap message use server token and send to server authenticate
+        $data = ProtocolTool::encodeString(
+            $this->wrapToken($socket->readBlocking($dataLen)),
+            ProtocolTool::PACK_INT32
+        );
+
         $socket->writeBlocking($data);
     }
 
@@ -79,14 +84,13 @@ class Gssapi extends Mechanism
      * get sasl authenticate mechanism name
      *
      * @access public
-     * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return self::MECHANISM_NAME;
     }
 
-    private function initSecurityContext() : string
+    private function initSecurityContext(): string
     {
         $token = '';
         $ret   = $this->gssapi->initSecContext($this->principal, null, null, null, $token);
@@ -95,8 +99,8 @@ class Gssapi extends Mechanism
         }
         return $token;
     }
-    
-    private function wrapToken(string $token) : string
+
+    private function wrapToken(string $token): string
     {
         $message = '';
         $this->gssapi->wrap($token, $message);

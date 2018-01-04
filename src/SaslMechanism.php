@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 interface SaslMechanism
@@ -8,7 +10,6 @@ interface SaslMechanism
      * sasl authenticate
      *
      * @access public
-     * @return void
      */
-    public function authenticate(CommonSocket $socket) : void;
+    public function authenticate(CommonSocket $socket): void;
 }

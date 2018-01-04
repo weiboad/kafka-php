@@ -1,14 +1,24 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+
 class Metadata extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         foreach ($payloads as $topic) {
             if (! \is_string($topic)) {
-                throw new \Kafka\Exception\Protocol('request metadata topic array have invalid value. ');
+                throw new ProtocolException('request metadata topic array have invalid value. ');
             }
         }
 
@@ -19,13 +29,15 @@ class Metadata extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset       = 0;
-        $version      = $this->getApiVersion(self::METADATA_REQUEST);
-        $brokerRet    = $this->decodeArray(substr($data, $offset), [$this, 'metaBroker'], $version);
+        $brokerRet    = $this->decodeArray(\substr($data, $offset), [$this, 'metaBroker']);
         $offset      += $brokerRet['length'];
-        $topicMetaRet = $this->decodeArray(substr($data, $offset), [$this, 'metaTopicMetaData'], $version);
+        $topicMetaRet = $this->decodeArray(\substr($data, $offset), [$this, 'metaTopicMetaData']);
         $offset      += $topicMetaRet['length'];
 
         $result = [
@@ -36,14 +48,17 @@ class Metadata extends Protocol
         return $result;
     }
 
-    protected function metaBroker(string $data, string $version): array
+    /**
+     * @return mixed[]
+     */
+    protected function metaBroker(string $data): array
     {
         $offset       = 0;
-        $nodeId       = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $nodeId       = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset      += 4;
-        $hostNameInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $hostNameInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
         $offset      += $hostNameInfo['length'];
-        $port         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $port         = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset      += 4;
 
         return [
@@ -56,14 +71,17 @@ class Metadata extends Protocol
         ];
     }
 
-    protected function metaTopicMetaData(string $data, string $version): array
+    /**
+     * @return mixed[]
+     */
+    protected function metaTopicMetaData(string $data): array
     {
         $offset         = 0;
-        $topicErrCode   = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $topicErrCode   = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset        += 2;
-        $topicInfo      = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $topicInfo      = $this->decodeString(\substr($data, $offset), self::BIT_B16);
         $offset        += $topicInfo['length'];
-        $partitionsMeta = $this->decodeArray(substr($data, $offset), [$this, 'metaPartitionMetaData'], $version);
+        $partitionsMeta = $this->decodeArray(\substr($data, $offset), [$this, 'metaPartitionMetaData']);
         $offset        += $partitionsMeta['length'];
 
         return [
@@ -76,18 +94,21 @@ class Metadata extends Protocol
         ];
     }
 
-    protected function metaPartitionMetaData(string $data, string $version): array
+    /**
+     * @return mixed[]
+     */
+    protected function metaPartitionMetaData(string $data): array
     {
         $offset   = 0;
-        $errcode  = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errcode  = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset  += 2;
-        $partId   = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $partId   = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset  += 4;
-        $leader   = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $leader   = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset  += 4;
-        $replicas = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $replicas = $this->decodePrimitiveArray(\substr($data, $offset), self::BIT_B32);
         $offset  += $replicas['length'];
-        $isr      = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
+        $isr      = $this->decodePrimitiveArray(\substr($data, $offset), self::BIT_B32);
         $offset  += $isr['length'];
 
         return [

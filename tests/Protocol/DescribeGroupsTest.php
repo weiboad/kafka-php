@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\DescribeGroups;
+use PHPUnit\Framework\TestCase;
 
-final class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
+final class DescribeGroupsTest extends TestCase
 {
+    /**
+     * @var DescribeGroups
+     */
     private $describe;
 
     public function setUp(): void
@@ -34,6 +40,6 @@ final class DescribeGroupsTest extends \PHPUnit\Framework\TestCase
         $expected = '[{"errorCode":0,"groupId":"test","state":"Stable","protocolType":"consumer","protocol":"group","members":[{"memberId":"kafka-php-4da393fb-37cf-42cc-90dd-7bf6ba31fd30","clientId":"kafka-php","clientHost":"\/127.0.0.1","metadata":{"version":0,"topics":["test"],"userData":""},"assignment":{"version":0,"partitions":[{"topicName":"test","partitions":[0]}],"userData":""}}]}]';
 
         $test = $this->describe->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

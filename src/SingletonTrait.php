@@ -1,13 +1,23 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
+
+use Psr\Log\LoggerAwareTrait;
 
 trait SingletonTrait
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
+    /**
+     * @var object
+     */
     protected static $instance;
 
+    /**
+     * @return object
+     */
     public static function getInstance()
     {
         if (self::$instance === null) {

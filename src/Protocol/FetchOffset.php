@@ -1,17 +1,27 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Protocol;
 
+use Kafka\Exception\NotSupported;
+use Kafka\Exception\Protocol as ProtocolException;
+
 class FetchOffset extends Protocol
 {
+    /**
+     * @param mixed[] $payloads
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     public function encode(array $payloads = []): string
     {
         if (! isset($payloads['data'])) {
-            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `data` is undefined.');
+            throw new ProtocolException('given fetch offset data invalid. `data` is undefined.');
         }
 
         if (! isset($payloads['group_id'])) {
-            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `group_id` is undefined.');
+            throw new ProtocolException('given fetch offset data invalid. `group_id` is undefined.');
         }
 
         $header = $this->requestHeader('kafka-php', self::OFFSET_FETCH_REQUEST, self::OFFSET_FETCH_REQUEST);
@@ -22,11 +32,13 @@ class FetchOffset extends Protocol
         return $data;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function decode(string $data): array
     {
         $offset  = 0;
-        $version = $this->getApiVersion(self::OFFSET_REQUEST);
-        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'offsetTopic'], $version);
+        $topics  = $this->decodeArray(\substr($data, $offset), [$this, 'offsetTopic']);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -37,14 +49,20 @@ class FetchOffset extends Protocol
         return self::pack(self::BIT_B32, (string) $values);
     }
 
+    /**
+     * @param mixed[] $values
+     *
+     * @throws NotSupported
+     * @throws ProtocolException
+     */
     protected function encodeOffsetTopic(array $values): string
     {
         if (! isset($values['topic_name'])) {
-            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `topic_name` is undefined.');
+            throw new ProtocolException('given fetch offset data invalid. `topic_name` is undefined.');
         }
 
         if (! isset($values['partitions']) || empty($values['partitions'])) {
-            throw new \Kafka\Exception\Protocol('given fetch offset data invalid. `partitions` is undefined.');
+            throw new ProtocolException('given fetch offset data invalid. `partitions` is undefined.');
         }
 
         $topic      = self::encodeString($values['topic_name'], self::PACK_INT16);
@@ -53,13 +71,17 @@ class FetchOffset extends Protocol
         return $topic . $partitions;
     }
 
-    protected function offsetTopic(string $data, string $version): array
+    /**
+     * @return mixed[]
+     * @throws ProtocolException
+     */
+    protected function offsetTopic(string $data): array
     {
         $offset    = 0;
-        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $topicInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'offsetPartition'], $version);
+        $partitions = $this->decodeArray(\substr($data, $offset), [$this, 'offsetPartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -71,19 +93,23 @@ class FetchOffset extends Protocol
         ];
     }
 
-    protected function offsetPartition(string $data, string $version): array
+    /**
+     * @return mixed[]
+     * @throws ProtocolException
+     */
+    protected function offsetPartition(string $data): array
     {
         $offset = 0;
 
-        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
+        $partitionId = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
         $offset     += 4;
 
-        $roffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
+        $roffset = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
         $offset += 8;
 
-        $metadata  = $this->decodeString(substr($data, $offset), self::BIT_B16);
+        $metadata  = $this->decodeString(\substr($data, $offset), self::BIT_B16);
         $offset   += $metadata['length'];
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
         $offset   += 2;
 
         return [

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kafka\Sasl;
 
@@ -7,7 +8,7 @@ use Kafka\Protocol\Protocol;
 
 class Plain extends Mechanism
 {
-    private const MECHANISM_NAME = "PLAIN";
+    private const MECHANISM_NAME = 'PLAIN';
 
     /**
      * @var string
@@ -22,11 +23,11 @@ class Plain extends Mechanism
 
     public function __construct(string $username, string $password)
     {
-        $this->username = trim($username);
-        $this->password = trim($password);
+        $this->username = \trim($username);
+        $this->password = \trim($password);
     }
 
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket): void
     {
         $split = Protocol::pack(Protocol::BIT_B8, '0');
 
@@ -39,7 +40,7 @@ class Plain extends Mechanism
         $socket->readBlocking(4);
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return self::MECHANISM_NAME;
     }

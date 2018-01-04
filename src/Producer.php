@@ -1,14 +1,17 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Amp\Loop;
 use Kafka\Producer\Process;
 use Kafka\Producer\SyncProcess;
+use Psr\Log\LoggerAwareTrait;
 
 class Producer
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var Process|SyncProcess
@@ -21,7 +24,11 @@ class Producer
     }
 
     /**
-     * @param array|bool $data
+     * @param mixed[]|bool $data
+     *
+     * @return mixed[]|null
+     *
+     * @throws \Kafka\Exception
      */
     public function send($data = true): ?array
     {
@@ -38,6 +45,13 @@ class Producer
         return null;
     }
 
+    /**
+     * @param mixed[] $data
+     *
+     * @return mixed[]
+     *
+     * @throws \Kafka\Exception
+     */
     private function sendSynchronously(array $data): array
     {
         if (! $this->process instanceof SyncProcess) {
@@ -47,6 +61,9 @@ class Producer
         return $this->process->send($data);
     }
 
+    /**
+     * @throws \Kafka\Exception
+     */
     private function sendAsynchronously(bool $startLoop): void
     {
         if ($this->process instanceof SyncProcess) {

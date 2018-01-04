@@ -1,11 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\SaslHandShake;
+use PHPUnit\Framework\TestCase;
 
-final class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
+final class SaslHandShakeTest extends TestCase
 {
+    /**
+     * @var SaslHandShake
+     */
     private $sasl;
 
     public function setUp(): void
@@ -42,13 +47,12 @@ final class SaslHandShakeTest extends \PHPUnit\Framework\TestCase
      * testDecode
      *
      * @access public
-     * @return void
      */
     public function testDecode(): void
     {
         $data     = '0022000000010006475353415049';
         $expected = '{"mechanisms":["GSSAPI"],"errorCode":34}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sasl->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->sasl->decode(\hex2bin($data))));
     }
 }

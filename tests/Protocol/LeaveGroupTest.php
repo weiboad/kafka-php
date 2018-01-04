@@ -1,11 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\LeaveGroup;
+use PHPUnit\Framework\TestCase;
 
-final class LeaveGroupTest extends \PHPUnit\Framework\TestCase
+final class LeaveGroupTest extends TestCase
 {
+    /**
+     * @var LeaveGroup
+     */
     private $leave;
 
     public function setUp(): void
@@ -41,9 +46,7 @@ final class LeaveGroupTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoMemberId(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->leave->encode($data);
     }
@@ -53,6 +56,6 @@ final class LeaveGroupTest extends \PHPUnit\Framework\TestCase
         $test     = $this->leave->decode(\hex2bin('0000'));
         $expected = '{"errorCode":0}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

@@ -1,15 +1,20 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka\Producer;
 
 use Amp\Loop;
 use Kafka\Broker;
+use Kafka\Exception;
+use Kafka\LoggerTrait;
 use Kafka\ProducerConfig;
 use Kafka\Protocol;
+use Psr\Log\LoggerAwareTrait;
 
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     /**
      * @var callable|null
@@ -43,18 +48,15 @@ class Process
 
     public function init(): void
     {
-        // init protocol
-        $config = ProducerConfig::getInstance();
+        $config = $this->getConfig();
         Protocol::init($config->getBrokerVersion(), $this->logger);
 
-        // init process request
-        $broker = Broker::getInstance();
+        $broker = $this->getBroker();
         $broker->setConfig($config);
-        $broker->setProcess(function (string $data, $fd): void {
+        $broker->setProcess(function (string $data, int $fd): void {
             $this->processRequest($data, $fd);
         });
 
-        // init state
         $this->state = State::getInstance();
 
         if ($this->logger) {
@@ -80,7 +82,7 @@ class Process
         $this->init();
         $this->state->start();
 
-        $config = ProducerConfig::getInstance();
+        $config = $this->getConfig();
 
         if ($config->getIsAsyn()) {
             return;
@@ -114,6 +116,9 @@ class Process
         $this->error = $error;
     }
 
+    /**
+     * @throws \Kafka\Exception
+     */
     public function syncMeta(): void
     {
         $this->debug('Start sync metadata request');
@@ -121,31 +126,33 @@ class Process
         $brokerList = ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
 
-        foreach (explode(',', $brokerList) as $key => $val) {
-            if (trim($val)) {
+        foreach (\explode(',', $brokerList) as $key => $val) {
+            if (\trim($val)) {
                 $brokerHost[] = $val;
             }
         }
 
-        if (count($brokerHost) == 0) {
-            throw new \Kafka\Exception('No valid broker configured');
+        if (\count($brokerHost) === 0) {
+            throw new Exception('No valid broker configured');
         }
 
-        shuffle($brokerHost);
-        $broker = Broker::getInstance();
+        \shuffle($brokerHost);
+        $broker = $this->getBroker();
+
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host);
-            if ($socket) {
+
+            if ($socket !== null) {
                 $params = [];
-                $this->debug('Start sync metadata request params:' . json_encode($params));
+                $this->debug('Start sync metadata request params:' . \json_encode($params));
                 $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
                 return;
             }
         }
 
-        throw new \Kafka\Exception(
-            sprintf(
+        throw new Exception(
+            \sprintf(
                 'It was not possible to establish a connection for metadata with the brokers "%s"',
                 $brokerList
             )
@@ -154,13 +161,15 @@ class Process
 
     /**
      * process Request
+     *
+     * @throws \Kafka\Exception
      */
-    protected function processRequest(string $data, $fd): void
+    protected function processRequest(string $data, int $fd): void
     {
-        $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+        $correlationId = Protocol\Protocol::unpack(Protocol\Protocol::BIT_B32, \substr($data, 0, 4));
         switch ($correlationId) {
             case Protocol::METADATA_REQUEST:
-                $result = Protocol::decode(Protocol::METADATA_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::METADATA_REQUEST, \substr($data, 4));
 
                 if (! isset($result['brokers'], $result['topics'])) {
                     $this->error('Get metadata is fail, brokers or topics is null.');
@@ -168,13 +177,13 @@ class Process
                     break;
                 }
 
-                $broker   = Broker::getInstance();
+                $broker   = $this->getBroker();
                 $isChange = $broker->setData($result['topics'], $result['brokers']);
                 $this->state->succRun(State::REQUEST_METADATA, $isChange);
 
                 break;
             case Protocol::PRODUCE_REQUEST:
-                $result = Protocol::decode(Protocol::PRODUCE_REQUEST, substr($data, 4));
+                $result = Protocol::decode(Protocol::PRODUCE_REQUEST, \substr($data, 4));
                 $this->succProduce($result, $fd);
                 break;
             default:
@@ -182,13 +191,18 @@ class Process
         }
     }
 
+    /**
+     * @return int[]
+     */
     public function produce(): array
     {
-        $context     = [];
-        $broker      = Broker::getInstance();
-        $requiredAck = ProducerConfig::getInstance()->getRequiredAck();
-        $timeout     = ProducerConfig::getInstance()->getTimeout();
-        $compression = ProducerConfig::getInstance()->getCompression();
+        $context = [];
+        $broker  = $this->getBroker();
+        $config  = $this->getConfig();
+
+        $requiredAck = $config->getRequiredAck();
+        $timeout     = $config->getTimeout();
+        $compression = $config->getCompression();
 
         // get send message
         // data struct
@@ -205,9 +219,9 @@ class Process
         $sendData = $this->convertMessage($data);
 
         foreach ($sendData as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect($brokerId);
+            $connect = $broker->getDataConnect((string) $brokerId);
 
-            if (! $connect) {
+            if ($connect === null) {
                 return $context;
             }
 
@@ -218,7 +232,7 @@ class Process
                 'compression'  => $compression,
             ];
 
-            $this->debug("Send message start, params:" . json_encode($params));
+            $this->debug('Send message start, params:' . \json_encode($params));
             $requestData = Protocol::encode(Protocol::PRODUCE_REQUEST, $params);
 
             if ($requiredAck === 0) { // If it is 0 the server will not send any response
@@ -232,9 +246,12 @@ class Process
         return $context;
     }
 
-    protected function succProduce($result, $fd)
+    /**
+     * @param mixed[] $result
+     */
+    protected function succProduce(array $result, int $fd): void
     {
-        $msg = sprintf('Send message sucess, result: %s', json_encode($result));
+        $msg = \sprintf('Send message sucess, result: %s', \json_encode($result));
         $this->debug($msg);
 
         if ($this->success !== null) {
@@ -244,7 +261,7 @@ class Process
         $this->state->succRun(State::REQUEST_PRODUCE, $fd);
     }
 
-    protected function stateConvert($errorCode, $context = null)
+    protected function stateConvert(int $errorCode): bool
     {
         $this->error(Protocol::getError($errorCode));
 
@@ -276,14 +293,19 @@ class Process
         return true;
     }
 
+    /**
+     * @param mixed[] $data
+     *
+     * @return mixed[]
+     */
     protected function convertMessage(array $data): array
     {
         $sendData  = [];
-        $broker    = Broker::getInstance();
+        $broker    = $this->getBroker();
         $topicInfo = $broker->getTopics();
 
         foreach ($data as $value) {
-            if (! isset($value['topic']) || ! trim($value['topic'])) {
+            if (! isset($value['topic']) || ! \trim($value['topic'])) {
                 continue;
             }
 
@@ -291,13 +313,13 @@ class Process
                 continue;
             }
 
-            if (! isset($value['value']) || ! trim($value['value'])) {
+            if (! isset($value['value']) || ! \trim($value['value'])) {
                 continue;
             }
 
             $topicMeta = $topicInfo[$value['topic']];
-            $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
+            $partNums  = \array_keys($topicMeta);
+            \shuffle($partNums);
 
             $partId = ! isset($value['partId'], $topicMeta[$value['partId']]) ? $partNums[0] : $value['partId'];
 
@@ -313,7 +335,7 @@ class Process
             }
 
             $partition['partition_id'] = $partId;
-            if (trim($value['key'] ?? '') !== '') {
+            if (\trim($value['key'] ?? '') !== '') {
                 $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
             } else {
                 $partition['messages'][] = $value['value'];
@@ -325,5 +347,15 @@ class Process
         }
 
         return $sendData;
+    }
+
+    private function getConfig(): ProducerConfig
+    {
+        return ProducerConfig::getInstance();
+    }
+
+    private function getBroker(): Broker
+    {
+        return Broker::getInstance();
     }
 }

@@ -1,15 +1,21 @@
 <?php
+declare(strict_types=1);
+
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
-use Monolog\Logger;
+
+use Amp\Loop;
+use Kafka\Producer;
+use Kafka\ProducerConfig;
 use Monolog\Handler\StdoutHandler;
+use Monolog\Logger;
 
 // Create the logger
 $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$config = \Kafka\ProducerConfig::getInstance();
+$config = ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(1000);
 $config->setMetadataBrokerList('127.0.0.1:9092');
 $config->setBrokerVersion('1.0.0');
@@ -19,13 +25,23 @@ $config->setProduceInterval(500);
 
 class Message
 {
+    /**
+     * @var string[]
+     */
     private $message;
 
-    public function getMessage()
+    /**
+     * @return string[]
+     */
+    public function getMessage(): array
     {
         return $this->message;
     }
-    public function setMessage($message)
+
+    /**
+     * @param string[] $message
+     */
+    public function setMessage(array $message): void
     {
         $this->message = $message;
     }
@@ -33,7 +49,7 @@ class Message
 
 // control message send interval time
 $message = new Message;
-\Amp\Loop::repeat(3000, function () use ($message) {
+Loop::repeat(3000, function () use ($message): void {
     $message->setMessage([
         [
             'topic' => 'test',
@@ -43,16 +59,16 @@ $message = new Message;
     ]);
 });
 
-$producer = new \Kafka\Producer(function () use ($message) {
+$producer = new Producer(function () use ($message) {
     $tmp = $message->getMessage();
     $message->setMessage([]);
     return $tmp;
 });
 $producer->setLogger($logger);
-$producer->success(function ($result) {
+$producer->success(function ($result): void {
     var_dump($result);
 });
-$producer->error(function ($errorCode, $context) {
+$producer->error(function ($errorCode, $context): void {
     var_dump($errorCode);
 });
 $producer->send();

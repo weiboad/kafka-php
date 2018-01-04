@@ -1,15 +1,20 @@
 <?php
+declare(strict_types=1);
+
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
-use Monolog\Logger;
+
+use Kafka\Producer;
+use Kafka\ProducerConfig;
 use Monolog\Handler\StdoutHandler;
+use Monolog\Logger;
 
 // Create the logger
 $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$config = \Kafka\ProducerConfig::getInstance();
+$config = ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('127.0.0.1:9093');
 $config->setBrokerVersion('0.10.2.1');
@@ -24,7 +29,7 @@ $config->setProduceInterval(500);
 //$config->setSslPassphrase('123456');
 //$config->setSslPeerName('nmred');
 
-$producer = new \Kafka\Producer();
+$producer = new Producer();
 $producer->setLogger($logger);
 
 for ($i = 0; $i < 100; $i++) {

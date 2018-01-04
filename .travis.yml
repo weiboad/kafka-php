@@ -51,7 +51,7 @@ jobs:
       script:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
-        - ./vendor/bin/infection --min-msi=50 --min-covered-msi=83 --threads=4
+        - ./vendor/bin/infection --min-msi=49 --min-covered-msi=82 --threads=4
 
     - stage: Functional tests
       services:

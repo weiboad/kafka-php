@@ -1,19 +1,23 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Base\Sasl;
 
-class PlainTest extends \PHPUnit\Framework\TestCase
-{
+use Kafka\Sasl\Plain;
+use Kafka\Socket;
+use PHPUnit\Framework\TestCase;
 
+class PlainTest extends TestCase
+{
     /**
      * testHandShake
      *
      * @access public
-     * @return void
      */
-    public function testHandShake()
+    public function testHandShake(): void
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(Socket::class);
 
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.
@@ -26,7 +30,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo(\hex2bin('0000000d006e6d72656400313233343536'))]
             );
 
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
+        $provider = new Plain('nmred', '123456');
         $provider->authenticate($socket);
     }
 
@@ -36,9 +40,8 @@ class PlainTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Kafka\Exception
      * @expectedExceptionMessage The broker does not support the requested SASL mechanism.
      * @access public
-     * @return void
      */
-    public function testHandShakeNotSupport()
+    public function testHandShakeNotSupport(): void
     {
         // Create a stub for the SomeClass class.
         $socket = $this->createMock(\Kafka\Socket::class);
@@ -61,9 +64,8 @@ class PlainTest extends \PHPUnit\Framework\TestCase
      * testGetMechanismName
      *
      * @access public
-     * @return void
      */
-    public function testGetMechanismName()
+    public function testGetMechanismName(): void
     {
         $provider = new \Kafka\Sasl\Plain('nmred', '123456');
         $this->assertSame('PLAIN', $provider->getName());

@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Fetch;
+use PHPUnit\Framework\TestCase;
 
-final class FetchTest extends \PHPUnit\Framework\TestCase
+final class FetchTest extends TestCase
 {
+    /**
+     * @var Fetch
+     */
     private $fetch;
 
     public function setUp(): void
@@ -26,7 +32,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
                             'partition_id' => 0,
                             'offset' => 45,
                             'max_bytes' => 128,
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -57,9 +63,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition_id' => 0,
-                        ]
+                        ['partition_id' => 0],
                     ],
                 ],
             ],
@@ -94,9 +98,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -130,7 +132,7 @@ final class FetchTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->fetch->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 
     public function testDecodeCompressedMessage(): void

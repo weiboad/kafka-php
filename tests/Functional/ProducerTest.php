@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace KafkaTest\Functional;
 
+use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy\Callback;
+use Kafka\ConsumerConfig;
+use Kafka\ProducerConfig;
 use Kafka\Protocol\Protocol;
+use PHPUnit\Framework\TestCase;
 
-abstract class ProducerTest extends \PHPUnit\Framework\TestCase
+abstract class ProducerTest extends TestCase
 {
     private const MESSAGES_TO_SEND = 30;
 
@@ -35,10 +39,10 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
      */
     public function prepareEnvironment(): void
     {
-        $this->version  = getenv('KAFKA_VERSION');
-        $this->brokers  = getenv('KAFKA_BROKERS');
-        $this->topic    = getenv('KAFKA_TOPIC');
-        $this->compress = getenv('KAFKA_COMPRESS') === '1';
+        $this->version  = \getenv('KAFKA_VERSION');
+        $this->brokers  = \getenv('KAFKA_BROKERS');
+        $this->topic    = \getenv('KAFKA_TOPIC');
+        $this->compress = \getenv('KAFKA_COMPRESS') === '1';
 
         if (! $this->version || ! $this->brokers || ! $this->topic) {
             self::markTestSkipped(
@@ -49,7 +53,8 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     protected function configureProducer(): void
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        /** @var ProducerConfig $config */
+        $config = ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
 
@@ -70,7 +75,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $consumedMessages = 0;
         $executionEnd     = new \DateTimeImmutable('+1 minute');
 
-        $consumer = new \Kafka\Consumer(
+        $consumer = new Consumer(
             new Callback(
                 function () use (&$consumedMessages, $executionEnd): bool {
                     return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
@@ -79,7 +84,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         );
 
         $consumer->start(
-            function (string $topic, int $partition, array $message) use (&$consumedMessages) {
+            function (string $topic, int $partition, array $message) use (&$consumedMessages): void {
                 self::assertSame($this->topic, $topic);
                 self::assertLessThan(3, $partition);
                 self::assertArrayHasKey('offset', $message);
@@ -92,7 +97,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
                 self::assertArrayHasKey('value', $message['message']);
                 self::assertContains('msg-', $message['message']['value']);
 
-                if (version_compare($this->version, '0.10.0', '>=')) {
+                if (\version_compare($this->version, '0.10.0', '>=')) {
                     self::assertArrayHasKey('timestamp', $message['message']);
                     self::assertNotEquals(-1, $message['message']['timestamp']);
                 }
@@ -106,7 +111,8 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     private function configureConsumer(): void
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        /** @var ConsumerConfig $config */
+        $config = ConsumerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
         $config->setGroupId('kafka-php-tests');
@@ -114,6 +120,9 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $config->setTopics([$this->topic]);
     }
 
+    /**
+     * @return string[][]
+     */
     public function createMessages(int $amount = self::MESSAGES_TO_SEND): array
     {
         $messages = [];
@@ -121,7 +130,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         for ($i = 0; $i < $amount; ++$i) {
             $messages[] = [
                 'topic' => $this->topic,
-                'value' => 'msg-' . str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT)
+                'value' => 'msg-' . \str_pad((string) ($i + 1), 2, '0', \STR_PAD_LEFT),
             ];
         }
 

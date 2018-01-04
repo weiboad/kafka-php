@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Psr\Log\LoggerInterface;
@@ -151,7 +153,7 @@ class Protocol
         57 => 'The user-specified log directory is not found in the broker config.',
         58 => 'SASL Authentication failed.',
         59 => 'This exception is raised by the broker if it could not locate the producer metadata associated with the producerId in question',
-        60 => 'A partition reassignment is in progress'
+        60 => 'A partition reassignment is in progress',
     ];
 
     /**
@@ -159,7 +161,7 @@ class Protocol
      */
     protected static $objects = [];
 
-    public static function init(string $version, LoggerInterface $logger = null): void
+    public static function init(string $version, ?LoggerInterface $logger = null): void
     {
         $class = [
             Protocol\Protocol::PRODUCE_REQUEST           => Protocol\Produce::class,
@@ -189,18 +191,22 @@ class Protocol
     }
 
     /**
+     * @param mixed[] $payloads
+     *
      * @throws \Kafka\Exception
      */
     public static function encode(int $key, array $payloads): string
     {
         if (! isset(self::$objects[$key])) {
-            throw new \Kafka\Exception('Not support api key, key:' . $key);
+            throw new Exception('Not support api key, key:' . $key);
         }
 
         return self::$objects[$key]->encode($payloads);
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws \Kafka\Exception
      */
     public static function decode(int $key, string $data): array
@@ -212,9 +218,6 @@ class Protocol
         return self::$objects[$key]->decode($data);
     }
 
-    /**
-     * get error
-     */
     public static function getError(int $errCode): string
     {
         if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {

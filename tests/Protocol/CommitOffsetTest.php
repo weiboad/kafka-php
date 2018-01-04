@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\CommitOffset;
+use PHPUnit\Framework\TestCase;
 
-final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
+final class CommitOffsetTest extends TestCase
 {
+    /**
+     * @var CommitOffset
+     */
     private $commit;
 
     public function setUp(): void
@@ -27,9 +33,9 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                             'partition' => 0,
                             'offset' => 45,
                             'metadata' => '',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -50,9 +56,9 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                         [
                             'partition' => 0,
                             'offset' => 45,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -68,9 +74,7 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
      */
     public function testEncodeNoData(): void
     {
-        $data = [
-            'group_id' => 'test'
-        ];
+        $data = ['group_id' => 'test'];
 
         $this->commit->encode($data);
     }
@@ -82,7 +86,7 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
     public function testEncodeNoGroupId(): void
     {
         $data = [
-            'data' => []
+            'data' => [],
         ];
 
         $this->commit->encode($data);
@@ -97,7 +101,7 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                []
+                [],
             ],
         ];
 
@@ -113,9 +117,7 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $data = [
             'group_id' => 'test',
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ]
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -134,9 +136,9 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        []
-                    ]
-                ]
+                        [],
+                    ],
+                ],
             ],
         ];
 
@@ -155,11 +157,9 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition' => 0
-                        ]
-                    ]
-                ]
+                        ['partition' => 0],
+                    ],
+                ],
             ],
         ];
 
@@ -172,6 +172,6 @@ final class CommitOffsetTest extends \PHPUnit\Framework\TestCase
         $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0}]}]';
 
         $test = $this->commit->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Kafka;
 
 use Kafka\Protocol\Produce;
@@ -21,6 +23,9 @@ class ProducerConfig extends Config
         Produce::COMPRESSION_SNAPPY,
     ];
 
+    /**
+     * @var mixed[]
+     */
     protected static $defaults = [
         'requiredAck'     => 1,
         'timeout'         => 5000,
@@ -30,48 +35,56 @@ class ProducerConfig extends Config
         'compression'     => Protocol\Protocol::COMPRESSION_NONE,
     ];
 
-    public function setRequestTimeout($requestTimeout): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setRequestTimeout(int $requestTimeout): void
     {
-        if (! is_numeric($requestTimeout) || $requestTimeout < 1 || $requestTimeout > 900000) {
+        if ($requestTimeout < 1 || $requestTimeout > 900000) {
             throw new Exception\Config('Set request timeout value is invalid, must set it 1 .. 900000');
         }
 
         static::$options['requestTimeout'] = $requestTimeout;
     }
 
-    public function setProduceInterval($produceInterval): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setProduceInterval(int $produceInterval): void
     {
-        if (! is_numeric($produceInterval) || $produceInterval < 1 || $produceInterval > 900000) {
+        if ($produceInterval < 1 || $produceInterval > 900000) {
             throw new Exception\Config('Set produce interval timeout value is invalid, must set it 1 .. 900000');
         }
 
         static::$options['produceInterval'] = $produceInterval;
     }
 
-    public function setTimeout($timeout): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setTimeout(int $timeout): void
     {
-        if (! is_numeric($timeout) || $timeout < 1 || $timeout > 900000) {
+        if ($timeout < 1 || $timeout > 900000) {
             throw new Exception\Config('Set timeout value is invalid, must set it 1 .. 900000');
         }
 
         static::$options['timeout'] = $timeout;
     }
 
-    public function setRequiredAck($requiredAck): void
+    /**
+     * @throws \Kafka\Exception\Config
+     */
+    public function setRequiredAck(int $requiredAck): void
     {
-        if (! is_numeric($requiredAck) || $requiredAck < -1 || $requiredAck > 1000) {
+        if ($requiredAck < -1 || $requiredAck > 1000) {
             throw new Exception\Config('Set required ack value is invalid, must set it -1 .. 1000');
         }
 
         static::$options['requiredAck'] = $requiredAck;
     }
 
-    public function setIsAsyn($asyn): void
+    public function setIsAsyn(bool $asyn): void
     {
-        if (! is_bool($asyn)) {
-            throw new Exception\Config('Set isAsyn value is invalid, must set it bool value');
-        }
-
         static::$options['isAsyn'] = $asyn;
     }
 

@@ -1,13 +1,22 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Produce;
 use Lcobucci\Clock\FrozenClock;
+use PHPUnit\Framework\TestCase;
 
-final class ProduceTest extends \PHPUnit\Framework\TestCase
+final class ProduceTest extends TestCase
 {
+    /**
+     * @var Produce
+     */
     private $produce;
 
+    /**
+     * @var Produce
+     */
     private $produce10;
 
     public function setUp(): void
@@ -57,7 +66,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
                         [
                             'partition_id' => 0,
                             'messages' => [
-                                ['key' => 'testkey', 'value' => 'test...']
+                                ['key' => 'testkey', 'value' => 'test...'],
                             ],
                         ],
                     ],
@@ -81,7 +90,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
                     'partitions' => [
                         [
                             'partition_id' => 0,
-                            'messages' => 'test...'
+                            'messages' => 'test...',
                         ],
                     ],
                 ],
@@ -149,9 +158,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             'data' => [
-                [
-                    'topic_name' => 'test',
-                ],
+                ['topic_name' => 'test'],
             ],
         ];
 
@@ -191,9 +198,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
                 [
                     'topic_name' => 'test',
                     'partitions' => [
-                        [
-                            'partition_id' => 0,
-                        ],
+                        ['partition_id' => 0],
                     ],
                 ],
             ],
@@ -207,7 +212,7 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
         $data     = '0000000100047465737400000001000000000000000000000000002a00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":14,"timestamp":0}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce->decode(\hex2bin($data))));
     }
 
     public function testDecodeKafka10(): void
@@ -215,6 +220,6 @@ final class ProduceTest extends \PHPUnit\Framework\TestCase
         $data     = '0000000100047465737400000001000000000000000000000000006effffffffffffffff00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":22,"timestamp":-1}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce10->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce10->decode(\hex2bin($data))));
     }
 }

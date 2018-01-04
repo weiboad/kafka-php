@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\GroupCoordinator;
+use PHPUnit\Framework\TestCase;
 
-final class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
+final class GroupCoordinatorTest extends TestCase
 {
+    /**
+     * @var GroupCoordinator
+     */
     private $group;
 
     public function setUp(): void
@@ -14,9 +20,7 @@ final class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
 
     public function testEncode(): void
     {
-        $data = [
-            'group_id' => 'test',
-        ];
+        $data = ['group_id' => 'test'];
 
         $test = $this->group->encode($data);
         self::assertSame('00000019000a00000000000a00096b61666b612d706870000474657374', \bin2hex($test));
@@ -38,6 +42,6 @@ final class GroupCoordinatorTest extends \PHPUnit\Framework\TestCase
 
         $test = $this->group->decode(\hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
     }
 }
