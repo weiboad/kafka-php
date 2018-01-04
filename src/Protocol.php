@@ -182,7 +182,7 @@ class Protocol
         foreach ($class as $key => $className) {
             self::$objects[$key] = new $className($version);
 
-            if ($logger) {
+            if ($logger !== null) {
                 self::$objects[$key]->setLogger($logger);
             }
         }
@@ -214,13 +214,8 @@ class Protocol
 
     /**
      * get error
-     *
-     * @param integer $errCode
-     * @static
-     * @access public
-     * @return string
      */
-    public static function getError($errCode)
+    public static function getError(int $errCode): string
     {
         if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {
             return 'Unknown error (' . $errCode . ')';

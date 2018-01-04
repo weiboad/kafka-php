@@ -17,7 +17,6 @@ abstract class CommonSocket
      * Send timeout in seconds.
      *
      * @var float
-     * @access protected
      */
     protected $sendTimeoutSec = 0;
 
@@ -25,7 +24,6 @@ abstract class CommonSocket
      * Send timeout in microseconds.
      *
      * @var float
-     * @access protected
      */
     protected $sendTimeoutUsec = 100000;
 
@@ -33,7 +31,6 @@ abstract class CommonSocket
      * Recv timeout in seconds
      *
      * @var float
-     * @access protected
      */
     protected $recvTimeoutSec = 0;
 
@@ -41,161 +38,116 @@ abstract class CommonSocket
      * Recv timeout in microseconds
      *
      * @var float
-     * @access protected
      */
     protected $recvTimeoutUsec = 750000;
 
     /**
-     * Stream resource
-     *
-     * @var mixed
-     * @access protected
+     * @var resource
      */
-    protected $stream = null;
+    protected $stream;
 
     /**
-     * Socket host
-     *
-     * @var mixed
-     * @access protected
+     * @var string|null
      */
-    protected $host = null;
+    protected $host;
 
     /**
-     * Socket port
-     *
-     * @var mixed
-     * @access protected
+     * @var int
      */
     protected $port = -1;
 
     /**
-     * Max Write Attempts
      * @var int
-     * @access protected
      */
     protected $maxWriteAttempts = 3;
 
     /**
-     * Config socket connect params
-     * @var Object
-     * @access protected
+     * @var Config|null
      */
-    protected $config = null;
+    protected $config;
 
     /**
-     * Sasl provider
-     * @var SaslMechanism
-     * @access private
+     * @var SaslMechanism|null
      */
-    private $saslMechanismProvider = null;
+    private $saslProvider;
 
-    /**
-     * __construct
-     *
-     * @access public
-     * @param $host
-     * @param $port
-     * @param Object $config
-     */
     public function __construct(string $host, int $port, ?Config $config = null, ?SaslMechanism $saslProvider = null)
     {
-        $this->host                  = $host;
-        $this->port                  = $port;
-        $this->config                = $config;
-        $this->saslMechanismProvider = $saslProvider;
+        $this->host         = $host;
+        $this->port         = $port;
+        $this->config       = $config;
+        $this->saslProvider = $saslProvider;
     }
 
-    /**
-     * @param float $sendTimeoutSec
-     */
     public function setSendTimeoutSec(float $sendTimeoutSec) : void
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
 
-    /**
-     * @param float $sendTimeoutUsec
-     */
     public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
-    /**
-     * @param float $recvTimeoutSec
-     */
     public function setRecvTimeoutSec(float $recvTimeoutSec) : void
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
 
-
-    /**
-     * @param float $recvTimeoutUsec
-     */
     public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
 
-
-    /**
-     * @param int $number
-     */
     public function setMaxWriteAttempts(int $number) : void
     {
         $this->maxWriteAttempts = $number;
     }
 
     /**
-     * create the socket stream
-     *
-     * @access public
-     * @return void
+     * @throws Exception
      */
     protected function createStream() : void
     {
-        if (empty($this->host)) {
-            throw new \Kafka\Exception('Cannot open null host.');
+        if (trim($this->host) === '') {
+            throw new Exception('Cannot open null host.');
         }
+
         if ($this->port <= 0) {
-            throw new \Kafka\Exception('Cannot open without port.');
+            throw new Exception('Cannot open without port.');
         }
 
         $remoteSocket = sprintf('tcp://%s:%s', $this->host, $this->port);
+        $context      = stream_context_create([]);
 
-        $context = stream_context_create([]);
-        if ($this->config != null && $this->config->getSslEnable()) { // ssl connection
+        if ($this->config !== null && $this->config->getSslEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
-            $localCert    = $this->config->getSslLocalCert();
-            $localKey     = $this->config->getSslLocalPk();
-            $verifyPeer   = $this->config->getSslVerifyPeer();
-            $passphrase   = $this->config->getSslPassphrase();
-            $cafile       = $this->config->getSslCafile();
-            $peerName     = $this->config->getSslPeerName();
 
-            $context = stream_context_create(['ssl' => [
-                'local_cert' => $localCert,
-                'local_pk' => $localKey,
-                'verify_peer' => $verifyPeer,
-                'passphrase' => $passphrase,
-                'cafile' => $cafile,
-                'peer_name' => $peerName
-            ]]);
+            $context = stream_context_create(
+                [
+                    'ssl' => [
+                        'local_cert'  => $this->config->getSslLocalCert(),
+                        'local_pk'    => $this->config->getSslLocalPk(),
+                        'verify_peer' => $this->config->getSslVerifyPeer(),
+                        'passphrase'  => $this->config->getSslPassphrase(),
+                        'cafile'      => $this->config->getSslCafile(),
+                        'peer_name'   => $this->config->getSslPeerName(),
+                    ],
+                ]
+            );
         }
 
         $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
 
-        if ($this->stream == false) {
-            $error = 'Could not connect to '
-                    . $this->host . ':' . $this->port
-                    . ' (' . $errstr . ' [' . $errno . '])';
-            throw new \Kafka\Exception($error);
+        if ($this->stream === false) {
+            throw new Exception(
+                sprintf('Could not connect to %s:%d (%s [%d])', $this->host, $this->port, $errstr, $errno)
+            );
         }
+
         // SASL auth
-        if ($this->saslMechanismProvider !== null) {
-            $this->saslMechanismProvider->authenticate($this);
+        if ($this->saslProvider !== null) {
+            $this->saslProvider->authenticate($this);
         }
     }
 
@@ -206,7 +158,7 @@ abstract class CommonSocket
      *
      * @codeCoverageIgnore
      */
-    protected function createSocket($remoteSocket, $context, &$errno, &$errstr)
+    protected function createSocket(string $remoteSocket, $context, ?int &$errno, ?string &$errstr)
     {
         return stream_socket_client(
             $remoteSocket,
@@ -230,14 +182,15 @@ abstract class CommonSocket
      *
      * @codeCoverageIgnore
      */
-    protected function select($sockets, $timeoutSec, $timeoutUsec, $isRead = true)
+    protected function select(array $sockets, float $timeoutSec, float $timeoutUsec, bool $isRead = true)
     {
         $null = null;
+
         if ($isRead) {
             return @stream_select($sockets, $null, $null, $timeoutSec, $timeoutUsec);
-        } else {
-            return @stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
         }
+
+        return @stream_select($null, $sockets, $null, $timeoutSec, $timeoutUsec);
     }
 
     /**
@@ -247,7 +200,7 @@ abstract class CommonSocket
      *
      * @codeCoverageIgnore
      */
-    protected function getMetaData()
+    protected function getMetaData(): array
     {
         return stream_get_meta_data($this->stream);
     }
@@ -258,120 +211,122 @@ abstract class CommonSocket
      * This method will not wait for all the requested data, it will return as
      * soon as any data is received.
      *
-     * @param integer $len               Maximum number of bytes to read.
-     *
-     * @return string Binary data
-     * @throws \Kafka\Exception
+     * @throws Exception
      */
-    public function readBlocking(int $len) : string
+    public function readBlocking(int $length) : string
     {
-        if ($len > self::READ_MAX_LENGTH) {
-            throw new \Kafka\Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
+        if ($length > self::READ_MAX_LENGTH) {
+            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
         }
 
-        $null     = null;
-        $read     = [$this->stream];
-        $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
+
         if ($readable === false) {
             $this->close();
-            throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
+            throw new Exception('Could not read ' . $length . ' bytes from stream (not readable)');
         }
+
         if ($readable === 0) { // select timeout
             $res = $this->getMetaData();
             $this->close();
+
             if (! empty($res['timed_out'])) {
-                throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
-            } else {
-                throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
+                throw new Exception('Timed out reading ' . $length . ' bytes from stream');
             }
+
+            throw new Exception('Could not read ' . $length . ' bytes from stream (not readable)');
         }
 
-        $remainingBytes = $len;
+        $remainingBytes = $length;
         $data           = $chunk = '';
+
         while ($remainingBytes > 0) {
             $chunk = fread($this->stream, $remainingBytes);
+
             if ($chunk === false || strlen($chunk) === 0) {
                 // Zero bytes because of EOF?
                 if (feof($this->stream)) {
                     $this->close();
-                    throw new \Kafka\Exception('Unexpected EOF while reading ' . $len . ' bytes from stream (no data)');
+                    throw new Exception('Unexpected EOF while reading ' . $length . ' bytes from stream (no data)');
                 }
                 // Otherwise wait for bytes
-                $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+                $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
                 if ($readable !== 1) {
-                    throw new \Kafka\Exception('Timed out while reading ' . $len . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
+                    throw new Exception('Timed out while reading ' . $length . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
                 }
+
                 continue; // attempt another read
             }
+
             $data           .= $chunk;
             $remainingBytes -= strlen($chunk);
         }
+
         return $data;
     }
 
     /**
      * Write to the socket.
      *
-     * @param string $buf The data to write
-     *
-     * @return integer
-     * @throws \Kafka\Exception
+     * @throws Exception
      */
-    public function writeBlocking(string $buf) : int
+    public function writeBlocking(string $buffer) : int
     {
-        $write = [$this->stream];
-
-        $null = null;
         // fwrite to a socket may be partial, so loop until we
         // are done with the entire buffer
         $failedAttempts = 0;
         $bytesWritten   = 0;
-        $bytesToWrite   = strlen($buf);
+
+        $bytesToWrite = strlen($buffer);
+
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
-            $writable = $this->select($write, $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
+            $writable = $this->select([$this->stream], $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
+
             if (false === $writable) {
-                throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
+                throw new Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
+
             if (0 === $writable) {
                 $res = $this->getMetaData();
                 if (! empty($res['timed_out'])) {
-                    throw new \Kafka\Exception('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');
-                } else {
-                    throw new \Kafka\Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
+                    throw new Exception('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');
                 }
+
+                throw new Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
 
             if ($bytesToWrite - $bytesWritten > self::MAX_WRITE_BUFFER) {
                 // write max buffer size
-                $wrote = fwrite($this->stream, substr($buf, $bytesWritten, self::MAX_WRITE_BUFFER));
+                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten, self::MAX_WRITE_BUFFER));
             } else {
                 // write remaining buffer bytes to stream
-                $wrote = fwrite($this->stream, substr($buf, $bytesWritten));
+                $wrote = fwrite($this->stream, substr($buffer, $bytesWritten));
             }
 
             if ($wrote === -1 || $wrote === false) {
-                throw new \Kafka\Exception\Socket('Could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
-            } elseif ($wrote === 0) {
+                throw new Exception\Socket('Could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+            }
+
+            if ($wrote === 0) {
                 // Increment the number of times we have failed
                 $failedAttempts++;
+
                 if ($failedAttempts > $this->maxWriteAttempts) {
-                    throw new \Kafka\Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . strlen($buf) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
+                    throw new Exception\Socket('After ' . $failedAttempts . ' attempts could not write ' . strlen($buffer) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
                 }
             } else {
                 // If we wrote something, reset our failed attempt counter
                 $failedAttempts = 0;
             }
+
             $bytesWritten += $wrote;
         }
+
         return $bytesWritten;
     }
 
-    /**
-     * close the socket
-     *
-     * @access public
-     * @return void
-     */
     abstract public function close() : void;
+
+    abstract public function connect(): void;
 }

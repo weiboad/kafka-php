@@ -1,2 +1,7 @@
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    ignoreErrors:
+        - '#Call to an undefined method Kafka\\ConsumerConfig::(g|s)etValidKey\(\)#'

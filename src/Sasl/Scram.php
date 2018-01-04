@@ -2,12 +2,10 @@
 namespace Kafka\Sasl;
 
 use Kafka\CommonSocket;
-use Kafka\SaslMechanism;
 use Kafka\Exception;
-use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
 
-class Scram extends Mechanism implements SaslMechanism
+class Scram extends Mechanism
 {
     public const SCRAM_SHA_256 = 256;
     public const SCRAM_SHA_512 = 512;
@@ -19,43 +17,58 @@ class Scram extends Mechanism implements SaslMechanism
         self::SCRAM_SHA_512 => 'sha512',
     ];
 
+    /**
+     * @var int
+     */
     private $hashAlgorithm;
 
+    /**
+     * @var string
+     */
     private $username;
 
+    /**
+     * @var string
+     */
     private $password;
 
+    /**
+     * @var string
+     */
     private $cnonce;
 
+    /**
+     * @var string
+     */
     private $firstMessageBare;
 
+    /**
+     * @var string
+     */
     private $saltedPassword;
 
+    /**
+     * @var string
+     */
     private $authMessage;
 
     /**
-     *
-     * __construct
-     *
-     * @access public
-     * @return void
+     * @throws \Kafka\Exception
      */
     public function __construct(string $username, string $password, int $algorithm)
     {
         if (! isset(self::ALLOW_SHA_ALGORITHM[$algorithm])) {
             throw new Exception('Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].');
         }
+
         $this->hashAlgorithm = $algorithm;
         $this->username      = $this->formatName(trim($username));
         $this->password      = trim($password);
     }
 
     /**
-     *
-     * sasl authenticate
-     *
-     * @access protected
-     * @return void
+     * @throws \Kafka\Exception
+     * @throws \Exception
      */
     protected function performAuthentication(CommonSocket $socket) : void
     {
@@ -77,55 +90,45 @@ class Scram extends Mechanism implements SaslMechanism
     }
 
 
-    /**
-     *
-     * get sasl authenticate mechanism name
-     *
-     * @access public
-     * @return string
-     */
     public function getName() : string
     {
         return self::MECHANISM_NAME . $this->hashAlgorithm;
     }
 
     /**
-      * Generate the initial response which can be either sent directly in the first message or as a response to an empty
-      *
-      * @return string The SCRAM response to send.
-      * @access private
-      */
+     * @throws \Exception
+     */
     protected function firstMessage() : string
     {
-        $message                = '';
-        $this->cnonce           = $this->generateNonce();
-        $message                = sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
+        $this->cnonce = $this->generateNonce();
+        $message      = sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
+
         $this->firstMessageBare = substr($message, 3);
+
         return $message;
     }
 
     /**
-      * Generate the final message
-      *
-      * @return string The SCRAM response to send.
-      * @access private
-      */
+     * @throws \Kafka\Exception
+     */
     protected function finalMessage(string $challenge) : string
     {
-        $message        = '';
         $challengeArray = explode(',', $challenge);
+
         if (count($challengeArray) < 3) {
             throw new Exception('Server response challenge is invalid.');
         }
 
         $nonce = substr($challengeArray[0], 2);
         $salt  = base64_decode(substr($challengeArray[1], 2));
+
         if (! $salt) {
             throw new Exception('Server response challenge is invalid, paser salt is failure.');
         }
 
-        $i      = intval(substr($challengeArray[2], 2));
+        $i      = (int) substr($challengeArray[2], 2);
         $cnonce = substr($nonce, 0, strlen($this->cnonce));
+
         if ($cnonce !== $this->cnonce) {
             throw new Exception('Server response challenge is invalid, cnonce is invalid.');
         }
@@ -165,12 +168,13 @@ class Scram extends Mechanism implements SaslMechanism
       * SCRAM has also a server verification step
       *
       * @param string $data The additional data sent along a successful outcome.
+     *
       * @return bool Whether the server has been authenticated.
-      * @access protected
       */
     protected function verifyMessage(string $data) : bool
     {
         $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9]{3}=|[A-Xa-z0-9]{2}==)?)$#';
+
         if ($this->saltedPassword === null || $this->authMessage === null) {
             return false;
         }
@@ -185,18 +189,17 @@ class Scram extends Mechanism implements SaslMechanism
         return hash_equals($proposedServerSignature, $serverSignature);
     }
 
-  /**
-    * Creates the client nonce for the response
-    *
-    * @return string
-    * @access protected
-    */
+    /**
+     * @throws \Exception
+     */
     protected function generateNonce() : string
     {
         $str = '';
-        for ($i=0; $i<32; $i++) {
-            $str .= chr(mt_rand(0, 255));
+
+        for ($i = 0; $i < 32; $i++) {
+            $str .= \chr(\random_int(0, 255));
         }
+
         return base64_encode($str);
     }
 
@@ -215,34 +218,27 @@ class Scram extends Mechanism implements SaslMechanism
     * @See RFC-4013.
     *
     * @param string $user a name to be prepared.
-    * @return string the reformated name.
-    * @access private
+    * @return string the reformatted name.
     */
     private function formatName(string $user) : string
     {
         return str_replace(['=', ','], ['=3D', '=2C'], $user);
-
-        return $user;
     }
 
   /**
     * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
-    *
-    * @param string $str The string to hash.
-    * @param string $hash The hash value.
-    * @param int $i The iteration count.
-    * @return string
-    * @access private
     */
     private function hi(string $str, string $salt, int $icnt) : string
     {
         $int1   = "\0\0\0\1";
         $ui     = $this->hmac($str, $salt . $int1, true);
         $result = $ui;
+
         for ($k = 1; $k < $icnt; $k++) {
             $ui     = $this->hmac($str, $ui, true);
             $result = $result ^ $ui;
         }
+
         return $result;
     }
 }

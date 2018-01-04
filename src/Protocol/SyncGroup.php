@@ -92,7 +92,7 @@ class SyncGroup extends Protocol
 
         $memberId = self::encodeString($values['member_id'], self::PACK_INT16);
 
-        $data  = self::pack(self::BIT_B16, 0);
+        $data  = self::pack(self::BIT_B16, '0');
         $data .= self::encodeArray($values['assignments'], [$this, 'encodeGroupAssignmentTopic']);
         $data .= self::encodeString($values['user_data'], self::PACK_INT32);
 
@@ -117,7 +117,7 @@ class SyncGroup extends Protocol
 
     protected function encodeGroupAssignmentTopicPartition(int $values): string
     {
-        return self::pack(self::BIT_B32, $values);
+        return self::pack(self::BIT_B32, (string) $values);
     }
 
     protected function syncGroupResponsePartition(string $data): array

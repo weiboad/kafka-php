@@ -1,26 +1,47 @@
 <?php
 namespace Kafka;
 
-use \Kafka\Sasl\Plain;
-use \Kafka\Sasl\Gssapi;
-use \Kafka\Sasl\Scram;
+use Kafka\Sasl\Gssapi;
+use Kafka\Sasl\Plain;
+use Kafka\Sasl\Scram;
 
 class Broker
 {
     use SingletonTrait;
 
-    private $groupBrokerId = null;
+    /**
+     * @var string
+     */
+    private $groupBrokerId;
 
+    /**
+     * @var array
+     */
     private $topics = [];
 
+    /**
+     * @var array
+     */
     private $brokers = [];
 
+    /**
+     * @var array
+     */
     private $metaSockets = [];
 
+    /**
+     * @var array
+     */
     private $dataSockets = [];
 
+    /**
+     * @var callable|null
+     */
     private $process;
 
+    /**
+     * @var Config|null
+     */
     private $config;
 
     public function setProcess(callable $process)
@@ -43,9 +64,10 @@ class Broker
         return $this->groupBrokerId;
     }
 
-    public function setData($topics, $brokersResult)
+    public function setData(array $topics, array $brokersResult): bool
     {
         $brokers = [];
+
         foreach ($brokersResult as $value) {
             $key           = $value['nodeId'];
             $hostname      = $value['host'] . ':' . $value['port'];
@@ -53,27 +75,33 @@ class Broker
         }
 
         $change = false;
-        if (serialize($this->brokers) != serialize($brokers)) {
+
+        if (serialize($this->brokers) !== serialize($brokers)) {
             $this->brokers = $brokers;
-            $change        = true;
+
+            $change = true;
         }
 
         $newTopics = [];
         foreach ($topics as $topic) {
-            if ($topic['errorCode'] != \Kafka\Protocol::NO_ERROR) {
+            if ((int) $topic['errorCode'] !== \Kafka\Protocol::NO_ERROR) {
                 $this->error('Parse metadata for topic is error, error:' . \Kafka\Protocol::getError($topic['errorCode']));
                 continue;
             }
+
             $item = [];
+
             foreach ($topic['partitions'] as $part) {
                 $item[$part['partitionId']] = $part['leader'];
             }
+
             $newTopics[$topic['topicName']] = $item;
         }
 
-        if (serialize($this->topics) != serialize($newTopics)) {
+        if (serialize($this->topics) !== serialize($newTopics)) {
             $this->topics = $newTopics;
-            $change       = true;
+
+            $change = true;
         }
 
         return $change;
@@ -124,24 +152,28 @@ class Broker
 
         $host = null;
         $port = null;
+
         if (isset($this->brokers[$key])) {
-            $hostname          = $this->brokers[$key];
-            list($host, $port) = explode(':', $hostname);
+            $hostname = $this->brokers[$key];
+
+            [$host, $port] = explode(':', $hostname);
         }
 
         if (strpos($key, ':') !== false) {
-            list($host, $port) = explode(':', $key);
+            [$host, $port] = explode(':', $key);
         }
 
-        if (! $host || ! $port || (! $modeSync && ! $this->process)) {
+        if ($host === null || $port === null || (! $modeSync && $this->process === null)) {
             return false;
         }
 
         try {
             $socket = $this->getSocket($host, $port, $modeSync);
-            if (! $modeSync) {
+
+            if ($socket instanceof Socket && $this->process !== null) {
                 $socket->setOnReadable($this->process);
             }
+
             $socket->connect();
             $this->{$type}[$key] = $socket;
 
@@ -163,20 +195,27 @@ class Broker
         $this->brokers = [];
     }
 
-    public function getSocket($host, $port, $modeSync)
+    /**
+     * @throws \Kafka\Exception
+     */
+    public function getSocket(string $host, int $port, bool $modeSync): CommonSocket
     {
         $saslProvider = $this->judgeConnectionConfig();
+
         if ($modeSync) {
-            $socket = new \Kafka\SocketSync($host, $port, $this->config, $saslProvider);
-        } else {
-            $socket = new \Kafka\Socket($host, $port, $this->config, $saslProvider);
+            return new SocketSync($host, $port, $this->config, $saslProvider);
         }
-        return $socket;
+
+        return new Socket($host, $port, $this->config, $saslProvider);
     }
 
+
+    /**
+     * @throws \Kafka\Exception
+     */
     private function judgeConnectionConfig() : ?SaslMechanism
     {
-        if ($this->config == null) {
+        if ($this->config === null) {
             return null;
         }
 
@@ -184,45 +223,43 @@ class Broker
             Config::SECURITY_PROTOCOL_PLAINTEXT,
             Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
         ];
-        $saslConnections  = [
+
+        $saslConnections = [
             Config::SECURITY_PROTOCOL_SASL_SSL,
             Config::SECURITY_PROTOCOL_SASL_PLAINTEXT
         ];
-        
-        $securityProtocol = $this->config->getSecurityProtocol();
-        if (in_array($securityProtocol, $plainConnections, true)) {
-            $this->config->setSslEnable(false);
-        } else {
-            $this->config->setSslEnable(true);
-        }
 
-        if (in_array($securityProtocol, $saslConnections, true)) {
-            return $this->getSaslMechanismProvider();
+        $securityProtocol = $this->config->getSecurityProtocol();
+
+        $this->config->setSslEnable(! \in_array($securityProtocol, $plainConnections, true));
+
+        if (\in_array($securityProtocol, $saslConnections, true)) {
+            return $this->getSaslMechanismProvider($this->config);
         }
 
         return null;
     }
 
-    private function getSaslMechanismProvider() : SaslMechanism
+    /**
+     * @throws \Kafka\Exception
+     */
+    private function getSaslMechanismProvider(Config $config) : SaslMechanism
     {
-        $mechanism = $this->config->getSaslMechanism();
-        $provider  = null;
-        $username  = $this->config->getSaslUsername();
-        $password  = $this->config->getSaslPassword();
+        $mechanism = $config->getSaslMechanism();
+        $username  = $config->getSaslUsername();
+        $password  = $config->getSaslPassword();
+
         switch ($mechanism) {
             case Config::SASL_MECHANISMS_PLAIN:
-                $provider = new Plain($username, $password);
-                break;
+                return new Plain($username, $password);
             case Config::SASL_MECHANISMS_GSSAPI:
-                $provider = Gssapi::fromKeytab($this->config->getSaslKeytab(), $this->config->getSaslPrincipal());
-                break;
+                return Gssapi::fromKeytab($config->getSaslKeytab(), $config->getSaslPrincipal());
             case Config::SASL_MECHANISMS_SCRAM_SHA_256:
-                $provider = new Scram($username, $password, Scram::SCRAM_SHA_256);
-                break;
+                return new Scram($username, $password, Scram::SCRAM_SHA_256);
             case Config::SASL_MECHANISMS_SCRAM_SHA_512:
-                $provider = new Scram($username, $password, Scram::SCRAM_SHA_512);
-                break;
+                return new Scram($username, $password, Scram::SCRAM_SHA_512);
         }
-        return $provider;
+
+        throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
     }
 }

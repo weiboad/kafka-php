@@ -2,52 +2,41 @@
 namespace Kafka;
 
 use Amp\Loop;
+use Kafka\Protocol\Protocol;
 
 class Socket extends CommonSocket
 {
-
     /**
-     * Reader watcher
-     * @var int
-     * @access private
+     * @var string
      */
-    private $readWatcher = 0;
+    private $readWatcherId = '';
 
     /**
-     * Write watcher
-     * @var int
-     * @access private
+     * @var string
      */
-    private $writeWatcher = 0;
+    private $writeWatcherId = '';
 
     /**
-     * Write watcher
-     * @var int
-     * @access private
+     * @var string
      */
     private $writeBuffer = '';
 
     /**
-     * Reader buffer
-     * @var int
-     * @access private
+     * @var string
      */
     private $readBuffer = '';
 
     /**
-     * Reader need buffer length
      * @var int
-     * @access private
      */
     private $readNeedLength = 0;
 
     /**
-     * Connects the socket
-     *
-     * @access public
-     * @return void
+     * @var callable|null
      */
-    public function connect()
+    private $onReadable;
+
+    public function connect(): void
     {
         if (! $this->isSocketDead()) {
             return;
@@ -58,74 +47,58 @@ class Socket extends CommonSocket
         stream_set_blocking($this->stream, 0);
         stream_set_read_buffer($this->stream, 0);
 
-        $this->readWatcher = Loop::onReadable($this->stream, function () {
-            do {
-                if (! $this->isSocketDead()) {
-                    $newData = @fread($this->stream, self::READ_MAX_LENGTH);
-                } else {
-                    $this->reconnect();
-                    return;
-                }
-                if ($newData) {
-                    $this->read($newData);
-                }
-            } while ($newData);
-        });
+        $this->readWatcherId = Loop::onReadable(
+            $this->stream,
+            function () {
+                do {
+                    if (! $this->isSocketDead()) {
+                        $newData = @fread($this->stream, self::READ_MAX_LENGTH);
+                    } else {
+                        $this->reconnect();
+                        return;
+                    }
+                    if ($newData) {
+                        $this->read($newData);
+                    }
+                } while ($newData);
+            }
+        );
 
-        $this->writeWatcher = Loop::onWritable($this->stream, function () {
-            $this->write();
-        }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
+        $this->writeWatcherId = Loop::onWritable(
+            $this->stream,
+            function () {
+                $this->write();
+            },
+            ['enable' => false] // <-- let's initialize the watcher as "disabled"
+        );
     }
 
-    /**
-     * reconnect the socket
-     *
-     * @access public
-     * @return void
-     */
-    public function reconnect()
+    public function reconnect(): void
     {
         $this->close();
         $this->connect();
     }
 
-    public $onReadable;
-    /**
-     * set on readable callback function
-     *
-     * @access public
-     * @return void
-     */
-    public function setOnReadable(callable $read)
+    public function setOnReadable(callable $read): void
     {
         $this->onReadable = $read;
     }
 
-    /**
-     * close the socket
-     *
-     * @access public
-     * @return void
-     */
     public function close() : void
     {
-        Loop::cancel($this->readWatcher);
-        Loop::cancel($this->writeWatcher);
+        Loop::cancel($this->readWatcherId);
+        Loop::cancel($this->writeWatcherId);
+
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
+
         $this->readBuffer     = '';
         $this->writeBuffer    = '';
         $this->readNeedLength = 0;
     }
 
-    /**
-     * checks if the socket is a valid resource
-     *
-     * @access public
-     * @return boolean
-     */
-    public function isResource()
+    public function isResource(): bool
     {
         return is_resource($this->stream);
     }
@@ -135,22 +108,18 @@ class Socket extends CommonSocket
      *
      * This method will not wait for all the requested data, it will return as
      * soon as any data is received.
-     *
-     * @param integer $len               Maximum number of bytes to read.
-     * @param boolean $verifyExactLength Throw an exception if the number of read bytes is less than $len
-     *
-     * @return string Binary data
-     * @throws \Kafka\Exception\SocketEOF
      */
-    public function read($data)
+    public function read(string $data): void
     {
         $this->readBuffer .= $data;
+
         do {
-            if ($this->readNeedLength == 0) { // response start
+            if ($this->readNeedLength === 0) { // response start
                 if (strlen($this->readBuffer) < 4) {
                     return;
                 }
-                $dataLen              = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
+
+                $dataLen              = Protocol::unpack(Protocol::BIT_B32, substr($this->readBuffer, 0, 4));
                 $this->readNeedLength = $dataLen;
                 $this->readBuffer     = substr($this->readBuffer, 4);
             }
@@ -158,7 +127,8 @@ class Socket extends CommonSocket
             if (strlen($this->readBuffer) < $this->readNeedLength) {
                 return;
             }
-            $data = substr($this->readBuffer, 0, $this->readNeedLength);
+
+            $data = (string) substr($this->readBuffer, 0, $this->readNeedLength);
 
             $this->readBuffer     = substr($this->readBuffer, $this->readNeedLength);
             $this->readNeedLength = 0;
@@ -170,35 +140,32 @@ class Socket extends CommonSocket
     /**
      * Write to the socket.
      *
-     * @param string $buf The data to write
-     *
-     * @return integer
-     * @throws \Kafka\Exception\SocketEOF
+     * @throws Loop\InvalidWatcherError
      */
-    public function write($data = null)
+    public function write(?string $data = null): void
     {
-        if ($data != null) {
+        if ($data !== null) {
             $this->writeBuffer .= $data;
         }
+
         $bytesToWrite = strlen($this->writeBuffer);
         $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
-            Loop::disable($this->writeWatcher);
+            Loop::disable($this->writeWatcherId);
         } elseif ($bytesWritten >= 0) {
-            Loop::enable($this->writeWatcher);
+            Loop::enable($this->writeWatcherId);
         } elseif ($this->isSocketDead()) {
             $this->reconnect();
         }
+
         $this->writeBuffer = substr($this->writeBuffer, $bytesWritten);
     }
 
     /**
      * check the stream is close
-     *
-     * @return bool
      */
-    protected function isSocketDead()
+    protected function isSocketDead(): bool
     {
         return ! is_resource($this->stream) || @feof($this->stream);
     }
