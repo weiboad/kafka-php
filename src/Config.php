@@ -3,6 +3,19 @@ declare(strict_types=1);
 
 namespace Kafka;
 
+use function array_filter;
+use function array_shift;
+use function count;
+use function explode;
+use function in_array;
+use function is_file;
+use function lcfirst;
+use function preg_match;
+use function strpos;
+use function substr;
+use function trim;
+use function version_compare;
+
 /**
  * @method string getClientId()
  * @method string getBrokerVersion()
@@ -93,14 +106,14 @@ abstract class Config
      */
     public function __call(string $name, array $args)
     {
-        $isGetter = \strpos($name, 'get') === 0 || \strpos($name, 'iet') === 0;
-        $isSetter = \strpos($name, 'set') === 0;
+        $isGetter = strpos($name, 'get') === 0 || strpos($name, 'iet') === 0;
+        $isSetter = strpos($name, 'set') === 0;
 
         if (! $isGetter && ! $isSetter) {
             return false;
         }
 
-        $option = \lcfirst(\substr($name, 3));
+        $option = lcfirst(substr($name, 3));
 
         if ($isGetter) {
             if (isset(self::$options[$option])) {
@@ -118,11 +131,11 @@ abstract class Config
             return false;
         }
 
-        if (\count($args) !== 1) {
+        if (count($args) !== 1) {
             return false;
         }
 
-        static::$options[$option] = \array_shift($args);
+        static::$options[$option] = array_shift($args);
 
         // check todo
         return true;
@@ -133,7 +146,7 @@ abstract class Config
      */
     public function setClientId(string $val): void
     {
-        $client = \trim($val);
+        $client = trim($val);
 
         if ($client === '') {
             throw new Exception\Config('Set clientId value is invalid, must is not empty string.');
@@ -147,9 +160,9 @@ abstract class Config
      */
     public function setBrokerVersion(string $version): void
     {
-        $version = \trim($version);
+        $version = trim($version);
 
-        if ($version === '' || \version_compare($version, '0.8.0', '<')) {
+        if ($version === '' || version_compare($version, '0.8.0', '<')) {
             throw new Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
         }
 
@@ -161,12 +174,12 @@ abstract class Config
      */
     public function setMetadataBrokerList(string $brokerList): void
     {
-        $brokerList = \trim($brokerList);
+        $brokerList = trim($brokerList);
 
-        $brokers = \array_filter(
-            \explode(',', $brokerList),
+        $brokers = array_filter(
+            explode(',', $brokerList),
             function (string $broker): bool {
-                return \preg_match('/^(.*:[\d]+)$/', $broker) === 1;
+                return preg_match('/^(.*:[\d]+)$/', $broker) === 1;
             }
         );
 
@@ -233,7 +246,7 @@ abstract class Config
      */
     public function setSslLocalCert(string $localCert): void
     {
-        if (! \is_file($localCert)) {
+        if (! is_file($localCert)) {
             throw new Exception\Config('Set ssl local cert file is invalid');
         }
 
@@ -245,7 +258,7 @@ abstract class Config
      */
     public function setSslLocalPk(string $localPk): void
     {
-        if (! \is_file($localPk)) {
+        if (! is_file($localPk)) {
             throw new Exception\Config('Set ssl local private key file is invalid');
         }
 
@@ -257,7 +270,7 @@ abstract class Config
      */
     public function setSslCafile(string $cafile): void
     {
-        if (! \is_file($cafile)) {
+        if (! is_file($cafile)) {
             throw new Exception\Config('Set ssl ca file is invalid');
         }
 
@@ -269,7 +282,7 @@ abstract class Config
      */
     public function setSaslKeytab(string $keytab): void
     {
-        if (! \is_file($keytab)) {
+        if (! is_file($keytab)) {
             throw new Exception\Config('Set sasl gssapi keytab file is invalid');
         }
 
@@ -281,7 +294,7 @@ abstract class Config
      */
     public function setSecurityProtocol(string $protocol): void
     {
-        if (! \in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
+        if (! in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
             throw new Exception\Config('Invalid security protocol given.');
         }
 
@@ -293,7 +306,7 @@ abstract class Config
      */
     public function setSaslMechanism(string $mechanism): void
     {
-        if (! \in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
+        if (! in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
             throw new Exception\Config('Invalid security sasl mechanism given.');
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace KafkaTest\Base\StreamStub;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use function stream_context_get_options;
 
 class Simple
 {
@@ -20,7 +21,7 @@ class Simple
     public function stream_open(string $path, string $mode, int $options): bool
     {
         if (self::$mock !== null) {
-            self::$mock->context(\stream_context_get_options($this->context));
+            self::$mock->context(stream_context_get_options($this->context));
 
             return self::$mock->open($path, $mode, $options);
         }

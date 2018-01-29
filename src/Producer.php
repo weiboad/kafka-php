@@ -7,6 +7,7 @@ use Amp\Loop;
 use Kafka\Producer\Process;
 use Kafka\Producer\SyncProcess;
 use Psr\Log\LoggerAwareTrait;
+use function is_array;
 
 class Producer
 {
@@ -36,7 +37,7 @@ class Producer
             $this->process->setLogger($this->logger);
         }
 
-        if (\is_array($data)) {
+        if (is_array($data)) {
             return $this->sendSynchronously($data);
         }
 

@@ -5,6 +5,7 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function substr;
 
 class JoinGroup extends Protocol
 {
@@ -62,18 +63,18 @@ class JoinGroup extends Protocol
     public function decode(string $data): array
     {
         $offset        = 0;
-        $errorCode     = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode     = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset       += 2;
-        $generationId  = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $generationId  = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset       += 4;
-        $groupProtocol = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $groupProtocol = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset       += $groupProtocol['length'];
-        $leaderId      = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $leaderId      = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset       += $leaderId['length'];
-        $memberId      = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $memberId      = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset       += $memberId['length'];
 
-        $members = $this->decodeArray(\substr($data, $offset), [$this, 'joinGroupMember']);
+        $members = $this->decodeArray(substr($data, $offset), [$this, 'joinGroupMember']);
         $offset += $memberId['length'];
 
         return [
@@ -132,18 +133,18 @@ class JoinGroup extends Protocol
     protected function joinGroupMember(string $data): array
     {
         $offset     = 0;
-        $memberId   = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $memberId   = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset    += $memberId['length'];
-        $memberMeta = $this->decodeString(\substr($data, $offset), self::BIT_B32);
+        $memberMeta = $this->decodeString(substr($data, $offset), self::BIT_B32);
         $offset    += $memberMeta['length'];
 
         $metaData    = $memberMeta['data'];
         $metaOffset  = 0;
-        $version     = self::unpack(self::BIT_B16, \substr($metaData, $metaOffset, 2));
+        $version     = self::unpack(self::BIT_B16, substr($metaData, $metaOffset, 2));
         $metaOffset += 2;
-        $topics      = $this->decodeArray(\substr($metaData, $metaOffset), [$this, 'decodeString'], self::BIT_B16);
+        $topics      = $this->decodeArray(substr($metaData, $metaOffset), [$this, 'decodeString'], self::BIT_B16);
         $metaOffset += $topics['length'];
-        $userData    = $this->decodeString(\substr($metaData, $metaOffset), self::BIT_B32);
+        $userData    = $this->decodeString(substr($metaData, $metaOffset), self::BIT_B32);
 
         return [
             'length' => $offset,

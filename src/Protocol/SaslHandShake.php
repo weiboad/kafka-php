@@ -5,6 +5,11 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function array_shift;
+use function implode;
+use function in_array;
+use function is_string;
+use function substr;
 
 class SaslHandShake extends Protocol
 {
@@ -23,15 +28,15 @@ class SaslHandShake extends Protocol
      */
     public function encode(array $payloads = []): string
     {
-        $mechanism = \array_shift($payloads);
+        $mechanism = array_shift($payloads);
 
-        if (! \is_string($mechanism)) {
+        if (! is_string($mechanism)) {
             throw new ProtocolException('Invalid request SASL hand shake mechanism given. ');
         }
 
-        if (! \in_array($mechanism, self::ALLOW_SASL_MECHANISMS, true)) {
+        if (! in_array($mechanism, self::ALLOW_SASL_MECHANISMS, true)) {
             throw new ProtocolException(
-                'Invalid request SASL hand shake mechanism given, it must be one of: ' . \implode('|', self::ALLOW_SASL_MECHANISMS)
+                'Invalid request SASL hand shake mechanism given, it must be one of: ' . implode('|', self::ALLOW_SASL_MECHANISMS)
             );
         }
 
@@ -48,9 +53,9 @@ class SaslHandShake extends Protocol
     public function decode(string $data): array
     {
         $offset            = 0;
-        $errcode           = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errcode           = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset           += 2;
-        $enabledMechanisms = $this->decodeArray(\substr($data, $offset), [$this, 'mechanism']);
+        $enabledMechanisms = $this->decodeArray(substr($data, $offset), [$this, 'mechanism']);
         $offset           += $enabledMechanisms['length'];
 
         return [
@@ -65,7 +70,7 @@ class SaslHandShake extends Protocol
     protected function mechanism(string $data): array
     {
         $offset        = 0;
-        $mechanismInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $mechanismInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset       += $mechanismInfo['length'];
 
         return [

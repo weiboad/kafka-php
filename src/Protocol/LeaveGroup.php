@@ -5,6 +5,7 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function substr;
 
 class LeaveGroup extends Protocol
 {
@@ -36,7 +37,7 @@ class LeaveGroup extends Protocol
      */
     public function decode(string $data): array
     {
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, 0, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, 0, 2));
 
         return ['errorCode' => $errorCode];
     }

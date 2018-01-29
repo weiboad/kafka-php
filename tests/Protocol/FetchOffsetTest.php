@@ -5,6 +5,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\FetchOffset;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class FetchOffsetTest extends TestCase
 {
@@ -33,7 +36,7 @@ final class FetchOffsetTest extends TestCase
         $expected = '0000002b000900010000000900096b61666b612d706870000474657374000000010004746573740000000100000000';
         $test     = $this->offset->encode($data);
 
-        self::assertSame($expected, \bin2hex($test));
+        self::assertSame($expected, bin2hex($test));
     }
 
     /**
@@ -100,7 +103,7 @@ final class FetchOffsetTest extends TestCase
         $data     = '000000010004746573740000000100000000ffffffffffffffff00000000';
         $expected = '[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"metadata":"","offset":-1}]}]';
 
-        $test = $this->offset->decode(\hex2bin($data));
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
+        $test = $this->offset->decode(hex2bin($data));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

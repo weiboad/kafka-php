@@ -5,6 +5,7 @@ namespace Kafka\Sasl;
 
 use Kafka\CommonSocket;
 use Kafka\Protocol\Protocol;
+use function trim;
 
 class Plain extends Mechanism
 {
@@ -23,8 +24,8 @@ class Plain extends Mechanism
 
     public function __construct(string $username, string $password)
     {
-        $this->username = \trim($username);
-        $this->password = \trim($password);
+        $this->username = trim($username);
+        $this->password = trim($password);
     }
 
     protected function performAuthentication(CommonSocket $socket): void

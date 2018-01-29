@@ -8,6 +8,7 @@ use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;
 use Kafka\SaslMechanism;
+use function substr;
 
 abstract class Mechanism implements SaslMechanism
 {
@@ -30,8 +31,8 @@ abstract class Mechanism implements SaslMechanism
         $dataLen = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->readBlocking(4));
 
         $data          = $socket->readBlocking($dataLen);
-        $correlationId = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, \substr($data, 0, 4));
-        $result        = Protocol::decode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, \substr($data, 4));
+        $correlationId = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+        $result        = Protocol::decode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, substr($data, 4));
 
         if ($result['errorCode'] !== Protocol::NO_ERROR) {
             throw new Exception(Protocol::getError($result['errorCode']));

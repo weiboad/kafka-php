@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kafka;
 
 use Kafka\Protocol\Produce;
+use function in_array;
 
 /**
  * @method int getRequestTimeout()
@@ -90,7 +91,7 @@ class ProducerConfig extends Config
 
     public function setCompression(int $compression): void
     {
-        if (! \in_array($compression, self::COMPRESSION_OPTIONS, true)) {
+        if (! in_array($compression, self::COMPRESSION_OPTIONS, true)) {
             throw new Exception\Config('Compression must be one the Kafka\Protocol\Produce::COMPRESSION_* constants');
         }
 

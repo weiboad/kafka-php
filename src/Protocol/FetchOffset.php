@@ -5,6 +5,7 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function substr;
 
 class FetchOffset extends Protocol
 {
@@ -38,7 +39,7 @@ class FetchOffset extends Protocol
     public function decode(string $data): array
     {
         $offset  = 0;
-        $topics  = $this->decodeArray(\substr($data, $offset), [$this, 'offsetTopic']);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'offsetTopic']);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -78,10 +79,10 @@ class FetchOffset extends Protocol
     protected function offsetTopic(string $data): array
     {
         $offset    = 0;
-        $topicInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(\substr($data, $offset), [$this, 'offsetPartition']);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'offsetPartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -101,15 +102,15 @@ class FetchOffset extends Protocol
     {
         $offset = 0;
 
-        $partitionId = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset     += 4;
 
-        $roffset = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
+        $roffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
         $offset += 8;
 
-        $metadata  = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $metadata  = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $metadata['length'];
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
 
         return [

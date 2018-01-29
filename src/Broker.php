@@ -6,6 +6,13 @@ namespace Kafka;
 use Kafka\Sasl\Gssapi;
 use Kafka\Sasl\Plain;
 use Kafka\Sasl\Scram;
+use function array_keys;
+use function explode;
+use function in_array;
+use function serialize;
+use function shuffle;
+use function sprintf;
+use function strpos;
 
 class Broker
 {
@@ -68,7 +75,7 @@ class Broker
 
     /**
      * @param mixed[][] $topics
-     * @param mixed[] $brokersResult
+     * @param mixed[]   $brokersResult
      */
     public function setData(array $topics, array $brokersResult): bool
     {
@@ -80,7 +87,7 @@ class Broker
 
         $changed = false;
 
-        if (\serialize($this->brokers) !== \serialize($brokers)) {
+        if (serialize($this->brokers) !== serialize($brokers)) {
             $this->brokers = $brokers;
 
             $changed = true;
@@ -102,7 +109,7 @@ class Broker
             $newTopics[$topic['topicName']] = $item;
         }
 
-        if (\serialize($this->topics) !== \serialize($newTopics)) {
+        if (serialize($this->topics) !== serialize($newTopics)) {
             $this->topics = $newTopics;
 
             $changed = true;
@@ -134,8 +141,8 @@ class Broker
 
     public function getRandConnect(bool $modeSync = false): ?CommonSocket
     {
-        $nodeIds = \array_keys($this->brokers);
-        \shuffle($nodeIds);
+        $nodeIds = array_keys($this->brokers);
+        shuffle($nodeIds);
 
         if (! isset($nodeIds[0])) {
             return null;
@@ -168,11 +175,11 @@ class Broker
         if (isset($this->brokers[$key])) {
             $hostname = $this->brokers[$key];
 
-            [$host, $port] = \explode(':', $hostname);
+            [$host, $port] = explode(':', $hostname);
         }
 
-        if (\strpos($key, ':') !== false) {
-            [$host, $port] = \explode(':', $key);
+        if (strpos($key, ':') !== false) {
+            [$host, $port] = explode(':', $key);
         }
 
         if ($host === null || $port === null || (! $modeSync && $this->process === null)) {
@@ -243,9 +250,9 @@ class Broker
 
         $securityProtocol = $this->config->getSecurityProtocol();
 
-        $this->config->setSslEnable(! \in_array($securityProtocol, $plainConnections, true));
+        $this->config->setSslEnable(! in_array($securityProtocol, $plainConnections, true));
 
-        if (\in_array($securityProtocol, $saslConnections, true)) {
+        if (in_array($securityProtocol, $saslConnections, true)) {
             return $this->getSaslMechanismProvider($this->config);
         }
 
@@ -272,6 +279,6 @@ class Broker
                 return new Scram($username, $password, Scram::SCRAM_SHA_512);
         }
 
-        throw new Exception(\sprintf('"%s" is an invalid SASL mechanism', $mechanism));
+        throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
     }
 }

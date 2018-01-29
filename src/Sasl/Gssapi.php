@@ -8,6 +8,11 @@ use Kafka\CommonSocket;
 use Kafka\Exception;
 use Kafka\Protocol\Protocol as ProtocolTool;
 use KRB5CCache;
+use const GSS_C_INITIATE;
+use function extension_loaded;
+use function file_exists;
+use function is_file;
+use function is_readable;
 
 class Gssapi extends Mechanism
 {
@@ -36,15 +41,15 @@ class Gssapi extends Mechanism
 
     public static function fromKeytab(string $keytab, string $principal): self
     {
-        if (! \extension_loaded('krb5')) {
+        if (! extension_loaded('krb5')) {
             throw new Exception('Extension "krb5" is required for "GSSAPI" authentication');
         }
 
-        if (! \file_exists($keytab) || ! \is_file($keytab)) {
+        if (! file_exists($keytab) || ! is_file($keytab)) {
             throw new Exception('Invalid keytab, keytab file not exists.');
         }
 
-        if (! \is_readable($keytab)) {
+        if (! is_readable($keytab)) {
             throw new Exception('Invalid keytab, keytab file disable read.');
         }
 
@@ -52,7 +57,7 @@ class Gssapi extends Mechanism
         self::$ccache->initKeytab($principal, $keytab);
 
         $gssapi = new GSSAPIContext();
-        $gssapi->acquireCredentials(self::$ccache, $principal, \GSS_C_INITIATE);
+        $gssapi->acquireCredentials(self::$ccache, $principal, GSS_C_INITIATE);
         return new self($gssapi, $principal);
     }
 

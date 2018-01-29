@@ -5,6 +5,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\Heartbeat;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class HeartbeatTest extends TestCase
 {
@@ -29,7 +32,7 @@ final class HeartbeatTest extends TestCase
         $expected = '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937';
         $test     = $this->heart->encode($data);
 
-        self::assertSame($expected, \bin2hex($test));
+        self::assertSame($expected, bin2hex($test));
     }
 
     /**
@@ -73,9 +76,9 @@ final class HeartbeatTest extends TestCase
      */
     public function testDecode(): void
     {
-        $test     = $this->heart->decode(\hex2bin('0000'));
+        $test     = $this->heart->decode(hex2bin('0000'));
         $expected = '{"errorCode":0}';
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

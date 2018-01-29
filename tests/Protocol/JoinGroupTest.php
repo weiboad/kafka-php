@@ -5,6 +5,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\JoinGroup;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class JoinGroupTest extends TestCase
 {
@@ -44,8 +47,8 @@ final class JoinGroupTest extends TestCase
         $test9      = $this->group9->encode($data);
         $test10     = $this->group10->encode($data);
 
-        self::assertSame($expected9, \bin2hex($test9));
-        self::assertSame($expected10, \bin2hex($test10));
+        self::assertSame($expected9, bin2hex($test9));
+        self::assertSame($expected10, bin2hex($test10));
     }
 
     /**
@@ -122,8 +125,8 @@ final class JoinGroupTest extends TestCase
         $test9      = $this->group9->encode($data);
         $test10     = $this->group10->encode($data);
 
-        self::assertSame($expected9, \bin2hex($test9));
-        self::assertSame($expected10, \bin2hex($test10));
+        self::assertSame($expected9, bin2hex($test9));
+        self::assertSame($expected10, bin2hex($test10));
     }
 
     /**
@@ -191,8 +194,8 @@ final class JoinGroupTest extends TestCase
         $data     = '000000000001000567726f7570002e6b61666b612d7068702d31313433353333332d663663342d346663622d616532642d396134393335613934663366002e6b61666b612d7068702d31313433353333332d663663342d346663622d616532642d39613439333561393466336600000001002e6b61666b612d7068702d31313433353333332d663663342d346663622d616532642d3961343933356139346633660000001000000000000100047465737400000000';
         $expected = '{"errorCode":0,"generationId":1,"groupProtocol":"group","leaderId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","memberId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","members":[{"memberId":"kafka-php-11435333-f6c4-4fcb-ae2d-9a4935a94f3f","memberMeta":{"version":0,"topics":["test"],"userData":""}}]}';
 
-        $test = $this->group9->decode(\hex2bin($data));
+        $test = $this->group9->decode(hex2bin($data));
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }

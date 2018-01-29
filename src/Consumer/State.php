@@ -6,6 +6,8 @@ namespace Kafka\Consumer;
 use Amp\Loop;
 use Kafka\ConsumerConfig;
 use Kafka\SingletonTrait;
+use function array_keys;
+use function microtime;
 
 class State
 {
@@ -114,7 +116,7 @@ class State
 
     private function removeWatchers(): void
     {
-        foreach (\array_keys($this->requests) as $request) {
+        foreach (array_keys($this->requests) as $request) {
             if (! isset($this->requests[$request]['watcher'])) {
                 return;
             }
@@ -355,7 +357,7 @@ class State
         }
 
         // set process start time
-        $this->callStatus[$key]['time'] = \microtime(true);
+        $this->callStatus[$key]['time'] = microtime(true);
         switch ($key) {
             case self::REQUEST_METADATA:
             case self::REQUEST_GETGROUP:

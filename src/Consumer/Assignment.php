@@ -5,6 +5,7 @@ namespace Kafka\Consumer;
 
 use Kafka\Broker;
 use Kafka\SingletonTrait;
+use function count;
 
 class Assignment
 {
@@ -97,7 +98,7 @@ class Assignment
         $broker = Broker::getInstance();
         $topics = $broker->getTopics();
 
-        $memberCount = \count($result);
+        $memberCount = count($result);
 
         $count   = 0;
         $members = [];

@@ -5,6 +5,7 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function substr;
 
 class SyncGroup extends Protocol
 {
@@ -47,10 +48,10 @@ class SyncGroup extends Protocol
     public function decode(string $data): array
     {
         $offset    = 0;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
 
-        $memberAssignments = $this->decodeString(\substr($data, $offset), self::BIT_B32);
+        $memberAssignments = $this->decodeString(substr($data, $offset), self::BIT_B32);
         $offset           += $memberAssignments['length'];
 
         $memberAssignment = $memberAssignments['data'];
@@ -62,16 +63,16 @@ class SyncGroup extends Protocol
         $memberAssignmentOffset  = 0;
         $version                 = self::unpack(
             self::BIT_B16_SIGNED,
-            \substr($memberAssignment, $memberAssignmentOffset, 2)
+            substr($memberAssignment, $memberAssignmentOffset, 2)
         );
         $memberAssignmentOffset += 2;
         $partitionAssignments    = $this->decodeArray(
-            \substr($memberAssignment, $memberAssignmentOffset),
+            substr($memberAssignment, $memberAssignmentOffset),
             [$this, 'syncGroupResponsePartition']
         );
         $memberAssignmentOffset += $partitionAssignments['length'];
         $userData                = $this->decodeString(
-            \substr($memberAssignment, $memberAssignmentOffset),
+            substr($memberAssignment, $memberAssignmentOffset),
             self::BIT_B32
         );
 
@@ -149,9 +150,9 @@ class SyncGroup extends Protocol
     protected function syncGroupResponsePartition(string $data): array
     {
         $offset     = 0;
-        $topicName  = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $topicName  = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset    += $topicName['length'];
-        $partitions = $this->decodePrimitiveArray(\substr($data, $offset), self::BIT_B32);
+        $partitions = $this->decodePrimitiveArray(substr($data, $offset), self::BIT_B32);
         $offset    += $partitions['length'];
 
         return [
