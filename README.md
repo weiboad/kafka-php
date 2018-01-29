@@ -29,8 +29,11 @@ Add the lib directory to the PHP include_path and use an autoloader like the one
 
 ## Composer Install
 
-Simply add a dependency on nmred/kafka-php to your project's composer.json file if you use Composer to manage the dependencies of your project. Here is a minimal example of a composer.json file :
+Simply add a dependency `nmred/kafka-php` to your project if you use Composer to manage the dependencies of your project.
+ 
+`$ composer require nmred/kafka-php`
 
+ Here is a minimal example of a composer.json file :
 ```
 {
 	"require": {
@@ -61,19 +64,21 @@ $logger->pushHandler(new StdoutHandler());
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('10.13.4.159:9192');
-$config->setBrokerVersion('0.9.0.1');
+$config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
-$producer = new \Kafka\Producer(function() {
-	return array(
-		array(
-			'topic' => 'test',
-			'value' => 'test....message.',
-			'key' => 'testkey',
-			),
-	);
-});
+$producer = new \Kafka\Producer(
+    function() {
+        return [
+            [
+                'topic' => 'test',
+                'value' => 'test....message.',
+                'key' => 'testkey',
+            ],
+        ];
+    }
+);
 $producer->setLogger($logger);
 $producer->success(function($result) {
 	var_dump($result);
@@ -100,7 +105,7 @@ $logger->pushHandler(new StdoutHandler());
 $config = \Kafka\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('127.0.0.1:9192');
-$config->setBrokerVersion('0.9.0.1');
+$config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
@@ -108,14 +113,13 @@ $producer = new \Kafka\Producer();
 $producer->setLogger($logger);
 
 for($i = 0; $i < 100; $i++) {
-        $result = $producer->send(array(
-                array(
-                        'topic' => 'test1',
-                        'value' => 'test1....message.',
-                        'key' => '',
-                ),
-        ));
-        var_dump($result);
+    $producer->send([
+        [
+            'topic' => 'test1',
+            'value' => 'test1....message.',
+            'key' => '',
+        ],
+    ]);
 }
 ```
 
@@ -136,8 +140,8 @@ $config = \Kafka\ConsumerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('10.13.4.159:9192');
 $config->setGroupId('test');
-$config->setBrokerVersion('0.9.0.1');
-$config->setTopics(array('test'));
+$config->setBrokerVersion('1.0.0');
+$config->setTopics(['test']);
 //$config->setOffsetReset('earliest');
 $consumer = new \Kafka\Consumer();
 $consumer->setLogger($logger);
