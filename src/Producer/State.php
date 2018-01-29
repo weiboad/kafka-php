@@ -70,7 +70,7 @@ class State
         }
 
         // start sync metadata
-        if (isset($this->requests[self::REQUEST_METADATA]['func'])
+        if (isset($request, $this->requests[self::REQUEST_METADATA]['func'])
             && $this->callStatus[self::REQUEST_METADATA]['status'] === self::STATUS_LOOP) {
             $context = $this->requests[self::REQUEST_METADATA]['func']();
             $this->processing($request, $context);
