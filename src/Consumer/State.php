@@ -5,11 +5,14 @@ namespace Kafka\Consumer;
 
 use Amp\Loop;
 use Kafka\ConsumerConfig;
+use Kafka\LoggerTrait;
 use Kafka\SingletonTrait;
+use Psr\Log\LoggerAwareTrait;
 
 class State
 {
-    use SingletonTrait;
+    use LoggerAwareTrait;
+    use LoggerTrait;
 
     public const REQUEST_METADATA      = 1;
     public const REQUEST_GETGROUP      = 2;
@@ -50,8 +53,15 @@ class State
      */
     private $requests = self::CLEAN_REQUEST_STATE;
 
-    public function init(): void
+    /**
+     * @param callable[] $callbacks
+     */
+    public function __construct(ConsumerConfig $consumerConfig, array $callbacks)
     {
+        foreach ($callbacks as $request => $callback) {
+            $this->requests[$request]['func'] = $callback;
+        }
+
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
             self::REQUEST_GETGROUP      => ['status' => self::STATUS_START],
@@ -64,16 +74,13 @@ class State
             self::REQUEST_COMMIT_OFFSET => ['status' => self::STATUS_LOOP],
         ];
 
-        /** @var ConsumerConfig $config */
-        $config = ConsumerConfig::getInstance();
-
         foreach ($this->requests as $request => $option) {
             if ($request !== self::REQUEST_METADATA) {
                 $this->requests[$request]['interval'] = 1000;
                 continue;
             }
 
-            $this->requests[$request]['interval'] = $config->getMetadataRefreshIntervalMs();
+            $this->requests[$request]['interval'] = $consumerConfig->getMetadataRefreshIntervalMs();
         }
     }
 
@@ -193,16 +200,6 @@ class State
             case self::REQUEST_SYNCGROUP:
                 $this->recover();
                 break;
-        }
-    }
-
-    /**
-     * @param callable[] $callbacks
-     */
-    public function setCallback(array $callbacks): void
-    {
-        foreach ($callbacks as $request => $callback) {
-            $this->requests[$request]['func'] = $callback;
         }
     }
 
