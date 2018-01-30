@@ -13,6 +13,9 @@ class Consumer
     use LoggerAwareTrait;
     use LoggerTrait;
 
+    /** @var ConsumerConfig */
+    private $consumerConfig;
+
     /**
      * @var StopStrategy|null
      */
@@ -23,9 +26,10 @@ class Consumer
      */
     private $process;
 
-    public function __construct(?StopStrategy $stopStrategy = null)
+    public function __construct(ConsumerConfig $consumerConfig, ?StopStrategy $stopStrategy = null)
     {
-        $this->stopStrategy = $stopStrategy;
+        $this->consumerConfig = $consumerConfig;
+        $this->stopStrategy   = $stopStrategy;
     }
 
     /**
@@ -39,6 +43,7 @@ class Consumer
     {
         if ($this->process !== null) {
             $this->error('Consumer is already being executed');
+
             return;
         }
 
@@ -60,7 +65,7 @@ class Consumer
      */
     protected function createProcess(?callable $consumer): Process
     {
-        $process = new Process($consumer);
+        $process = new Process($this->consumerConfig, $consumer);
 
         if ($this->logger) {
             $process->setLogger($this->logger);
@@ -82,6 +87,7 @@ class Consumer
     {
         if ($this->process === null) {
             $this->error('Consumer is not running');
+
             return;
         }
 

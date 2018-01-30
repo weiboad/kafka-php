@@ -16,6 +16,9 @@ class Process
     use LoggerAwareTrait;
     use LoggerTrait;
 
+    /** @var ConsumerConfig */
+    private $consumerConfig;
+
     /**
      * @var callable|null
      */
@@ -31,9 +34,10 @@ class Process
      */
     private $state;
 
-    public function __construct(?callable $consumer = null)
+    public function __construct(ConsumerConfig $consumerConfig, ?callable $consumer = null)
     {
-        $this->consumer = $consumer;
+        $this->consumerConfig = $consumerConfig;
+        $this->consumer       = $consumer;
     }
 
     public function init(): void
@@ -43,16 +47,14 @@ class Process
 
         $broker = $this->getBroker();
         $broker->setConfig($config);
-        $broker->setProcess(function (string $data, int $fd): void {
-            $this->processRequest($data, $fd);
-        });
+        $broker->setProcess(
+            function (string $data, int $fd): void {
+                $this->processRequest($data, $fd);
+            }
+        );
 
-        $this->state = State::getInstance();
-
-        if ($this->logger) {
-            $this->state->setLogger($this->logger);
-        }
-        $this->state->setCallback(
+        $this->state = new State(
+            $config,
             [
                 State::REQUEST_METADATA      => function (): void {
                     $this->syncMeta();
@@ -83,7 +85,10 @@ class Process
                 },
             ]
         );
-        $this->state->init();
+
+        if ($this->logger) {
+            $this->state->setLogger($this->logger);
+        }
     }
 
     public function start(): void
@@ -431,8 +436,8 @@ class Process
                 foreach ($topic['partitions'] as $partId) {
                     $item['partitions'][] = [
                         'partition_id' => $partId,
-                        'offset' => 1,
-                        'time' =>  -1,
+                        'offset'       => 1,
+                        'time'         => -1,
                     ];
                     $data[]               = $item;
                 }
@@ -591,8 +596,8 @@ class Process
                 foreach ($topic['partitions'] as $partId) {
                     $item['partitions'][] = [
                         'partition_id' => $partId,
-                        'offset' => isset($consumerOffsets[$topic['topic_name']][$partId]) ? $consumerOffsets[$topic['topic_name']][$partId] : 0,
-                        'max_bytes' => $this->getConfig()->getMaxBytes(),
+                        'offset'       => isset($consumerOffsets[$topic['topic_name']][$partId]) ? $consumerOffsets[$topic['topic_name']][$partId] : 0,
+                        'max_bytes'    => $this->getConfig()->getMaxBytes(),
                     ];
                 }
 
@@ -601,9 +606,9 @@ class Process
 
             $params = [
                 'max_wait_time' => $this->getConfig()->getMaxWaitTime(),
-                'replica_id' => -1,
-                'min_bytes' => '1000',
-                'data' => $data,
+                'replica_id'    => -1,
+                'min_bytes'     => '1000',
+                'data'          => $data,
             ];
 
             $this->debug('Fetch message start, params:' . \json_encode($params));
@@ -715,10 +720,10 @@ class Process
         }
 
         $params = [
-            'group_id' => $this->getConfig()->getGroupId(),
+            'group_id'      => $this->getConfig()->getGroupId(),
             'generation_id' => $this->getAssignment()->getGenerationId(),
-            'member_id' => $this->getAssignment()->getMemberId(),
-            'data' => $data,
+            'member_id'     => $this->getAssignment()->getMemberId(),
+            'data'          => $data,
         ];
 
         $this->debug('Commit current fetch offset start, params:' . \json_encode($params));
@@ -738,6 +743,7 @@ class Process
             foreach ($topic['partitions'] as $part) {
                 if ($part['errorCode'] !== 0) {
                     $this->stateConvert($part['errorCode']);
+
                     return;  // not call user consumer function
                 }
             }
@@ -779,6 +785,7 @@ class Process
         if (\in_array($errorCode, $recoverCodes, true)) {
             $this->state->recover();
             $assign->clearOffset();
+
             return false;
         }
 
@@ -789,6 +796,7 @@ class Process
 
             $assign->clearOffset();
             $this->state->rejoin();
+
             return false;
         }
 
@@ -813,7 +821,7 @@ class Process
 
     private function getConfig(): ConsumerConfig
     {
-        return ConsumerConfig::getInstance();
+        return $this->consumerConfig;
     }
 
     private function getAssignment(): Assignment
