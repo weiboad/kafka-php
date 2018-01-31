@@ -232,7 +232,7 @@ class State
         $status = $this->callStatus[$key]['status'];
         switch ($key) {
             case self::REQUEST_METADATA:
-                if ($status & self::STATUS_PROCESS == self::STATUS_PROCESS) {
+                if (($status & self::STATUS_PROCESS) == self::STATUS_PROCESS) {
                     return false;
                 }
                 if (($status & self::STATUS_LOOP) == self::STATUS_LOOP) {
