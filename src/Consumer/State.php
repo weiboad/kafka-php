@@ -86,7 +86,7 @@ class State
         }
 
         // start sync metadata
-        if (isset($this->requests[self::REQUEST_METADATA]['func'])) {
+        if (isset($request, $this->requests[self::REQUEST_METADATA]['func'])) {
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
