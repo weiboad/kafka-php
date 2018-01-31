@@ -6,6 +6,9 @@ namespace KafkaTest\Protocol;
 use Kafka\Protocol\Produce;
 use Lcobucci\Clock\FrozenClock;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class ProduceTest extends TestCase
 {
@@ -51,7 +54,7 @@ final class ProduceTest extends TestCase
 
         $expected = '00000092000000010000000000096b61666b612d7068700001000003e8000000010004746573740000000100000000000000630000000000000000000000153c1950a800000000000000000007746573742e2e2e0000000000000001000000153c1950a800000000000000000007746573742e2e2e0000000000000002000000153c1950a800000000000000000007746573742e2e2e';
 
-        self::assertSame($expected, \bin2hex($this->produce->encode($data)));
+        self::assertSame($expected, bin2hex($this->produce->encode($data)));
     }
 
     public function testEncodeForMessageKey(): void
@@ -76,7 +79,7 @@ final class ProduceTest extends TestCase
 
         $expected = '0000005f000000020000000000096b61666b612d7068700001000003e80000000100047465737400000001000000000000003000000000000000000000002422d04d210100000001608839138b00000007746573746b657900000007746573742e2e2e';
 
-        self::assertSame($expected, \bin2hex($this->produce10->encode($data)));
+        self::assertSame($expected, bin2hex($this->produce10->encode($data)));
     }
 
     public function testEncodeForMessage(): void
@@ -98,7 +101,7 @@ final class ProduceTest extends TestCase
         ];
 
         $expected = '00000058000000020000000000096b61666b612d7068700001000003e80000000100047465737400000001000000000000002900000000000000000000001d53d771b70100000001608839138b0000000000000007746573742e2e2e';
-        self::assertSame($expected, \bin2hex($this->produce10->encode($data)));
+        self::assertSame($expected, bin2hex($this->produce10->encode($data)));
     }
 
     public function testEncodeNotTimeoutAndRequired(): void
@@ -123,7 +126,7 @@ final class ProduceTest extends TestCase
 
         $expected = '00000092000000010000000000096b61666b612d706870000000000064000000010004746573740000000100000000000000630000000000000000000000153c1950a800000000000000000007746573742e2e2e0000000000000001000000153c1950a800000000000000000007746573742e2e2e0000000000000002000000153c1950a800000000000000000007746573742e2e2e';
 
-        self::assertSame($expected, \bin2hex($this->produce->encode($data)));
+        self::assertSame($expected, bin2hex($this->produce->encode($data)));
     }
 
     /**
@@ -212,7 +215,7 @@ final class ProduceTest extends TestCase
         $data     = '0000000100047465737400000001000000000000000000000000002a00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":14,"timestamp":0}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce->decode(hex2bin($data))));
     }
 
     public function testDecodeKafka10(): void
@@ -220,6 +223,6 @@ final class ProduceTest extends TestCase
         $data     = '0000000100047465737400000001000000000000000000000000006effffffffffffffff00000000';
         $expected = '{"throttleTime":0,"data":[{"topicName":"test","partitions":[{"partition":0,"errorCode":0,"offset":22,"timestamp":-1}]}]}';
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->produce10->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($this->produce10->decode(hex2bin($data))));
     }
 }

@@ -6,6 +6,21 @@ namespace Kafka\Sasl;
 use Kafka\CommonSocket;
 use Kafka\Exception;
 use Kafka\Protocol\Protocol as ProtocolTool;
+use function base64_decode;
+use function base64_encode;
+use function chr;
+use function count;
+use function explode;
+use function hash;
+use function hash_equals;
+use function hash_hmac;
+use function preg_match;
+use function random_int;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function substr;
+use function trim;
 
 class Scram extends Mechanism
 {
@@ -64,8 +79,8 @@ class Scram extends Mechanism
         }
 
         $this->hashAlgorithm = $algorithm;
-        $this->username      = $this->formatName(\trim($username));
-        $this->password      = \trim($password);
+        $this->username      = $this->formatName(trim($username));
+        $this->password      = trim($password);
     }
 
     /**
@@ -103,9 +118,9 @@ class Scram extends Mechanism
     protected function firstMessage(): string
     {
         $this->cnonce = $this->generateNonce();
-        $message      = \sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
+        $message      = sprintf('n,,n=%s,r=%s', $this->username, $this->cnonce);
 
-        $this->firstMessageBare = \substr($message, 3);
+        $this->firstMessageBare = substr($message, 3);
 
         return $message;
     }
@@ -115,21 +130,21 @@ class Scram extends Mechanism
      */
     protected function finalMessage(string $challenge): string
     {
-        $challengeArray = \explode(',', $challenge);
+        $challengeArray = explode(',', $challenge);
 
-        if (\count($challengeArray) < 3) {
+        if (count($challengeArray) < 3) {
             throw new Exception('Server response challenge is invalid.');
         }
 
-        $nonce = \substr($challengeArray[0], 2);
-        $salt  = \base64_decode(\substr($challengeArray[1], 2));
+        $nonce = substr($challengeArray[0], 2);
+        $salt  = base64_decode(substr($challengeArray[1], 2));
 
         if (! $salt) {
             throw new Exception('Server response challenge is invalid, paser salt is failure.');
         }
 
-        $i      = (int) \substr($challengeArray[2], 2);
-        $cnonce = \substr($nonce, 0, \strlen($this->cnonce));
+        $i      = (int) substr($challengeArray[2], 2);
+        $cnonce = substr($nonce, 0, strlen($this->cnonce));
 
         if ($cnonce !== $this->cnonce) {
             throw new Exception('Server response challenge is invalid, cnonce is invalid.');
@@ -161,18 +176,18 @@ class Scram extends Mechanism
 
         $clientSignature = $this->hmac($storedKey, $authMessage, true);
         $clientProof     = $clientKey ^ $clientSignature;
-        $proof           = ',p=' . \base64_encode($clientProof);
+        $proof           = ',p=' . base64_encode($clientProof);
 
         return $finalMessage . $proof;
     }
 
     /**
-      * SCRAM has also a server verification step
-      *
-      * @param string $data The additional data sent along a successful outcome.
+     * SCRAM has also a server verification step
      *
-      * @return bool Whether the server has been authenticated.
-      */
+     * @param string $data The additional data sent along a successful outcome.
+     *
+     * @return bool Whether the server has been authenticated.
+     */
     protected function verifyMessage(string $data): bool
     {
         $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9]{3}=|[A-Xa-z0-9]{2}==)?)$#';
@@ -181,14 +196,14 @@ class Scram extends Mechanism
             return false;
         }
 
-        if (! \preg_match($verifierRegexp, $data, $matches)) {
+        if (! preg_match($verifierRegexp, $data, $matches)) {
             return false;
         }
 
-        $proposedServerSignature = \base64_decode($matches[1]);
+        $proposedServerSignature = base64_decode($matches[1]);
         $serverKey               = $this->hmac($this->saltedPassword, 'Server Key', true);
         $serverSignature         = $this->hmac($serverKey, $this->authMessage, true);
-        return \hash_equals($proposedServerSignature, $serverSignature);
+        return hash_equals($proposedServerSignature, $serverSignature);
     }
 
     /**
@@ -199,37 +214,37 @@ class Scram extends Mechanism
         $str = '';
 
         for ($i = 0; $i < 32; $i++) {
-            $str .= \chr(\random_int(0, 255));
+            $str .= chr(random_int(0, 255));
         }
 
-        return \base64_encode($str);
+        return base64_encode($str);
     }
 
     private function hash(string $data): string
     {
-        return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
+        return hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
     }
 
     private function hmac(string $key, string $data, bool $raw): string
     {
-        return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
+        return hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
     }
 
-  /**
-    * Prepare a name for inclusion in a SCRAM response.
-    * @See RFC-4013.
-    *
-    * @param string $user a name to be prepared.
-    * @return string the reformatted name.
-    */
+    /**
+     * Prepare a name for inclusion in a SCRAM response.
+     * @See RFC-4013.
+     *
+     * @param string $user a name to be prepared.
+     * @return string the reformatted name.
+     */
     private function formatName(string $user): string
     {
-        return \str_replace(['=', ','], ['=3D', '=2C'], $user);
+        return str_replace(['=', ','], ['=3D', '=2C'], $user);
     }
 
-  /**
-    * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
-    */
+    /**
+     * Hi() call, which is essentially PBKDF2 (RFC-2898) with HMAC-H() as the pseudorandom function.
+     */
     private function hi(string $str, string $salt, int $icnt): string
     {
         $int1   = "\0\0\0\1";

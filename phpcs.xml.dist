@@ -11,175 +11,35 @@
     <file>src</file>
     <file>tests</file>
 
-    <rule ref="PSR2"/>
+    <rule ref="Doctrine" />
 
-    <rule ref="Generic.Formatting.SpaceAfterCast" />
-    <rule ref="Generic.Formatting.SpaceAfterNot" />
-    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
-
-    <rule ref="Squiz.Strings.ConcatenationSpacing">
-        <properties>
-            <property name="spacing" value="1"/>
-            <property name="ignoreNewlines" value="true"/>
-        </properties>
-    </rule>
-
-    <rule ref="Generic.Formatting.MultipleStatementAlignment">
-        <properties>
-            <property name="error" value="true"/>
-        </properties>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests\/Base\/StreamStub/*</exclude-pattern>
     </rule>
 
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
         <exclude-pattern>*/example/*</exclude-pattern>
     </rule>
-    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
-        <exclude-pattern>*/tests\/Base\/StreamStub/*</exclude-pattern>
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>*/example/*</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName">
+        <exclude-pattern>*/example/*</exclude-pattern>
     </rule>
 
-    <!-- strict rules -->
-    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowEqualOperators" />
-    <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly" />
-    <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition" />
-    <rule ref="SlevomatCodingStandard.ControlStructures.LanguageConstructWithParentheses" />
-    <rule ref="SlevomatCodingStandard.Classes.UnusedPrivateElements" />
-    <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace" />
-    <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch" />
-    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma" />
-    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
-    <rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints" />
-    <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility" />
-    <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />
-    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing" />
-    <rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse" />
-    <rule ref="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine" />
-    <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
-    <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
-    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing" />
-    <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses" />
-
-    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
-        <properties>
-            <property name="allowFullyQualifiedGlobalClasses" type="boolean" value="true"/>
-            <property name="allowFullyQualifiedGlobalFunctions" type="boolean" value="true"/>
-            <property name="allowFullyQualifiedGlobalConstants" type="boolean" value="true"/>
-            <property name="allowFullyQualifiedNameForCollidingClasses" type="boolean" value="true"/>
-        </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Types.EmptyLinesAroundTypeBraces">
-        <properties>
-            <property name="linesCountAfterOpeningBrace" value="0"/>
-            <property name="linesCountBeforeClosingBrace" value="0"/>
-        </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
-        <properties>
-            <property name="enableEachParameterAndReturnInspection" value="true"/>
-            <property name="traversableTypeHints" type="array" value="Doctrine\Common\Collections\Collection"/>
-            <property
-                    name="usefulAnnotations"
-                    type="array"
-                    value="
-                    @before,
-                    @beforeClass,
-                    @after,
-                    @afterClass,
-                    @test,
-                    @dataProvider,
-                    @deprecated,
-                    @expectedException,
-                    @expectedExceptionMessage,
-                    @expectedExceptionMessageRegExp,
-                    @expectedExceptionCode,
-                    @expectedDeprecation,
-                    @group,
-                    @internal,
-                    @link,
-                    @see,
-                    @throws
-                "
-            />
-        </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
-        <properties>
-            <property name="searchAnnotations" type="boolean" value="true"/>
-        </properties>
-    </rule>
-
+    <!-- Require presence of declare(strict_types=1) -->
     <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
         <properties>
-            <property name="newlinesCountBetweenOpenTagAndDeclare" value="1" />
-            <property name="spacesCountAroundEqualsSign" value="0" />
+            <property name="newlinesCountBetweenOpenTagAndDeclare" value="1"/>
+            <property name="spacesCountAroundEqualsSign" value="0"/>
+            <property name="newlinesCountAfterDeclare" value="2"/>
         </properties>
     </rule>
 
-    <rule ref="Squiz.Strings.DoubleQuoteUsage"/>
-    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-        <message>Variable "%s" not allowed in double quoted string; use sprintf() or concatenation instead</message>
-    </rule>
-
-    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
-
-    <rule ref="Squiz.Arrays.ArrayDeclaration">
-        <exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned"/>
-        <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
-        <exclude name="Squiz.Arrays.ArrayDeclaration.CloseBraceNotAligned"/>
-        <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned"/>
-    </rule>
-
-    <rule ref="Squiz.Strings.EchoedStrings"/>
-    <rule ref="Squiz.WhiteSpace.CastSpacing"/>
-    <rule ref="Squiz.WhiteSpace.FunctionOpeningBraceSpace"/>
-    <rule ref="Squiz.WhiteSpace.LanguageConstructSpacing"/>
-    <rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing"/>
-    <rule ref="Generic.Files.EndFileNewline"/>
-    <rule ref="Generic.WhiteSpace.ScopeIndent"/>
-
-    <rule ref="Squiz.WhiteSpace.ObjectOperatorSpacing">
+    <!-- Require space around colon in return types -->
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing">
         <properties>
-            <property name="ignoreNewlines" value="true"/>
+            <property name="spacesCountBeforeColon" value="0"/>
         </properties>
-    </rule>
-
-    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
-        <properties>
-            <property name="ignoreBlankLines" value="false"/>
-        </properties>
-    </rule>
-    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace.EmptyLines">
-        <severity>5</severity>
-    </rule>
-
-    <rule ref="Generic.CodeAnalysis.EmptyStatement">
-        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCATCH"/>
-    </rule>
-
-    <rule ref="Squiz.PHP.NonExecutableCode"/>
-
-    <rule ref="Squiz.Scope.StaticThisUsage"/>
-    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
-    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
-    <rule ref="Squiz.Functions.GlobalFunction"/>
-    <rule ref="Squiz.PHP.GlobalKeyword"/>
-    <rule ref="Squiz.PHP.InnerFunctions"/>
-    <rule ref="Generic.PHP.DeprecatedFunctions"/>
-    <rule ref="Generic.PHP.ForbiddenFunctions"/>
-    <rule ref="Squiz.Operators.ValidLogicalOperators"/>
-    <rule ref="Squiz.PHP.LowercasePHPFunctions"/>
-    <rule ref="Generic.PHP.BacktickOperator"/>
-    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
-    <rule ref="Generic.PHP.SAPIUsage"/>
-    <rule ref="PEAR.Commenting.InlineComment"/>
-
-    <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants">
-        <exclude-pattern>*/example/*</exclude-pattern>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions">
-        <exclude-pattern>*/example/*</exclude-pattern>
     </rule>
 </ruleset>
-

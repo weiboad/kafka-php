@@ -5,6 +5,9 @@ namespace KafkaTest\Base;
 
 use Kafka\Protocol;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 class ProtocolTest extends TestCase
 {
@@ -20,7 +23,7 @@ class ProtocolTest extends TestCase
 
         $expected = '0000004d000c00000000000c00096b61666b612d70687000047465737400000002002e6b61666b612d7068702d30653763626433332d373935302d343061662d623639312d656365616136363564323937';
 
-        self::assertSame($expected, \bin2hex(Protocol::encode(Protocol::HEART_BEAT_REQUEST, $data)));
+        self::assertSame($expected, bin2hex(Protocol::encode(Protocol::HEART_BEAT_REQUEST, $data)));
     }
 
     /**
@@ -56,9 +59,9 @@ class ProtocolTest extends TestCase
     {
         Protocol::init('0.9.0.1');
 
-        $test = Protocol::decode(Protocol::HEART_BEAT_REQUEST, \hex2bin('0000'));
+        $test = Protocol::decode(Protocol::HEART_BEAT_REQUEST, hex2bin('0000'));
 
-        self::assertJsonStringEqualsJsonString('{"errorCode":0}', \json_encode($test));
+        self::assertJsonStringEqualsJsonString('{"errorCode":0}', json_encode($test));
     }
 
     /**

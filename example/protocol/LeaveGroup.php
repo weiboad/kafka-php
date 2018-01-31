@@ -12,8 +12,6 @@ class LeaveGroup
      * @var string[]
      */
     protected $group = [];
-    // {{{ functions
-    // {{{ protected function joinGroup()
 
     protected function joinGroup(): void
     {
@@ -48,9 +46,6 @@ class LeaveGroup
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ protected function syncGroup()
 
     protected function syncGroup(): void
     {
@@ -90,9 +85,6 @@ class LeaveGroup
         });
     }
 
-    // }}}
-    // {{{ public function run()
-
     public function run(): void
     {
         $this->joinGroup();
@@ -118,9 +110,6 @@ class LeaveGroup
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // }}}
 }
 
 $leave = new LeaveGroup();

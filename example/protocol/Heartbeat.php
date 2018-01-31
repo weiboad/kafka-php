@@ -12,8 +12,6 @@ class Heartbeat
      * @var string[]
      */
     protected $group = [];
-    // {{{ functions
-    // {{{ protected function joinGroup()
 
     protected function joinGroup(): void
     {
@@ -48,9 +46,6 @@ class Heartbeat
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ protected function syncGroup()
 
     protected function syncGroup(): void
     {
@@ -90,9 +85,6 @@ class Heartbeat
         });
     }
 
-    // }}}
-    // {{{ public function run()
-
     public function run(): void
     {
         $this->joinGroup();
@@ -119,9 +111,6 @@ class Heartbeat
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // }}}
 }
 
 $heart = new Heartbeat();

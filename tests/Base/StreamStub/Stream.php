@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace KafkaTest\Base\StreamStub;
 
+use function str_repeat;
+use function strlen;
+
 class Stream
 {
     public function open(string $path, string $mode, int $options): bool
@@ -25,12 +28,12 @@ class Stream
 
     public function read(int $length): string
     {
-        return \str_repeat('x', $length);
+        return str_repeat('x', $length);
     }
 
     public function write(string $data): ?int
     {
-        return \strlen($data);
+        return strlen($data);
     }
 
     /**

@@ -9,6 +9,14 @@ use Kafka\LoggerTrait;
 use Kafka\ProducerConfig;
 use Kafka\Protocol\Protocol;
 use Psr\Log\LoggerAwareTrait;
+use function array_keys;
+use function count;
+use function explode;
+use function json_encode;
+use function shuffle;
+use function sprintf;
+use function substr;
+use function trim;
 
 class SyncProcess
 {
@@ -68,15 +76,15 @@ class SyncProcess
                 'compression'  => $compression,
             ];
 
-            $this->debug('Send message start, params:' . \json_encode($params));
+            $this->debug('Send message start, params:' . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $params);
             $connect->write($requestData);
 
             if ($requiredAck !== 0) { // If it is 0 the server will not send any response
                 $dataLen       = Protocol::unpack(Protocol::BIT_B32, $connect->read(4));
                 $data          = $connect->read($dataLen);
-                $correlationId = Protocol::unpack(Protocol::BIT_B32, \substr($data, 0, 4));
-                $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, \substr($data, 4));
+                $correlationId = Protocol::unpack(Protocol::BIT_B32, substr($data, 0, 4));
+                $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
 
                 $result[] = $ret;
             }
@@ -92,17 +100,17 @@ class SyncProcess
         $brokerList = ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
 
-        foreach (\explode(',', $brokerList) as $key => $val) {
-            if (\trim($val)) {
+        foreach (explode(',', $brokerList) as $key => $val) {
+            if (trim($val)) {
                 $brokerHost[] = $val;
             }
         }
 
-        if (\count($brokerHost) === 0) {
+        if (count($brokerHost) === 0) {
             throw new Exception('No valid broker configured');
         }
 
-        \shuffle($brokerHost);
+        shuffle($brokerHost);
         $broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
@@ -113,13 +121,13 @@ class SyncProcess
             }
 
             $params = [];
-            $this->debug('Start sync metadata request params:' . \json_encode($params));
+            $this->debug('Start sync metadata request params:' . json_encode($params));
             $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
             $socket->write($requestData);
             $dataLen       = Protocol::unpack(Protocol::BIT_B32, $socket->read(4));
             $data          = $socket->read($dataLen);
-            $correlationId = Protocol::unpack(Protocol::BIT_B32, \substr($data, 0, 4));
-            $result        = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, \substr($data, 4));
+            $correlationId = Protocol::unpack(Protocol::BIT_B32, substr($data, 0, 4));
+            $result        = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
 
             if (! isset($result['brokers'], $result['topics'])) {
                 throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
@@ -132,7 +140,7 @@ class SyncProcess
         }
 
         throw new \Kafka\Exception(
-            \sprintf(
+            sprintf(
                 'It was not possible to establish a connection for metadata with the brokers "%s"',
                 $brokerList
             )
@@ -151,7 +159,7 @@ class SyncProcess
         $topicInfos = $broker->getTopics();
 
         foreach ($data as $value) {
-            if (! isset($value['topic']) || ! \trim($value['topic'])) {
+            if (! isset($value['topic']) || ! trim($value['topic'])) {
                 continue;
             }
 
@@ -159,13 +167,13 @@ class SyncProcess
                 continue;
             }
 
-            if (! isset($value['value']) || ! \trim($value['value'])) {
+            if (! isset($value['value']) || ! trim($value['value'])) {
                 continue;
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partNums  = \array_keys($topicMeta);
-            \shuffle($partNums);
+            $partNums  = array_keys($topicMeta);
+            shuffle($partNums);
 
             $partId = isset($value['partId'], $topicMeta[$value['partId']]) ? $value['partId'] : $partNums[0];
 
@@ -182,7 +190,7 @@ class SyncProcess
 
             $partition['partition_id'] = $partId;
 
-            if (\trim($value['key'] ?? '') !== '') {
+            if (trim($value['key'] ?? '') !== '') {
                 $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
             } else {
                 $partition['messages'][] = $value['value'];

@@ -6,6 +6,9 @@ namespace Kafka\Protocol;
 use Kafka\Exception;
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function array_merge;
+use function strlen;
+use function substr;
 
 class Fetch extends Protocol
 {
@@ -53,11 +56,11 @@ class Fetch extends Protocol
         $throttleTime = 0;
 
         if ($version !== self::API_VERSION0) {
-            $throttleTime = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+            $throttleTime = self::unpack(self::BIT_B32, substr($data, $offset, 4));
             $offset      += 4;
         }
 
-        $topics  = $this->decodeArray(\substr($data, $offset), [$this, 'fetchTopic']);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'fetchTopic']);
         $offset += $topics['length'];
 
         return [
@@ -72,10 +75,10 @@ class Fetch extends Protocol
     protected function fetchTopic(string $data): array
     {
         $offset    = 0;
-        $topicInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(\substr($data, $offset), [$this, 'fetchPartition']);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'fetchPartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -95,20 +98,20 @@ class Fetch extends Protocol
     protected function fetchPartition(string $data): array
     {
         $offset              = 0;
-        $partitionId         = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $partitionId         = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset             += 4;
-        $errorCode           = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode           = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset             += 2;
-        $highwaterMarkOffset = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
+        $highwaterMarkOffset = self::unpack(self::BIT_B64, substr($data, $offset, 8));
         $offset             += 8;
 
-        $messageSetSize = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $messageSetSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset        += 4;
 
         $messages = [];
 
-        if ($messageSetSize > 0 && $offset < \strlen($data)) {
-            $messages = $this->decodeMessageSetArray(\substr($data, $offset, $messageSetSize), $messageSetSize);
+        if ($messageSetSize > 0 && $offset < strlen($data)) {
+            $messages = $this->decodeMessageSetArray(substr($data, $offset, $messageSetSize), $messageSetSize);
 
             $offset += $messages['length'];
         }
@@ -135,8 +138,8 @@ class Fetch extends Protocol
         $offset = 0;
         $result = [];
 
-        while ($offset < \strlen($data)) {
-            $value = \substr($data, $offset);
+        while ($offset < strlen($data)) {
+            $value = substr($data, $offset);
             $ret   = $this->decodeMessageSet($value);
 
             if ($ret === null) {
@@ -159,7 +162,7 @@ class Fetch extends Protocol
             }
 
             $innerMessages = $this->decodeMessageSetArray($ret['data']['message']['value'], $ret['length']);
-            $result        = \array_merge($result, $innerMessages['data']);
+            $result        = array_merge($result, $innerMessages['data']);
         }
 
         if ($offset < $messageSetSize) {
@@ -178,16 +181,16 @@ class Fetch extends Protocol
      */
     protected function decodeMessageSet(string $data): ?array
     {
-        if (\strlen($data) <= 12) {
+        if (strlen($data) <= 12) {
             return null;
         }
 
         $offset      = 0;
-        $roffset     = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
+        $roffset     = self::unpack(self::BIT_B64, substr($data, $offset, 8));
         $offset     += 8;
-        $messageSize = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $messageSize = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset     += 4;
-        $ret         = $this->decodeMessage(\substr($data, $offset), $messageSize);
+        $ret         = $this->decodeMessage(substr($data, $offset), $messageSize);
 
         if ($ret === null) {
             return null;
@@ -214,18 +217,18 @@ class Fetch extends Protocol
      */
     protected function decodeMessage(string $data, int $messageSize): ?array
     {
-        if ($messageSize === 0 || \strlen($data) < $messageSize) {
+        if ($messageSize === 0 || strlen($data) < $messageSize) {
             return null;
         }
 
         $offset  = 0;
-        $crc     = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $crc     = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset += 4;
 
-        $magic = self::unpack(self::BIT_B8, \substr($data, $offset, 1));
+        $magic = self::unpack(self::BIT_B8, substr($data, $offset, 1));
         ++$offset;
 
-        $attr = self::unpack(self::BIT_B8, \substr($data, $offset, 1));
+        $attr = self::unpack(self::BIT_B8, substr($data, $offset, 1));
         ++$offset;
 
         $timestamp  = 0;
@@ -233,14 +236,14 @@ class Fetch extends Protocol
 
         try { // try unpack message format v1, falling back to v0 if it fails
             if ($magic >= self::MESSAGE_MAGIC_VERSION1) {
-                $timestamp = self::unpack(self::BIT_B64, \substr($data, $offset, 8));
+                $timestamp = self::unpack(self::BIT_B64, substr($data, $offset, 8));
                 $offset   += 8;
             }
 
-            $keyRet  = $this->decodeString(\substr($data, $offset), self::BIT_B32);
+            $keyRet  = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset += $keyRet['length'];
 
-            $valueRet = $this->decodeString((string) \substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
+            $valueRet = $this->decodeString((string) substr($data, $offset), self::BIT_B32, $attr & Produce::COMPRESSION_CODEC_MASK);
             $offset  += $valueRet['length'];
 
             if ($offset !== $messageSize) {
@@ -251,10 +254,10 @@ class Fetch extends Protocol
         } catch (Exception $e) { // try unpack message format v0
             $offset    = $backOffset;
             $timestamp = 0;
-            $keyRet    = $this->decodeString(\substr($data, $offset), self::BIT_B32);
+            $keyRet    = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset   += $keyRet['length'];
 
-            $valueRet = $this->decodeString(\substr($data, $offset), self::BIT_B32);
+            $valueRet = $this->decodeString(substr($data, $offset), self::BIT_B32);
             $offset  += $valueRet['length'];
         }
 

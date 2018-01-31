@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
+use function substr;
 
 class ListGroup extends Protocol
 {
@@ -25,9 +26,9 @@ class ListGroup extends Protocol
     public function decode(string $data): array
     {
         $offset    = 0;
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
-        $groups    = $this->decodeArray(\substr($data, $offset), [$this, 'listGroup']);
+        $groups    = $this->decodeArray(substr($data, $offset), [$this, 'decodeGroup']);
 
         return [
             'errorCode' => $errorCode,
@@ -38,12 +39,12 @@ class ListGroup extends Protocol
     /**
      * @return mixed[]
      */
-    protected function listGroup(string $data): array
+    protected function decodeGroup(string $data): array
     {
         $offset       = 0;
-        $groupId      = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $groupId      = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset      += $groupId['length'];
-        $protocolType = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $protocolType = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset      += $protocolType['length'];
 
         return [

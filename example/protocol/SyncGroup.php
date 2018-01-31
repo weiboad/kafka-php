@@ -12,8 +12,6 @@ class SyncGroup
      * @var string[]
      */
     protected $group = [];
-    // {{{ functions
-    // {{{ protected function joinGroup()
 
     protected function joinGroup(): void
     {
@@ -48,9 +46,6 @@ class SyncGroup
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ public function run()
 
     public function run(): void
     {
@@ -89,9 +84,6 @@ class SyncGroup
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // }}}
 }
 
 $sync = new SyncGroup();

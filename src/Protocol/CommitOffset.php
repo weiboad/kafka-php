@@ -5,6 +5,8 @@ namespace Kafka\Protocol;
 
 use Kafka\Exception\NotSupported;
 use Kafka\Exception\Protocol as ProtocolException;
+use function substr;
+use function time;
 
 class CommitOffset extends Protocol
 {
@@ -64,7 +66,7 @@ class CommitOffset extends Protocol
     public function decode(string $data): array
     {
         $offset  = 0;
-        $topics  = $this->decodeArray(\substr($data, $offset), [$this, 'decodeTopic']);
+        $topics  = $this->decodeArray(substr($data, $offset), [$this, 'decodeTopic']);
         $offset += $topics['length'];
 
         return $topics['data'];
@@ -112,7 +114,7 @@ class CommitOffset extends Protocol
         }
 
         if (! isset($values['timestamp'])) {
-            $values['timestamp'] = \time() * 1000;
+            $values['timestamp'] = time() * 1000;
         }
 
         $version = $this->getApiVersion(self::OFFSET_COMMIT_REQUEST);
@@ -135,10 +137,10 @@ class CommitOffset extends Protocol
     protected function decodeTopic(string $data): array
     {
         $offset    = 0;
-        $topicInfo = $this->decodeString(\substr($data, $offset), self::BIT_B16);
+        $topicInfo = $this->decodeString(substr($data, $offset), self::BIT_B16);
         $offset   += $topicInfo['length'];
 
-        $partitions = $this->decodeArray(\substr($data, $offset), [$this, 'decodePartition']);
+        $partitions = $this->decodeArray(substr($data, $offset), [$this, 'decodePartition']);
         $offset    += $partitions['length'];
 
         return [
@@ -157,10 +159,10 @@ class CommitOffset extends Protocol
     {
         $offset = 0;
 
-        $partitionId = self::unpack(self::BIT_B32, \substr($data, $offset, 4));
+        $partitionId = self::unpack(self::BIT_B32, substr($data, $offset, 4));
         $offset     += 4;
 
-        $errorCode = self::unpack(self::BIT_B16_SIGNED, \substr($data, $offset, 2));
+        $errorCode = self::unpack(self::BIT_B16_SIGNED, substr($data, $offset, 2));
         $offset   += 2;
 
         return [

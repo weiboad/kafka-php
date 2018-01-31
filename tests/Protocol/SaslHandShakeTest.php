@@ -5,6 +5,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\SaslHandShake;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class SaslHandShakeTest extends TestCase
 {
@@ -22,7 +25,7 @@ final class SaslHandShakeTest extends TestCase
     {
         $test = $this->sasl->encode(['PLAIN']);
 
-        self::assertSame('0000001a001100000000001100096b61666b612d7068700005504c41494e', \bin2hex($test));
+        self::assertSame('0000001a001100000000001100096b61666b612d7068700005504c41494e', bin2hex($test));
     }
 
     /**
@@ -53,6 +56,6 @@ final class SaslHandShakeTest extends TestCase
         $data     = '0022000000010006475353415049';
         $expected = '{"mechanisms":["GSSAPI"],"errorCode":34}';
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($this->sasl->decode(\hex2bin($data))));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($this->sasl->decode(hex2bin($data))));
     }
 }

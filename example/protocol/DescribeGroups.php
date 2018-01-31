@@ -12,8 +12,6 @@ class DescribeGroups
      * @var string[]
      */
     protected $group = [];
-    // {{{ functions
-    // {{{ protected function joinGroup()
 
     protected function joinGroup(): void
     {
@@ -48,9 +46,6 @@ class DescribeGroups
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ protected function syncGroup()
 
     protected function syncGroup(): void
     {
@@ -90,9 +85,6 @@ class DescribeGroups
         });
     }
 
-    // }}}
-    // {{{ public function run()
-
     public function run(): void
     {
         $this->joinGroup();
@@ -115,9 +107,6 @@ class DescribeGroups
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // }}}
 }
 
 $describe = new DescribeGroups();

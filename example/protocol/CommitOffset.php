@@ -12,8 +12,6 @@ class CommitOffset
      * @var string[]
      */
     protected $group = [];
-    // {{{ functions
-    // {{{ protected function joinGroup()
 
     protected function joinGroup(): void
     {
@@ -48,9 +46,6 @@ class CommitOffset
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ protected function syncGroup()
 
     protected function syncGroup(): void
     {
@@ -89,9 +84,6 @@ class CommitOffset
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // {{{ public function run()
 
     public function run(): void
     {
@@ -132,9 +124,6 @@ class CommitOffset
         Amp\run(function () use ($socket, $requestData): void {
         });
     }
-
-    // }}}
-    // }}}
 }
 
 $commit = new CommitOffset();

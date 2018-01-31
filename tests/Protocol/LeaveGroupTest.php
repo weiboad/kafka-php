@@ -5,6 +5,9 @@ namespace KafkaTest\Protocol;
 
 use Kafka\Protocol\LeaveGroup;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function hex2bin;
+use function json_encode;
 
 final class LeaveGroupTest extends TestCase
 {
@@ -28,7 +31,7 @@ final class LeaveGroupTest extends TestCase
         $expected = '00000049000d00000000000d00096b61666b612d706870000474657374002e6b61666b612d7068702d65623139633065612d346233652d346564302d626164612d633837333935316338656561';
         $test     = $this->leave->encode($data);
 
-        self::assertSame($expected, \bin2hex($test));
+        self::assertSame($expected, bin2hex($test));
     }
 
     /**
@@ -53,9 +56,9 @@ final class LeaveGroupTest extends TestCase
 
     public function testDecode(): void
     {
-        $test     = $this->leave->decode(\hex2bin('0000'));
+        $test     = $this->leave->decode(hex2bin('0000'));
         $expected = '{"errorCode":0}';
 
-        self::assertJsonStringEqualsJsonString($expected, \json_encode($test));
+        self::assertJsonStringEqualsJsonString($expected, json_encode($test));
     }
 }
