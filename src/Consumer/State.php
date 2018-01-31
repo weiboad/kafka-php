@@ -38,17 +38,17 @@ class State
 
     private $callStatus = [];
 
-	private $requests = [
-		self::REQUEST_METADATA      => [],
-		self::REQUEST_GETGROUP      => [],
-		self::REQUEST_JOINGROUP     => [],
-		self::REQUEST_SYNCGROUP     => [],
-		self::REQUEST_HEARTGROUP    => [],
-		self::REQUEST_OFFSET        => ['interval' => 2000],
-		self::REQUEST_FETCH         => ['interval' => 100],
-		self::REQUEST_FETCH_OFFSET  => ['interval' => 2000],
-		self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
-	];
+    private $requests = [
+        self::REQUEST_METADATA      => [],
+        self::REQUEST_GETGROUP      => [],
+        self::REQUEST_JOINGROUP     => [],
+        self::REQUEST_SYNCGROUP     => [],
+        self::REQUEST_HEARTGROUP    => [],
+        self::REQUEST_OFFSET        => ['interval' => 2000],
+        self::REQUEST_FETCH         => ['interval' => 100],
+        self::REQUEST_FETCH_OFFSET  => ['interval' => 2000],
+        self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
+    ];
 
     private $loop = null;
 

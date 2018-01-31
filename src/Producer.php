@@ -26,7 +26,7 @@ class Producer
         } else {
             $this->process = new \Kafka\Producer\Process($producer);
         }
-		$this->loop = Loop::getInstance();
+        $this->loop = Loop::getInstance();
     }
 
     /**
