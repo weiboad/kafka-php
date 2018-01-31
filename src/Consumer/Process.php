@@ -557,8 +557,8 @@ class Process
                     continue;
                 }
 
-                $offset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
-                if ($offset === false) {
+				$consumerOffset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
+                if ($consumerOffset === false) {
                     return; // current is rejoin....
                 }
                 foreach ($part['messages'] as $message) {
@@ -566,12 +566,14 @@ class Process
                     //if ($this->consumer != null) {
                     //    call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
                     //}
-                    $offset = $message['offset'];
+                    $commitOffset = $message['offset'];
                 }
 
-                $consumerOffset = ($part['highwaterMarkOffset'] > $offset) ? ($offset + 1) : $offset;
+				$commitOffset = isset($commitOffset) ? $commitOffset : $consumerOffset - 1;
+				$consumerOffset = $commitOffset + 1;
+
                 $assign->setConsumerOffset($topic['topicName'], $part['partition'], $consumerOffset);
-                $assign->setCommitOffset($topic['topicName'], $part['partition'], $offset);
+				$assign->setCommitOffset($topic['topicName'], $part['partition'], $commitOffset);
             }
         }
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH, $fd);
