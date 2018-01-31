@@ -17,9 +17,9 @@ class State
     const STATUS_PROCESS = 8;
     const STATUS_FINISH  = 16;
 
-    
+
     private $callStatus = [];
-    
+
     private $requests = [
         self::REQUEST_METADATA => [],
         self::REQUEST_PRODUCE => [],
@@ -70,7 +70,7 @@ class State
         }
 
         // start sync metadata
-        if (isset($this->requests[self::REQUEST_METADATA]['func'])
+        if (isset($request, $this->requests[self::REQUEST_METADATA]['func'])
             && $this->callStatus[self::REQUEST_METADATA]['status'] == self::STATUS_LOOP) {
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
