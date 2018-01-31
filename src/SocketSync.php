@@ -42,7 +42,7 @@ class SocketSync extends CommonSocket
      * @access public
      * @return void
      */
-    public function close() 
+    public function close()
     {
         if (is_resource($this->stream)) {
             fclose($this->stream);
@@ -71,7 +71,7 @@ class SocketSync extends CommonSocket
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function read(int $len) 
+    public function read(int $len)
     {
         return $this->readBlocking($len);
     }

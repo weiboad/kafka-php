@@ -8,7 +8,7 @@ use Kafka\Exception;
 
 class Plain extends Mechanism
 {
-    private const MECHANISM_NAME = "PLAIN";
+    const MECHANISM_NAME = "PLAIN";
 
     private $username;
 
@@ -22,7 +22,7 @@ class Plain extends Mechanism
      * @access public
      * @return void
      */
-    public function __construct(string $username, string $password)
+    public function __construct($username, $password)
     {
         $this->username = trim($username);
         $this->password = trim($password);
@@ -35,7 +35,7 @@ class Plain extends Mechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket)
     {
         $split = \Kafka\Protocol\Protocol::pack(\Kafka\Protocol\Protocol::BIT_B8, 0);
         $data  = $split . $this->username . $split . $this->password;
@@ -51,7 +51,7 @@ class Plain extends Mechanism
      * @access public
      * @return string
      */
-    public function getName() : string
+    public function getName()
     {
         return self::MECHANISM_NAME;
     }

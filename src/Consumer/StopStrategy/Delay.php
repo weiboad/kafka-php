@@ -15,10 +15,10 @@ final class Delay implements StopStrategy
     private $delay;
     private $loop;
 
-    public function __construct(int $delay)
+    public function __construct($delay)
     {
         $this->delay = $delay;
-		$this->loop = Loop::getInstance();
+        $this->loop  = Loop::getInstance();
     }
 
     public function setup(Consumer $consumer)

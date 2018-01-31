@@ -94,7 +94,7 @@ abstract class Config
     {
         $version = trim($version);
         if ($version == '' || version_compare($version, '0.8.0') < 0) {
-            throw new \Kafka\Exception\Config('Set broker version value is invalid, must is not empty string and gt 0.8.0.');
+            throw new \Kafka\Exception\Config('Set broker version value is invalid, must is not empty and gt 0.8.0.');
         }
         static::$options['brokerVersion'] = $version;
     }
@@ -169,7 +169,7 @@ abstract class Config
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
     }
 
-    public function setSslLocalCert(string $localCert)
+    public function setSslLocalCert($localCert)
     {
         if (! file_exists($localCert) || ! is_file($localCert)) {
             throw new \Kafka\Exception\Config('Set ssl local cert file is invalid');
@@ -177,7 +177,7 @@ abstract class Config
         static::$options['sslLocalCert'] = $localCert;
     }
 
-    public function setSslLocalPk(string $localPk)
+    public function setSslLocalPk($localPk)
     {
         if (! file_exists($localPk) || ! is_file($localPk)) {
             throw new \Kafka\Exception\Config('Set ssl local private key file is invalid');
@@ -185,7 +185,7 @@ abstract class Config
         static::$options['sslLocalPk'] = $localPk;
     }
 
-    public function setSslCafile(string $cafile)
+    public function setSslCafile($cafile)
     {
         if (! file_exists($cafile) || ! is_file($cafile)) {
             throw new \Kafka\Exception\Config('Set ssl ca file is invalid');
@@ -193,7 +193,7 @@ abstract class Config
         static::$options['sslCafile'] = $cafile;
     }
 
-    public function setSaslKeytab(string $keytab)
+    public function setSaslKeytab($keytab)
     {
         if (! file_exists($keytab) || ! is_file($keytab)) {
             throw new \Kafka\Exception\Config('Set sasl gssapi keytab file is invalid');

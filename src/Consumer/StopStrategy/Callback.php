@@ -24,18 +24,18 @@ final class Callback implements StopStrategy
     private $interval;
     private $loop;
 
-    public function __construct(callable $callback, int $interval = self::DEFAULT_INTERVAL)
+    public function __construct($callback, $interval = self::DEFAULT_INTERVAL)
     {
         $this->callback = $callback;
         $this->interval = $interval;
-		$this->loop = Loop::getInstance();
+        $this->loop     = Loop::getInstance();
     }
 
     public function setup(Consumer $consumer)
     {
         $this->loop->repeat(
             $this->interval,
-            function (string $watcherId) use ($consumer) {
+            function ($watcherId) use ($consumer) {
                 $shouldStop = (bool) call_user_func($this->callback);
 
                 if (! $shouldStop) {

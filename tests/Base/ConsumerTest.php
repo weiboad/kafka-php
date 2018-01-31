@@ -147,7 +147,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
 
         $process->method('start')->willReturnCallback(
             function () use ($startCallback) {
-				Loop::getInstance()->defer($startCallback);
+                Loop::getInstance()->defer($startCallback);
             }
         );
 

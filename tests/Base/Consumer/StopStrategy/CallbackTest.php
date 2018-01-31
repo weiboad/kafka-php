@@ -1,7 +1,7 @@
 <?php
 namespace KafkaTest\Base\Consumer\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,12 +13,15 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
      */
     private $consumer;
 
+    private $loop;
+
     /**
      * @before
      */
     public function createConsumer()
     {
         $this->consumer = $this->createMock(Consumer::class, ['stop']);
+        $this->loop     = \Kafka\Loop::getInstance();
     }
 
     /**
@@ -39,11 +42,11 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
         );
         $strategy->setup($this->consumer);
 
-        self::assertSame(1, Loop::getInfo()['repeat']['enabled']);
+        self::assertSame(1, $this->loop->getInfo()['repeat']['enabled']);
 
-        Loop::delay(60, [Loop::class, 'stop']);
-        Loop::run();
+        $this->loop->delay(60, [$this->loop, 'stop']);
+        $this->loop->run();
 
-        self::assertSame(0, Loop::getInfo()['repeat']['enabled']);
+        self::assertSame(0, $this->loop->getInfo()['repeat']['enabled']);
     }
 }

@@ -107,47 +107,47 @@ abstract class CommonSocket
         $this->port                  = $port;
         $this->config                = $config;
         $this->saslMechanismProvider = $saslProvider;
-		$this->loop = Loop::getInstance();
+        $this->loop                  = Loop::getInstance();
     }
 
     /**
-     * @param float $sendTimeoutSec
+     * @param $sendTimeoutSec
      */
-    public function setSendTimeoutSec($sendTimeoutSec) 
+    public function setSendTimeoutSec($sendTimeoutSec)
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
 
     /**
-     * @param float $sendTimeoutUsec
+     * @param $sendTimeoutUsec
      */
-    public function setSendTimeoutUsec(float $sendTimeoutUsec) 
+    public function setSendTimeoutUsec($sendTimeoutUsec)
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
 
     /**
-     * @param float $recvTimeoutSec
+     * @param $recvTimeoutSec
      */
-    public function setRecvTimeoutSec(float $recvTimeoutSec) 
+    public function setRecvTimeoutSec($recvTimeoutSec)
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
     
 
     /**
-     * @param float $recvTimeoutUsec
+     * @param $recvTimeoutUsec
      */
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec) 
+    public function setRecvTimeoutUsec($recvTimeoutUsec)
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
     
 
     /**
-     * @param int $number
+     * @param $number
      */
-    public function setMaxWriteAttempts(int $number) 
+    public function setMaxWriteAttempts($number)
     {
         $this->maxWriteAttempts = $number;
     }
@@ -158,7 +158,7 @@ abstract class CommonSocket
      * @access public
      * @return void
      */
-    protected function createStream() 
+    protected function createStream()
     {
         if (empty($this->host)) {
             throw new \Kafka\Exception('Cannot open null host.');
@@ -321,7 +321,7 @@ abstract class CommonSocket
      * @return integer
      * @throws \Kafka\Exception
      */
-    public function writeBlocking($buf) 
+    public function writeBlocking($buf)
     {
         $write = [$this->stream];
 
@@ -377,5 +377,5 @@ abstract class CommonSocket
      * @access public
      * @return void
      */
-    abstract public function close() ;
+    abstract public function close();
 }

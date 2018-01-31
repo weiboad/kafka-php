@@ -76,7 +76,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      * testSetBrokerVersionEmpty
      *
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker version value is invalid, must is not empty string and gt 0.8.0.
+     * @expectedExceptionMessage Set broker version value is invalid, must is not empty and gt 0.8.0.
      * @access public
      * @return void
      */
@@ -90,7 +90,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      * testSetBrokerVersionValid
      *
      * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker version value is invalid, must is not empty string and gt 0.8.0.
+     * @expectedExceptionMessage Set broker version value is invalid, must is not empty and gt 0.8.0.
      * @access public
      * @return void
      */

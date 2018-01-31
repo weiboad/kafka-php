@@ -13,9 +13,9 @@ class Scram extends Mechanism implements SaslMechanism
     const SCRAM_SHA_256 = 256;
     const SCRAM_SHA_512 = 512;
     
-    private const MECHANISM_NAME = "SCRAM-SHA-";
+    const MECHANISM_NAME = "SCRAM-SHA-";
 
-    private const ALLOW_SHA_ALGORITHM = [
+    private static $allowShaAlgorithm = [
         self::SCRAM_SHA_256 => 'sha256',
         self::SCRAM_SHA_512 => 'sha512',
     ];
@@ -42,9 +42,9 @@ class Scram extends Mechanism implements SaslMechanism
      * @access public
      * @return void
      */
-    public function __construct(string $username, string $password, int $algorithm)
+    public function __construct($username, $password, $algorithm)
     {
-        if (! isset(self::ALLOW_SHA_ALGORITHM[$algorithm])) {
+        if (! isset(self::$allowShaAlgorithm[$algorithm])) {
             throw new Exception('Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].');
         }
         $this->hashAlgorithm = $algorithm;
@@ -60,7 +60,7 @@ class Scram extends Mechanism implements SaslMechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket)
     {
         $firstMessage = $this->firstMessage();
         $data         = ProtocolTool::encodeString($firstMessage, ProtocolTool::PACK_INT32);
@@ -87,7 +87,7 @@ class Scram extends Mechanism implements SaslMechanism
      * @access public
      * @return string
      */
-    public function getName() : string
+    public function getName()
     {
         return self::MECHANISM_NAME . $this->hashAlgorithm;
     }
@@ -98,7 +98,7 @@ class Scram extends Mechanism implements SaslMechanism
       * @return string The SCRAM response to send.
       * @access private
       */
-    protected function firstMessage() : string
+    protected function firstMessage()
     {
         $message                = '';
         $this->cnonce           = $this->generateNonce();
@@ -113,7 +113,7 @@ class Scram extends Mechanism implements SaslMechanism
       * @return string The SCRAM response to send.
       * @access private
       */
-    protected function finalMessage(string $challenge) : string
+    protected function finalMessage($challenge)
     {
         $message        = '';
         $challengeArray = explode(',', $challenge);
@@ -171,7 +171,7 @@ class Scram extends Mechanism implements SaslMechanism
       * @return bool Whether the server has been authenticated.
       * @access protected
       */
-    protected function verifyMessage(string $data) : bool
+    protected function verifyMessage($data)
     {
         $verifierRegexp = '#^v=((?:[A-Za-z0-9/+]{4})*(?:[A-Za-z0-9]{3}=|[A-Xa-z0-9]{2}==)?)$#';
         if ($this->saltedPassword === null || $this->authMessage === null) {
@@ -194,7 +194,7 @@ class Scram extends Mechanism implements SaslMechanism
     * @return string
     * @access protected
     */
-    protected function generateNonce() : string
+    protected function generateNonce()
     {
         $str = '';
         for ($i=0; $i<32; $i++) {
@@ -203,14 +203,14 @@ class Scram extends Mechanism implements SaslMechanism
         return base64_encode($str);
     }
 
-    private function hash(string $data) : string
+    private function hash($data)
     {
-        return \hash(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, true);
+        return \hash(self::$allowShaAlgorithm[$this->hashAlgorithm], $data, true);
     }
 
-    private function hmac(string $key, string $data, bool $raw) : string
+    private function hmac($key, $data, $raw)
     {
-        return \hash_hmac(self::ALLOW_SHA_ALGORITHM[$this->hashAlgorithm], $data, $key, $raw);
+        return \hash_hmac(self::$allowShaAlgorithm[$this->hashAlgorithm], $data, $key, $raw);
     }
 
   /**
@@ -221,7 +221,7 @@ class Scram extends Mechanism implements SaslMechanism
     * @return string the reformated name.
     * @access private
     */
-    private function formatName(string $user) : string
+    private function formatName($user)
     {
         return str_replace(['=', ','], ['=3D', '=2C'], $user);
 
@@ -237,7 +237,7 @@ class Scram extends Mechanism implements SaslMechanism
     * @return string
     * @access private
     */
-    private function hi(string $str, string $salt, int $icnt) : string
+    private function hi($str, $salt, $icnt)
     {
         $int1   = "\0\0\0\1";
         $ui     = $this->hmac($str, $salt . $int1, true);

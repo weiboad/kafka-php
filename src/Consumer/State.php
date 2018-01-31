@@ -40,11 +40,11 @@ class State
 
     private $requests = self::CLEAN_REQUEST_STATE;
 
-	private $loop = null;
+    private $loop = null;
 
     public function init()
     {
-		$this->loop = Loop::getInstance();
+        $this->loop       = Loop::getInstance();
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
             self::REQUEST_GETGROUP      => ['status' => self::STATUS_START],

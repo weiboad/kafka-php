@@ -25,7 +25,7 @@ class Consumer
     public function __construct($stopStrategy = null)
     {
         $this->stopStrategy = $stopStrategy;
-		$this->loop = Loop::getInstance();
+        $this->loop         = Loop::getInstance();
     }
 
     /**

@@ -9,7 +9,7 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 
 class Gssapi extends Mechanism
 {
-    private const MECHANISM_NAME = "GSSAPI";
+    const MECHANISM_NAME = "GSSAPI";
 
     private $principal;
 
@@ -24,13 +24,13 @@ class Gssapi extends Mechanism
      * @access public
      * @return void
      */
-    public function __construct(\GSSAPIContext $gssapi, string $principal)
+    public function __construct(\GSSAPIContext $gssapi, $principal)
     {
         $this->gssapi    = $gssapi;
         $this->principal = $principal;
     }
 
-    public static function fromKeytab(string $keytab, string $principal): self
+    public static function fromKeytab($keytab, $principal)
     {
         if (! extension_loaded('krb5')) {
             throw new Exception('Extension "krb5" is required for "GSSAPI" authentication');
@@ -59,7 +59,7 @@ class Gssapi extends Mechanism
      * @access protected
      * @return void
      */
-    protected function performAuthentication(CommonSocket $socket) : void
+    protected function performAuthentication(CommonSocket $socket)
     {
         $token = $this->initSecurityContext();
 
@@ -81,12 +81,12 @@ class Gssapi extends Mechanism
      * @access public
      * @return string
      */
-    public function getName() : string
+    public function getName()
     {
         return self::MECHANISM_NAME;
     }
 
-    private function initSecurityContext() : string
+    private function initSecurityContext()
     {
         $token = '';
         $ret   = $this->gssapi->initSecContext($this->principal, null, null, null, $token);
@@ -96,7 +96,7 @@ class Gssapi extends Mechanism
         return $token;
     }
     
-    private function wrapToken(string $token) : string
+    private function wrapToken($token)
     {
         $message = '';
         $this->gssapi->wrap($token, $message);

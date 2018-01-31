@@ -9,7 +9,7 @@ use Kafka\Protocol\Protocol as ProtocolTool;
 abstract class Mechanism implements \Kafka\SaslMechanism
 {
 
-    public function authenticate(CommonSocket $socket): void
+    public function authenticate(CommonSocket $socket)
     {
         $this->handShake($socket, $this->getName());
         $this->performAuthentication($socket);
@@ -22,7 +22,7 @@ abstract class Mechanism implements \Kafka\SaslMechanism
      * @access protected
      * @return void
      */
-    protected function handShake(CommonSocket $socket, string $mechanism) : void
+    protected function handShake(CommonSocket $socket, $mechanism)
     {
         $requestData = Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, $mechanism);
         $socket->writeBlocking($requestData);
@@ -37,6 +37,6 @@ abstract class Mechanism implements \Kafka\SaslMechanism
         }
     }
 
-    abstract protected function performAuthentication(CommonSocket $socket): void;
-    abstract public function getName(): string;
+    abstract protected function performAuthentication(CommonSocket $socket);
+    abstract public function getName();
 }

@@ -4,7 +4,7 @@ namespace Kafka\Protocol;
 class SaslHandShake extends Protocol
 {
     
-    private const ALLOW_SASL_MECHANISMS = [
+    private static $allowSaslMechanisms = [
         'GSSAPI',
         'PLAIN',
         'SCRAM-SHA-256',
@@ -24,8 +24,8 @@ class SaslHandShake extends Protocol
             throw new \Kafka\Exception\Protocol('Invalid request SASL hand shake mechanism given. ');
         }
 
-        if (! in_array($mechanism, self::ALLOW_SASL_MECHANISMS, true)) {
-            throw new \Kafka\Exception\Protocol('Invalid request SASL hand shake mechanism given, it must be one of: ' . implode('|', self::ALLOW_SASL_MECHANISMS));
+        if (! in_array($mechanism, self::$allowSaslMechanisms, true)) {
+            throw new \Kafka\Exception\Protocol('Invalid request SASL hand shake mechanism given, it must be one of: ' . implode('|', self::$allowSaslMechanisms));
         }
 
         $header = $this->requestHeader('kafka-php', self::SASL_HAND_SHAKE_REQUEST, self::SASL_HAND_SHAKE_REQUEST);

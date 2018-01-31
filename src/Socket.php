@@ -107,7 +107,7 @@ class Socket extends CommonSocket
      * @access public
      * @return void
      */
-    public function close() : void
+    public function close()
     {
         $this->loop->cancel($this->readWatcher);
         $this->loop->cancel($this->writeWatcher);

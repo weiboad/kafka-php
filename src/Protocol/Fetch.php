@@ -121,7 +121,7 @@ class Fetch extends Protocol
                 'errorCode' => $errorCode,
                 'highwaterMarkOffset' => $highwaterMarkOffset,
                 'messageSetSize' => $messageSetSize,
-                'messages' => $messages['data'] ?? [],
+                'messages' => isset($messages['data']) ? $messages['data'] : [],
             ]
         ];
     }

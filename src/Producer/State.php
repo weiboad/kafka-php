@@ -20,7 +20,7 @@ class State
 
     private $callStatus = [];
     
-	private $loop = null;
+    private $loop = null;
 
     private $requests = [
         self::REQUEST_METADATA => [],
@@ -29,7 +29,7 @@ class State
 
     public function init()
     {
-		$this->loop = Loop::getInstance();
+        $this->loop       = Loop::getInstance();
         $this->callStatus = [
             self::REQUEST_METADATA => [
                 'status'=> self::STATUS_LOOP,

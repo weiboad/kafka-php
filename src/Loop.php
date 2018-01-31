@@ -1,94 +1,92 @@
 <?php
 namespace Kafka;
 
-use Amp as AmpLoop;
-
 class Loop
 {
-	use \Kafka\SingletonTrait;
+    use \Kafka\SingletonTrait;
 
     private $watchers = [];
 
-    public function repeat(int $interval, callable $callback) 
+    public function repeat($interval, callable $callback)
     {
-        $watcherId = AmpLoop::repeat($interval, $callback);
+        $watcherId = \Amp\repeat($callback, $interval);
         $this->addWatcher($watcherId);
         return $watcherId;
     }
 
-    public function defer(callable $callback) 
+    public function defer(callable $callback)
     {
-        $watcherId = AmpLoop::defer($callback);
+        $watcherId = \Amp\immediately($callback);
         $this->addWatcher($watcherId);
         return $watcherId;
     }
 
-    public function cancel(string $watcherId) 
+    public function cancel($watcherId)
     {
-        AmpLoop::cancel($watcherId);
+        \Amp\cancel($watcherId);
         $this->delWatcher($watcherId);
     }
 
-    public function disable(string $watcherId) 
+    public function disable($watcherId)
     {
-        AmpLoop::disable($watcherId);
+        \Amp\disable($watcherId);
     }
 
-    public function enable(string $watcherId) 
+    public function enable($watcherId)
     {
-        AmpLoop::enable($watcherId);
+        \Amp\enable($watcherId);
     }
 
-    public function delay(int $delay, callable $callback, $data = null) 
+    public function delay($delay, callable $callback, $data = [])
     {
-        $watcherId = AmpLoop::delay($delay, $callback, $data);
+        $watcherId = \Amp\once($callback, $delay, $data);
         $this->addWatcher($watcherId);
         return $watcherId;
     }
 
-    public function onReadable($stream, callable $callback, $data = null) 
+    public function onReadable($stream, callable $callback, $data = [])
     {
-        $watcherId = AmpLoop::onReadable($stream, $callback, $data);
+        $watcherId = \Amp\onReadable($stream, $callback, $data);
         $this->addWatcher($watcherId);
         return $watcherId;
     }
 
-    public function onWritable($stream, callable $callback, $data = null) 
+    public function onWritable($stream, callable $callback, $data = [])
     {
-        $watcherId = AmpLoop::onWritable($stream, $callback, $data);
+        $watcherId = \Amp\onWritable($stream, $callback, $data);
         $this->addWatcher($watcherId);
         return $watcherId;
     }
 
-    public function run() 
+    public function run()
     {
-        $info = AmpLoop::getInfo();
+        $info = \Amp\info();
         if (isset($info['running']) && $info['running'] === true) {
             return;
         }
 
-        AmpLoop::run();
+        \Amp\run();
     }
 
-    public function stop() 
+    public function stop()
     {
-        AmpLoop::stop();
+        \Amp\stop();
         foreach ($this->watchers as $watcherId => $unused) {
             $this->cancel($watcherId);
         }
     }
 
-    public function getInfo() 
+    public function getInfo()
     {
-        return AmpLoop::getInfo();
+        return \Amp\info();
     }
 
-    private function addWatcher(string $watcherId) 
+    private function addWatcher($watcherId)
     {
         $this->watchers[$watcherId] = true;
     }
 
-    private function delWatcher(string $watcherId) 
+    private function delWatcher($watcherId)
     {
         if (! isset($this->watchers[$watcherId])) {
             return;

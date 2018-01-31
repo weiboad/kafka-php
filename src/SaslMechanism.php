@@ -10,5 +10,5 @@ interface SaslMechanism
      * @access public
      * @return void
      */
-    public function authenticate(CommonSocket $socket) : void;
+    public function authenticate(CommonSocket $socket);
 }
