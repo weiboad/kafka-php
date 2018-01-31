@@ -174,7 +174,7 @@ class Broker
         return $socket;
     }
 
-    private function judgeConnectionConfig() : ?SaslMechanism
+    private function judgeConnectionConfig() 
     {
         if ($this->config == null) {
             return null;
@@ -203,7 +203,7 @@ class Broker
         return null;
     }
 
-    private function getSaslMechanismProvider() : SaslMechanism
+    private function getSaslMechanismProvider() 
     {
         $mechanism = $this->config->getSaslMechanism();
         $provider  = null;

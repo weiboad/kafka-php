@@ -1,9 +1,7 @@
 <?php
-declare(strict_types=1);
-
 namespace Kafka\Consumer\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy;
 
@@ -15,17 +13,19 @@ final class Delay implements StopStrategy
      * @var int
      */
     private $delay;
+    private $loop;
 
     public function __construct(int $delay)
     {
         $this->delay = $delay;
+		$this->loop = Loop::getInstance();
     }
 
-    public function setup(Consumer $consumer): void
+    public function setup(Consumer $consumer)
     {
-        Loop::delay(
+        $this->loop->delay(
             $this->delay,
-            function () use ($consumer): void {
+            function () use ($consumer) {
                 $consumer->stop();
             }
         );

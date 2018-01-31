@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Functional;
 
 use Kafka\Protocol;
@@ -12,7 +10,7 @@ final class AsyncProducerTest extends ProducerTest
      *
      * @runInSeparateProcess
      */
-    public function sendAsyncMessages(): void
+    public function sendAsyncMessages()
     {
         $this->configureProducer();
 
@@ -21,12 +19,12 @@ final class AsyncProducerTest extends ProducerTest
 
         $producer = new \Kafka\Producer([$this, 'createMessages']);
         $producer->success(
-            function () use (&$messagesSent): void {
+            function () use (&$messagesSent) {
                 $messagesSent = true;
             }
         );
         $producer->error(
-            function (int $errorCode) use (&$error): void {
+            function (int $errorCode) use (&$error) {
                 $error = $errorCode;
             }
         );

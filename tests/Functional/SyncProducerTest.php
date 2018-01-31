@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Functional;
 
 final class SyncProducerTest extends ProducerTest
@@ -10,7 +8,7 @@ final class SyncProducerTest extends ProducerTest
      *
      * @runInSeparateProcess
      */
-    public function sendSyncMessages(): void
+    public function sendSyncMessages()
     {
         $this->configureProducer();
 

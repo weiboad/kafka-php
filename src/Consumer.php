@@ -1,7 +1,7 @@
 <?php
 namespace Kafka;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer\Process;
 use Kafka\Consumer\StopStrategy;
 
@@ -15,14 +15,17 @@ class Consumer
      */
     private $stopStrategy;
 
+    private $loop = null;
+
     /**
      * @var Process|null
      */
     private $process;
 
-    public function __construct(?StopStrategy $stopStrategy = null)
+    public function __construct($stopStrategy = null)
     {
         $this->stopStrategy = $stopStrategy;
+		$this->loop = Loop::getInstance();
     }
 
     /**
@@ -34,7 +37,7 @@ class Consumer
      *
      * @return void
      */
-    public function start(?callable $consumer = null): void
+    public function start($consumer = null)
     {
         if ($this->process !== null) {
             $this->error('Consumer is already being executed');
@@ -46,7 +49,7 @@ class Consumer
         $this->process = $this->createProcess($consumer);
         $this->process->start();
 
-        Loop::run();
+        $this->loop->run();
     }
 
     /**
@@ -57,7 +60,7 @@ class Consumer
      *
      * @codeCoverageIgnore
      */
-    protected function createProcess(?callable $consumer): Process
+    protected function createProcess($consumer)
     {
         $process = new Process($consumer);
 
@@ -68,7 +71,7 @@ class Consumer
         return $process;
     }
 
-    private function setupStopStrategy(): void
+    private function setupStopStrategy()
     {
         if ($this->stopStrategy === null) {
             return;
@@ -77,7 +80,7 @@ class Consumer
         $this->stopStrategy->setup($this);
     }
 
-    public function stop(): void
+    public function stop()
     {
         if ($this->process === null) {
             $this->error('Consumer is not running');
@@ -87,6 +90,6 @@ class Consumer
         $this->process->stop();
         $this->process = null;
 
-        Loop::stop();
+        $this->loop->stop();
     }
 }

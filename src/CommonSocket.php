@@ -91,6 +91,8 @@ abstract class CommonSocket
      */
     private $saslMechanismProvider = null;
 
+    private $loop = null;
+
     /**
      * __construct
      *
@@ -99,18 +101,19 @@ abstract class CommonSocket
      * @param $port
      * @param Object $config
      */
-    public function __construct(string $host, int $port, ?Config $config = null, ?SaslMechanism $saslProvider = null)
+    public function __construct($host, $port, $config = null, $saslProvider = null)
     {
         $this->host                  = $host;
         $this->port                  = $port;
         $this->config                = $config;
         $this->saslMechanismProvider = $saslProvider;
+		$this->loop = Loop::getInstance();
     }
 
     /**
      * @param float $sendTimeoutSec
      */
-    public function setSendTimeoutSec(float $sendTimeoutSec) : void
+    public function setSendTimeoutSec($sendTimeoutSec) 
     {
         $this->sendTimeoutSec = $sendTimeoutSec;
     }
@@ -118,7 +121,7 @@ abstract class CommonSocket
     /**
      * @param float $sendTimeoutUsec
      */
-    public function setSendTimeoutUsec(float $sendTimeoutUsec) : void
+    public function setSendTimeoutUsec(float $sendTimeoutUsec) 
     {
         $this->sendTimeoutUsec = $sendTimeoutUsec;
     }
@@ -126,7 +129,7 @@ abstract class CommonSocket
     /**
      * @param float $recvTimeoutSec
      */
-    public function setRecvTimeoutSec(float $recvTimeoutSec) : void
+    public function setRecvTimeoutSec(float $recvTimeoutSec) 
     {
         $this->recvTimeoutSec = $recvTimeoutSec;
     }
@@ -135,7 +138,7 @@ abstract class CommonSocket
     /**
      * @param float $recvTimeoutUsec
      */
-    public function setRecvTimeoutUsec(float $recvTimeoutUsec) : void
+    public function setRecvTimeoutUsec(float $recvTimeoutUsec) 
     {
         $this->recvTimeoutUsec = $recvTimeoutUsec;
     }
@@ -144,7 +147,7 @@ abstract class CommonSocket
     /**
      * @param int $number
      */
-    public function setMaxWriteAttempts(int $number) : void
+    public function setMaxWriteAttempts(int $number) 
     {
         $this->maxWriteAttempts = $number;
     }
@@ -155,7 +158,7 @@ abstract class CommonSocket
      * @access public
      * @return void
      */
-    protected function createStream() : void
+    protected function createStream() 
     {
         if (empty($this->host)) {
             throw new \Kafka\Exception('Cannot open null host.');
@@ -264,7 +267,7 @@ abstract class CommonSocket
      * @return string Binary data
      * @throws \Kafka\Exception
      */
-    public function readBlocking(int $len) : string
+    public function readBlocking($len)
     {
         if ($len > self::READ_MAX_LENGTH) {
             throw new \Kafka\Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
@@ -318,7 +321,7 @@ abstract class CommonSocket
      * @return integer
      * @throws \Kafka\Exception
      */
-    public function writeBlocking(string $buf) : int
+    public function writeBlocking($buf) 
     {
         $write = [$this->stream];
 
@@ -374,5 +377,5 @@ abstract class CommonSocket
      * @access public
      * @return void
      */
-    abstract public function close() : void;
+    abstract public function close() ;
 }

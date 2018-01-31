@@ -1,9 +1,7 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Base;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -17,7 +15,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @before
      */
-    public function createConsumer(?Consumer\StopStrategy $stopStrategy = null): void
+    public function createConsumer($stopStrategy = null)
     {
 
         $this->consumer = $this->getMockBuilder(Consumer::class)
@@ -32,7 +30,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function startShouldRunTheProcessForeverWhenNoStopStrategyWasConfigured(): void
+    public function startShouldRunTheProcessForeverWhenNoStopStrategyWasConfigured()
     {
         $executed = false;
 
@@ -41,7 +39,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
 
         $startCallback = function () use (&$executed) {
             $executed = true;
-            Loop::stop();
+            Loop::getInstance()->stop();
         };
 
         $this->consumer->expects($this->once())
@@ -57,14 +55,14 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function startShouldLogErrorWhenSomeoneTriesToDoItTwice(): void
+    public function startShouldLogErrorWhenSomeoneTriesToDoItTwice()
     {
         $callback = function () {
         };
 
         $startCallback = function () {
             $this->consumer->start();
-            Loop::stop();
+            Loop::getInstance()->stop();
         };
 
         $this->consumer->expects($this->once())
@@ -82,7 +80,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function startShouldRunTheProcessUntilTheStopVerifierSaysSo(): void
+    public function startShouldRunTheProcessUntilTheStopVerifierSaysSo()
     {
         $executed = false;
 
@@ -95,7 +93,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
 
         $this->createConsumer(
             new Consumer\StopStrategy\Callback(
-                function () use (&$executed): bool {
+                function () use (&$executed) {
                     return $executed;
                 }
             )
@@ -114,7 +112,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function stopShouldCleanThingsAndStopTheLoop(): void
+    public function stopShouldCleanThingsAndStopTheLoop()
     {
         $callback = function () {
         };
@@ -134,7 +132,7 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function stopShouldLogErrorWhenConsumerIsNotRunning(): void
+    public function stopShouldLogErrorWhenConsumerIsNotRunning()
     {
         $this->consumer->expects($this->once())
                        ->method('error')
@@ -143,13 +141,13 @@ final class ConsumerTest extends \PHPUnit\Framework\TestCase
         $this->consumer->stop();
     }
 
-    private function createProcess(callable $startCallback, bool $expectsStop = false): Consumer\Process
+    private function createProcess($startCallback, $expectsStop = false)
     {
         $process = $this->createMock(Consumer\Process::class);
 
         $process->method('start')->willReturnCallback(
             function () use ($startCallback) {
-                Loop::defer($startCallback);
+				Loop::getInstance()->defer($startCallback);
             }
         );
 

@@ -88,7 +88,7 @@ class Protocol
     const UNKNOWN_PRODUCER_ID                   = 59;
     const REASSIGNMENT_IN_PROGRESS              = 60;
 
-    private const PROTOCOL_ERROR_MAP = [
+    private static $protocolMap = [
         0  => 'No error--it worked!',
         -1 => 'An unexpected server error',
         1  => 'The requested offset is outside the range of offsets maintained by the server for the given topic/partition.',
@@ -227,10 +227,10 @@ class Protocol
      */
     public static function getError($errCode)
     {
-        if (! isset(self::PROTOCOL_ERROR_MAP[$errCode])) {
+        if (! isset(self::$protocolMap[$errCode])) {
             return 'Unknown error (' . $errCode . ')';
         }
 
-        return self::PROTOCOL_ERROR_MAP[$errCode];
+        return self::$protocolMap[$errCode];
     }
 }

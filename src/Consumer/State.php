@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Consumer;
 
-use Amp\Loop;
+use Kafka\Loop;
 
 class State
 {
@@ -40,8 +40,11 @@ class State
 
     private $requests = self::CLEAN_REQUEST_STATE;
 
+	private $loop = null;
+
     public function init()
     {
+		$this->loop = Loop::getInstance();
         $this->callStatus = [
             self::REQUEST_METADATA      => ['status' => self::STATUS_LOOP],
             self::REQUEST_GETGROUP      => ['status' => self::STATUS_START],
@@ -76,7 +79,7 @@ class State
                 continue;
             }
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            $this->loop->repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -90,7 +93,7 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        Loop::repeat(1000, function ($watcherId) {
+        $this->loop->repeat(1000, function ($watcherId) {
             $this->report();
         });
     }
@@ -110,7 +113,7 @@ class State
                 return;
             }
 
-            Loop::cancel($this->requests[$request]['watcher']);
+            $this->loop->cancel($this->requests[$request]['watcher']);
         }
     }
 

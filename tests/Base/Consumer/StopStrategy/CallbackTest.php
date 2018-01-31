@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Base\Consumer\StopStrategy;
 
 use Amp\Loop;
@@ -18,15 +16,15 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
     /**
      * @before
      */
-    public function createConsumer(): void
+    public function createConsumer()
     {
-        $this->consumer = $this->createPartialMock(Consumer::class, ['stop']);
+        $this->consumer = $this->createMock(Consumer::class, ['stop']);
     }
 
     /**
      * @test
      */
-    public function setupShouldStopTheConsumerOnceTheCallbackReturnsTrue(): void
+    public function setupShouldStopTheConsumerOnceTheCallbackReturnsTrue()
     {
         $this->consumer->expects($this->once())
                        ->method('stop');
@@ -34,7 +32,7 @@ final class CallbackTest extends \PHPUnit\Framework\TestCase
         $executionCount = 0;
 
         $strategy = new Callback(
-            function () use (&$executionCount): bool {
+            function () use (&$executionCount) {
                 return ++$executionCount === 5;
             },
             10

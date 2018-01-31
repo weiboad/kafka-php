@@ -1,8 +1,6 @@
 <?php
 namespace Kafka\Producer;
 
-use Amp\Loop;
-
 class Process
 {
     use \Psr\Log\LoggerAwareTrait;
@@ -73,17 +71,6 @@ class Process
     {
         $this->init();
         $this->state->start();
-        $config = \Kafka\ProducerConfig::getInstance();
-        $isAsyn = $config->getIsAsyn();
-        if (! $isAsyn) {
-            Loop::repeat($config->getRequestTimeout(), function ($watcherId) {
-                if ($this->error) {
-                    call_user_func($this->error, 1000);
-                }
-                Loop::cancel($watcherId);
-                Loop::stop();
-            });
-        };
     }
 
     /**

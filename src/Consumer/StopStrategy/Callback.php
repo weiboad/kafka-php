@@ -1,15 +1,13 @@
 <?php
-declare(strict_types=1);
-
 namespace Kafka\Consumer\StopStrategy;
 
-use Amp\Loop;
+use Kafka\Loop;
 use Kafka\Consumer;
 use Kafka\Consumer\StopStrategy;
 
 final class Callback implements StopStrategy
 {
-    private const DEFAULT_INTERVAL = 250;
+    const DEFAULT_INTERVAL = 250;
 
     /**
      * The verification callback that will be executed to check if the consumer must be stopped or not
@@ -24,26 +22,28 @@ final class Callback implements StopStrategy
      * @var int
      */
     private $interval;
+    private $loop;
 
     public function __construct(callable $callback, int $interval = self::DEFAULT_INTERVAL)
     {
         $this->callback = $callback;
         $this->interval = $interval;
+		$this->loop = Loop::getInstance();
     }
 
-    public function setup(Consumer $consumer): void
+    public function setup(Consumer $consumer)
     {
-        Loop::repeat(
+        $this->loop->repeat(
             $this->interval,
-            function (string $watcherId) use ($consumer): void {
-                $shouldStop = (bool) ($this->callback)();
+            function (string $watcherId) use ($consumer) {
+                $shouldStop = (bool) call_user_func($this->callback);
 
                 if (! $shouldStop) {
                     return;
                 }
 
                 $consumer->stop();
-                Loop::cancel($watcherId);
+                $this->loop->cancel($watcherId);
             }
         );
     }

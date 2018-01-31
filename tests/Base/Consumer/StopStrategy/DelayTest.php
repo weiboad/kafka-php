@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Base\Consumer\StopStrategy;
 
 use Amp\Loop;
@@ -18,7 +16,7 @@ final class DelayTest extends \PHPUnit\Framework\TestCase
     /**
      * @before
      */
-    public function createConsumer(): void
+    public function createConsumer()
     {
         $this->consumer = $this->createPartialMock(Consumer::class, ['stop']);
     }
@@ -26,7 +24,7 @@ final class DelayTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      */
-    public function setupShouldStopTheConsumerAfterTheConfiguredDelay(): void
+    public function setupShouldStopTheConsumerAfterTheConfiguredDelay()
     {
         $this->consumer->expects($this->once())
                        ->method('stop');

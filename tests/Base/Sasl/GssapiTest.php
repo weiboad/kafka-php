@@ -113,7 +113,7 @@ class GssapiTest extends \PHPUnit\Framework\TestCase
         return $socket;
     }
 
-    private function mockGssapiContext(string $principal, bool $success = true, int $initTimes = 1, int $wrapTimes = 1) : \GSSAPIContext
+    private function mockGssapiContext($principal, $success = true, $initTimes = 1, $wrapTimes = 1)
     {
         $gssapiContext = $this->createMock(\GSSAPIContext::class);
         $gssapiContext->expects($this->exactly($initTimes))

@@ -1,13 +1,11 @@
 <?php
-declare(strict_types=1);
-
 namespace KafkaTest\Functional;
 
 use Kafka\Consumer\StopStrategy\Callback;
 
 abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 {
-    private const MESSAGES_TO_SEND = 30;
+    const MESSAGES_TO_SEND = 30;
 
     /**
      * @var string
@@ -27,7 +25,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * @before
      */
-    public function prepareEnvironment(): void
+    public function prepareEnvironment()
     {
         $this->version = getenv('KAFKA_VERSION');
         $this->brokers = getenv('KAFKA_BROKERS');
@@ -40,7 +38,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    protected function configureProducer(): void
+    protected function configureProducer()
     {
         $config = \Kafka\ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
@@ -52,7 +50,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
      *
      * @runInSeparateProcess
      */
-    public function consumeProducedMessages(): void
+    public function consumeProducedMessages()
     {
         $this->configureConsumer();
 
@@ -61,7 +59,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
         $consumer = new \Kafka\Consumer(
             new Callback(
-                function () use (&$consumedMessages, $executionEnd): bool {
+                function () use (&$consumedMessages, $executionEnd) {
                     return $consumedMessages >= self::MESSAGES_TO_SEND || new \DateTimeImmutable() > $executionEnd;
                 }
             )
@@ -76,7 +74,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(self::MESSAGES_TO_SEND, $consumedMessages);
     }
 
-    private function configureConsumer(): void
+    private function configureConsumer()
     {
         $config = \Kafka\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
@@ -86,7 +84,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
         $config->setTopics([$this->topic]);
     }
 
-    public function createMessages(int $amount = self::MESSAGES_TO_SEND): array
+    public function createMessages($amount = self::MESSAGES_TO_SEND)
     {
         $messages = [];
 

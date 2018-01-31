@@ -14,14 +14,14 @@ abstract class Config
     const SASL_MECHANISMS_SCRAM_SHA_256 = 'SCRAM_SHA_256';
     const SASL_MECHANISMS_SCRAM_SHA_512 = 'SCRAM_SHA_512';
 
-    private const ALLOW_SECURITY_PROTOCOLS = [
+    private static $allowSecurityProtocols = [
         self::SECURITY_PROTOCOL_PLAINTEXT,
         self::SECURITY_PROTOCOL_SSL,
         self::SECURITY_PROTOCOL_SASL_PLAINTEXT,
         self::SECURITY_PROTOCOL_SASL_SSL
     ];
 
-    private const ALLOW_MECHANISMS = [
+    private static $allowMechanisms = [
         self::SASL_MECHANISMS_PLAIN,
         self::SASL_MECHANISMS_GSSAPI,
         self::SASL_MECHANISMS_SCRAM_SHA_256,
@@ -203,7 +203,7 @@ abstract class Config
 
     public function setSecurityProtocol($protocol)
     {
-        if (! in_array($protocol, self::ALLOW_SECURITY_PROTOCOLS, true)) {
+        if (! in_array($protocol, self::$allowSecurityProtocols, true)) {
             throw new \Kafka\Exception\Config('Invalid security protocol given.');
         }
 
@@ -212,7 +212,7 @@ abstract class Config
 
     public function setSaslMechanism($mechanism)
     {
-        if (! in_array($mechanism, self::ALLOW_MECHANISMS, true)) {
+        if (! in_array($mechanism, self::$allowMechanisms, true)) {
             throw new \Kafka\Exception\Config('Invalid security sasl mechanism given.');
         }
 

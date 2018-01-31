@@ -75,12 +75,12 @@ class ProtocolTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider errorCodesAndExpectedMessages
      */
-    public function errorMessageShouldBeCorrectlyGenerated(int $errorCode, string $message): void
+    public function errorMessageShouldBeCorrectlyGenerated($errorCode, $message)
     {
         self::assertSame($message, \Kafka\Protocol::getError($errorCode));
     }
 
-    public function errorCodesAndExpectedMessages(): array
+    public function errorCodesAndExpectedMessages()
     {
         return [
             [0, 'No error--it worked!'],

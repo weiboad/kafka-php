@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Producer;
 
-use Amp\Loop;
+use Kafka\Loop;
 
 class State
 {
@@ -20,6 +20,8 @@ class State
     
     private $callStatus = [];
     
+	private $loop = null;
+
     private $requests = [
         self::REQUEST_METADATA => [],
         self::REQUEST_PRODUCE => [],
@@ -27,6 +29,7 @@ class State
 
     public function init()
     {
+		$this->loop = Loop::getInstance();
         $this->callStatus = [
             self::REQUEST_METADATA => [
                 'status'=> self::STATUS_LOOP,
@@ -60,7 +63,7 @@ class State
     {
         foreach ($this->requests as $request => $option) {
             $interval = isset($option['interval']) ? $option['interval'] : 200;
-            Loop::repeat($interval, function ($watcherId) use ($request, $option) {
+            $this->loop->repeat($interval, function ($watcherId) use ($request, $option) {
                 if ($this->checkRun($request) && $option['func'] != null) {
                     $context = call_user_func($option['func']);
                     $this->processing($request, $context);
@@ -75,7 +78,7 @@ class State
             $context = call_user_func($this->requests[self::REQUEST_METADATA]['func']);
             $this->processing($request, $context);
         }
-        Loop::repeat(1000, function ($watcherId) {
+        $this->loop->repeat(1000, function ($watcherId) {
             $this->report();
         });
     }
@@ -97,23 +100,13 @@ class State
                 break;
             case self::REQUEST_PRODUCE:
                 if ($context == null) {
-                    if (! $isAsyn) {
-                        $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        Loop::stop();
-                    } else {
-                        $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                    }
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                     break;
                 }
                 unset($this->callStatus[$key]['context'][$context]);
                 $contextStatus = $this->callStatus[$key]['context'];
                 if (empty($contextStatus)) {
-                    if (! $isAsyn) {
-                        $this->callStatus[$key]['status'] = self::STATUS_FINISH;
-                        Loop::stop();
-                    } else {
-                        $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
-                    }
+                    $this->callStatus[$key]['status'] = (self::STATUS_LOOP | self::STATUS_FINISH);
                 }
                 break;
         }

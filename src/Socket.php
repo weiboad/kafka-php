@@ -1,7 +1,7 @@
 <?php
 namespace Kafka;
 
-use Amp\Loop;
+use Kafka\Loop;
 
 class Socket extends CommonSocket
 {
@@ -58,7 +58,7 @@ class Socket extends CommonSocket
         stream_set_blocking($this->stream, 0);
         stream_set_read_buffer($this->stream, 0);
 
-        $this->readWatcher = Loop::onReadable($this->stream, function () {
+        $this->readWatcher = $this->loop->onReadable($this->stream, function () {
             do {
                 if (! $this->isSocketDead()) {
                     $newData = @fread($this->stream, self::READ_MAX_LENGTH);
@@ -72,7 +72,7 @@ class Socket extends CommonSocket
             } while ($newData);
         });
 
-        $this->writeWatcher = Loop::onWritable($this->stream, function () {
+        $this->writeWatcher = $this->loop->onWritable($this->stream, function () {
             $this->write();
         }, ['enable' => false]); // <-- let's initialize the watcher as "disabled"
     }
@@ -109,8 +109,8 @@ class Socket extends CommonSocket
      */
     public function close() : void
     {
-        Loop::cancel($this->readWatcher);
-        Loop::cancel($this->writeWatcher);
+        $this->loop->cancel($this->readWatcher);
+        $this->loop->cancel($this->writeWatcher);
         if (is_resource($this->stream)) {
             fclose($this->stream);
         }
@@ -183,9 +183,9 @@ class Socket extends CommonSocket
         $bytesWritten = @fwrite($this->stream, $this->writeBuffer);
 
         if ($bytesToWrite === $bytesWritten) {
-            Loop::disable($this->writeWatcher);
+            $this->loop->disable($this->writeWatcher);
         } elseif ($bytesWritten >= 0) {
-            Loop::enable($this->writeWatcher);
+            $this->loop->enable($this->writeWatcher);
         } elseif ($this->isSocketDead()) {
             $this->reconnect();
         }
