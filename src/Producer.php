@@ -1,12 +1,16 @@
 <?php
 namespace Kafka;
 
+use \Kafka\Loop;
+
 class Producer
 {
     use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     private $process = null;
+
+    private $loop = null;
 
     /**
      * __construct
@@ -22,6 +26,7 @@ class Producer
         } else {
             $this->process = new \Kafka\Producer\Process($producer);
         }
+		$this->loop = Loop::getInstance();
     }
 
     /**
@@ -39,7 +44,7 @@ class Producer
         if (is_bool($data)) {
             $this->process->start();
             if ($data) {
-                \Amp\Loop::run();
+                $this->loop->run();
             }
         } else {
             return $this->process->send($data);

@@ -24,7 +24,7 @@ class State
     const STATUS_PROCESS = 8;
     const STATUS_FINISH  = 16;
 
-    private const CLEAN_REQUEST_STATE = [
+    private static $cleanRequestState = [
         self::REQUEST_METADATA      => [],
         self::REQUEST_GETGROUP      => [],
         self::REQUEST_JOINGROUP     => [],
@@ -38,7 +38,17 @@ class State
 
     private $callStatus = [];
 
-    private $requests = self::CLEAN_REQUEST_STATE;
+	private $requests = [
+		self::REQUEST_METADATA      => [],
+		self::REQUEST_GETGROUP      => [],
+		self::REQUEST_JOINGROUP     => [],
+		self::REQUEST_SYNCGROUP     => [],
+		self::REQUEST_HEARTGROUP    => [],
+		self::REQUEST_OFFSET        => ['interval' => 2000],
+		self::REQUEST_FETCH         => ['interval' => 100],
+		self::REQUEST_FETCH_OFFSET  => ['interval' => 2000],
+		self::REQUEST_COMMIT_OFFSET => ['norepeat' => true],
+	];
 
     private $loop = null;
 
@@ -103,10 +113,10 @@ class State
         $this->removeWatchers();
 
         $this->callStatus = [];
-        $this->requests   = self::CLEAN_REQUEST_STATE;
+        $this->requests   = self::$cleanRequestState;
     }
 
-    private function removeWatchers(): void
+    private function removeWatchers()
     {
         foreach (array_keys($this->requests) as $request) {
             if ($this->requests[$request]['watcher'] === null) {

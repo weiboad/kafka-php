@@ -446,7 +446,6 @@ class SocketTest extends \PHPUnit\Framework\TestCase
             ->setMethods($mockMethod)
             ->setConstructorArgs([$host, $port, $config, $sasl])
             ->getMock();
-        $socket->loop = \Kafka\Loop::getInstance();
 
         $socket->method('createSocket')
                ->will($this->returnCallback(function ($remoteSocket, $context, &$errno, &$error) {

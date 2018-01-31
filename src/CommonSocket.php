@@ -91,7 +91,7 @@ abstract class CommonSocket
      */
     private $saslMechanismProvider = null;
 
-    private $loop = null;
+    protected $loop = null;
 
     /**
      * __construct
