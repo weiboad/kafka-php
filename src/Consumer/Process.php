@@ -550,7 +550,7 @@ class Process
             foreach ($consumerOffsets as $topic => $value) {
                 foreach ($value as $partId => $offset) {
                     if (isset($lastOffsets[$topic][$partId]) && $lastOffsets[$topic][$partId] > $offset) {
-                        $consumerOffsets[$topic][$partId] = $offset + 1;
+                        $consumerOffsets[$topic][$partId] = $offset;
                     }
                 }
             }
