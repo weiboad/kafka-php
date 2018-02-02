@@ -644,10 +644,10 @@ class Process
                 foreach ($part['messages'] as $message) {
                     $this->messages[$topic['topicName']][$part['partition']][] = $message;
 
-                    $offset = $message['offset'];
+                    $offset = $message['offset'] + 1;
                 }
 
-                $consumerOffset = ($offset + 1);
+                $consumerOffset = $offset;
                 $assign->setConsumerOffset($topic['topicName'], $part['partition'], $consumerOffset);
                 $assign->setCommitOffset($topic['topicName'], $part['partition'], $offset);
             }
