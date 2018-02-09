@@ -144,7 +144,7 @@ class SocketTest extends TestCase
      * testReadBlockingMaxRead
      *
      * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Invalid length given, it should be lesser than or equals to 5242880
+     * @expectedExceptionMessage Invalid length 5242881 given, it should be lesser than or equals to 5242880
      */
     public function testReadBlockingMaxRead(): void
     {
@@ -231,7 +231,7 @@ class SocketTest extends TestCase
      * testReadBlockingReadFailureTryTimeout
      *
      * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Timed out while reading 4 bytes from socket, 4 bytes are still needed
+     * @expectedExceptionMessage Timed out while reading 4 bytes from stream, 4 bytes are still needed
      */
     public function testReadBlockingReadFailureTryTimeout(): void
     {

@@ -245,14 +245,14 @@ abstract class CommonSocket
     public function readBlocking(int $length): string
     {
         if ($length > self::READ_MAX_LENGTH) {
-            throw new Exception('Invalid length given, it should be lesser than or equals to ' . self::READ_MAX_LENGTH);
+            throw Exception\Socket::invalidLength($length, self::READ_MAX_LENGTH);
         }
 
         $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
 
         if ($readable === false) {
             $this->close();
-            throw new Exception('Could not read ' . $length . ' bytes from stream (not readable)');
+            throw Exception\Socket::notReadable($length);
         }
 
         if ($readable === 0) { // select timeout
@@ -260,10 +260,10 @@ abstract class CommonSocket
             $this->close();
 
             if (! empty($res['timed_out'])) {
-                throw new Exception('Timed out reading ' . $length . ' bytes from stream');
+                throw Exception\Socket::timedOut($length);
             }
 
-            throw new Exception('Could not read ' . $length . ' bytes from stream (not readable)');
+            throw Exception\Socket::notReadable($length);
         }
 
         $remainingBytes = $length;
@@ -276,12 +276,12 @@ abstract class CommonSocket
                 // Zero bytes because of EOF?
                 if (feof($this->stream)) {
                     $this->close();
-                    throw new Exception('Unexpected EOF while reading ' . $length . ' bytes from stream (no data)');
+                    throw Exception\Socket::unexpectedEOF($length);
                 }
                 // Otherwise wait for bytes
                 $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
                 if ($readable !== 1) {
-                    throw new Exception('Timed out while reading ' . $length . ' bytes from socket, ' . $remainingBytes . ' bytes are still needed');
+                    throw Exception\Socket::timedOutWithRemainingBytes($length, $remainingBytes);
                 }
 
                 continue; // attempt another read
