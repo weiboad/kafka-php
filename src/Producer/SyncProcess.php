@@ -130,7 +130,7 @@ class SyncProcess
             $result        = \Kafka\Protocol::decode(\Kafka\Protocol::METADATA_REQUEST, substr($data, 4));
 
             if (! isset($result['brokers'], $result['topics'])) {
-                throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
+                throw new Exception('Get metadata is fail, brokers or topics is null.');
             }
 
             $broker = $this->getBroker();
@@ -139,7 +139,7 @@ class SyncProcess
             return;
         }
 
-        throw new \Kafka\Exception(
+        throw new Exception(
             sprintf(
                 'It was not possible to establish a connection for metadata with the brokers "%s"',
                 $brokerList

@@ -9,12 +9,12 @@ use Kafka\Socket;
 $data = ['group_id' => 'test'];
 
 Protocol::init('0.9.1.0');
-$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $data);
+$requestData = Protocol::encode(Protocol::GROUP_COORDINATOR_REQUEST, $data);
 
 $socket = new Socket('127.0.0.1', '9092');
 $socket->setOnReadable(function ($data): void {
     $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-    $result = \Kafka\Protocol::decode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
+    $result = Protocol::decode(Protocol::GROUP_COORDINATOR_REQUEST, substr($data, 4));
     echo json_encode($result);
     Amp\Loop::stop();
 });

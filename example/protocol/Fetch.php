@@ -25,12 +25,12 @@ $data = [
 ];
 
 Protocol::init('0.9.1.0');
-$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::FETCH_REQUEST, $data);
+$requestData = Protocol::encode(Protocol::FETCH_REQUEST, $data);
 
 $socket = new Socket('127.0.0.1', '9192');
 $socket->setOnReadable(function ($data): void {
     $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-    $result = \Kafka\Protocol::decode(\Kafka\Protocol::FETCH_REQUEST, substr($data, 4));
+    $result = Protocol::decode(Protocol::FETCH_REQUEST, substr($data, 4));
     echo json_encode($result);
     Amp\stop();
 });

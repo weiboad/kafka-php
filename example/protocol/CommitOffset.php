@@ -31,12 +31,12 @@ class CommitOffset
         ];
 
         Protocol::init('0.9.1.0');
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
+        $requestData = Protocol::encode(Protocol::JOIN_GROUP_REQUEST, $data);
 
         $socket = new Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data): void {
             $coodid      = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-            $result      = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
+            $result      = Protocol::decode(Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
             $this->group = $result;
             Amp\stop();
         });
@@ -68,13 +68,13 @@ class CommitOffset
             ],
         ];
 
-        \Kafka\Protocol::init('0.9.1.0');
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
+        Protocol::init('0.9.1.0');
+        $requestData = Protocol::encode(Protocol::SYNC_GROUP_REQUEST, $data);
 
-        $socket = new \Kafka\Socket('127.0.0.1', '9192');
+        $socket = new Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data): void {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
+            $result = Protocol::decode(Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
             //echo json_encode($result);
             Amp\stop();
         });
@@ -108,13 +108,13 @@ class CommitOffset
             ],
         ];
 
-        \Kafka\Protocol::init('0.9.1.0');
-        $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, $data);
+        Protocol::init('0.9.1.0');
+        $requestData = Protocol::encode(Protocol::OFFSET_COMMIT_REQUEST, $data);
 
-        $socket = new \Kafka\Socket('127.0.0.1', '9192');
+        $socket = new Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data): void {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-            $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));
+            $result = Protocol::decode(Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));
             echo json_encode($result);
             Amp\stop();
         });

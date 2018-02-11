@@ -23,7 +23,7 @@ $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
 $config->setSecurityProtocol(Config::SECURITY_PROTOCOL_SASL_SSL);
-$config->setSaslMechanism(\Kafka\Config::SASL_MECHANISMS_SCRAM_SHA_256);
+$config->setSaslMechanism(Config::SASL_MECHANISMS_SCRAM_SHA_256);
 $config->setSaslUsername('nmred');
 $config->setSaslPassword('123456');
 $config->setSaslUsername('alice');

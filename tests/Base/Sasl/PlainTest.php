@@ -45,7 +45,7 @@ class PlainTest extends TestCase
     public function testHandShakeNotSupport(): void
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(Socket::class);
 
         $handShakeData = hex2bin('00000011002100000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.
@@ -57,7 +57,7 @@ class PlainTest extends TestCase
                 [$this->equalTo(hex2bin('0000001a001100000000001100096b61666b612d7068700005504c41494e'))]
             );
 
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
+        $provider = new Plain('nmred', '123456');
         $provider->authenticate($socket);
     }
 
@@ -68,7 +68,7 @@ class PlainTest extends TestCase
      */
     public function testGetMechanismName(): void
     {
-        $provider = new \Kafka\Sasl\Plain('nmred', '123456');
+        $provider = new Plain('nmred', '123456');
         $this->assertSame('PLAIN', $provider->getName());
     }
 }
