@@ -62,9 +62,11 @@ class Process
 
         $broker = $this->getBroker();
         $broker->setConfig($config);
-        $broker->setProcess(function (string $data, int $fd): void {
-            $this->processRequest($data, $fd);
-        });
+        $broker->setProcess(
+            function (string $data, int $fd): void {
+                $this->processRequest($data, $fd);
+            }
+        );
 
         $this->state = State::getInstance();
 
@@ -156,6 +158,7 @@ class Process
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
+
                 return;
             }
         }
@@ -225,7 +228,7 @@ class Process
             return $context;
         }
 
-        $sendData = $this->convertMessage($data);
+        $sendData = $this->convertRecordSet($data);
 
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect((string) $brokerId);
@@ -296,6 +299,7 @@ class Process
 
         if (in_array($errorCode, $recoverCodes, true)) {
             $this->state->recover();
+
             return false;
         }
 
@@ -303,39 +307,39 @@ class Process
     }
 
     /**
-     * @param mixed[] $data
+     * @param mixed[] $recordSet
      *
      * @return mixed[]
      */
-    protected function convertMessage(array $data): array
+    protected function convertRecordSet(array $recordSet): array
     {
         $sendData  = [];
         $broker    = $this->getBroker();
         $topicInfo = $broker->getTopics();
 
-        foreach ($data as $value) {
-            if (! isset($value['topic']) || ! trim($value['topic'])) {
+        foreach ($recordSet as $record) {
+            if (! isset($record['topic']) || ! trim($record['topic'])) {
                 continue;
             }
 
-            if (! isset($topicInfo[$value['topic']])) {
+            if (! isset($topicInfo[$record['topic']])) {
                 continue;
             }
 
-            if (! isset($value['value']) || ! trim($value['value'])) {
+            if (! isset($record['value']) || ! trim($record['value'])) {
                 continue;
             }
 
-            $topicMeta = $topicInfo[$value['topic']];
+            $topicMeta = $topicInfo[$record['topic']];
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 
-            $partId = ! isset($value['partId'], $topicMeta[$value['partId']]) ? $partNums[0] : $value['partId'];
+            $partId = ! isset($record['partId'], $topicMeta[$record['partId']]) ? $partNums[0] : $record['partId'];
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];
-            if (isset($sendData[$brokerId][$value['topic']])) {
-                $topicData = $sendData[$brokerId][$value['topic']];
+            if (isset($sendData[$brokerId][$record['topic']])) {
+                $topicData = $sendData[$brokerId][$record['topic']];
             }
 
             $partition = [];
@@ -344,15 +348,15 @@ class Process
             }
 
             $partition['partition_id'] = $partId;
-            if (trim($value['key'] ?? '') !== '') {
-                $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
+            if (trim($record['key'] ?? '') !== '') {
+                $partition['messages'][] = ['value' => $record['value'], 'key' => $record['key']];
             } else {
-                $partition['messages'][] = $value['value'];
+                $partition['messages'][] = $record['value'];
             }
 
-            $topicData['partitions'][$partId]     = $partition;
-            $topicData['topic_name']              = $value['topic'];
-            $sendData[$brokerId][$value['topic']] = $topicData;
+            $topicData['partitions'][$partId]      = $partition;
+            $topicData['topic_name']               = $record['topic'];
+            $sendData[$brokerId][$record['topic']] = $topicData;
         }
 
         return $sendData;
