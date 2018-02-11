@@ -23,8 +23,13 @@ class SyncProcess
     use LoggerAwareTrait;
     use LoggerTrait;
 
-    public function __construct()
+    /** @var RecordValidator */
+    private $recordValidator;
+
+    public function __construct(?RecordValidator $recordValidator = null)
     {
+        $this->recordValidator = $recordValidator ?? new RecordValidator();
+
         $config = $this->getConfig();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
 
@@ -154,24 +159,14 @@ class SyncProcess
      */
     protected function convertRecordSet(array $recordSet): array
     {
-        $sendData   = [];
-        $broker     = $this->getBroker();
-        $topicInfos = $broker->getTopics();
+        $sendData = [];
+        $broker   = $this->getBroker();
+        $topics   = $broker->getTopics();
 
         foreach ($recordSet as $record) {
-            if (! isset($record['topic']) || ! trim($record['topic'])) {
-                continue;
-            }
+            $this->recordValidator->validate($record, $topics);
 
-            if (! isset($topicInfos[$record['topic']])) {
-                continue;
-            }
-
-            if (! isset($record['value']) || ! trim($record['value'])) {
-                continue;
-            }
-
-            $topicMeta = $topicInfos[$record['topic']];
+            $topicMeta = $topics[$record['topic']];
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 

@@ -50,9 +50,13 @@ class Process
      */
     private $state;
 
-    public function __construct(?callable $producer = null)
+    /** @var RecordValidator */
+    private $recordValidator;
+
+    public function __construct(?callable $producer = null, ?RecordValidator $recordValidator = null)
     {
-        $this->producer = $producer;
+        $this->producer        = $producer;
+        $this->recordValidator = $recordValidator ?? new RecordValidator();
     }
 
     public function init(): void
@@ -97,7 +101,7 @@ class Process
 
         if ($config->getIsAsyn()) {
             return;
-        };
+        }
 
         Loop::repeat(
             $config->getRequestTimeout(),
@@ -313,24 +317,14 @@ class Process
      */
     protected function convertRecordSet(array $recordSet): array
     {
-        $sendData  = [];
-        $broker    = $this->getBroker();
-        $topicInfo = $broker->getTopics();
+        $sendData = [];
+        $broker   = $this->getBroker();
+        $topics   = $broker->getTopics();
 
         foreach ($recordSet as $record) {
-            if (! isset($record['topic']) || ! trim($record['topic'])) {
-                continue;
-            }
+            $this->recordValidator->validate($record, $topics);
 
-            if (! isset($topicInfo[$record['topic']])) {
-                continue;
-            }
-
-            if (! isset($record['value']) || ! trim($record['value'])) {
-                continue;
-            }
-
-            $topicMeta = $topicInfo[$record['topic']];
+            $topicMeta = $topics[$record['topic']];
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 
