@@ -142,6 +142,7 @@ $config->setMetadataBrokerList('10.13.4.159:9192');
 $config->setGroupId('test');
 $config->setBrokerVersion('1.0.0');
 $config->setTopics(['test']);
+$config->setConsumeMode(\Kafka\ConsumeMode::consumeBeforeCommitOffset());
 //$config->setOffsetReset('earliest');
 $consumer = new \Kafka\Consumer();
 $consumer->setLogger($logger);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kafka\Consumer;
 
 use Kafka\Broker;
+use Kafka\ConsumeMode;
 use Kafka\ConsumerConfig;
 use Kafka\Exception;
 use Kafka\LoggerTrait;
@@ -665,7 +666,7 @@ class Process
         $this->state->succRun(State::REQUEST_FETCH, $fd);
     }
 
-    protected function consumeMessage(): void
+    private function consumeMessages(): void
     {
         foreach ($this->messages as $topic => $value) {
             foreach ($value as $partition => $messages) {
@@ -684,8 +685,8 @@ class Process
     {
         $config = $this->getConfig();
 
-        if ($config->getConsumeMode() === ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET) {
-            $this->consumeMessage();
+        if ($config->getConsumeMode() === ConsumeMode::consumeBeforeCommitOffset()) {
+            $this->consumeMessages();
         }
 
         $broker        = $this->getBroker();
@@ -752,8 +753,8 @@ class Process
             }
         }
 
-        if ($this->getConfig()->getConsumeMode() === ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET) {
-            $this->consumeMessage();
+        if ($this->getConfig()->getConsumeMode() === ConsumeMode::consumeAfterCommitOffset()) {
+            $this->consumeMessages();
         }
     }
 

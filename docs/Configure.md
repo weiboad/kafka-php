@@ -4,7 +4,7 @@ Kafka-php Configuration
 | Property	| C/P	| Range	| Default | Desc |
 | --  | -- | -- | -- | -- |
 | brokerVersion | C/P | 0.8.0 | 0.10.1.0 | User supplied broker version |
-| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application | 
+| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application |
 | messageMaxBytes | C/P | 1000 .. 1000000000 | 1000000 | Maximum transmit message size. |
 | metadataBrokerList | C/P | | | Kafka Broker server list |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | Metadata cache max age. Defaults to metadata.refresh.interval.ms * 3 |
@@ -17,6 +17,7 @@ Kafka-php Configuration
 | sslPassphrase | C/P |  |  | Passphrase with which your local_cert file was encoded. |
 | sslPeerName | C/P |  |  | Peer name to be used. If this value is not set, then the name is guessed based on the hostname used when opening the stream. |
 | sslVerifyPeer | C/P | true/false | false | Require verification of SSL certificate used. |
+| consumeMode | C | 1,2 | 1 | Consume before or after commiting offset. | 
 | offsetReset | C | latest,earliest | latest | Action to take when there is no initial offset in offset store or the desired offset is out of range |
 | groupId | C |  | |  Client group id string. All clients sharing the same group.id belong to the same group. |
 | maxBytes | C |  | 65536 | Maximum bytes to fetch. |

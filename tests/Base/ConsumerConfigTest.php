@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace KafkaTest\Base;
 
+use Kafka\ConsumeMode;
 use Kafka\ConsumerConfig;
-use Kafka\Exception\Config;
 use PHPUnit\Framework\TestCase;
 
 final class ConsumerConfigTest extends TestCase
@@ -133,20 +133,10 @@ final class ConsumerConfigTest extends TestCase
      */
     public function setConsumeModeShouldConfigureTheAttributeProperly(): void
     {
-        self::assertSame(ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET, $this->config->getConsumeMode());
+        self::assertSame(ConsumeMode::consumeAfterCommitOffset(), $this->config->getConsumeMode());
 
-        $this->config->setConsumeMode(ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET);
+        $this->config->setConsumeMode(ConsumeMode::consumeBeforeCommitOffset());
 
-        self::assertSame(ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET, $this->config->getConsumeMode());
-    }
-
-    /**
-     * @test
-     */
-    public function setShouldThrowExceptionWhenInvalidDataIsGiven(): void
-    {
-        $this->expectException(Config::class);
-
-        $this->config->setConsumeMode(100);
+        self::assertSame(ConsumeMode::consumeBeforeCommitOffset(), $this->config->getConsumeMode());
     }
 }

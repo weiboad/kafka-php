@@ -17,17 +17,11 @@ use function trim;
  */
 class ConsumerConfig extends Config
 {
+    private const CONSUME_MODE = 'consume_mode';
     use SingletonTrait;
 
-    public const CONSUME_AFTER_COMMIT_OFFSET  = 1;
-    public const CONSUME_BEFORE_COMMIT_OFFSET = 2;
-
-    /**
-     * @var mixed[]
-     */
-    protected $runtimeOptions = [
-        'consume_mode' => self::CONSUME_AFTER_COMMIT_OFFSET,
-    ];
+    /** @var mixed[] */
+    private $runtimeOptions = [];
 
     /**
      * @var mixed[]
@@ -41,6 +35,11 @@ class ConsumerConfig extends Config
         'maxBytes'         => 65536, // 64kb
         'maxWaitTime'      => 100,
     ];
+
+    private function __construct()
+    {
+        $this->runtimeOptions[self::CONSUME_MODE] = ConsumeMode::consumeAfterCommitOffset();
+    }
 
     /**
      * @throws \Kafka\Exception\Config
@@ -136,20 +135,13 @@ class ConsumerConfig extends Config
         static::$options['topics'] = $topics;
     }
 
-    public function setConsumeMode(int $mode): void
+    public function setConsumeMode(ConsumeMode $consumeMode): void
     {
-        if (! in_array($mode, [self::CONSUME_AFTER_COMMIT_OFFSET, self::CONSUME_BEFORE_COMMIT_OFFSET], true)) {
-            throw new Exception\Config(
-                'Invalid consume mode given, it must be either "ConsumerConfig::CONSUME_AFTER_COMMIT_OFFSET" or '
-                . '"ConsumerConfig::CONSUME_BEFORE_COMMIT_OFFSET"'
-            );
-        }
-
-        $this->runtimeOptions['consume_mode'] = $mode;
+        $this->runtimeOptions[self::CONSUME_MODE] = $consumeMode;
     }
 
-    public function getConsumeMode(): int
+    public function getConsumeMode(): ConsumeMode
     {
-        return $this->runtimeOptions['consume_mode'];
+        return $this->runtimeOptions[self::CONSUME_MODE];
     }
 }
