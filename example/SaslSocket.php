@@ -35,10 +35,10 @@ $data = [
 ];
 
 
-$requestData = \Kafka\Protocol::encode(\Kafka\Protocol::PRODUCE_REQUEST, $data);
+$requestData = Protocol::encode(Protocol::PRODUCE_REQUEST, $data);
 $socket->write($requestData);
 $dataLen       = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->readBlocking(4));
 $data          = $socket->readBlocking($dataLen);
 $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-$result        = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
+$result        = Protocol::decode(Protocol::PRODUCE_REQUEST, substr($data, 4));
 var_dump($result);

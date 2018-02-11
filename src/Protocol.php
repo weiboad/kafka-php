@@ -212,7 +212,7 @@ class Protocol
     public static function decode(int $key, string $data): array
     {
         if (! isset(self::$objects[$key])) {
-            throw new \Kafka\Exception('Not support api key, key:' . $key);
+            throw new Exception('Not support api key, key:' . $key);
         }
 
         return self::$objects[$key]->decode($data);

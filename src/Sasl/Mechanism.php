@@ -26,13 +26,13 @@ abstract class Mechanism implements SaslMechanism
      */
     protected function handShake(CommonSocket $socket, string $mechanism): void
     {
-        $requestData = Protocol::encode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, [$mechanism]);
+        $requestData = Protocol::encode(Protocol::SASL_HAND_SHAKE_REQUEST, [$mechanism]);
         $socket->writeBlocking($requestData);
         $dataLen = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, $socket->readBlocking(4));
 
         $data          = $socket->readBlocking($dataLen);
         $correlationId = ProtocolTool::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
-        $result        = Protocol::decode(\Kafka\Protocol::SASL_HAND_SHAKE_REQUEST, substr($data, 4));
+        $result        = Protocol::decode(Protocol::SASL_HAND_SHAKE_REQUEST, substr($data, 4));
 
         if ($result['errorCode'] !== Protocol::NO_ERROR) {
             throw new Exception(Protocol::getError($result['errorCode']));
