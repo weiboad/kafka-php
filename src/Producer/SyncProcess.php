@@ -14,7 +14,6 @@ use function count;
 use function explode;
 use function json_encode;
 use function shuffle;
-use function sprintf;
 use function substr;
 use function trim;
 
@@ -144,12 +143,7 @@ class SyncProcess
             return;
         }
 
-        throw new Exception(
-            sprintf(
-                'It was not possible to establish a connection for metadata with the brokers "%s"',
-                $brokerList
-            )
-        );
+        throw Exception\ConnectionException::fromBrokerList($brokerList);
     }
 
     /**

@@ -167,12 +167,7 @@ class Process
             }
         }
 
-        throw new Exception(
-            sprintf(
-                'It was not possible to establish a connection for metadata with the brokers "%s"',
-                $brokerList
-            )
-        );
+        throw Exception\ConnectionException::fromBrokerList($brokerList);
     }
 
     /**
