@@ -50,9 +50,13 @@ class Process
      */
     private $state;
 
-    public function __construct(?callable $producer = null)
+    /** @var RecordValidator */
+    private $recordValidator;
+
+    public function __construct(?callable $producer = null, ?RecordValidator $recordValidator = null)
     {
-        $this->producer = $producer;
+        $this->producer        = $producer;
+        $this->recordValidator = $recordValidator ?? new RecordValidator();
     }
 
     public function init(): void
@@ -62,9 +66,11 @@ class Process
 
         $broker = $this->getBroker();
         $broker->setConfig($config);
-        $broker->setProcess(function (string $data, int $fd): void {
-            $this->processRequest($data, $fd);
-        });
+        $broker->setProcess(
+            function (string $data, int $fd): void {
+                $this->processRequest($data, $fd);
+            }
+        );
 
         $this->state = State::getInstance();
 
@@ -95,7 +101,7 @@ class Process
 
         if ($config->getIsAsyn()) {
             return;
-        };
+        }
 
         Loop::repeat(
             $config->getRequestTimeout(),
@@ -156,6 +162,7 @@ class Process
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = Protocol::encode(Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
+
                 return;
             }
         }
@@ -225,7 +232,7 @@ class Process
             return $context;
         }
 
-        $sendData = $this->convertMessage($data);
+        $sendData = $this->convertRecordSet($data);
 
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect((string) $brokerId);
@@ -296,6 +303,7 @@ class Process
 
         if (in_array($errorCode, $recoverCodes, true)) {
             $this->state->recover();
+
             return false;
         }
 
@@ -303,39 +311,29 @@ class Process
     }
 
     /**
-     * @param mixed[] $data
+     * @param mixed[] $recordSet
      *
      * @return mixed[]
      */
-    protected function convertMessage(array $data): array
+    protected function convertRecordSet(array $recordSet): array
     {
-        $sendData  = [];
-        $broker    = $this->getBroker();
-        $topicInfo = $broker->getTopics();
+        $sendData = [];
+        $broker   = $this->getBroker();
+        $topics   = $broker->getTopics();
 
-        foreach ($data as $value) {
-            if (! isset($value['topic']) || ! trim($value['topic'])) {
-                continue;
-            }
+        foreach ($recordSet as $record) {
+            $this->recordValidator->validate($record, $topics);
 
-            if (! isset($topicInfo[$value['topic']])) {
-                continue;
-            }
-
-            if (! isset($value['value']) || ! trim($value['value'])) {
-                continue;
-            }
-
-            $topicMeta = $topicInfo[$value['topic']];
+            $topicMeta = $topics[$record['topic']];
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 
-            $partId = ! isset($value['partId'], $topicMeta[$value['partId']]) ? $partNums[0] : $value['partId'];
+            $partId = ! isset($record['partId'], $topicMeta[$record['partId']]) ? $partNums[0] : $record['partId'];
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];
-            if (isset($sendData[$brokerId][$value['topic']])) {
-                $topicData = $sendData[$brokerId][$value['topic']];
+            if (isset($sendData[$brokerId][$record['topic']])) {
+                $topicData = $sendData[$brokerId][$record['topic']];
             }
 
             $partition = [];
@@ -344,15 +342,15 @@ class Process
             }
 
             $partition['partition_id'] = $partId;
-            if (trim($value['key'] ?? '') !== '') {
-                $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
+            if (trim($record['key'] ?? '') !== '') {
+                $partition['messages'][] = ['value' => $record['value'], 'key' => $record['key']];
             } else {
-                $partition['messages'][] = $value['value'];
+                $partition['messages'][] = $record['value'];
             }
 
-            $topicData['partitions'][$partId]     = $partition;
-            $topicData['topic_name']              = $value['topic'];
-            $sendData[$brokerId][$value['topic']] = $topicData;
+            $topicData['partitions'][$partId]      = $partition;
+            $topicData['topic_name']               = $record['topic'];
+            $sendData[$brokerId][$record['topic']] = $topicData;
         }
 
         return $sendData;

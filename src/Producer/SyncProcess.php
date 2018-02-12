@@ -23,8 +23,13 @@ class SyncProcess
     use LoggerAwareTrait;
     use LoggerTrait;
 
-    public function __construct()
+    /** @var RecordValidator */
+    private $recordValidator;
+
+    public function __construct(?RecordValidator $recordValidator = null)
     {
+        $this->recordValidator = $recordValidator ?? new RecordValidator();
+
         $config = $this->getConfig();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
 
@@ -35,13 +40,13 @@ class SyncProcess
     }
 
     /**
-     * @param string[][] $data
+     * @param mixed[][] $recordSet
      *
      * @return mixed[]
      *
      * @throws \Kafka\Exception
      */
-    public function send(array $data): array
+    public function send(array $recordSet): array
     {
         $broker = $this->getBroker();
         $config = $this->getConfig();
@@ -56,11 +61,11 @@ class SyncProcess
         //  partId:
         //  key:
         //  value:
-        if (empty($data)) {
+        if (empty($recordSet)) {
             return [];
         }
 
-        $sendData = $this->convertMessage($data);
+        $sendData = $this->convertRecordSet($recordSet);
         $result   = [];
         foreach ($sendData as $brokerId => $topicList) {
             $connect = $broker->getDataConnect((string) $brokerId, true);
@@ -82,9 +87,9 @@ class SyncProcess
 
             if ($requiredAck !== 0) { // If it is 0 the server will not send any response
                 $dataLen       = Protocol::unpack(Protocol::BIT_B32, $connect->read(4));
-                $data          = $connect->read($dataLen);
-                $correlationId = Protocol::unpack(Protocol::BIT_B32, substr($data, 0, 4));
-                $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
+                $recordSet     = $connect->read($dataLen);
+                $correlationId = Protocol::unpack(Protocol::BIT_B32, substr($recordSet, 0, 4));
+                $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($recordSet, 4));
 
                 $result[] = $ret;
             }
@@ -148,39 +153,29 @@ class SyncProcess
     }
 
     /**
-     * @param string[][] $data
+     * @param string[][] $recordSet
      *
      * @return mixed[]
      */
-    protected function convertMessage(array $data): array
+    protected function convertRecordSet(array $recordSet): array
     {
-        $sendData   = [];
-        $broker     = $this->getBroker();
-        $topicInfos = $broker->getTopics();
+        $sendData = [];
+        $broker   = $this->getBroker();
+        $topics   = $broker->getTopics();
 
-        foreach ($data as $value) {
-            if (! isset($value['topic']) || ! trim($value['topic'])) {
-                continue;
-            }
+        foreach ($recordSet as $record) {
+            $this->recordValidator->validate($record, $topics);
 
-            if (! isset($topicInfos[$value['topic']])) {
-                continue;
-            }
-
-            if (! isset($value['value']) || ! trim($value['value'])) {
-                continue;
-            }
-
-            $topicMeta = $topicInfos[$value['topic']];
+            $topicMeta = $topics[$record['topic']];
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 
-            $partId = isset($value['partId'], $topicMeta[$value['partId']]) ? $value['partId'] : $partNums[0];
+            $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];
-            if (isset($sendData[$brokerId][$value['topic']])) {
-                $topicData = $sendData[$brokerId][$value['topic']];
+            if (isset($sendData[$brokerId][$record['topic']])) {
+                $topicData = $sendData[$brokerId][$record['topic']];
             }
 
             $partition = [];
@@ -190,15 +185,15 @@ class SyncProcess
 
             $partition['partition_id'] = $partId;
 
-            if (trim($value['key'] ?? '') !== '') {
-                $partition['messages'][] = ['value' => $value['value'], 'key' => $value['key']];
+            if (trim($record['key'] ?? '') !== '') {
+                $partition['messages'][] = ['value' => $record['value'], 'key' => $record['key']];
             } else {
-                $partition['messages'][] = $value['value'];
+                $partition['messages'][] = $record['value'];
             }
 
-            $topicData['partitions'][$partId]     = $partition;
-            $topicData['topic_name']              = $value['topic'];
-            $sendData[$brokerId][$value['topic']] = $topicData;
+            $topicData['partitions'][$partId]      = $partition;
+            $topicData['topic_name']               = $record['topic'];
+            $sendData[$brokerId][$record['topic']] = $topicData;
         }
 
         return $sendData;
