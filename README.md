@@ -3,7 +3,7 @@ Kafka-php
 
 [中文文档](README_CH.md)
 
-[![QQ Group](https://img.shields.io/badge/QQ%20Group-531522091-brightgreen.svg)]()
+[![QQ Group](https://img.shields.io/badge/QQ%20Group-657517955-brightgreen.svg)]()
 [![Build Status](https://travis-ci.org/weiboad/kafka-php.svg?branch=master)](https://travis-ci.org/weiboad/kafka-php)
 [![Packagist](https://img.shields.io/packagist/dm/nmred/kafka-php.svg?style=plastic)]()
 [![Packagist](https://img.shields.io/packagist/dd/nmred/kafka-php.svg?style=plastic)]()
@@ -157,5 +157,6 @@ Refer [Example](https://github.com/weiboad/kafka-php/tree/master/example)
 
 ## QQ Group
 
-531522091
+Group 1: 531522091 
+Group 2: 657517955
 ![QQ Group](docs/qq_group.png)
