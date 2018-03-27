@@ -3,7 +3,7 @@ Kafka-php
 
 [English Document](README.md)
 
-[![QQ Group](https://img.shields.io/badge/QQ%20Group-531522091-brightgreen.svg)]()
+[![QQ Group](https://img.shields.io/badge/QQ%20Group-657517955-brightgreen.svg)]()
 [![Build Status](https://travis-ci.org/weiboad/kafka-php.svg?branch=master)](https://travis-ci.org/weiboad/kafka-php)
 [![Packagist](https://img.shields.io/packagist/dm/nmred/kafka-php.svg?style=plastic)]()
 [![Packagist](https://img.shields.io/packagist/dd/nmred/kafka-php.svg?style=plastic)]()
@@ -149,5 +149,6 @@ $consumer->start(function($topic, $part, $message) {
 
 ## QQ 群号 
 
-531522091
+群一： 531522091 （已满）
+群二： 657517955
 ![QQ Group](docs/qq_group.png)
