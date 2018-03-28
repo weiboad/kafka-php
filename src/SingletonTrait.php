@@ -15,10 +15,7 @@ trait SingletonTrait
      */
     protected static $instance;
 
-    /**
-     * @return object
-     */
-    public static function getInstance()
+    public static function getInstance(): object
     {
         if (self::$instance === null) {
             static::$instance = new static();

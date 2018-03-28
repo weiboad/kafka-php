@@ -173,7 +173,7 @@ class Broker
         $port = null;
 
         if (isset($this->brokers[$key])) {
-            $hostname = $this->brokers[$key];
+            $hostname      = $this->brokers[$key];
 
             [$host, $port] = explode(':', $hostname);
         }
