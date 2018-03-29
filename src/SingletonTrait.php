@@ -17,6 +17,7 @@ trait SingletonTrait
 
     /**
      * Need to be compatible php 7.1.x, so this scene cannot be specified return type `object`
+     * @return object
      */
     public static function getInstance()
     {
