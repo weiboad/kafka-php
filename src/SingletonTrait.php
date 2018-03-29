@@ -15,7 +15,9 @@ trait SingletonTrait
      */
     protected static $instance;
 
-    // Need to be compatible php 7.1.x, so this scene cannot be specified return type `object`
+    /**
+     * Need to be compatible php 7.1.x, so this scene cannot be specified return type `object`
+     */
     public static function getInstance()
     {
         if (self::$instance === null) {
