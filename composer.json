@@ -17,7 +17,8 @@
     },
     "require": {
         "php": "^7.1",
-        "amphp/amp": "^2.0.3",
+        "amphp/amp": "^2.0",
+        "consistence/consistence": "^1.0",
         "lcobucci/clock": "^1.0",
         "psr/log": "^1.0"
     },
