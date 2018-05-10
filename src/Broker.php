@@ -231,8 +231,9 @@ class Broker
      * @param array $partNums
      * @return int
      */
-    public function getPartitionId($data, $partNums)
+    public function getPartitionId($data, $topicMeta)
     {
+        $partNums  = array_keys($topicMeta);
         if (isset($data['key']) && trim($data['key'])) {
             $partId = $partNums[crc32($data['key']) % count($partNums)];
         } else {

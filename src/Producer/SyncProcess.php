@@ -133,8 +133,7 @@ class SyncProcess
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partNums  = array_keys($topicMeta);
-            $partId = $broker->getPartitionId($value, $partNums);
+            $partId = $broker->getPartitionId($value, $topicMeta);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];
