@@ -222,7 +222,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $broker->setData($data['topics'], $data['brokers']);
-        $data = ['partId' => '1', ];
+        $data = ['partId' => '1'];
         $partId = $broker->getPartitionId($data);
         $this->assertEquals('1', $partId);
     }
