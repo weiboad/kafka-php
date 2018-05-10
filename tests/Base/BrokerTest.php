@@ -184,9 +184,8 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     public function testGetPartitionId()
     {
         $broker   = \Kafka\Broker::getInstance();
-        $partNums = [3, 2, 2];
-        $data = ['key' => '123'];
-        $partId = $broker->getPartitionId($data, $partNums);
-        $this->assertEquals('2', $partId);
+        $data = ['partId' => '1', ];
+        $partId = $broker->getPartitionId($data);
+        $this->assertEquals('1', $partId);
     }
 }

@@ -231,8 +231,10 @@ class Broker
      * @param array $partNums
      * @return int
      */
-    public function getPartitionId($data, $topicMeta)
+    public function getPartitionId($data)
     {
+        $topicInfos = $this->getTopics();
+        $topicMeta = $topicInfos[$data['topic']];
         $partNums  = array_keys($topicMeta);
         if (isset($data['key']) && trim($data['key'])) {
             $partId = $partNums[crc32($data['key']) % count($partNums)];
