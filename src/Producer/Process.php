@@ -293,7 +293,7 @@ class Process
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partId = $broker->getPartitionId($value);
+            $partId    = $broker->getPartitionId($value);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];

@@ -184,7 +184,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
     public function testGetPartitionId()
     {
         $broker = \Kafka\Broker::getInstance();
-        $data = [
+        $data   = [
             'brokers' => [
                 [
                     'host' => '127.0.0.1',
@@ -222,7 +222,7 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $broker->setData($data['topics'], $data['brokers']);
-        $data = [
+        $data   = [
             'partId' => '1',
             'topic' => 'test',
             'value' => 'test message'
