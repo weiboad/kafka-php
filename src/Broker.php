@@ -225,4 +225,24 @@ class Broker
         }
         return $provider;
     }
+
+    /**
+     * @param array $data
+     * @param array $partNums
+     * @return int
+     */
+    public function getPartitionId($data, $partNums)
+    {
+        if (isset($data['key']) && trim($data['key'])) {
+            $partId = $partNums[crc32($data['key']) % count($partNums)];
+        } else {
+            if (! isset($data['partId']) || ! isset($topicMeta[$data['partId']])) {
+                shuffle($partNums);
+                $partId = $partNums[0];
+            } else {
+                $partId = $data['partId'];
+            }
+        }
+        return $partId;
+    }
 }

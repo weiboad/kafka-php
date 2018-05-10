@@ -174,4 +174,19 @@ class BrokerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(\Kafka\SocketSync::class, $socket);
     }
+
+    /**
+     * testGetPartitionId
+     *
+     * @access public
+     * @return void
+     */
+    public function testGetPartitionId()
+    {
+        $broker   = \Kafka\Broker::getInstance();
+        $partNums = [3, 2, 2];
+        $data = ['key' => '123'];
+        $partId = $broker->getPartitionId($data, $partNums);
+        $this->assertEquals('2', $partId);
+    }
 }

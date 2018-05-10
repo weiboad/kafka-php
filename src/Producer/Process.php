@@ -294,13 +294,7 @@ class Process
 
             $topicMeta = $topicInfos[$value['topic']];
             $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
-            $partId = 0;
-            if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
-                $partId = $partNums[0];
-            } else {
-                $partId = $value['partId'];
-            }
+            $partId = $broker->getPartitionId($value, $partNums);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];

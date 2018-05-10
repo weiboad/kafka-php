@@ -134,16 +134,7 @@ class SyncProcess
 
             $topicMeta = $topicInfos[$value['topic']];
             $partNums  = array_keys($topicMeta);
-            if (isset($value['key']) && trim($value['key'])) {
-                $partId = crc32($value['key']) % count($partNums);
-            } else {
-                shuffle($partNums);
-                if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
-                    $partId = $partNums[0];
-                } else {
-                    $partId = $value['partId'];
-                }
-            }
+            $partId = $broker->getPartitionId($value, $partNums);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];
