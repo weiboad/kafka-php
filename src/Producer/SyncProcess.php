@@ -134,7 +134,7 @@ class SyncProcess
 
             $topicMeta = $topicInfos[$value['topic']];
             $partNums  = array_keys($topicMeta);
-            if (isset($value['key'])&&trim($value['key'])){
+            if (isset($value['key']) && trim($value['key'])){
                 $partId = crc32($value['key']) % count($partNums);
             } else {
                 shuffle($partNums);
