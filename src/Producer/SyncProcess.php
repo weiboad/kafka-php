@@ -67,7 +67,7 @@ class SyncProcess
         $sendData = $this->convertRecordSet($recordSet);
         $result   = [];
         foreach ($sendData as $brokerId => $topicList) {
-            $connect = $broker->getDataConnect((string) $brokerId, true);
+            $connect = $broker->getDataConnect((string) $brokerId, Broker::SOCKET_MODE_SYNC);
 
             if ($connect === null) {
                 return [];
@@ -118,7 +118,7 @@ class SyncProcess
         $broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
-            $socket = $broker->getMetaConnect($host, true);
+            $socket = $broker->getMetaConnect($host, Broker::SOCKET_MODE_SYNC);
 
             if ($socket === null) {
                 continue;

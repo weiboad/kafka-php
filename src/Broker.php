@@ -7,6 +7,7 @@ use Kafka\Sasl\Gssapi;
 use Kafka\Sasl\Plain;
 use Kafka\Sasl\Scram;
 use function array_keys;
+use function array_walk_recursive;
 use function explode;
 use function in_array;
 use function serialize;
@@ -17,6 +18,9 @@ use function strpos;
 class Broker
 {
     use SingletonTrait;
+
+    public const SOCKET_MODE_ASYNC = 0;
+    public const SOCKET_MODE_SYNC  = 1;
 
     /**
      * @var int
@@ -43,6 +47,9 @@ class Broker
      */
     private $dataSockets = [];
 
+    /** @var SocketFactory */
+    private $socketFactory;
+
     /**
      * @var callable|null
      */
@@ -52,6 +59,11 @@ class Broker
      * @var Config|null
      */
     private $config;
+
+    public function setSocketFactory(SocketFactory $socketFactory): void
+    {
+        $this->socketFactory = $socketFactory;
+    }
 
     public function setProcess(callable $process): void
     {
@@ -134,12 +146,12 @@ class Broker
         return $this->brokers;
     }
 
-    public function getMetaConnect(string $key, bool $modeSync = false): ?CommonSocket
+    public function getMetaConnect(string $key, int $mode = self::SOCKET_MODE_ASYNC): ?CommonSocket
     {
-        return $this->getConnect($key, 'metaSockets', $modeSync);
+        return $this->getConnect($key, 'metaSockets', $mode);
     }
 
-    public function getRandConnect(bool $modeSync = false): ?CommonSocket
+    public function getRandConnect(int $mode = self::SOCKET_MODE_ASYNC): ?CommonSocket
     {
         $nodeIds = array_keys($this->brokers);
         shuffle($nodeIds);
@@ -148,24 +160,24 @@ class Broker
             return null;
         }
 
-        return $this->getMetaConnect((string) $nodeIds[0], $modeSync);
+        return $this->getMetaConnect((string) $nodeIds[0], $mode);
     }
 
-    public function getDataConnect(string $key, bool $modeSync = false): ?CommonSocket
+    public function getDataConnect(string $key, int $mode = self::SOCKET_MODE_ASYNC): ?CommonSocket
     {
-        return $this->getConnect($key, 'dataSockets', $modeSync);
+        return $this->getConnect($key, 'dataSockets', $mode);
     }
 
-    public function getConnect(string $key, string $type, bool $modeSync = false): ?CommonSocket
+    public function getConnect(string $key, string $type, int $mode = self::SOCKET_MODE_ASYNC): ?CommonSocket
     {
-        if (isset($this->{$type}[$key])) {
-            return $this->{$type}[$key];
+        if (isset($this->{$type}[$key][$mode])) {
+            return $this->{$type}[$key][$mode];
         }
 
         if (isset($this->brokers[$key])) {
             $hostname = $this->brokers[$key];
-            if (isset($this->{$type}[$hostname])) {
-                return $this->{$type}[$hostname];
+            if (isset($this->{$type}[$hostname][$mode])) {
+                return $this->{$type}[$hostname][$mode];
             }
         }
 
@@ -182,19 +194,19 @@ class Broker
             [$host, $port] = explode(':', $key);
         }
 
-        if ($host === null || $port === null || (! $modeSync && $this->process === null)) {
+        if ($host === null || $port === null || ($mode === self::SOCKET_MODE_ASYNC && $this->process === null)) {
             return null;
         }
 
         try {
-            $socket = $this->getSocket((string) $host, (int) $port, $modeSync);
+            $socket = $this->getSocket((string) $host, (int) $port, $mode);
 
             if ($socket instanceof Socket && $this->process !== null) {
                 $socket->setOnReadable($this->process);
             }
 
             $socket->connect();
-            $this->{$type}[$key] = $socket;
+            $this->{$type}[$key][$mode] = $socket;
 
             return $socket;
         } catch (\Throwable $e) {
@@ -205,29 +217,28 @@ class Broker
 
     public function clear(): void
     {
-        foreach ($this->metaSockets as $key => $socket) {
+        $sockets = [$this->metaSockets, $this->dataSockets];
+
+        array_walk_recursive($sockets, function (CommonSocket $socket): void {
             $socket->close();
-        }
-        foreach ($this->dataSockets as $key => $socket) {
-            $socket->close();
-        }
+        });
+
         $this->brokers = [];
     }
 
     /**
      * @throws \Kafka\Exception
      */
-    public function getSocket(string $host, int $port, bool $modeSync): CommonSocket
+    public function getSocket(string $host, int $port, int $mode): CommonSocket
     {
         $saslProvider = $this->judgeConnectionConfig();
 
-        if ($modeSync) {
-            return new SocketSync($host, $port, $this->config, $saslProvider);
+        if ($mode === self::SOCKET_MODE_SYNC) {
+            return $this->getSocketFactory()->createSocketSync($host, $port, $this->config, $saslProvider);
         }
 
-        return new Socket($host, $port, $this->config, $saslProvider);
+        return $this->getSocketFactory()->createSocket($host, $port, $this->config, $saslProvider);
     }
-
 
     /**
      * @throws \Kafka\Exception
@@ -280,5 +291,14 @@ class Broker
         }
 
         throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
+    }
+
+    private function getSocketFactory(): SocketFactory
+    {
+        if ($this->socketFactory === null) {
+            $this->socketFactory = new SocketFactory();
+        }
+
+        return $this->socketFactory;
     }
 }
