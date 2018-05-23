@@ -5,6 +5,7 @@ namespace KafkaTest\Base\Producer;
 
 use Kafka\Exception\InvalidRecordInSet;
 use Kafka\Producer\RecordValidator;
+use Kafka\ProducerConfig;
 use PHPUnit\Framework\TestCase;
 
 final class RecordValidatorTest extends TestCase
@@ -15,6 +16,10 @@ final class RecordValidatorTest extends TestCase
     public function setUp(): void
     {
         $this->recordValidator = new RecordValidator();
+
+        /** @var ProducerConfig $config */
+        $config = ProducerConfig::getInstance();
+        $config->setAutoCreateTopicsEnable(false);
 
         parent::setUp();
     }
@@ -60,5 +65,18 @@ final class RecordValidatorTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment
+     */
+    public function testValidateNonExistingTopicWhenAutoCreateTopicsEnabled(): void
+    {
+        /** @var ProducerConfig $config */
+        $config = ProducerConfig::getInstance();
+        $config->setAutoCreateTopicsEnable(true);
+
+        $this->recordValidator->validate(['topic' => 'test', 'value' => 'a value'], []);
     }
 }
