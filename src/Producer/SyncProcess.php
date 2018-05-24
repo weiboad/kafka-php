@@ -161,10 +161,7 @@ class SyncProcess
             $this->recordValidator->validate($record, $topics);
 
             $topicMeta = $topics[$record['topic']];
-            $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
-
-            $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
+            $partId    = $broker->getPartitionId($record);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];

@@ -281,4 +281,21 @@ class Broker
 
         throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
     }
+
+    /**
+     * @param array $record
+     * @return int
+     */
+    public function getPartitionId($record)
+    {
+        $topicInfos = $this->getTopics();
+        $topicMeta  = $topicInfos[$record['topic']];
+        $partNums   = array_keys($topicMeta);
+        if (isset($record['key']) && trim($record['key'])) {
+            $partId = $partNums[crc32($record['key']) % count($partNums)];
+        } else {
+            $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
+        }
+        return $partId;
+    }
 }
