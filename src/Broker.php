@@ -298,6 +298,6 @@ class Broker
         } else {
             $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
         }
-        return $partId;
+        return (int)$partId;
     }
 }
