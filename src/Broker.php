@@ -286,7 +286,7 @@ class Broker
     }
 
     /**
-     * @param array $record
+     * @param mixed[] $record
      */
     public function getPartitionId($record): int
     {
@@ -298,6 +298,6 @@ class Broker
         } else {
             $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
         }
-        return (int)$partId;
+        return (int) $partId;
     }
 }
