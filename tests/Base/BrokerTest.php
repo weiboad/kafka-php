@@ -151,7 +151,6 @@ class BrokerTest extends TestCase
         return Broker::getInstance();
     }
 
-
     /**
      * testGetPartitionId
      * @access public
