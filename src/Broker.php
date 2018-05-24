@@ -7,6 +7,8 @@ use Kafka\Sasl\Gssapi;
 use Kafka\Sasl\Plain;
 use Kafka\Sasl\Scram;
 use function array_keys;
+use function count;
+use function crc32;
 use function explode;
 use function in_array;
 use function serialize;
@@ -14,8 +16,6 @@ use function shuffle;
 use function sprintf;
 use function strpos;
 use function trim;
-use function crc32;
-use function count;
 
 class Broker
 {
@@ -287,9 +287,8 @@ class Broker
 
     /**
      * @param array $record
-     * @return int
      */
-    public function getPartitionId($record)
+    public function getPartitionId($record): int
     {
         $topicInfos = $this->getTopics();
         $topicMeta  = $topicInfos[$record['topic']];
