@@ -286,7 +286,7 @@ class Broker
     }
 
     /**
-     * @param array $record
+     * @param mixed[] $record
      */
     public function getPartitionId(array $record): int
     {
