@@ -151,7 +151,8 @@ class BrokerTest extends TestCase
         return Broker::getInstance();
     }
 
-    public function testGetPartitionId()
+
+    public function testGetPartitionId(): void
     {
         $broker = Broker::getInstance();
         $data   = [
@@ -195,7 +196,7 @@ class BrokerTest extends TestCase
         $data   = [
             'partId' => '1',
             'topic' => 'test',
-            'value' => 'test message'
+            'value' => 'test message',
         ];
         $partId = $broker->getPartitionId($data);
         $this->assertEquals('1', $partId);
