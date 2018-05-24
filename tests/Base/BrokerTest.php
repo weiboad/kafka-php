@@ -152,6 +152,11 @@ class BrokerTest extends TestCase
     }
 
 
+    /**
+     * testGetPartitionId
+     * @access public
+     * @return void
+     */
     public function testGetPartitionId(): void
     {
         $broker = Broker::getInstance();

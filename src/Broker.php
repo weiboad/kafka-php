@@ -13,6 +13,9 @@ use function serialize;
 use function shuffle;
 use function sprintf;
 use function strpos;
+use function trim;
+use function crc32;
+use function count;
 
 class Broker
 {
