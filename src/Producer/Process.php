@@ -10,7 +10,6 @@ use Kafka\LoggerTrait;
 use Kafka\ProducerConfig;
 use Kafka\Protocol;
 use Psr\Log\LoggerAwareTrait;
-use function array_keys;
 use function count;
 use function explode;
 use function in_array;

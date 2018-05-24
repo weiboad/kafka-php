@@ -151,15 +151,9 @@ class BrokerTest extends TestCase
         return Broker::getInstance();
     }
 
-    /**
-     * testGetPartitionId
-     *
-     * @access public
-     * @return void
-     */
     public function testGetPartitionId()
     {
-        $broker = \Kafka\Broker::getInstance();
+        $broker = Broker::getInstance();
         $data   = [
             'brokers' => [
                 [
