@@ -285,10 +285,7 @@ class Broker
         throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
     }
 
-    /**
-     * @param mixed[] $record
-     */
-    public function getPartitionId($record): int
+    public function getPartitionId(array $record): int
     {
         $topicInfos = $this->getTopics();
         $topicMeta  = $topicInfos[$record['topic']];
