@@ -490,7 +490,7 @@ class Process
             foreach ($consumerOffsets as $topic => $value) {
                 foreach ($value as $partId => $offset) {
                     if (isset($lastOffsets[$topic][$partId]) && $lastOffsets[$topic][$partId] > $offset) {
-                        $consumerOffsets[$topic][$partId] = $offset + 1;
+                        $consumerOffsets[$topic][$partId] = $offset;
                     }
                 }
             }
@@ -557,8 +557,8 @@ class Process
                     continue;
                 }
 
-				$consumerOffset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
-                if ($consumerOffset === false) {
+                $offset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
+                if ($offset === false) {
                     return; // current is rejoin....
                 }
                 foreach ($part['messages'] as $message) {
@@ -566,14 +566,11 @@ class Process
                     //if ($this->consumer != null) {
                     //    call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
                     //}
-                    $commitOffset = $message['offset'];
+                    $offset = $message['offset'] + 1;
                 }
 
-				$commitOffset = isset($commitOffset) ? $commitOffset : $consumerOffset - 1;
-				$consumerOffset = $commitOffset + 1;
-
-                $assign->setConsumerOffset($topic['topicName'], $part['partition'], $consumerOffset);
-				$assign->setCommitOffset($topic['topicName'], $part['partition'], $commitOffset);
+                $assign->setConsumerOffset($topic['topicName'], $part['partition'], $offset);
+				$assign->setCommitOffset($topic['topicName'], $part['partition'], $offset);
             }
         }
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH, $fd);
