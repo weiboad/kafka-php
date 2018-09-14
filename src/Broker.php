@@ -7,8 +7,6 @@ use \Kafka\Sasl\Scram;
 
 class Broker
 {
-    use SingletonTrait;
-
     private $groupBrokerId = null;
 
     private $topics = [];
@@ -22,6 +20,21 @@ class Broker
     private $process;
 
     private $config;
+
+    private static $instance = [];
+
+    /**
+     * @return static
+     */
+    public static function getInstance($instance_name = 'default')
+    {
+        if(self::$instance[$instance_name]) {
+            return self::$instance[$instance_name];
+        }else{
+            return self::$instance[$instance_name] = new static();
+        }
+    }
+
 
     public function setProcess(callable $process)
     {
