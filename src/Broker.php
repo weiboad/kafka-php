@@ -28,7 +28,8 @@ class Broker
      */
     public static function getInstance($instance_name = 'default')
     {
-        if(self::$instance[$instance_name]) {
+
+        if(isset(self::$instance[$instance_name] )) {
             return self::$instance[$instance_name];
         }else{
             return self::$instance[$instance_name] = new static();
