@@ -12,7 +12,7 @@ class SyncProcess
         $config = \Kafka\ProducerConfig::getInstance();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
         // init broker
-        $broker = \Kafka\Broker::getInstance();
+        $broker = \Kafka\Broker::getInstance(__CLASS__);
         $broker->setConfig($config);
 
         $this->syncMeta();
@@ -20,7 +20,7 @@ class SyncProcess
 
     public function send($data)
     {
-        $broker      = \Kafka\Broker::getInstance();
+        $broker      = \Kafka\Broker::getInstance(__CLASS__);
         $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
         $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
 
@@ -80,7 +80,7 @@ class SyncProcess
         }
 
         shuffle($brokerHost);
-        $broker = \Kafka\Broker::getInstance();
+        $broker = \Kafka\Broker::getInstance(__CLASS__);
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host, true);
             if ($socket) {
@@ -95,7 +95,7 @@ class SyncProcess
                 if (! isset($result['brokers']) || ! isset($result['topics'])) {
                     throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
                 } else {
-                    $broker = \Kafka\Broker::getInstance();
+                    $broker = \Kafka\Broker::getInstance(__CLASS__);
                     $broker->setData($result['topics'], $result['brokers']);
                 }
                 return;
@@ -113,7 +113,7 @@ class SyncProcess
     protected function convertMessage($data)
     {
         $sendData   = [];
-        $broker     = \Kafka\Broker::getInstance();
+        $broker     = \Kafka\Broker::getInstance(__CLASS__);
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {

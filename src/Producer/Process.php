@@ -34,7 +34,7 @@ class Process
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
 
         // init process request
-        $broker = \Kafka\Broker::getInstance();
+        $broker = \Kafka\Broker::getInstance(__CLASS__);
         $broker->setConfig($config);
         $broker->setProcess(function ($data, $fd) {
             $this->processRequest($data, $fd);
@@ -124,7 +124,7 @@ class Process
         }
 
         shuffle($brokerHost);
-        $broker = \Kafka\Broker::getInstance();
+        $broker = \Kafka\Broker::getInstance(__CLASS__);
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host);
             if ($socket) {
@@ -160,7 +160,7 @@ class Process
                     $this->error('Get metadata is fail, brokers or topics is null.');
                     $this->state->failRun(\Kafka\Producer\State::REQUEST_METADATA);
                 } else {
-                    $broker   = \Kafka\Broker::getInstance();
+                    $broker   = \Kafka\Broker::getInstance(__CLASS__);
                     $isChange = $broker->setData($result['topics'], $result['brokers']);
                     $this->state->succRun(\Kafka\Producer\State::REQUEST_METADATA, $isChange);
                 }
@@ -177,7 +177,7 @@ class Process
     protected function produce()
     {
         $context     = [];
-        $broker      = \Kafka\Broker::getInstance();
+        $broker      = \Kafka\Broker::getInstance(__CLASS__);
         $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
         $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
 
@@ -260,7 +260,7 @@ class Process
     protected function convertMessage($data)
     {
         $sendData   = [];
-        $broker     = \Kafka\Broker::getInstance();
+        $broker     = \Kafka\Broker::getInstance(__CLASS__);
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {
