@@ -40,7 +40,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     protected function configureProducer()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
     }
@@ -76,7 +76,7 @@ abstract class ProducerTest extends \PHPUnit\Framework\TestCase
 
     private function configureConsumer()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList($this->brokers);
         $config->setBrokerVersion($this->version);
         $config->setGroupId('kafka-php-tests');

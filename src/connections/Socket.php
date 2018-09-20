@@ -1,6 +1,7 @@
 <?php
-namespace Kafka;
+namespace Kafka\connections;
 
+use Kafka\connections\CommonSocket;
 use Kafka\Loop;
 
 class Socket extends CommonSocket

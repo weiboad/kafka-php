@@ -1,6 +1,8 @@
 <?php
 namespace Kafka;
 
+use Kafka\connections\CommonSocket;
+
 interface SaslMechanism
 {
     /**

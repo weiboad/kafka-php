@@ -7,7 +7,7 @@ use Kafka\Consumer\StopStrategy;
 
 class Consumer
 {
-    use \Psr\Log\LoggerAwareTrait;
+    use Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     /**

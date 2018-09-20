@@ -1,7 +1,7 @@
 <?php
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
+use Kafka\connections\CommonSocket;
 use Kafka\Exception;
 use Kafka\Protocol;
 use Kafka\Protocol\Protocol as ProtocolTool;

@@ -1,35 +1,54 @@
 <?php
 namespace Kafka\Producer;
 
-class SyncProcess
-{
-    use \Psr\Log\LoggerAwareTrait;
-    use \Kafka\LoggerTrait;
+use Kafka\Broker;
+use Kafka\LoggerTrait;
+use Kafka\lib\ProducerConfig;
+use Psr\Log\LoggerAwareInterface;
 
-    public function __construct()
+class SyncProcess implements LoggerAwareInterface
+{
+    use LoggerTrait;
+
+
+    /**
+     * @var Broker
+     */
+    private $broker;
+
+
+    /**
+     * @var ProducerConfig
+     */
+    private $config;
+
+    public function __construct(ProducerConfig $config = null)
     {
-        // init protocol
-        $config = \Kafka\ProducerConfig::getInstance();
+        $this->setConfig($config);
+
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
-        // init broker
-        $broker = \Kafka\Broker::getInstance();
+
+        $broker = new Broker();
         $broker->setConfig($config);
+
+        $this->setBroker($broker);
 
         $this->syncMeta();
     }
 
+    /**
+     * @param $data
+     *
+     * @return array|bool
+     */
     public function send($data)
     {
-        $broker      = \Kafka\Broker::getInstance();
-        $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-        $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
+        $broker      = $this->getBroker();
+        $config = $this->getConfig();
+        $requiredAck = $config->getRequiredAck();
+        $timeout     = $config->getTimeout();
 
-        // get send message
-        // data struct
-        //  topic:
-        //  partId:
-        //  key:
-        //  value:
         if (empty($data)) {
             return false;
         }
@@ -42,10 +61,9 @@ class SyncProcess
                 return false;
             }
 
-            $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
             $params      = [
                 'required_ack' => $requiredAck,
-                'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
+                'timeout' => $timeout,
                 'data' => $topicList,
             ];
             $this->debug("Send message start, params:" . json_encode($params));
@@ -54,7 +72,7 @@ class SyncProcess
             if ($requiredAck != 0) { // If it is 0 the server will not send any response
                 $dataLen       = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, $connect->read(4));
                 $data          = $connect->read($dataLen);
-                $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
+//                $correlationId = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
                 $ret           = \Kafka\Protocol::decode(\Kafka\Protocol::PRODUCE_REQUEST, substr($data, 4));
                 $result[]      = $ret;
             }
@@ -66,7 +84,10 @@ class SyncProcess
     {
         $this->debug('Start sync metadata request');
 
-        $brokerList = \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList();
+        $config = $this->getConfig();
+        $broker = $this->getBroker();
+
+        $brokerList = $config->getMetadataBrokerList();
         $brokerHost = [];
 
         foreach (explode(',', $brokerList) as $key => $val) {
@@ -80,7 +101,7 @@ class SyncProcess
         }
 
         shuffle($brokerHost);
-        $broker = \Kafka\Broker::getInstance();
+
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host, true);
             if ($socket) {
@@ -95,9 +116,10 @@ class SyncProcess
                 if (! isset($result['brokers']) || ! isset($result['topics'])) {
                     throw new \Kafka\Exception('Get metadata is fail, brokers or topics is null.');
                 } else {
-                    $broker = \Kafka\Broker::getInstance();
+                    $broker = \Kafka\Broker::getInstance(__CLASS__);
                     $broker->setData($result['topics'], $result['brokers']);
                 }
+                //TODO why return ？？
                 return;
             }
         }
@@ -113,7 +135,7 @@ class SyncProcess
     protected function convertMessage($data)
     {
         $sendData   = [];
-        $broker     = \Kafka\Broker::getInstance();
+        $broker     = $this->getBroker();
         $topicInfos = $broker->getTopics();
         foreach ($data as $value) {
             if (! isset($value['topic']) || ! trim($value['topic'])) {
@@ -133,10 +155,10 @@ class SyncProcess
             }
 
             $topicMeta = $topicInfos[$value['topic']];
-            $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
-            $partId = 0;
+
             if (! isset($value['partId']) || ! isset($topicMeta[$value['partId']])) {
+                $partNums  = array_keys($topicMeta);
+                shuffle($partNums);
                 $partId = $partNums[0];
             } else {
                 $partId = $value['partId'];
@@ -166,5 +188,37 @@ class SyncProcess
         }
 
         return $sendData;
+    }
+
+    /**
+     * @return Broker
+     */
+    public function getBroker(): Broker
+    {
+        return $this->broker;
+    }
+
+    /**
+     * @param Broker $broker
+     */
+    public function setBroker(Broker $broker)
+    {
+        $this->broker = $broker;
+    }
+
+    /**
+     * @return ProducerConfig
+     */
+    public function getConfig(): ProducerConfig
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param ProducerConfig $config
+     */
+    public function setConfig(ProducerConfig $config)
+    {
+        $this->config = $config;
     }
 }

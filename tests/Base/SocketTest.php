@@ -1,8 +1,8 @@
 <?php
 namespace KafkaTest\Base;
 
-use \Kafka\Socket;
-use \Kafka\Config;
+use Kafka\connections\Socket;
+use Kafka\lib\Config;
 use \KafkaTest\Base\StreamStub\Simple as SimpleStream;
 use \KafkaTest\Base\StreamStub\Stream;
 use org\bovigo\vfs\vfsStream;
@@ -123,7 +123,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
                    ->method('context')
                    ->with($this->equalTo(stream_context_get_options($context)));
 
-        $config = $this->getMockForAbstractClass(\Kafka\Config::class);
+        $config = $this->getMockForAbstractClass(\Kafka\lib\Config::class);
         $config->setSslEnable(true);
         $config->setSslLocalPk($localKey);
         $config->setSslLocalCert($localCert);

@@ -1,15 +1,21 @@
 <?php
 namespace Kafka;
 
-use \Kafka\Loop;
+use Kafka\Producer\Process;
+use Kafka\Producer\SyncProcess;
 
 class Producer
 {
-    use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
+    /**
+     * @var Producer\Process|SyncProcess|null
+     */
     private $process = null;
 
+    /**
+     * @var Loop|null
+     */
     private $loop = null;
 
     /**
@@ -22,19 +28,17 @@ class Producer
     public function __construct(callable $producer = null)
     {
         if (is_null($producer)) {
-            $this->process = new \Kafka\Producer\SyncProcess();
+            $this->process = new SyncProcess();
         } else {
-            $this->process = new \Kafka\Producer\Process($producer);
+            $this->process = new Process($producer);
         }
         $this->loop = Loop::getInstance();
     }
 
     /**
-     * start producer
+     * @param bool $data
      *
-     * @access public
-     * @data is data is boolean that is async process, thus it is sync process
-     * @return void
+     * @return mixed
      */
     public function send($data = true)
     {

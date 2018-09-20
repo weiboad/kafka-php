@@ -1,11 +1,10 @@
 <?php
 namespace Kafka\Consumer;
 
-use Kafka\ConsumerConfig;
+use Kafka\lib\ConsumerConfig;
 
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     protected $consumer = null;
@@ -26,7 +25,7 @@ class Process
     public function init()
     {
         // init protocol
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
 
         // init process request
@@ -178,7 +177,7 @@ class Process
     {
         $this->debug('Start sync metadata request');
 
-        $brokerList = \Kafka\ConsumerConfig::getInstance()->getMetadataBrokerList();
+        $brokerList = \Kafka\lib\ConsumerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
 
         foreach (explode(',', $brokerList) as $key => $val) {
@@ -196,7 +195,7 @@ class Process
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host);
             if ($socket) {
-                $params = \Kafka\ConsumerConfig::getInstance()->getTopics();
+                $params = \Kafka\lib\ConsumerConfig::getInstance()->getTopics();
                 $this->debug('Start sync metadata request params:' . json_encode($params));
                 $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::METADATA_REQUEST, $params);
                 $socket->write($requestData);
@@ -220,7 +219,7 @@ class Process
             return;
         }
         $params      = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
         ];
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::GROUP_COORDINATOR_REQUEST, $params);
         $connect->write($requestData);
@@ -234,13 +233,13 @@ class Process
         if (! $connect) {
             return false;
         }
-        $topics      = \Kafka\ConsumerConfig::getInstance()->getTopics();
+        $topics      = \Kafka\lib\ConsumerConfig::getInstance()->getTopics();
         $assign      = \Kafka\Consumer\Assignment::getInstance();
         $memberId    = $assign->getMemberId();
         $params      = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
-            'session_timeout' => \Kafka\ConsumerConfig::getInstance()->getSessionTimeout(),
-            'rebalance_timeout' => \Kafka\ConsumerConfig::getInstance()->getRebalanceTimeout(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
+            'session_timeout' => \Kafka\lib\ConsumerConfig::getInstance()->getSessionTimeout(),
+            'rebalance_timeout' => \Kafka\lib\ConsumerConfig::getInstance()->getRebalanceTimeout(),
             'member_id' => ($memberId == null) ? '' : $memberId,
             'data' => [
                 [
@@ -286,12 +285,12 @@ class Process
         if (! $connect) {
             return;
         }
-        $topics       = \Kafka\ConsumerConfig::getInstance()->getTopics();
+        $topics       = \Kafka\lib\ConsumerConfig::getInstance()->getTopics();
         $assign       = \Kafka\Consumer\Assignment::getInstance();
         $memberId     = $assign->getMemberId();
         $generationId = $assign->getGenerationId();
         $params       = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
             'generation_id' => $generationId,
             'member_id' => $memberId,
             'data' => $assign->getAssignments(),
@@ -354,7 +353,7 @@ class Process
         }
         $generationId = $assign->getGenerationId();
         $params       = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
             'generation_id' => $generationId,
             'member_id' => $memberId,
         ];
@@ -456,7 +455,7 @@ class Process
             }
         }
         $params = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
             'data' => $data,
         ];
         //$this->debug("Get current fetch offset start, params:" . json_encode($params));
@@ -490,7 +489,7 @@ class Process
             foreach ($consumerOffsets as $topic => $value) {
                 foreach ($value as $partId => $offset) {
                     if (isset($lastOffsets[$topic][$partId]) && $lastOffsets[$topic][$partId] > $offset) {
-                        $consumerOffsets[$topic][$partId] = $offset + 1;
+                        $consumerOffsets[$topic][$partId] = $offset;
                     }
                 }
             }
@@ -523,13 +522,13 @@ class Process
                     $item['partitions'][] = [
                         'partition_id' => $partId,
                         'offset' => isset($consumerOffsets[$topic['topic_name']][$partId]) ? $consumerOffsets[$topic['topic_name']][$partId] : 0,
-                        'max_bytes' => \Kafka\ConsumerConfig::getInstance()->getMaxBytes(),
+                        'max_bytes' => \Kafka\lib\ConsumerConfig::getInstance()->getMaxBytes(),
                     ];
                 }
                 $data[] = $item;
             }
             $params = [
-                'max_wait_time' => \Kafka\ConsumerConfig::getInstance()->getMaxWaitTime(),
+                'max_wait_time' => \Kafka\lib\ConsumerConfig::getInstance()->getMaxWaitTime(),
                 'replica_id' => -1,
                 'min_bytes' => '1000',
                 'data' => $data,
@@ -557,8 +556,8 @@ class Process
                     continue;
                 }
 
-				$consumerOffset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
-                if ($consumerOffset === false) {
+                $offset = $assign->getConsumerOffset($topic['topicName'], $part['partition']);
+                if ($offset === false) {
                     return; // current is rejoin....
                 }
                 foreach ($part['messages'] as $message) {
@@ -566,14 +565,11 @@ class Process
                     //if ($this->consumer != null) {
                     //    call_user_func($this->consumer, $topic['topicName'], $part['partition'], $message);
                     //}
-                    $commitOffset = $message['offset'];
+                    $offset = $message['offset'] + 1;
                 }
 
-				$commitOffset = isset($commitOffset) ? $commitOffset : $consumerOffset - 1;
-				$consumerOffset = $commitOffset + 1;
-
-                $assign->setConsumerOffset($topic['topicName'], $part['partition'], $consumerOffset);
-				$assign->setCommitOffset($topic['topicName'], $part['partition'], $commitOffset);
+                $assign->setConsumerOffset($topic['topicName'], $part['partition'], $offset);
+				$assign->setCommitOffset($topic['topicName'], $part['partition'], $offset);
             }
         }
         $this->state->succRun(\Kafka\Consumer\State::REQUEST_FETCH, $fd);
@@ -630,7 +626,7 @@ class Process
             }
         }
         $params = [
-            'group_id' => \Kafka\ConsumerConfig::getInstance()->getGroupId(),
+            'group_id' => \Kafka\lib\ConsumerConfig::getInstance()->getGroupId(),
             'generation_id' => \Kafka\Consumer\Assignment::getInstance()->getGenerationId(),
             'member_id' => \Kafka\Consumer\Assignment::getInstance()->getMemberId(),
             'data' => $data,
@@ -700,7 +696,7 @@ class Process
         }
 
         if (\Kafka\Protocol::OFFSET_OUT_OF_RANGE == $errorCode) {
-            $resetOffset = \Kafka\ConsumerConfig::getInstance()->getOffsetReset();
+            $resetOffset = \Kafka\lib\ConsumerConfig::getInstance()->getOffsetReset();
             if ($resetOffset == 'latest') {
                 $offsets = $assign->getLastOffsets();
             } else {

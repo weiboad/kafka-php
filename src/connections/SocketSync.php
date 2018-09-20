@@ -1,5 +1,8 @@
 <?php
-namespace Kafka;
+namespace Kafka\connections;
+
+use Kafka\connections\CommonSocket;
+use Kafka\connections\Socket;
 
 class SocketSync extends CommonSocket
 {
@@ -10,6 +13,7 @@ class SocketSync extends CommonSocket
      * @static
      * @access public
      * @param $stream
+     * @deprecated
      * @return Socket
      */
     public static function createFromStream($stream)

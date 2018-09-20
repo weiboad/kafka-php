@@ -1,5 +1,8 @@
 <?php
-namespace Kafka;
+namespace Kafka\connections;
+
+use Kafka\Loop;
+use Kafka\SaslMechanism;
 
 abstract class CommonSocket
 {

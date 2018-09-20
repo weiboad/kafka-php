@@ -112,7 +112,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
 
     private function getSocketForVerify($verifyMessage = '')
     {
-        $socket             = $this->createMock(\Kafka\Socket::class);
+        $socket             = $this->createMock(\Kafka\connections\Socket::class);
         $handShakeData      = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         $firstServerMessage = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $verifyMessage      = ($verifyMessage === '') ? 'v=AM496N+dPKeXeORuChQslmlCo+QHI8wy7CxRWOIMXdY=' : $verifyMessage;
@@ -145,7 +145,7 @@ class ScramTest extends \PHPUnit\Framework\TestCase
 
     private function getSocketForInvalidFinalMessage($serverMessage = '')
     {
-        $socket        = $this->createMock(\Kafka\Socket::class);
+        $socket        = $this->createMock(\Kafka\connections\Socket::class);
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
 
         if ($serverMessage === '') {

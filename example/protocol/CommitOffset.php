@@ -27,7 +27,7 @@ class CommitOffset
         $protocol    = \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::JOIN_GROUP_REQUEST, $data);
 
-        $socket = new \Kafka\Socket('127.0.0.1', '9192');
+        $socket = new \Kafka\connections\Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data) {
             $coodid      = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result      = \Kafka\Protocol::decode(\Kafka\Protocol::JOIN_GROUP_REQUEST, substr($data, 4));
@@ -70,7 +70,7 @@ class CommitOffset
         $protocol    = \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::SYNC_GROUP_REQUEST, $data);
 
-        $socket = new \Kafka\Socket('127.0.0.1', '9192');
+        $socket = new \Kafka\connections\Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data) {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result = \Kafka\Protocol::decode(\Kafka\Protocol::SYNC_GROUP_REQUEST, substr($data, 4));
@@ -113,7 +113,7 @@ class CommitOffset
         $protocol    = \Kafka\Protocol::init('0.9.1.0');
         $requestData = \Kafka\Protocol::encode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, $data);
 
-        $socket = new \Kafka\Socket('127.0.0.1', '9192');
+        $socket = new \Kafka\connections\Socket('127.0.0.1', '9192');
         $socket->setOnReadable(function ($data) {
             $coodid = \Kafka\Protocol\Protocol::unpack(\Kafka\Protocol\Protocol::BIT_B32, substr($data, 0, 4));
             $result = \Kafka\Protocol::decode(\Kafka\Protocol::OFFSET_COMMIT_REQUEST, substr($data, 4));

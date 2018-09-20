@@ -12,7 +12,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function tearDown()
     {
-        \Kafka\ProducerConfig::getInstance()->clear();
+        \Kafka\lib\ProducerConfig::getInstance()->clear();
     }
 
     /**
@@ -23,7 +23,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRequestTimeout()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setRequestTimeout(1011);
         $this->assertEquals($config->getRequestTimeout(), 1011);
     }
@@ -38,7 +38,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRequestTimeoutValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setRequestTimeout('-1');
     }
 
@@ -50,7 +50,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetProduceInterval()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setProduceInterval(1011);
         $this->assertEquals($config->getProduceInterval(), 1011);
     }
@@ -65,7 +65,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetProduceIntervalValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setProduceInterval('-1');
     }
 
@@ -77,7 +77,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetTimeout()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setTimeout(1011);
         $this->assertEquals($config->getTimeout(), 1011);
     }
@@ -92,7 +92,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetTimeoutValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setTimeout('-1');
     }
 
@@ -104,7 +104,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRequiredAck()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setRequiredAck(1);
         $this->assertEquals($config->getRequiredAck(), 1);
     }
@@ -119,7 +119,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRequiredAckValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setRequiredAck('-2');
     }
 
@@ -131,7 +131,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetIsAsyn()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setIsAsyn(true);
         $this->assertTrue($config->getIsAsyn());
     }
@@ -146,7 +146,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetIsAsynValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setIsAsyn('-2');
     }
 
@@ -160,7 +160,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslLocalCert()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSslLocalCert('invalid_path');
     }
 
@@ -174,7 +174,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslLocalCertNotFile()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSslLocalCert('/tmp');
     }
 
@@ -186,7 +186,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslLocalCertValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $path   = '/etc/passwd';
         $config->setSslLocalCert($path);
         $this->assertEquals($path, $config->getSslLocalCert());
@@ -202,7 +202,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslLocalPk()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSslLocalPk('invalid_path');
     }
 
@@ -214,7 +214,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslLocalPkValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $path   = '/etc/passwd';
         $config->setSslLocalPk($path);
         $this->assertEquals($path, $config->getSslLocalPk());
@@ -230,7 +230,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslCafile()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSslCafile('invalid_path');
     }
 
@@ -242,7 +242,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSslCafileValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $path   = '/etc/passwd';
         $config->setSslCafile($path);
         $this->assertEquals($path, $config->getSslCafile());
@@ -258,7 +258,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSaslKeytab()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSaslKeytab('invalid_path');
     }
 
@@ -270,7 +270,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSaslKeytabValid()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $path   = '/etc/passwd';
         $config->setSaslKeytab($path);
         $this->assertEquals($path, $config->getSaslKeytab());
@@ -286,7 +286,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSecurityProtocol()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSecurityProtocol('xxxx');
     }
 
@@ -298,8 +298,8 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSecurityProtocolValid()
     {
-        $config   = \Kafka\ProducerConfig::getInstance();
-        $protocol = \Kafka\Config::SECURITY_PROTOCOL_PLAINTEXT;
+        $config   = \Kafka\lib\ProducerConfig::getInstance();
+        $protocol = \Kafka\lib\Config::SECURITY_PROTOCOL_PLAINTEXT;
         $config->setSecurityProtocol($protocol);
         $this->assertEquals($protocol, $config->getSecurityProtocol());
     }
@@ -314,7 +314,7 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSaslMechanism()
     {
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         $config->setSaslMechanism('xxxx');
     }
 
@@ -326,8 +326,8 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSaslMechanismValid()
     {
-        $config    = \Kafka\ProducerConfig::getInstance();
-        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
+        $config    = \Kafka\lib\ProducerConfig::getInstance();
+        $mechanism = \Kafka\lib\Config::SASL_MECHANISMS_GSSAPI;
         $config->setSaslMechanism($mechanism);
         $this->assertEquals($mechanism, $config->getSaslMechanism());
     }
@@ -340,11 +340,11 @@ class ProducerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testClear()
     {
-        $config    = \Kafka\ProducerConfig::getInstance();
-        $mechanism = \Kafka\Config::SASL_MECHANISMS_GSSAPI;
+        $config    = \Kafka\lib\ProducerConfig::getInstance();
+        $mechanism = \Kafka\lib\Config::SASL_MECHANISMS_GSSAPI;
         $config->setSaslMechanism($mechanism);
         $this->assertEquals($mechanism, $config->getSaslMechanism());
         $config->clear();
-        $this->assertEquals(\Kafka\Config::SASL_MECHANISMS_PLAIN, $config->getSaslMechanism());
+        $this->assertEquals(\Kafka\lib\Config::SASL_MECHANISMS_PLAIN, $config->getSaslMechanism());
     }
 }

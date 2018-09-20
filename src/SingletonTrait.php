@@ -3,7 +3,6 @@ namespace Kafka;
 
 trait SingletonTrait
 {
-    use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     protected static $instance = null;

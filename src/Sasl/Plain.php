@@ -2,7 +2,7 @@
 
 namespace Kafka\Sasl;
 
-use Kafka\CommonSocket;
+use Kafka\connections\CommonSocket;
 use Kafka\SaslMechanism;
 use Kafka\Exception;
 

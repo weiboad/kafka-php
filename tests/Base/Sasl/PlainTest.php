@@ -13,7 +13,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
     public function testHandShake()
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(\Kafka\connections\Socket::class);
 
         $handShakeData = \hex2bin('00000011000000000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.
@@ -41,7 +41,7 @@ class PlainTest extends \PHPUnit\Framework\TestCase
     public function testHandShakeNotSupport()
     {
         // Create a stub for the SomeClass class.
-        $socket = $this->createMock(\Kafka\Socket::class);
+        $socket = $this->createMock(\Kafka\connections\Socket::class);
 
         $handShakeData = \hex2bin('00000011002100000004000d534352414d2d5348412d3531320005504c41494e0006475353415049000d534352414d2d5348412d323536');
         // Configure the stub.

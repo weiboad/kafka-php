@@ -1,5 +1,21 @@
 <?php
-namespace Kafka;
+namespace Kafka\lib;
+
+use Kafka\lib\Config;
+use Kafka\SingletonTrait;
+
+/**
+ * Class ProducerConfig
+ *
+ * @method getTimeout
+ * @method getRequiredAck
+ * @method getIsAsyn
+ * @method getRequestTimeout
+ * @method getProduceInterval
+ *
+ * @package Kafka
+ */
+
 
 class ProducerConfig extends Config
 {

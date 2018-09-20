@@ -1,13 +1,16 @@
 <?php
 namespace Kafka;
 
+use Kafka\lib\Config;
+use Kafka\lib\ConsumerConfig;
+use Kafka\lib\ProducerConfig;
 use \Kafka\Sasl\Plain;
 use \Kafka\Sasl\Gssapi;
 use \Kafka\Sasl\Scram;
 
 class Broker
 {
-    use SingletonTrait;
+    use LoggerTrait;
 
     private $groupBrokerId = null;
 
@@ -21,7 +24,27 @@ class Broker
 
     private $process;
 
+    /**
+     * @var Config|ProducerConfig|ConsumerConfig
+     */
     private $config;
+
+
+    private static $instance = [];
+
+    /**
+     * @return static
+     */
+    public static function getInstance($instance_name = 'default')
+    {
+
+        if(isset(self::$instance[$instance_name] )) {
+            return self::$instance[$instance_name];
+        }else{
+            return self::$instance[$instance_name] = new static();
+        }
+    }
+
 
     public function setProcess(callable $process)
     {
@@ -167,9 +190,9 @@ class Broker
     {
         $saslProvider = $this->judgeConnectionConfig();
         if ($modeSync) {
-            $socket = new \Kafka\SocketSync($host, $port, $this->config, $saslProvider);
+            $socket = new connections\SocketSync($host, $port, $this->config, $saslProvider);
         } else {
-            $socket = new \Kafka\Socket($host, $port, $this->config, $saslProvider);
+            $socket = new connections\Socket($host, $port, $this->config, $saslProvider);
         }
         return $socket;
     }

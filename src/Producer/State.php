@@ -42,7 +42,7 @@ class State
         // instances clear
 
         // init requests
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         foreach ($this->requests as $request => $option) {
             switch ($request) {
                 case self::REQUEST_METADATA:
@@ -85,7 +85,7 @@ class State
 
     public function succRun($key, $context = null)
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $isAsyn = $config->getIsAsyn();
         if (! isset($this->callStatus[$key])) {
             return false;
