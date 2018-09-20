@@ -1,9 +1,10 @@
 <?php
 namespace Kafka\Producer;
 
+use Kafka\lib\ProducerConfig;
+
 class Process
 {
-    use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     protected $producer = null;
@@ -14,7 +15,15 @@ class Process
 
     protected $error = null;
 
+    /**
+     * @var State
+     */
     private $state;
+
+    /**
+     * @var \Kafka\lib\ProducerConfig
+     */
+    private $config;
 
     public function __construct(callable $producer = null)
     {
@@ -30,7 +39,7 @@ class Process
     public function init()
     {
         // init protocol
-        $config = \Kafka\ProducerConfig::getInstance();
+        $config = \Kafka\lib\ProducerConfig::getInstance();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
 
         // init process request
@@ -110,7 +119,7 @@ class Process
     {
         $this->debug('Start sync metadata request');
 
-        $brokerList = \Kafka\ProducerConfig::getInstance()->getMetadataBrokerList();
+        $brokerList = \Kafka\lib\ProducerConfig::getInstance()->getMetadataBrokerList();
         $brokerHost = [];
 
         foreach (explode(',', $brokerList) as $key => $val) {
@@ -178,8 +187,8 @@ class Process
     {
         $context     = [];
         $broker      = \Kafka\Broker::getInstance(__CLASS__);
-        $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
-        $timeout     = \Kafka\ProducerConfig::getInstance()->getTimeout();
+        $requiredAck = \Kafka\lib\ProducerConfig::getInstance()->getRequiredAck();
+        $timeout     = \Kafka\lib\ProducerConfig::getInstance()->getTimeout();
 
         // get send message
         // data struct
@@ -199,10 +208,10 @@ class Process
                 return;
             }
 
-            $requiredAck = \Kafka\ProducerConfig::getInstance()->getRequiredAck();
+            $requiredAck = \Kafka\lib\ProducerConfig::getInstance()->getRequiredAck();
             $params      = [
                 'required_ack' => $requiredAck,
-                'timeout' => \Kafka\ProducerConfig::getInstance()->getTimeout(),
+                'timeout' => \Kafka\lib\ProducerConfig::getInstance()->getTimeout(),
                 'data' => $topicList,
             ];
             $this->debug("Send message start, params:" . json_encode($params));
@@ -226,6 +235,22 @@ class Process
             call_user_func($this->success, $result);
         }
         $this->state->succRun(\Kafka\Producer\State::REQUEST_PRODUCE, $fd);
+    }
+
+    /**
+     * @return \Kafka\lib\ProducerConfig
+     */
+    public function getConfig(): ProducerConfig
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param \Kafka\lib\ProducerConfig $config
+     */
+    public function setConfig(ProducerConfig $config)
+    {
+        $this->config = $config;
     }
 
     protected function stateConvert($errorCode, $context = null)

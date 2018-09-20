@@ -12,7 +12,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function tearDown()
     {
-        \Kafka\ConsumerConfig::getInstance()->clear();
+        \Kafka\lib\ConsumerConfig::getInstance()->clear();
     }
 
     /**
@@ -23,7 +23,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testDefaultConfig()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $this->assertEquals($config->getClientId(), 'kafka-php');
         $this->assertEquals($config->getSessionTimeout(), 30000);
         $this->assertFalse($config->setValidKey('xxx', '222'));
@@ -40,7 +40,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetClientId()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setClientId('kafka-php1');
         $this->assertEquals($config->getClientId(), 'kafka-php1');
     }
@@ -55,7 +55,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetClientIdEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setClientId('');
     }
 
@@ -67,7 +67,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetBrokerVersion()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setBrokerVersion('0.9.0.1');
         $this->assertEquals($config->getBrokerVersion(), '0.9.0.1');
     }
@@ -82,7 +82,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetBrokerVersionEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setBrokerVersion('');
     }
 
@@ -96,7 +96,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetBrokerVersionValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setBrokerVersion('0.1');
     }
 
@@ -108,7 +108,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataBrokerList()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList('127.0.0.1:9192,127.0.0.1:9292');
         $this->assertEquals($config->getMetadataBrokerList(), '127.0.0.1:9192,127.0.0.1:9292');
     }
@@ -123,7 +123,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataBrokerListEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList('');
     }
 
@@ -137,7 +137,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataBrokerListEmpty1()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList(',');
     }
 
@@ -151,7 +151,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataBrokerListEmpty2()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataBrokerList('127.0.0.1: , : ');
     }
 
@@ -163,7 +163,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetGroupId()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setGroupId('test');
         $this->assertEquals($config->getGroupId(), 'test');
     }
@@ -178,7 +178,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetGroupIdEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setGroupId('');
     }
 
@@ -192,7 +192,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetGroupIdEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->getGroupId();
     }
 
@@ -204,7 +204,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSessionTimeout()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setSessionTimeout(2000);
         $this->assertEquals($config->getSessionTimeout(), 2000);
     }
@@ -219,7 +219,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetSessionTimeoutValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setSessionTimeout('-1');
     }
 
@@ -231,7 +231,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRebalanceTimeout()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setRebalanceTimeout(2000);
         $this->assertEquals($config->getRebalanceTimeout(), 2000);
     }
@@ -246,7 +246,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetRebalanceTimeoutValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setRebalanceTimeout('-1');
     }
 
@@ -258,7 +258,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetOffsetReset()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setOffsetReset('earliest');
         $this->assertEquals($config->getOffsetReset(), 'earliest');
     }
@@ -273,7 +273,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetOffsetResetValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setOffsetReset('xxxx');
     }
 
@@ -285,7 +285,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetTopics()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setTopics(['test']);
         $this->assertEquals($config->getTopics(), ['test']);
     }
@@ -300,7 +300,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetTopicsEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setTopics('');
     }
 
@@ -314,7 +314,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTopicsEmpty()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->getTopics();
     }
 
@@ -326,7 +326,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMessageMaxBytes()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMessageMaxBytes(1011);
         $this->assertEquals($config->getMessageMaxBytes(), 1011);
     }
@@ -341,7 +341,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMessageMaxBytesValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMessageMaxBytes('999');
     }
 
@@ -353,7 +353,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataRequestTimeoutMs()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataRequestTimeoutMs(1011);
         $this->assertEquals($config->getMetadataRequestTimeoutMs(), 1011);
     }
@@ -368,7 +368,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataRequestTimeoutMsValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataRequestTimeoutMs('9');
     }
 
@@ -380,7 +380,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataRefreshIntervalMs()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataRefreshIntervalMs(1011);
         $this->assertEquals($config->getMetadataRefreshIntervalMs(), 1011);
     }
@@ -395,7 +395,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataRefreshIntervalMsValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataRefreshIntervalMs('9');
     }
 
@@ -407,7 +407,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataMaxAgeMs()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataMaxAgeMs(1011);
         $this->assertEquals($config->getMetadataMaxAgeMs(), 1011);
     }
@@ -422,7 +422,7 @@ class ConsumerConfigTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetMetadataMaxAgeMsValid()
     {
-        $config = \Kafka\ConsumerConfig::getInstance();
+        $config = \Kafka\lib\ConsumerConfig::getInstance();
         $config->setMetadataMaxAgeMs('86400001');
     }
 }

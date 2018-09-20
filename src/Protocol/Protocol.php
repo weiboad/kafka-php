@@ -3,7 +3,6 @@ namespace Kafka\Protocol;
 
 abstract class Protocol
 {
-    use \Psr\Log\LoggerAwareTrait;
     use \Kafka\LoggerTrait;
 
     /**

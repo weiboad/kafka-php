@@ -9,7 +9,7 @@ $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$config = \Kafka\ProducerConfig::getInstance();
+$config = \Kafka\lib\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(1000);
 $config->setMetadataBrokerList('127.0.0.1:9092');
 $config->setBrokerVersion('1.0.0');

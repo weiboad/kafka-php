@@ -9,15 +9,15 @@ $logger = new Logger('my_logger');
 // Now add some handlers
 $logger->pushHandler(new StdoutHandler());
 
-$config = \Kafka\ProducerConfig::getInstance();
+$config = \Kafka\lib\ProducerConfig::getInstance();
 $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('127.0.0.1:9093');
 $config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
 $config->setIsAsyn(false);
 $config->setProduceInterval(500);
-$config->setSecurityProtocol(\Kafka\Config::SECURITY_PROTOCOL_SASL_SSL);
-$config->setSaslMechanism(\Kafka\Config::SASL_MECHANISMS_SCRAM_SHA_256);
+$config->setSecurityProtocol(\Kafka\lib\Config::SECURITY_PROTOCOL_SASL_SSL);
+$config->setSaslMechanism(\Kafka\lib\Config::SASL_MECHANISMS_SCRAM_SHA_256);
 $config->setSaslUsername('nmred');
 $config->setSaslPassword('123456');
 $config->setSaslUsername('alice');

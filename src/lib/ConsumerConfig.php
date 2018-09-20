@@ -1,5 +1,8 @@
 <?php
-namespace Kafka;
+namespace Kafka\lib;
+
+use Kafka\lib\Config;
+use Kafka\SingletonTrait;
 
 /**
  * @method string|false ietGroupId()

@@ -1,5 +1,16 @@
 <?php
-namespace Kafka;
+namespace Kafka\lib;
+
+
+/**
+ * Class Config
+ *
+ * @method getBrokerVersion
+ * @method getMetadataBrokerList
+ *
+ * @package Kafka
+ */
+
 
 abstract class Config
 {
