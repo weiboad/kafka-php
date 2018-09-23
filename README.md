@@ -48,7 +48,7 @@ Configuration properties are documented in [Configuration](docs/Configure.md)
 
 ## Producer
 
-### Asynchronous mode
+### Synchronous mode
 
 ```php
 <?php
@@ -89,7 +89,7 @@ $producer->error(function($errorCode) {
 $producer->send(true);
 ```
 
-### Synchronous mode
+### Asynchronous mode
 
 ```php
 <?php
@@ -115,9 +115,9 @@ $producer->setLogger($logger);
 for($i = 0; $i < 100; $i++) {
     $producer->send([
         [
-            'topic' => 'test1',
-            'value' => 'test1....message.',
-            'key' => '',
+            'topic' => 'test',
+            'value' => 'test....message.',
+            'key' => 'testkey',
         ],
     ]);
 }
