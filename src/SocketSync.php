@@ -100,4 +100,27 @@ class SocketSync extends CommonSocket
             rewind($this->stream);
         }
     }
+
+    /**
+     * reconnect the socket
+     *
+     * @access public
+     * @return void
+     */
+    function reconnect()
+    {
+        $this->close();
+        $this->connect();
+    }
+
+
+    /**
+     * check the stream is close
+     *
+     * @return bool
+     */
+    function isSocketDead()
+    {
+        return ! is_resource($this->stream) || @feof($this->stream);
+    }
 }

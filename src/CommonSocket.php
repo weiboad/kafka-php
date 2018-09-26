@@ -3,6 +3,7 @@ namespace Kafka;
 
 abstract class CommonSocket
 {
+    use LoggerTrait;
 
     const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
 
@@ -273,13 +274,22 @@ abstract class CommonSocket
             throw new \Kafka\Exception('Invalid length given, it should be lesser than or equals to ' . self:: READ_MAX_LENGTH);
         }
 
+        //http://php.net/manpual/en/function.stream-select.ph
+
+        try_again:
+
         $null     = null;
+        if($this->isSocketDead()) {
+            $this->reconnect();
+        }
         $read     = [$this->stream];
         $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+
         if ($readable === false) {
-            $this->close();
-            throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
+            goto try_again;
         }
+
+
         if ($readable === 0) { // select timeout
             $res = $this->getMetaData();
             $this->close();
@@ -378,4 +388,7 @@ abstract class CommonSocket
      * @return void
      */
     abstract public function close();
+
+    abstract protected function isSocketDead();
+    abstract protected function reconnect();
 }
