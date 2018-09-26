@@ -280,26 +280,21 @@ abstract class CommonSocket
 
         $null     = null;
         if($this->isSocketDead()) {
+            $res = $this->getMetaData();
+            $this->debug(json_encode($res));
+            $this->debug('socket dead, reconnecting...');
             $this->reconnect();
         }
         $read     = [$this->stream];
-        $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        $readable = $this->select($read, null, $this->recvTimeoutUsec);
 
-        if ($readable === false) {
+        if ($readable == false) {
+            $res = $this->getMetaData();
+            $this->debug(json_encode($res));
             $this->debug('select read socket failed try_again');
             goto try_again;
         }
 
-
-        if ($readable === 0) { // select timeout
-            $res = $this->getMetaData();
-            $this->close();
-            if (! empty($res['timed_out'])) {
-                throw new \Kafka\Exception('Timed out reading ' . $len . ' bytes from stream');
-            } else {
-                throw new \Kafka\Exception('Could not read ' . $len . ' bytes from stream (not readable)');
-            }
-        }
 
         $remainingBytes = $len;
         $data           = $chunk = '';
