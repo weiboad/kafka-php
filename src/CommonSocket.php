@@ -286,6 +286,7 @@ abstract class CommonSocket
         $readable = $this->select($read, $this->recvTimeoutSec, $this->recvTimeoutUsec);
 
         if ($readable === false) {
+            $this->debug('select read socket failed try_again');
             goto try_again;
         }
 
