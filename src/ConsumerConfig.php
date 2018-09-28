@@ -4,6 +4,8 @@ namespace Kafka;
 /**
  * @method string|false ietGroupId()
  * @method array|false ietTopics()
+ * @method setMaxBytes
+ * @method setMaxWaitTime
  */
 class ConsumerConfig extends Config
 {
