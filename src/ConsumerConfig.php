@@ -6,6 +6,9 @@ namespace Kafka;
  * @method array|false ietTopics()
  * @method setMaxBytes
  * @method setMaxWaitTime
+ * @method getMaxWaitTime
+ * @method getMaxBytes
+ * @method getOffsetReset
  */
 class ConsumerConfig extends Config
 {
