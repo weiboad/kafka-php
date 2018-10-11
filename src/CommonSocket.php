@@ -4,6 +4,7 @@ namespace Kafka;
 abstract class CommonSocket
 {
     use LoggerTrait;
+    use \Psr\Log\LoggerAwareTrait;
 
     const READ_MAX_LENGTH = 5242880; // read socket max length 5MB
 
