@@ -31,6 +31,8 @@ use function version_compare;
  * @method string getSslLocalPk()
  * @method bool getSslVerifyPeer()
  * @method void setSslVerifyPeer(bool $sslVerifyPeer)
+ * @method bool getSslVerifyPeerName()
+ * @method void setSslVerifyPeerName(bool $sslVerifyPeerName)
  * @method string getSslPassphrase()
  * @method void setSslPassphrase(string $sslPassphrase)
  * @method string getSslCafile()
@@ -89,6 +91,7 @@ abstract class Config
         'sslLocalCert'              => '',
         'sslLocalPk'                => '',
         'sslVerifyPeer'             => false,
+        'sslVerifyPeerName'         => false,
         'sslPassphrase'             => '',
         'sslCafile'                 => '',
         'sslPeerName'               => '',

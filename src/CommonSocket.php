@@ -142,12 +142,13 @@ abstract class CommonSocket
             $context = stream_context_create(
                 [
                     'ssl' => [
-                        'local_cert'  => $this->config->getSslLocalCert(),
-                        'local_pk'    => $this->config->getSslLocalPk(),
-                        'verify_peer' => $this->config->getSslVerifyPeer(),
-                        'passphrase'  => $this->config->getSslPassphrase(),
-                        'cafile'      => $this->config->getSslCafile(),
-                        'peer_name'   => $this->config->getSslPeerName(),
+                        'local_cert'       => $this->config->getSslLocalCert(),
+                        'local_pk'         => $this->config->getSslLocalPk(),
+                        'verify_peer'      => $this->config->getSslVerifyPeer(),
+                        'verify_peer_name' => $this->config->getSslVerifyPeerName(),
+                        'passphrase'       => $this->config->getSslPassphrase(),
+                        'cafile'           => $this->config->getSslCafile(),
+                        'peer_name'        => $this->config->getSslPeerName(),
                     ],
                 ]
             );

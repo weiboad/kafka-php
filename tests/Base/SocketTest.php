@@ -94,24 +94,26 @@ class SocketTest extends TestCase
 
     public function testCreateStreamSsl(): void
     {
-        $host       = '127.0.0.1';
-        $port       = 9192;
-        $localCert  = $this->root->url() . '/localCert';
-        $localKey   = $this->root->url() . '/localKey';
-        $verifyPeer = false;
-        $passphrase = '123456';
-        $cafile     = $this->root->url() . '/cafile';
-        $peerName   = 'kafka';
+        $host           = '127.0.0.1';
+        $port           = 9192;
+        $localCert      = $this->root->url() . '/localCert';
+        $localKey       = $this->root->url() . '/localKey';
+        $verifyPeer     = false;
+        $verifyPeerName = false;
+        $passphrase     = '123456';
+        $cafile         = $this->root->url() . '/cafile';
+        $peerName       = 'kafka';
 
         $context = stream_context_create(
             [
                 'ssl' => [
-                    'local_cert'  => $localCert,
-                    'local_pk'    => $localKey,
-                    'verify_peer' => $verifyPeer,
-                    'passphrase'  => $passphrase,
-                    'cafile'      => $cafile,
-                    'peer_name'   => $peerName,
+                    'local_cert'       => $localCert,
+                    'local_pk'         => $localKey,
+                    'verify_peer'      => $verifyPeer,
+                    'verify_peer_name' => $verifyPeerName,
+                    'passphrase'       => $passphrase,
+                    'cafile'           => $cafile,
+                    'peer_name'        => $peerName,
                 ],
             ]
         );
@@ -129,6 +131,7 @@ class SocketTest extends TestCase
         $config->setSslCafile($cafile);
         $config->setSslPassphrase($passphrase);
         $config->setSslVerifyPeer($verifyPeer);
+        $config->setSslVerifyPeerName($verifyPeerName);
         $config->setSslPeerName($peerName);
 
         $sasl = $this->createMock(SaslMechanism::class);
