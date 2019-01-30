@@ -651,7 +651,7 @@ class Process
                 foreach ($part['messages'] as $message) {
                     $this->messages[$topic['topicName']][$part['partition']][] = $message;
 
-                    $offset = $offset > $message['offset'] ? $offset : $message['offset'];
+                    $offset = $offset > $message['offset'] ? $offset + 1 : $message['offset'];
                 }
 
                 $consumerOffset = ($part['highwaterMarkOffset'] > $offset) ? ($offset + 1) : $offset;
