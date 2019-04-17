@@ -1,5 +1,5 @@
 {
-    "name": "nmred/kafka-php",
+    "name": "superli/kafka-php",
     "description": "Kafka client for php",
     "type": "library",
     "keywords": [
