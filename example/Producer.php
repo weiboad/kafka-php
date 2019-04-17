@@ -20,7 +20,7 @@ $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('127.0.0.1:9093');
 $config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
-$config->setIsAsyn(false);
+$config->setIsAsyn(true);
 $config->setProduceInterval(500);
 $config->setSecurityProtocol(Config::SECURITY_PROTOCOL_SASL_SSL);
 $config->setSaslMechanism(Config::SASL_MECHANISMS_SCRAM_SHA_256);
