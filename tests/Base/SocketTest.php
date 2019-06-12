@@ -260,9 +260,11 @@ class SocketTest extends TestCase
         $streamMock->method('eof')->willReturn(false);
         $streamMock->method('read')->willReturn('xxxx');
 
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setRecvTimeoutSec(3000);
-        $socket->setRecvTimeoutUsec(30001);
+        $config = $this->getMockForAbstractClass(Config::class);
+        $config->setRecvTimeoutSec(30000);
+        $config->setRecvTimeoutUsec(30001);
+
+        $socket = $this->mockStreamSocketClient($host, $port, $config, null, ['select']);
 
         $socket->method('select')
                ->with($this->isType('array'), 3000, 30001, true)
@@ -367,9 +369,11 @@ class SocketTest extends TestCase
         $streamMock->method('eof')->willReturn(false);
         $streamMock->method('write')->willReturn(4);
 
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setSendTimeoutSec(3000);
-        $socket->setSendTimeoutUsec(30001);
+        $config = $this->getMockForAbstractClass(Config::class);
+        $config->setSendTimeoutSec(30000);
+        $config->setSendTimeoutUsec(30001);
+
+        $socket = $this->mockStreamSocketClient($host, $port, $config, null, ['select']);
 
         $socket->method('select')
                ->with($this->isType('array'), 3000, 30001, false)
