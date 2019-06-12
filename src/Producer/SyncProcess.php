@@ -115,7 +115,7 @@ class SyncProcess
         }
 
         shuffle($brokerHost);
-        $broker = $this->getBroker();
+	$broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host, true);
@@ -160,9 +160,10 @@ class SyncProcess
         foreach ($recordSet as $record) {
             $this->recordValidator->validate($record, $topics);
 
-            $topicMeta = $topics[$record['topic']];
+            $topicMeta = $this->getTopicMeta($record['topic']);
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
+            $partNums = [0];
 
             $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
 
@@ -191,6 +192,30 @@ class SyncProcess
         }
 
         return $sendData;
+    }
+
+    /**
+     * Get the topic meta. If auto create is on, get a random broker instead of
+     * a random broker that the topic is on.
+     *
+     * @param string $topic
+     *
+     * @return array
+     */
+    protected function getTopicMeta($topic)
+    {
+        $topics = $this->getBroker()->getTopics();
+
+        if (isset($topics[$topic])) {
+            return $topics[$topic];
+        }
+
+        // Here we can safely assume that auto create topics are set to true. If
+        // not, and the topic does not exist, the validate of the record would
+        // have failed.
+
+        // Default for auto creation.
+        return [0 => 0];
     }
 
     private function getBroker(): Broker

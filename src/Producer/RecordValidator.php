@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kafka\Producer;
 
 use Kafka\Exception;
+use Kafka\ProducerConfig;
 use function is_string;
 use function trim;
 
@@ -30,7 +31,9 @@ final class RecordValidator
             throw Exception\InvalidRecordInSet::missingTopic();
         }
 
-        if (! isset($topicList[$record['topic']])) {
+        /** @var ProducerConfig $config */
+        $config = ProducerConfig::getInstance();
+        if (! isset($topicList[$record['topic']]) && ! $config->getAutoCreateTopicsEnable() && false) {
             throw Exception\InvalidRecordInSet::nonExististingTopic($record['topic']);
         }
 
