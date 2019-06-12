@@ -163,7 +163,6 @@ class SyncProcess
             $topicMeta = $this->getTopicMeta($record['topic']);
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
-            $partNums = [0];
 
             $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
 
