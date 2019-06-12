@@ -90,6 +90,7 @@ abstract class Config
         'sslLocalCert'              => '',
         'sslLocalPk'                => '',
         'sslVerifyPeer'             => false,
+        'sslVerifyPeerName'         => true,
         'sslPassphrase'             => '',
         'sslCafile'                 => '',
         'sslPeerName'               => '',
@@ -98,6 +99,10 @@ abstract class Config
         'saslPassword'              => '',
         'saslKeytab'                => '',
         'saslPrincipal'             => '',
+        'sendTimeoutSec'            => 0,
+        'sendTimeoutUsec'           => 100000,
+        'recvTimeoutSec'            => 0,
+        'recvTimeoutUsec'           => 750000,
     ];
 
     /**
@@ -320,5 +325,45 @@ abstract class Config
         }
 
         static::$options['saslMechanism'] = $mechanism;
+    }
+
+    /**
+     * @throws Exception\Config
+     */
+    public function setSendTimeoutSec(int $timeout): void
+    {
+        static::$options['sendTimeoutSec'] = $timeout;
+    }
+
+    /**
+     * @throws Exception\Config
+     */
+    public function setSendTimeoutUsec(int $timeout): void
+    {
+        static::$options['recvTimeoutUsec'] = $timeout;
+    }
+
+    /**
+     * @throws Exception\Config
+     */
+    public function setRecvTimeoutSec(int $timeout): void
+    {
+        static::$options['recvTimeoutSec'] = $timeout;
+    }
+
+    /**
+     * @throws Exception\Config
+     */
+    public function setRecvTimeoutUsec(int $timeout): void
+    {
+        static::$options['recvTimeoutUsec'] = $timeout;
+    }
+
+    /**
+     * @throws Exception\Config
+     */
+    public function setSslVerifyPeerName(bool $verify): void
+    {
+        static::$options['sslVerifyPeerName'] = $verify;
     }
 }
