@@ -33,7 +33,7 @@ final class RecordValidator
 
         /** @var ProducerConfig $config */
         $config = ProducerConfig::getInstance();
-        if (! isset($topicList[$record['topic']]) && ! $config->getAutoCreateTopicsEnable() && false) {
+        if (! isset($topicList[$record['topic']]) && ! $config->getAutoCreateTopicsEnable()) {
             throw Exception\InvalidRecordInSet::nonExististingTopic($record['topic']);
         }
 
