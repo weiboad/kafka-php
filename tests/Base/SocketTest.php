@@ -396,6 +396,10 @@ class SocketTest extends TestCase
         ?SaslMechanism $sasl = null,
         array $mockMethod = []
     ): Socket {
+        if ($config === null) {
+            $config = $this->getMockForAbstractClass(Config::class);
+        }
+
         $socket = $this->getMockBuilder(Socket::class)
                        ->setMethods(array_merge(['createSocket'], $mockMethod))
                        ->setConstructorArgs([$host, $port, $config, $sasl])
