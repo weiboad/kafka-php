@@ -250,14 +250,6 @@ abstract class Config
     /**
      * @throws Exception\Config
      */
-    public function setAutoCreateTopicsEnable(bool $flag = true): void
-    {
-        static::$options['autoCreateTopicsEnable'] = $flag;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
     public function setSslLocalCert(string $localCert): void
     {
         if (! is_file($localCert)) {
@@ -325,45 +317,5 @@ abstract class Config
         }
 
         static::$options['saslMechanism'] = $mechanism;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
-    public function setSendTimeoutSec(int $timeout): void
-    {
-        static::$options['sendTimeoutSec'] = $timeout;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
-    public function setSendTimeoutUsec(int $timeout): void
-    {
-        static::$options['recvTimeoutUsec'] = $timeout;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
-    public function setRecvTimeoutSec(int $timeout): void
-    {
-        static::$options['recvTimeoutSec'] = $timeout;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
-    public function setRecvTimeoutUsec(int $timeout): void
-    {
-        static::$options['recvTimeoutUsec'] = $timeout;
-    }
-
-    /**
-     * @throws Exception\Config
-     */
-    public function setSslVerifyPeerName(bool $verify): void
-    {
-        static::$options['sslVerifyPeerName'] = $verify;
     }
 }
