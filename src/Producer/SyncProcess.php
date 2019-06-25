@@ -28,6 +28,10 @@ class SyncProcess
     public function __construct(?RecordValidator $recordValidator = null)
     {
         $this->recordValidator = $recordValidator ?? new RecordValidator();
+    }
+
+    public function init(): void
+    {
 
         $config = $this->getConfig();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
@@ -47,6 +51,7 @@ class SyncProcess
      */
     public function send(array $recordSet): array
     {
+        $this->init();
         $broker = $this->getBroker();
         $config = $this->getConfig();
 
