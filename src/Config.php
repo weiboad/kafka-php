@@ -84,11 +84,13 @@ abstract class Config
         'metadataRequestTimeoutMs'  => 60000,
         'metadataRefreshIntervalMs' => 300000,
         'metadataMaxAgeMs'          => -1,
+        'autoCreateTopicsEnable'    => true,
         'securityProtocol'          => self::SECURITY_PROTOCOL_PLAINTEXT,
         'sslEnable'                 => false, // this config item will override, don't config it.
         'sslLocalCert'              => '',
         'sslLocalPk'                => '',
         'sslVerifyPeer'             => false,
+        'sslVerifyPeerName'         => true,
         'sslPassphrase'             => '',
         'sslCafile'                 => '',
         'sslPeerName'               => '',
@@ -97,6 +99,10 @@ abstract class Config
         'saslPassword'              => '',
         'saslKeytab'                => '',
         'saslPrincipal'             => '',
+        'sendTimeoutSec'            => 0,
+        'sendTimeoutUsec'           => 100000,
+        'recvTimeoutSec'            => 0,
+        'recvTimeoutUsec'           => 750000,
     ];
 
     /**

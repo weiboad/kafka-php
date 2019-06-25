@@ -30,34 +30,6 @@ abstract class CommonSocket
     public const MAX_WRITE_BUFFER = 2048;
 
     /**
-     * Send timeout in seconds.
-     *
-     * @var int
-     */
-    protected $sendTimeoutSec = 0;
-
-    /**
-     * Send timeout in microseconds.
-     *
-     * @var int
-     */
-    protected $sendTimeoutUsec = 100000;
-
-    /**
-     * Recv timeout in seconds
-     *
-     * @var int
-     */
-    protected $recvTimeoutSec = 0;
-
-    /**
-     * Recv timeout in microseconds
-     *
-     * @var int
-     */
-    protected $recvTimeoutUsec = 750000;
-
-    /**
      * @var resource
      */
     protected $stream;
@@ -95,26 +67,6 @@ abstract class CommonSocket
         $this->saslProvider = $saslProvider;
     }
 
-    public function setSendTimeoutSec(int $sendTimeoutSec): void
-    {
-        $this->sendTimeoutSec = $sendTimeoutSec;
-    }
-
-    public function setSendTimeoutUsec(int $sendTimeoutUsec): void
-    {
-        $this->sendTimeoutUsec = $sendTimeoutUsec;
-    }
-
-    public function setRecvTimeoutSec(int $recvTimeoutSec): void
-    {
-        $this->recvTimeoutSec = $recvTimeoutSec;
-    }
-
-    public function setRecvTimeoutUsec(int $recvTimeoutUsec): void
-    {
-        $this->recvTimeoutUsec = $recvTimeoutUsec;
-    }
-
     public function setMaxWriteAttempts(int $number): void
     {
         $this->maxWriteAttempts = $number;
@@ -139,16 +91,20 @@ abstract class CommonSocket
         if ($this->config !== null && $this->config->getSslEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
 
+            $filterFunction = function ($elem) {
+                return $elem !== '';
+            };
             $context = stream_context_create(
                 [
-                    'ssl' => [
-                        'local_cert'  => $this->config->getSslLocalCert(),
-                        'local_pk'    => $this->config->getSslLocalPk(),
-                        'verify_peer' => $this->config->getSslVerifyPeer(),
-                        'passphrase'  => $this->config->getSslPassphrase(),
-                        'cafile'      => $this->config->getSslCafile(),
-                        'peer_name'   => $this->config->getSslPeerName(),
-                    ],
+                    'ssl' => array_filter([
+                        'local_cert'       => $this->config->getSslLocalCert(),
+                        'local_pk'         => $this->config->getSslLocalPk(),
+                        'verify_peer'      => true,
+                        'verify_peer_name' => false,
+                        'passphrase'       => $this->config->getSslPassphrase(),
+                        'cafile'           => $this->config->getSslCafile(),
+                        'peer_name'        => $this->config->getSslPeerName(),
+                    ], $filterFunction),
                 ]
             );
         }
@@ -184,7 +140,7 @@ abstract class CommonSocket
             $remoteSocket,
             $errno,
             $errstr,
-            $this->sendTimeoutSec + ($this->sendTimeoutUsec / 1000000),
+            $this->config->getSendTimeoutSec() + ($this->config->getSendTimeoutUsec() / 1000000),
             STREAM_CLIENT_CONNECT,
             $context
         );
@@ -248,7 +204,7 @@ abstract class CommonSocket
             throw Exception\Socket::invalidLength($length, self::READ_MAX_LENGTH);
         }
 
-        $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
+        $readable = $this->select([$this->stream], $this->config->getRecvTimeoutSec(), $this->config->getRecvTimeoutUsec());
 
         if ($readable === false) {
             $this->close();
@@ -279,7 +235,7 @@ abstract class CommonSocket
                     throw Exception\Socket::unexpectedEOF($length);
                 }
                 // Otherwise wait for bytes
-                $readable = $this->select([$this->stream], $this->recvTimeoutSec, $this->recvTimeoutUsec);
+                $readable = $this->select([$this->stream], $this->config->getRecvTimeoutSec(), $this->config->getRecvTimeoutUsec());
                 if ($readable !== 1) {
                     throw Exception\Socket::timedOutWithRemainingBytes($length, $remainingBytes);
                 }
@@ -310,7 +266,7 @@ abstract class CommonSocket
 
         while ($bytesWritten < $bytesToWrite) {
             // wait for stream to become available for writing
-            $writable = $this->select([$this->stream], $this->sendTimeoutSec, $this->sendTimeoutUsec, false);
+            $writable = $this->select([$this->stream], $this->config->getSendTimeoutSec(), $this->config->getSendTimeoutUsec(), false);
 
             if ($writable === false) {
                 throw new Exception\Socket('Could not write ' . $bytesToWrite . ' bytes to stream');

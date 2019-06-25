@@ -94,24 +94,26 @@ class SocketTest extends TestCase
 
     public function testCreateStreamSsl(): void
     {
-        $host       = '127.0.0.1';
-        $port       = 9192;
-        $localCert  = $this->root->url() . '/localCert';
-        $localKey   = $this->root->url() . '/localKey';
-        $verifyPeer = false;
-        $passphrase = '123456';
-        $cafile     = $this->root->url() . '/cafile';
-        $peerName   = 'kafka';
+        $host           = '127.0.0.1';
+        $port           = 9192;
+        $localCert      = $this->root->url() . '/localCert';
+        $localKey       = $this->root->url() . '/localKey';
+        $verifyPeer     = false;
+        $passphrase     = '123456';
+        $cafile         = $this->root->url() . '/cafile';
+        $peerName       = 'kafka';
+        $verifyPeerName = true;
 
         $context = stream_context_create(
             [
                 'ssl' => [
-                    'local_cert'  => $localCert,
-                    'local_pk'    => $localKey,
-                    'verify_peer' => $verifyPeer,
-                    'passphrase'  => $passphrase,
-                    'cafile'      => $cafile,
-                    'peer_name'   => $peerName,
+                    'local_cert'       => $localCert,
+                    'local_pk'         => $localKey,
+                    'verify_peer'      => $verifyPeer,
+                    'passphrase'       => $passphrase,
+                    'cafile'           => $cafile,
+                    'peer_name'        => $peerName,
+                    'verify_peer_name' => $verifyPeerName,
                 ],
             ]
         );
@@ -130,6 +132,7 @@ class SocketTest extends TestCase
         $config->setSslPassphrase($passphrase);
         $config->setSslVerifyPeer($verifyPeer);
         $config->setSslPeerName($peerName);
+        $config->setSslVerifyPeerName($verifyPeerName);
 
         $sasl = $this->createMock(SaslMechanism::class);
         $sasl->expects($this->once())
@@ -260,9 +263,11 @@ class SocketTest extends TestCase
         $streamMock->method('eof')->willReturn(false);
         $streamMock->method('read')->willReturn('xxxx');
 
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setRecvTimeoutSec(3000);
-        $socket->setRecvTimeoutUsec(30001);
+        $config = $this->getMockForAbstractClass(Config::class);
+        $config->setRecvTimeoutSec(30000);
+        $config->setRecvTimeoutUsec(30001);
+
+        $socket = $this->mockStreamSocketClient($host, $port, $config, null, ['select']);
 
         $socket->method('select')
                ->with($this->isType('array'), 3000, 30001, true)
@@ -367,9 +372,11 @@ class SocketTest extends TestCase
         $streamMock->method('eof')->willReturn(false);
         $streamMock->method('write')->willReturn(4);
 
-        $socket = $this->mockStreamSocketClient($host, $port, null, null, ['select']);
-        $socket->setSendTimeoutSec(3000);
-        $socket->setSendTimeoutUsec(30001);
+        $config = $this->getMockForAbstractClass(Config::class);
+        $config->setSendTimeoutSec(30000);
+        $config->setSendTimeoutUsec(30001);
+
+        $socket = $this->mockStreamSocketClient($host, $port, $config, null, ['select']);
 
         $socket->method('select')
                ->with($this->isType('array'), 3000, 30001, false)
@@ -392,6 +399,10 @@ class SocketTest extends TestCase
         ?SaslMechanism $sasl = null,
         array $mockMethod = []
     ): Socket {
+        if ($config === null) {
+            $config = $this->getMockForAbstractClass(Config::class);
+        }
+
         $socket = $this->getMockBuilder(Socket::class)
                        ->setMethods(array_merge(['createSocket'], $mockMethod))
                        ->setConstructorArgs([$host, $port, $config, $sasl])

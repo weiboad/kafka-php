@@ -6,6 +6,7 @@ namespace KafkaTest\Base\Producer;
 use Kafka\Exception\InvalidRecordInSet;
 use Kafka\Producer\RecordValidator;
 use PHPUnit\Framework\TestCase;
+use Kafka\ProducerConfig;
 
 final class RecordValidatorTest extends TestCase
 {
@@ -34,6 +35,9 @@ final class RecordValidatorTest extends TestCase
      */
     public function testInvalidRecordThrowsException(string $expectedExceptionMessage, array $record): void
     {
+        $config = ProducerConfig::getInstance();
+        $config->setAutoCreateTopicsEnable(false);
+
             $this->expectException(InvalidRecordInSet::class);
             $this->expectExceptionMessage($expectedExceptionMessage);
 

@@ -28,6 +28,10 @@ class SyncProcess
     public function __construct(?RecordValidator $recordValidator = null)
     {
         $this->recordValidator = $recordValidator ?? new RecordValidator();
+    }
+
+    public function init(): void
+    {
 
         $config = $this->getConfig();
         \Kafka\Protocol::init($config->getBrokerVersion(), $this->logger);
@@ -47,6 +51,7 @@ class SyncProcess
      */
     public function send(array $recordSet): array
     {
+        $this->init();
         $broker = $this->getBroker();
         $config = $this->getConfig();
 
@@ -115,7 +120,7 @@ class SyncProcess
         }
 
         shuffle($brokerHost);
-        $broker = $this->getBroker();
+	$broker = $this->getBroker();
 
         foreach ($brokerHost as $host) {
             $socket = $broker->getMetaConnect($host, true);
@@ -160,7 +165,7 @@ class SyncProcess
         foreach ($recordSet as $record) {
             $this->recordValidator->validate($record, $topics);
 
-            $topicMeta = $topics[$record['topic']];
+            $topicMeta = $this->getTopicMeta($record['topic']);
             $partNums  = array_keys($topicMeta);
             shuffle($partNums);
 
@@ -191,6 +196,30 @@ class SyncProcess
         }
 
         return $sendData;
+    }
+
+    /**
+     * Get the topic meta. If auto create is on, get a random broker instead of
+     * a random broker that the topic is on.
+     *
+     * @param string $topic
+     *
+     * @return array
+     */
+    protected function getTopicMeta($topic)
+    {
+        $topics = $this->getBroker()->getTopics();
+
+        if (isset($topics[$topic])) {
+            return $topics[$topic];
+        }
+
+        // Here we can safely assume that auto create topics are set to true. If
+        // not, and the topic does not exist, the validate of the record would
+        // have failed.
+
+        // Default for auto creation.
+        return [0 => 0];
     }
 
     private function getBroker(): Broker
