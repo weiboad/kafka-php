@@ -111,13 +111,13 @@ class Broker
 
     public function getConnect($key, $type, $modeSync = false)
     {
-        if (isset($this->{$type}[$key])) {
+        if (isset($this->{$type}[$key]) && $this->{$type}[$key]->isResource()) {
             return $this->{$type}[$key];
         }
 
         if (isset($this->brokers[$key])) {
             $hostname = $this->brokers[$key];
-            if (isset($this->{$type}[$hostname])) {
+            if (isset($this->{$type}[$hostname]) && $this->{$type}[$hostname]->isResource()) {
                 return $this->{$type}[$hostname];
             }
         }
