@@ -27,6 +27,8 @@ use function version_compare;
  * @method string getSecurityProtocol()
  * @method bool getSslEnable()
  * @method void setSslEnable(bool $sslEnable)
+ * @method bool getSslEnableAuthentication()
+ * @method void setSslEnableAuthentication(bool $sslEnableAuthentication)
  * @method string getSslLocalCert()
  * @method string getSslLocalPk()
  * @method bool getSslVerifyPeer()
