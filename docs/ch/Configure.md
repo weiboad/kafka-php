@@ -2,8 +2,8 @@ Kafka-php 配置参数
 ==================
 
 | Property	| C/P	| Range	| Default | Desc |
-| ----  | ---- | ---- | ---- | ---- | 
-| clientId | C/P | | kafka-php | 客户端标识 | 
+| ----  | ---- | ---- | ---- | ---- |
+| clientId | C/P | | kafka-php | 客户端标识 |
 | brokerVersion | C/P | 大于 0.8.0 | 0.10.1.0 | 为了计算 Kafka 请求的协议版本 |
 | metadataBrokerList | C/P | | | 指定 Kafka Broker 列表，多个用逗号分隔 |
 | messageMaxBytes | C/P | 1000 .. 1000000000 | 1000000 | 消息最大长度 |
@@ -21,7 +21,7 @@ Kafka-php 配置参数
 | groupId | C |  | |  消费模块的分组 ID |
 | sessionTimeout | C | 1 .. 3600000 | 30000 | 分组中消费者的有效时间 |
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | 分组 rebalance 等待 join 时间 |
-| topics | C | | |  将要消费的 kafka topic 名称 | 
+| topics | C | | |  将要消费的 kafka topic 名称 |
 | offsetReset | C | latest,earliest | latest | 如果消费 offset 失效的时候重置 offset 的策略 |
 | maxBytes | C |  | 65536 | 单次 FETCH 请求对于单个分区请求的最大字节数 |
 | maxWaitTime | C |  | 100 | 等待服务端响应 FETCH 请求的最大时间 |
@@ -43,4 +43,3 @@ $config->setClientId('test');
 ```
 
 无论是消费模块还是生产模块，如果参数设置不符合规则时都会抛 `\Kafka\Exception\Config` 异常
-

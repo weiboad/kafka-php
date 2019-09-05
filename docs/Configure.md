@@ -4,7 +4,7 @@ Kafka-php Configuration
 | Property	| C/P	| Range	| Default | Desc |
 | --  | -- | -- | -- | -- |
 | brokerVersion | C/P | 0.8.0 | 0.10.1.0 | User supplied broker version |
-| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application | 
+| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application |
 | messageMaxBytes | C/P | 1000 .. 1000000000 | 1000000 | Maximum transmit message size. |
 | metadataBrokerList | C/P | | | Kafka Broker server list |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | Metadata cache max age. Defaults to metadata.refresh.interval.ms * 3 |
@@ -24,7 +24,7 @@ Kafka-php Configuration
 | maxWaitTime | C |  | 100 | Maximum time in ms to wait for the response |
 | sessionTimeout | C | 1 .. 3600000 | 30000 | Client group session and failure detection timeout.  |
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | rebalance join wait timeout |
-| topics | C | | |  Want consumer topics | 
+| topics | C | | |  Want consumer topics |
 | isAsyn | P | true, false | false | Whether to use asynchronous production messages |
 | produceInterval | P | 1 .. 900000 | 100 | The time interval at which requests for production messages are executed when the message is produced asynchronously |
 | requestTimeout | P | 1 .. 900000 | 6000 |  The total timeout of the production message, which must be greater than the timeout config parameter |

@@ -441,10 +441,10 @@ class SocketTest extends TestCase
         $socket->method('createSocket')
             ->willReturnCallback(
                 function (string $remoteSocket, $context, ?int &$errno, ?string &$errstr) {
-                        $errno  = 99;
-                        $errstr = 'my custom error';
+                    $errno  = 99;
+                    $errstr = 'my custom error';
 
-                        return @fopen($remoteSocket, 'r+', false, $context);
+                    return @fopen($remoteSocket, 'r+', false, $context);
                 }
             );
 

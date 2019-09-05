@@ -7,6 +7,7 @@ use const STREAM_CLIENT_CONNECT;
 use function feof;
 use function fread;
 use function fwrite;
+use function is_null;
 use function is_resource;
 use function sprintf;
 use function stream_context_create;
@@ -162,6 +163,10 @@ abstract class CommonSocket
      */
     protected function createSslStreamContext()
     {
+        if (is_null($this->config)) {
+            throw new Exception('Cannot build SSL context without configuration');
+        }
+
         if ($this->config->getSslEnableAuthentication()) {
             return stream_context_create(
                 [
