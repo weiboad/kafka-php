@@ -165,26 +165,26 @@ abstract class CommonSocket
         if ($this->config->getSslEnableAuthentication()) {
             return stream_context_create(
                 [
-                        'ssl' => [
-                            'local_cert'  => $this->config->getSslLocalCert(),
-                            'local_pk'    => $this->config->getSslLocalPk(),
-                            'verify_peer' => $this->config->getSslVerifyPeer(),
-                            'passphrase'  => $this->config->getSslPassphrase(),
-                            'cafile'      => $this->config->getSslCafile(),
-                            'peer_name'   => $this->config->getSslPeerName(),
-                        ],
-                    ]
+                    'ssl' => [
+                        'local_cert'  => $this->config->getSslLocalCert(),
+                        'local_pk'    => $this->config->getSslLocalPk(),
+                        'verify_peer' => $this->config->getSslVerifyPeer(),
+                        'passphrase'  => $this->config->getSslPassphrase(),
+                        'cafile'      => $this->config->getSslCafile(),
+                        'peer_name'   => $this->config->getSslPeerName(),
+                    ],
+                ]
             );
         }
 
         return stream_context_create(
             [
-                        'ssl' => [
-                            'verify_peer' => $this->config->getSslVerifyPeer(),
-                            'cafile'      => $this->config->getSslCafile(),
-                            'peer_name'   => $this->config->getSslPeerName(),
-                        ],
-                    ]
+                'ssl' => [
+                    'verify_peer' => $this->config->getSslVerifyPeer(),
+                    'cafile'      => $this->config->getSslCafile(),
+                    'peer_name'   => $this->config->getSslPeerName(),
+                ],
+            ]
         );
     }
 
