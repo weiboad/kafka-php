@@ -96,6 +96,46 @@ class SocketTest extends TestCase
     {
         $host       = '127.0.0.1';
         $port       = 9192;
+        $verifyPeer = false;
+        $cafile     = $this->root->url() . '/cafile';
+        $peerName   = 'kafka';
+
+        $context = stream_context_create(
+            [
+                'ssl' => [
+                    'verify_peer' => $verifyPeer,
+                    'cafile'      => $cafile,
+                    'peer_name'   => $peerName,
+                ],
+            ]
+        );
+
+        $streamMock = $this->initStreamStub('ssl', $host, $port);
+
+        $streamMock->expects($this->once())
+                   ->method('context')
+                   ->with(stream_context_get_options($context));
+
+        $config = $this->getMockForAbstractClass(Config::class);
+        $config->setSslEnable(true);
+        $config->setSslEnableAuthentication(false);
+        $config->setSslCafile($cafile);
+        $config->setSslVerifyPeer($verifyPeer);
+        $config->setSslPeerName($peerName);
+
+        $sasl = $this->createMock(SaslMechanism::class);
+        $sasl->expects($this->once())
+             ->method('authenticate')
+             ->with($this->isInstanceOf(Socket::class));
+
+        $socket = $this->mockStreamSocketClient($host, $port, $config, $sasl);
+        $socket->connect();
+    }
+
+    public function testCreateStreamSslAuthentication(): void
+    {
+        $host       = '127.0.0.1';
+        $port       = 9192;
         $localCert  = $this->root->url() . '/localCert';
         $localKey   = $this->root->url() . '/localKey';
         $verifyPeer = false;
@@ -124,6 +164,7 @@ class SocketTest extends TestCase
 
         $config = $this->getMockForAbstractClass(Config::class);
         $config->setSslEnable(true);
+        $config->setSslEnableAuthentication(true);
         $config->setSslLocalPk($localKey);
         $config->setSslLocalCert($localCert);
         $config->setSslCafile($cafile);

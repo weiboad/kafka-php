@@ -11,6 +11,7 @@ Kafka-php Configuration
 | metadataRefreshIntervalMs | C/P | 10 .. 3600000  | 300000 | Topic metadata refresh interval in milliseconds. The metadata is automatically refreshed on error and connect. Use -1 to disable the intervalled refresh.  |
 | metadataRequestTimeoutMs | C/P | 10 .. 900000 | 60000 | Non-topic request timeout in milliseconds. This is for metadata requests, etc. |
 | sslEnable | C/P | true/false | false | Whether enable ssl connect or not |
+| sslEnableAuthentication | C/P | true/false | true | Enable authentication via SSL |
 | sslCafile | C/P |  |  | Location of Certificate Authority file on local filesystem which should be used with the verify_peer context option to authenticate the identity of the remote peer.|
 | sslLocalCert | C/P | File path |  | Path to local certificate file on filesystem. |
 | sslLocalPk | C/P | File path |  | Path to local private key file on filesystem in case of separate files for certificate (local_cert) and private key. |

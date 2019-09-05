@@ -11,6 +11,7 @@ Kafka-php 配置参数
 | metadataRefreshIntervalMs | C/P | 10 .. 3600000  | 300000 | 获取同步 meta 信息的时间间隔 |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | meta 信息有效期
 | sslEnable | C/P | true/false | false | 是否开启 Ssl 连接 |
+| sslEnableAuthentication | C/P | true/false | true | 通过SSL启用身份验证 |
 | sslLocalCert | C/P | File path |  | 本地证书路径 |
 | sslLocalPk | C/P | File path |  | 如果使用独立的文件来存储证书（local_cert）和私钥， 那么使用此选项来指明私钥文件的路径。|
 | sslVerifyPeer | C/P | true/false | false | 是否需要验证 SSL 证书。|
