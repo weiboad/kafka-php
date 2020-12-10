@@ -150,4 +150,58 @@ class BrokerTest extends TestCase
     {
         return Broker::getInstance();
     }
+
+    /**
+     * testGetPartitionId
+     * @access public
+     */
+    public function testGetPartitionId(): void
+    {
+        $broker = Broker::getInstance();
+        $data   = [
+            'brokers' => [
+                [
+                    'host' => '127.0.0.1',
+                    'port' => '9092',
+                    'nodeId' => '0',
+                ],
+                [
+                    'host' => '127.0.0.1',
+                    'port' => '9192',
+                    'nodeId' => '1',
+                ],
+                [
+                    'host' => '127.0.0.1',
+                    'port' => '9292',
+                    'nodeId' => '2',
+                ],
+            ],
+            'topics' => [
+                [
+                    'topicName' => 'test',
+                    'errorCode' => 0,
+                    'partitions' => [
+                        [
+                            'partitionId' => 0,
+                            'errorCode' => 0,
+                            'leader' => 0,
+                        ],
+                        [
+                            'partitionId' => 1,
+                            'errorCode' => 0,
+                            'leader' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $broker->setData($data['topics'], $data['brokers']);
+        $data   = [
+            'partId' => '1',
+            'topic' => 'test',
+            'value' => 'test message',
+        ];
+        $partId = $broker->getPartitionId($data);
+        $this->assertEquals('1', $partId);
+    }
 }

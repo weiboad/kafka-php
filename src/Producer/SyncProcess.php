@@ -9,7 +9,6 @@ use Kafka\LoggerTrait;
 use Kafka\ProducerConfig;
 use Kafka\Protocol\Protocol;
 use Psr\Log\LoggerAwareTrait;
-use function array_keys;
 use function count;
 use function explode;
 use function json_encode;
@@ -161,10 +160,7 @@ class SyncProcess
             $this->recordValidator->validate($record, $topics);
 
             $topicMeta = $topics[$record['topic']];
-            $partNums  = array_keys($topicMeta);
-            shuffle($partNums);
-
-            $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
+            $partId    = $broker->getPartitionId($record);
 
             $brokerId  = $topicMeta[$partId];
             $topicData = [];

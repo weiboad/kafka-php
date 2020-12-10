@@ -7,12 +7,15 @@ use Kafka\Sasl\Gssapi;
 use Kafka\Sasl\Plain;
 use Kafka\Sasl\Scram;
 use function array_keys;
+use function count;
+use function crc32;
 use function explode;
 use function in_array;
 use function serialize;
 use function shuffle;
 use function sprintf;
 use function strpos;
+use function trim;
 
 class Broker
 {
@@ -280,5 +283,21 @@ class Broker
         }
 
         throw new Exception(sprintf('"%s" is an invalid SASL mechanism', $mechanism));
+    }
+
+    /**
+     * @param mixed[] $record
+     */
+    public function getPartitionId(array $record): int
+    {
+        $topicInfos = $this->getTopics();
+        $topicMeta  = $topicInfos[$record['topic']];
+        $partNums   = array_keys($topicMeta);
+        if (isset($record['key']) && trim($record['key'])) {
+            $partId = $partNums[crc32($record['key']) % count($partNums)];
+        } else {
+            $partId = isset($record['partId'], $topicMeta[$record['partId']]) ? $record['partId'] : $partNums[0];
+        }
+        return (int) $partId;
     }
 }
