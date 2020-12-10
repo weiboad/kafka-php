@@ -7,6 +7,7 @@ use const STREAM_CLIENT_CONNECT;
 use function feof;
 use function fread;
 use function fwrite;
+use function is_null;
 use function is_resource;
 use function sprintf;
 use function stream_context_create;
@@ -138,19 +139,7 @@ abstract class CommonSocket
 
         if ($this->config !== null && $this->config->getSslEnable()) { // ssl connection
             $remoteSocket = sprintf('ssl://%s:%s', $this->host, $this->port);
-
-            $context = stream_context_create(
-                [
-                    'ssl' => [
-                        'local_cert'  => $this->config->getSslLocalCert(),
-                        'local_pk'    => $this->config->getSslLocalPk(),
-                        'verify_peer' => $this->config->getSslVerifyPeer(),
-                        'passphrase'  => $this->config->getSslPassphrase(),
-                        'cafile'      => $this->config->getSslCafile(),
-                        'peer_name'   => $this->config->getSslPeerName(),
-                    ],
-                ]
-            );
+            $context      = $this->createSslStreamContext();
         }
 
         $this->stream = $this->createSocket($remoteSocket, $context, $errno, $errstr);
@@ -165,6 +154,43 @@ abstract class CommonSocket
         if ($this->saslProvider !== null) {
             $this->saslProvider->authenticate($this);
         }
+    }
+
+    /**
+     * Ecapsulation of stream_context_create for SSL connections
+     *
+     * @return resource $context
+     */
+    protected function createSslStreamContext()
+    {
+        if (is_null($this->config)) {
+            throw new Exception('Cannot build SSL context without configuration');
+        }
+
+        if ($this->config->getSslEnableAuthentication()) {
+            return stream_context_create(
+                [
+                    'ssl' => [
+                        'local_cert'  => $this->config->getSslLocalCert(),
+                        'local_pk'    => $this->config->getSslLocalPk(),
+                        'verify_peer' => $this->config->getSslVerifyPeer(),
+                        'passphrase'  => $this->config->getSslPassphrase(),
+                        'cafile'      => $this->config->getSslCafile(),
+                        'peer_name'   => $this->config->getSslPeerName(),
+                    ],
+                ]
+            );
+        }
+
+        return stream_context_create(
+            [
+                'ssl' => [
+                    'verify_peer' => $this->config->getSslVerifyPeer(),
+                    'cafile'      => $this->config->getSslCafile(),
+                    'peer_name'   => $this->config->getSslPeerName(),
+                ],
+            ]
+        );
     }
 
     /**

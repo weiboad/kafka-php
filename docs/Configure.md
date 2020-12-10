@@ -4,13 +4,14 @@ Kafka-php Configuration
 | Property	| C/P	| Range	| Default | Desc |
 | --  | -- | -- | -- | -- |
 | brokerVersion | C/P | 0.8.0 | 0.10.1.0 | User supplied broker version |
-| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application | 
+| clientId | C/P |  | kafka-php | This is a user supplied identifier for the client application |
 | messageMaxBytes | C/P | 1000 .. 1000000000 | 1000000 | Maximum transmit message size. |
 | metadataBrokerList | C/P | | | Kafka Broker server list |
 | metadataMaxAgeMs | C/P | 1 .. 86400000 | -1 | Metadata cache max age. Defaults to metadata.refresh.interval.ms * 3 |
 | metadataRefreshIntervalMs | C/P | 10 .. 3600000  | 300000 | Topic metadata refresh interval in milliseconds. The metadata is automatically refreshed on error and connect. Use -1 to disable the intervalled refresh.  |
 | metadataRequestTimeoutMs | C/P | 10 .. 900000 | 60000 | Non-topic request timeout in milliseconds. This is for metadata requests, etc. |
 | sslEnable | C/P | true/false | false | Whether enable ssl connect or not |
+| sslEnableAuthentication | C/P | true/false | true | Enable authentication via SSL |
 | sslCafile | C/P |  |  | Location of Certificate Authority file on local filesystem which should be used with the verify_peer context option to authenticate the identity of the remote peer.|
 | sslLocalCert | C/P | File path |  | Path to local certificate file on filesystem. |
 | sslLocalPk | C/P | File path |  | Path to local private key file on filesystem in case of separate files for certificate (local_cert) and private key. |
@@ -23,7 +24,7 @@ Kafka-php Configuration
 | maxWaitTime | C |  | 100 | Maximum time in ms to wait for the response |
 | sessionTimeout | C | 1 .. 3600000 | 30000 | Client group session and failure detection timeout.  |
 | rebalanceTimeout | C | 1 .. 3600000 | 30000 | rebalance join wait timeout |
-| topics | C | | |  Want consumer topics | 
+| topics | C | | |  Want consumer topics |
 | isAsyn | P | true, false | false | Whether to use asynchronous production messages |
 | produceInterval | P | 1 .. 900000 | 100 | The time interval at which requests for production messages are executed when the message is produced asynchronously |
 | requestTimeout | P | 1 .. 900000 | 6000 |  The total timeout of the production message, which must be greater than the timeout config parameter |

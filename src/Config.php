@@ -27,6 +27,8 @@ use function version_compare;
  * @method string getSecurityProtocol()
  * @method bool getSslEnable()
  * @method void setSslEnable(bool $sslEnable)
+ * @method bool getSslEnableAuthentication()
+ * @method void setSslEnableAuthentication(bool $sslEnableAuthentication)
  * @method string getSslLocalCert()
  * @method string getSslLocalPk()
  * @method bool getSslVerifyPeer()
@@ -86,10 +88,11 @@ abstract class Config
         'metadataMaxAgeMs'          => -1,
         'securityProtocol'          => self::SECURITY_PROTOCOL_PLAINTEXT,
         'sslEnable'                 => false, // this config item will override, don't config it.
-        'sslLocalCert'              => '',
-        'sslLocalPk'                => '',
+        'sslEnableAuthentication'   => true,
+        'sslLocalCert'              => false,
+        'sslLocalPk'                => false,
         'sslVerifyPeer'             => false,
-        'sslPassphrase'             => '',
+        'sslPassphrase'             => false,
         'sslCafile'                 => '',
         'sslPeerName'               => '',
         'saslMechanism'             => self::SASL_MECHANISMS_PLAIN,

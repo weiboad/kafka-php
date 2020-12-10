@@ -800,8 +800,8 @@ class Process
         }
 
         if ($errorCode === Protocol::OFFSET_OUT_OF_RANGE) {
-            $resetOffset      = $this->getConfig()->getOffsetReset();
-            $offsets          = $resetOffset === 'latest' ? $assign->getLastOffsets() : $assign->getOffsets();
+            $resetOffset = $this->getConfig()->getOffsetReset();
+            $offsets     = $resetOffset === 'latest' ? $assign->getLastOffsets() : $assign->getOffsets();
 
             [$topic, $partId] = $context;
 
