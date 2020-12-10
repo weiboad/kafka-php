@@ -22,9 +22,11 @@ final class GH181Test extends TestCase
             );
         }
 
+        /** @var ProducerConfig $config */
         $config = ProducerConfig::getInstance();
         $config->setMetadataBrokerList($brokers);
         $config->setBrokerVersion($version);
+        $config->setAutoCreateTopicsEnable(false);
 
         parent::setUp();
     }

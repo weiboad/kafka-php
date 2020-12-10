@@ -24,6 +24,7 @@ use function version_compare;
  * @method int getMetadataRequestTimeoutMs()
  * @method int getMetadataRefreshIntervalMs()
  * @method int getMetadataMaxAgeMs()
+ * @method bool getAutoCreateTopicsEnable()
  * @method string getSecurityProtocol()
  * @method bool getSslEnable()
  * @method void setSslEnable(bool $sslEnable)
@@ -86,6 +87,7 @@ abstract class Config
         'metadataRequestTimeoutMs'  => 60000,
         'metadataRefreshIntervalMs' => 300000,
         'metadataMaxAgeMs'          => -1,
+        'autoCreateTopicsEnable'    => true,
         'securityProtocol'          => self::SECURITY_PROTOCOL_PLAINTEXT,
         'sslEnable'                 => false, // this config item will override, don't config it.
         'sslEnableAuthentication'   => true,
@@ -242,6 +244,11 @@ abstract class Config
             throw new Exception\Config('Set metadata max age value is invalid, must set it 1 .. 86400000');
         }
         static::$options['metadataMaxAgeMs'] = $metadataMaxAgeMs;
+    }
+
+    public function setAutoCreateTopicsEnable(bool $flag = true): void
+    {
+        static::$options['autoCreateTopicsEnable'] = $flag;
     }
 
     /**
