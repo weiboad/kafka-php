@@ -5,6 +5,7 @@ namespace KafkaTest\Base;
 
 use Kafka\Broker;
 use Kafka\Socket;
+use Kafka\SocketFactory;
 use Kafka\SocketSync;
 use PHPUnit\Framework\TestCase;
 
@@ -95,7 +96,7 @@ class BrokerTest extends TestCase
         $this->assertEquals($topics, $broker->getTopics());
     }
 
-    public function getConnect(): void
+    public function testGetConnect(): void
     {
         $broker = $this->getBroker();
         $data   = [
@@ -128,6 +129,34 @@ class BrokerTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testGetConnectSyncAndAsyncForTheSameBroker(): void
+    {
+        $socket = $this->getMockBuilder(Socket::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $socketSync = $this->getMockBuilder(SocketSync::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $socketFactory = $this->getMockBuilder(SocketFactory::class)
+            ->setMethods(['createSocket', 'createSocketSync'])
+            ->getMock();
+
+        $socketFactory->method('createSocket')
+            ->willReturn($socket);
+        $socketFactory->method('createSocketSync')
+            ->willReturn($socketSync);
+
+        $broker = $this->getBroker();
+        $broker->setSocketFactory($socketFactory);
+        $broker->setProcess(function (): void {
+        });
+
+        $this->assertSame($socket, $broker->getConnect('kafka:9092', 'metaSockets'));
+        $this->assertSame($socketSync, $broker->getConnect('kafka:9092', 'metaSockets', Broker::SOCKET_MODE_SYNC));
+    }
+
     public function testConnectRandFalse(): void
     {
         $broker = $this->getBroker();
@@ -141,7 +170,7 @@ class BrokerTest extends TestCase
         $broker   = $this->getBroker();
         $hostname = '127.0.0.1';
         $port     = 9092;
-        $socket   = $broker->getSocket($hostname, $port, true);
+        $socket   = $broker->getSocket($hostname, $port, Broker::SOCKET_MODE_SYNC);
 
         $this->assertInstanceOf(SocketSync::class, $socket);
     }
