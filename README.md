@@ -66,7 +66,7 @@ $config->setMetadataRefreshIntervalMs(10000);
 $config->setMetadataBrokerList('10.13.4.159:9192');
 $config->setBrokerVersion('1.0.0');
 $config->setRequiredAck(1);
-$config->setIsAsyn(false);
+$config->setIsAsyn(true);
 $config->setProduceInterval(500);
 $producer = new \Kafka\Producer(
     function() {
