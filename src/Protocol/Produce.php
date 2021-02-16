@@ -293,7 +293,7 @@ class Produce extends Protocol
             'data'   => [
                 'partition' => $partitionId,
                 'errorCode' => $errorCode,
-                'offset'    => $offset,
+                'offset'    => $partitionOffset,
                 'timestamp' => $timestamp,
             ],
         ];
