@@ -152,4 +152,18 @@ class ConsumerConfig extends Config
     {
         return $this->runtimeOptions['consume_mode'];
     }
+
+    /**
+     * @param int $maxBytes
+     *
+     * @throws \Kafka\Exception\Config
+     */
+    public function setMaxBytes(int $maxBytes): void
+    {
+        if ($maxBytes < 1000 || $maxBytes > 1000000000) {
+            throw new Exception\Config('Set consumer maxBytes value is invalid, must set it 1000 .. 1000000000');
+        }
+
+        static::$options['maxBytes'] = $maxBytes;
+    }
 }
