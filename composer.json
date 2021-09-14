@@ -16,7 +16,7 @@
         "sort-packages": true
     },
     "require": {
-        "php": "7.4.23",
+        "php": "7.4.13",
         "amphp/amp": "^2.0.3",
         "lcobucci/clock": "^1.0",
         "psr/log": "1.1.*"
