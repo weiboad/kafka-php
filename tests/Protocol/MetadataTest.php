@@ -35,12 +35,10 @@ final class MetadataTest extends TestCase
         self::assertSame('00000017000300000000000300096b61666b612d70687000000000', bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage request metadata topic array have invalid value.
-     */
     public function testEncodeValidTopic(): void
     {
+        $this->expectExceptionMessage("request metadata topic array have invalid value.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->meta->encode([1]);
     }
 

@@ -34,21 +34,17 @@ class GssapiTest extends TestCase
         $saslProvider->authenticate($socket);
     }
 
-    /**
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Invalid keytab, keytab file not exists.
-     */
     public function testKeytabIsNotExists(): void
     {
+        $this->expectExceptionMessage("Invalid keytab, keytab file not exists.");
+        $this->expectException(\Kafka\Exception::class);
         Gssapi::fromKeytab($this->root->url() . '/rand', 'testprincipal');
     }
 
-    /**
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Invalid keytab, keytab file disable read.
-     */
     public function testKeytabIsNotReadable(): void
     {
+        $this->expectExceptionMessage("Invalid keytab, keytab file disable read.");
+        $this->expectException(\Kafka\Exception::class);
         $keytab = $this->root->url() . '/keytab';
         chmod($keytab, 0000);
         Gssapi::fromKeytab($keytab, 'testprincipal');
@@ -61,12 +57,10 @@ class GssapiTest extends TestCase
         $this->assertSame('GSSAPI', $saslProvider->getName());
     }
 
-    /**
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Init security context failure.
-     */
     public function testInitSecurityContextNotSuccess(): void
     {
+        $this->expectExceptionMessage("Init security context failure.");
+        $this->expectException(\Kafka\Exception::class);
         $principal    = 'testprincipal';
         $socket       = $this->getSocketForTestGssapi(1);
         $saslProvider = new Gssapi($this->mockGssapiContext($principal, false, 1, 0), $principal);

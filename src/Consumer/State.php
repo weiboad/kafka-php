@@ -79,6 +79,16 @@ class State
         }
     }
 
+    /**
+     * For testing.
+     *
+     * @return array
+     */
+    public function getCallStatus(): array
+    {
+        return $this->callStatus;
+    }
+
     public function start(): void
     {
         foreach ($this->requests as $request => $option) {

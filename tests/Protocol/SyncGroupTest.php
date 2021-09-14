@@ -34,32 +34,26 @@ final class SyncGroupTest extends TestCase
         self::assertSame($expected, bin2hex($this->sync->encode($data)));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given sync group data invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given sync group data invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->sync->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given sync group data invalid. `generation_id` is undefined.
-     */
     public function testEncodeNoGenerationId(): void
     {
+        $this->expectExceptionMessage("given sync group data invalid. `generation_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = ['group_id' => 'test'];
 
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given sync group data invalid. `member_id` is undefined.
-     */
     public function testEncodeNoMemberId(): void
     {
+        $this->expectExceptionMessage("given sync group data invalid. `member_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -68,12 +62,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given sync group data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given sync group data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -83,12 +75,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `version` is undefined.
-     */
     public function testEncodeNoVersion(): void
     {
+        $this->expectExceptionMessage("given data invalid. `version` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -101,12 +91,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `member_id` is undefined.
-     */
     public function testEncodeNoDataMemberId(): void
     {
+        $this->expectExceptionMessage("given data invalid. `member_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -119,12 +107,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `assignments` is undefined.
-     */
     public function testEncodeNoDataAssignments(): void
     {
+        $this->expectExceptionMessage("given data invalid. `assignments` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -140,12 +126,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `topic_name` is undefined.
-     */
     public function testEncodeNoTopicName(): void
     {
+        $this->expectExceptionMessage("given data invalid. `topic_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',
@@ -164,12 +148,10 @@ final class SyncGroupTest extends TestCase
         $this->sync->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `partitions` is undefined.
-     */
     public function testEncodeNoPartitions(): void
     {
+        $this->expectExceptionMessage("given data invalid. `partitions` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'generation_id' => '1',

@@ -47,12 +47,10 @@ final class FetchTest extends TestCase
         self::assertSame($expected, bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch kafka data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given fetch kafka data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->fetch->encode();
     }
 
@@ -78,12 +76,10 @@ final class FetchTest extends TestCase
         self::assertSame($expected, bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch data invalid. `topic_name` is undefined.
-     */
     public function testEncodeNoTopicName(): void
     {
+        $this->expectExceptionMessage("given fetch data invalid. `topic_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 [],
@@ -93,12 +89,10 @@ final class FetchTest extends TestCase
         $this->fetch->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch data invalid. `partitions` is undefined.
-     */
     public function testEncodeNoPartitions(): void
     {
+        $this->expectExceptionMessage("given fetch data invalid. `partitions` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 ['topic_name' => 'test'],
@@ -108,12 +102,10 @@ final class FetchTest extends TestCase
         $this->fetch->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch data invalid. `partition_id` is undefined.
-     */
     public function testEncodeNoPartitionId(): void
     {
+        $this->expectExceptionMessage("given fetch data invalid. `partition_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 [

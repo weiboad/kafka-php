@@ -88,12 +88,11 @@ final class ConfigTest extends TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set clientId value is invalid, must is not empty string.
      */
     public function setClientIdShouldRaiseAnExceptionWhenIdIsEmpty(): void
     {
+        $this->expectException(\Kafka\Exception\Config::class);
+        $this->expectExceptionMessage("Set clientId value is invalid, must is not empty string.");
         $this->config->setClientId('');
     }
 
@@ -111,12 +110,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidBrokerVersion
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set broker version value is invalid, must is not empty string and gt 0.8.0.
      */
     public function setBrokerVersionShouldRaiseExceptionWhenInvalidDataIsGiven(string $brokerVersion): void
     {
+        $this->expectExceptionMessage("Set broker version value is invalid, must is not empty string and gt 0.8.0.");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setBrokerVersion($brokerVersion);
     }
 
@@ -151,12 +149,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidBrokerList
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Broker list must be a comma-separated list of brokers (format: "host:port"), with at least one broker
      */
     public function setMetadataBrokerListShouldRaiseAnExceptionWhenInvalidDataIsGiven(string $brokerList): void
     {
+        $this->expectExceptionMessage("Broker list must be a comma-separated list of brokers (format: \"host:port\"), with at least one broker");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setMetadataBrokerList($brokerList);
     }
 
@@ -186,12 +183,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidMessageMaxBytes
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set message max bytes value is invalid, must set it 1000 .. 1000000000
      */
     public function setMessageMaxBytesShouldRaiseExceptionWhenInvalidDataIsGiven(int $messageMaxBytes): void
     {
+        $this->expectExceptionMessage("Set message max bytes value is invalid, must set it 1000 .. 1000000000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setMessageMaxBytes($messageMaxBytes);
     }
 
@@ -220,12 +216,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidMetadataRequestTimeoutMs
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set metadata request timeout value is invalid, must set it 10 .. 900000
      */
     public function testSetMetadataRequestTimeoutMsShouldRaiseExceptionWhenInvalidDataIsGiven(int $metadataRequestTimeoutMs): void
     {
+        $this->expectExceptionMessage("Set metadata request timeout value is invalid, must set it 10 .. 900000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setMetadataRequestTimeoutMs($metadataRequestTimeoutMs);
     }
 
@@ -254,12 +249,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidMetadataRefreshIntervalMs
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set metadata refresh interval value is invalid, must set it 10 .. 3600000
      */
     public function setMetadataRefreshIntervalMsShouldRaiseExceptionWhenInvalidDataIsGiven(int $metadataRefreshIntervalMs): void
     {
+        $this->expectExceptionMessage("Set metadata refresh interval value is invalid, must set it 10 .. 3600000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setMetadataRefreshIntervalMs($metadataRefreshIntervalMs);
     }
 
@@ -288,12 +282,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidMetadataMaxAgeMs
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set metadata max age value is invalid, must set it 1 .. 86400000
      */
     public function setMetadataMaxAgeMsShouldRaiseExceptionWhenInvalidDataIsGiven(int $metadataMaxAgeMs): void
     {
+        $this->expectExceptionMessage("Set metadata max age value is invalid, must set it 1 .. 86400000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setMetadataMaxAgeMs($metadataMaxAgeMs);
     }
 
@@ -322,12 +315,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidFiles
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl local cert file is invalid
      */
     public function setSslLocalCertShouldRaiseExceptionWhenInvalidDataIsGiven(string $file): void
     {
+        $this->expectExceptionMessage("Set ssl local cert file is invalid");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSslLocalCert($file);
     }
 
@@ -343,12 +335,11 @@ final class ConfigTest extends TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl local private key file is invalid
      */
     public function setSslLocalPkShouldRaiseExceptionWhenInvalidDataIsGiven(): void
     {
+        $this->expectExceptionMessage("Set ssl local private key file is invalid");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSslLocalPk('invalid_path');
     }
 
@@ -364,12 +355,11 @@ final class ConfigTest extends TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set ssl ca file is invalid
      */
     public function setSslCafileShouldRaiseExceptionWhenInvalidDataIsGiven(): void
     {
+        $this->expectExceptionMessage("Set ssl ca file is invalid");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSslCafile('invalid_path');
     }
 
@@ -387,12 +377,11 @@ final class ConfigTest extends TestCase
      * @test
      *
      * @dataProvider invalidFiles
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set sasl gssapi keytab file is invalid
      */
     public function setSaslKeytabShouldRaiseExceptionWhenInvalidDataIsGiven(string $file): void
     {
+        $this->expectExceptionMessage("Set sasl gssapi keytab file is invalid");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSaslKeytab($file);
     }
 
@@ -419,12 +408,11 @@ final class ConfigTest extends TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Invalid security protocol given.
      */
     public function setSecurityProtocolShouldRaiseExceptionWhenInvalidDataIsGiven(): void
     {
+        $this->expectExceptionMessage("Invalid security protocol given.");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSecurityProtocol('xxxx');
     }
 
@@ -441,12 +429,11 @@ final class ConfigTest extends TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Invalid security sasl mechanism given.
      */
     public function setSaslMechanismShouldRaiseExceptionWhenInvalidDataIsGiven(): void
     {
+        $this->expectExceptionMessage("Invalid security sasl mechanism given.");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setSaslMechanism('xxxx');
     }
 }

@@ -29,12 +29,10 @@ final class GroupCoordinatorTest extends TestCase
         self::assertSame('00000019000a00000000000a00096b61666b612d706870000474657374', bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given group coordinator invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given group coordinator invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->group->encode();
     }
 

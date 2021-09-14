@@ -129,21 +129,17 @@ final class ProduceTest extends TestCase
         self::assertSame($expected, bin2hex($this->produce->encode($data)));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given procude data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given procude data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->produce->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given produce data invalid. `topic_name` is undefined.
-     */
     public function testEncodeNoTopicName(): void
     {
+        $this->expectExceptionMessage("given produce data invalid. `topic_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 [],
@@ -153,12 +149,10 @@ final class ProduceTest extends TestCase
         $this->produce->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given produce data invalid. `partitions` is undefined.
-     */
     public function testEncodeNoPartitions(): void
     {
+        $this->expectExceptionMessage("given produce data invalid. `partitions` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 ['topic_name' => 'test'],
@@ -168,12 +162,10 @@ final class ProduceTest extends TestCase
         $this->produce->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given produce data invalid. `partition_id` is undefined.
-     */
     public function testEncodeNoPartitionId(): void
     {
+        $this->expectExceptionMessage("given produce data invalid. `partition_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [
                 [
@@ -188,12 +180,10 @@ final class ProduceTest extends TestCase
         $this->produce->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given produce data invalid. `messages` is undefined.
-     */
     public function testEncodeNoMessage(): void
     {
+        $this->expectExceptionMessage("given produce data invalid. `messages` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'required_ack' => 1,
             'timeout' => '1000',

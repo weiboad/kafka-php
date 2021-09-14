@@ -34,21 +34,17 @@ final class LeaveGroupTest extends TestCase
         self::assertSame($expected, bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given leave group data invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given leave group data invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->leave->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given leave group data invalid. `member_id` is undefined.
-     */
     public function testEncodeNoMemberId(): void
     {
+        $this->expectExceptionMessage("given leave group data invalid. `member_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = ['group_id' => 'test'];
 
         $this->leave->encode($data);

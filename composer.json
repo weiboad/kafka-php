@@ -10,16 +10,16 @@
     "license": "BSD-3-Clause",
     "config": {
         "platform": {
-            "php": "7.1.12"
+            "php": "7.4.13"
         },
         "preferred-install": "dist",
         "sort-packages": true
     },
     "require": {
-        "php": "^7.1",
+        "php": "7.4.13",
         "amphp/amp": "^2.0.3",
         "lcobucci/clock": "^1.0",
-        "psr/log": "^1.0"
+        "psr/log": "1.1.*"
     },
     "autoload": {
         "psr-4": {
@@ -36,18 +36,17 @@
         "ext-krb5": "To be able to ues the GSSAPI SASL mechanism"
     },
     "require-dev": {
-        "doctrine/coding-standard": "^2.1",
-        "infection/infection": "^0.7",
-        "kmelia/monolog-stdout-handler": "^1.2",
-        "mikey179/vfsStream": "^1.6.5",
-        "monolog/monolog": "^1.23",
-        "phpstan/phpstan": "^0.9",
-        "phpstan/phpstan-phpunit": "^0.9",
-        "phpstan/phpstan-strict-rules": "^0.9",
-        "phpunit/phpcov": "^4.0",
-        "phpunit/phpunit": "^6.5",
+        "doctrine/coding-standard": "^9",
+        "infection/infection": "0.25.1",
+        "mikey179/vfsstream": "^1.6.5",
+        "monolog/monolog": "^2.3.2",
+        "phpstan/phpstan": "0.12.99",
+        "phpstan/phpstan-phpunit": "0.12.22",
+        "phpstan/phpstan-strict-rules": "0.12.11",
+        "phpunit/phpcov": "^8",
+        "phpunit/phpunit": "^9",
         "satooshi/php-coveralls": "2.0.0",
-        "slevomat/coding-standard": "^4.1",
+        "slevomat/coding-standard": "^7.0",
         "squizlabs/php_codesniffer": "^3.2"
     }
 }

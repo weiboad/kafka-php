@@ -28,21 +28,17 @@ final class SaslHandShakeTest extends TestCase
         self::assertSame('0000001a001100000000001100096b61666b612d7068700005504c41494e', bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage Invalid request SASL hand shake mechanism given.
-     */
     public function testEncodeNoMechanismGiven(): void
     {
+        $this->expectExceptionMessage("Invalid request SASL hand shake mechanism given.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->sasl->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessageRegExp /Invalid request SASL hand shake mechanism given, it must be one of: \w+/
-     */
     public function testEncodeInvalidMechanism(): void
     {
+        $this->expectExceptionMessageMatches("/Invalid request SASL hand shake mechanism given, it must be one of: \w+/");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->sasl->encode(['NOTALLOW']);
     }
 

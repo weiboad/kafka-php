@@ -38,12 +38,10 @@ final class ProducerConfigTest extends TestCase
         self::assertSame($this->config->getRequestTimeout(), 1011);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set request timeout value is invalid, must set it 1 .. 900000
-     */
     public function testSetRequestTimeoutValid(): void
     {
+        $this->expectExceptionMessage("Set request timeout value is invalid, must set it 1 .. 900000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setRequestTimeout(-1);
     }
 
@@ -54,12 +52,10 @@ final class ProducerConfigTest extends TestCase
         self::assertSame($this->config->getProduceInterval(), 1011);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set produce interval timeout value is invalid, must set it 1 .. 900000
-     */
     public function testSetProduceIntervalValid(): void
     {
+        $this->expectExceptionMessage("Set produce interval timeout value is invalid, must set it 1 .. 900000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setProduceInterval(-1);
     }
 
@@ -70,12 +66,10 @@ final class ProducerConfigTest extends TestCase
         self::assertSame($this->config->getTimeout(), 1011);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set timeout value is invalid, must set it 1 .. 900000
-     */
     public function testSetTimeoutValid(): void
     {
+        $this->expectExceptionMessage("Set timeout value is invalid, must set it 1 .. 900000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setTimeout(-1);
     }
 
@@ -85,12 +79,10 @@ final class ProducerConfigTest extends TestCase
         self::assertSame($this->config->getRequiredAck(), 1);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set required ack value is invalid, must set it -1 .. 1000
-     */
     public function testSetRequiredAckValid(): void
     {
+        $this->expectExceptionMessage("Set required ack value is invalid, must set it -1 .. 1000");
+        $this->expectException(\Kafka\Exception\Config::class);
         $this->config->setRequiredAck(-2);
     }
 
