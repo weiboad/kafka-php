@@ -38,12 +38,14 @@ class PlainTest extends TestCase
     /**
      * testHandShake
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage The broker does not support the requested SASL mechanism.
+     *
+     *
      * @access public
      */
     public function testHandShakeNotSupport(): void
     {
+        $this->expectExceptionMessage("The broker does not support the requested SASL mechanism.");
+        $this->expectException(\Kafka\Exception::class);
         // Create a stub for the SomeClass class.
         $socket = $this->createMock(Socket::class);
 

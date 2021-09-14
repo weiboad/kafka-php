@@ -42,21 +42,23 @@ class SocketTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Cannot open null host.
      */
     public function testCreateStreamHostName(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $socket = new Socket('', -99);
         $socket->connect();
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Cannot open without port.
      */
     public function testCreateStreamPort(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $socket = new Socket('123', -99);
         $socket->connect();
     }
@@ -78,11 +80,12 @@ class SocketTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Could not connect to 127.0.0.1:9192 (my custom error [99])
      */
     public function testCreateStreamFailure(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -184,11 +187,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingMaxRead
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Invalid length 5242881 given, it should be lesser than or equals to 5242880
      */
     public function testReadBlockingMaxRead(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -199,11 +203,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingFailure
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Could not read 4 bytes from stream (not readable)
      */
     public function testReadBlockingFailure(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -216,11 +221,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingTimeout
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Timed out reading 4 bytes from stream
      */
     public function testReadBlockingTimeout(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -234,11 +240,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingTimeoutElse
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Could not read 4 bytes from stream (not readable)
      */
     public function testReadBlockingTimeoutElse(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -253,11 +260,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingReadFailure
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Unexpected EOF while reading 4 bytes from stream (no data)
      */
     public function testReadBlockingReadFailure(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -271,11 +279,12 @@ class SocketTest extends TestCase
     /**
      * testReadBlockingReadFailureTryTimeout
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Timed out while reading 4 bytes from stream, 4 bytes are still needed
      */
     public function testReadBlockingReadFailureTryTimeout(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -315,11 +324,12 @@ class SocketTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Could not write 4 bytes to stream
      */
     public function testWriteBlockingFailure(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -330,11 +340,12 @@ class SocketTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Timed out writing 1 bytes to stream after writing 0 bytes
      */
     public function testWriteBlockingTimeout(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -346,11 +357,12 @@ class SocketTest extends TestCase
     }
 
     /**
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage Could not write 4 bytes to stream
      */
     public function testWriteBlockingTimeoutElse(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $host = '127.0.0.1';
         $port = 9192;
 
@@ -380,11 +392,12 @@ class SocketTest extends TestCase
     /**
      * testWriteBlockingReturnFalse
      *
-     * @expectedException \Kafka\Exception
+     *
      * @expectedExceptionMessage After 4 attempts could not write 4096 bytes to stream, completed writing only 0 bytes
      */
     public function testWriteBlockingReturnFalse(): void
     {
+        $this->expectException(\Kafka\Exception::class);
         $str  = str_pad('', Socket::MAX_WRITE_BUFFER * 2, '*');
         $host = '127.0.0.1';
         $port = 9192;

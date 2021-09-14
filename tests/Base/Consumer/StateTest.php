@@ -5,6 +5,7 @@ namespace KafkaTest\Base\Consumer;
 
 use Kafka\Consumer\State;
 use PHPUnit\Framework\TestCase;
+use function PHPUnit\Framework\assertSame;
 
 final class StateTest extends TestCase
 {
@@ -17,6 +18,6 @@ final class StateTest extends TestCase
         $state->init();
         $state->stop();
 
-        self::assertAttributeSame([], 'callStatus', $state);
+        assertSame([], $state->getCallStatus());
     }
 }

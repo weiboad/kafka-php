@@ -26,12 +26,10 @@ class ProtocolTest extends TestCase
         self::assertSame($expected, bin2hex(Protocol::encode(Protocol::HEART_BEAT_REQUEST, $data)));
     }
 
-    /**
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Not support api key, key:999
-     */
     public function testEncodeNoKey(): void
     {
+        $this->expectExceptionMessage("Not support api key, key:999");
+        $this->expectException(\Kafka\Exception::class);
         Protocol::init('0.9.0.1');
 
         $data = [
@@ -43,12 +41,10 @@ class ProtocolTest extends TestCase
         Protocol::encode(999, $data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Not support api key, key:999
-     */
     public function testDecodeNoKey(): void
     {
+        $this->expectExceptionMessage("Not support api key, key:999");
+        $this->expectException(\Kafka\Exception::class);
         Protocol::init('0.9.0.1');
         $data = '';
 

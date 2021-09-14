@@ -39,21 +39,17 @@ final class FetchOffsetTest extends TestCase
         self::assertSame($expected, bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch offset data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given fetch offset data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->offset->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch offset data invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given fetch offset data invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [],
         ];
@@ -61,12 +57,10 @@ final class FetchOffsetTest extends TestCase
         $this->offset->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch offset data invalid. `topic_name` is undefined.
-     */
     public function testEncodeNoTopicName(): void
     {
+        $this->expectExceptionMessage("given fetch offset data invalid. `topic_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [
@@ -77,12 +71,10 @@ final class FetchOffsetTest extends TestCase
         $this->offset->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given fetch offset data invalid. `partitions` is undefined.
-     */
     public function testEncodeNoPartitions(): void
     {
+        $this->expectExceptionMessage("given fetch offset data invalid. `partitions` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [

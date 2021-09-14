@@ -37,21 +37,17 @@ final class ConsumerConfigTest extends TestCase
         self::assertSame($this->config->getGroupId(), 'test');
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set group id value is invalid, must set it not empty string
-     */
     public function testSetGroupIdEmpty(): void
     {
+        $this->expectExceptionMessage("Set group id value is invalid, must set it not empty string");
+        $this->expectException(Config::class);
         $this->config->setGroupId('');
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Get group id value is invalid, must set it not empty string
-     */
     public function testGetGroupIdEmpty(): void
     {
+        $this->expectExceptionMessage("Get group id value is invalid, must set it not empty string");
+        $this->expectException(Config::class);
         $this->config->getGroupId();
     }
 
@@ -62,12 +58,10 @@ final class ConsumerConfigTest extends TestCase
         self::assertSame($this->config->getSessionTimeout(), 2000);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set session timeout value is invalid, must set it 1 .. 3600000
-     */
     public function testSetSessionTimeoutInvalid(): void
     {
+        $this->expectExceptionMessage("Set session timeout value is invalid, must set it 1 .. 3600000");
+        $this->expectException(Config::class);
         $this->config->setSessionTimeout(-1);
     }
 
@@ -78,12 +72,10 @@ final class ConsumerConfigTest extends TestCase
         self::assertSame($this->config->getRebalanceTimeout(), 2000);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set rebalance timeout value is invalid, must set it 1 .. 3600000
-     */
     public function testSetRebalanceTimeoutInvalid(): void
     {
+        $this->expectExceptionMessage("Set rebalance timeout value is invalid, must set it 1 .. 3600000");
+        $this->expectException(Config::class);
         $this->config->setRebalanceTimeout(-1);
     }
 
@@ -94,12 +86,10 @@ final class ConsumerConfigTest extends TestCase
         self::assertSame($this->config->getOffsetReset(), 'earliest');
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set offset reset value is invalid, must set it `latest` or `earliest`
-     */
     public function testSetOffsetResetInvalid(): void
     {
+        $this->expectExceptionMessage("Set offset reset value is invalid, must set it `latest` or `earliest`");
+        $this->expectException(Config::class);
         $this->config->setOffsetReset('xxxx');
     }
 
@@ -110,21 +100,17 @@ final class ConsumerConfigTest extends TestCase
         self::assertSame($this->config->getTopics(), ['test']);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Set consumer topics value is invalid, must set it not empty array
-     */
     public function testSetTopicsEmpty(): void
     {
+        $this->expectExceptionMessage("Set consumer topics value is invalid, must set it not empty array");
+        $this->expectException(Config::class);
         $this->config->setTopics([]);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Config
-     * @expectedExceptionMessage Get consumer topics value is invalid, must set it not empty
-     */
     public function testGetTopicsEmpty(): void
     {
+        $this->expectExceptionMessage("Get consumer topics value is invalid, must set it not empty");
+        $this->expectException(Config::class);
         $this->config->getTopics();
     }
 

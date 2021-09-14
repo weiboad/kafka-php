@@ -71,23 +71,19 @@ final class CommitOffsetTest extends TestCase
         self::assertSame($expected, bin2hex($test));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given commit data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = ['group_id' => 'test'];
 
         $this->commit->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit offset data invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given commit offset data invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'data' => [],
         ];
@@ -95,12 +91,10 @@ final class CommitOffsetTest extends TestCase
         $this->commit->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit offset data invalid. `topic_name` is undefined.
-     */
     public function testEncodeNoTopicName(): void
     {
+        $this->expectExceptionMessage("given commit offset data invalid. `topic_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [
@@ -111,12 +105,10 @@ final class CommitOffsetTest extends TestCase
         $this->commit->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit offset data invalid. `partitions` is undefined.
-     */
     public function testEncodeNoPartitions(): void
     {
+        $this->expectExceptionMessage("given commit offset data invalid. `partitions` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [
@@ -127,12 +119,10 @@ final class CommitOffsetTest extends TestCase
         $this->commit->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit offset data invalid. `partition` is undefined.
-     */
     public function testEncodeNoPartition(): void
     {
+        $this->expectExceptionMessage("given commit offset data invalid. `partition` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [
@@ -148,12 +138,10 @@ final class CommitOffsetTest extends TestCase
         $this->commit->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given commit offset data invalid. `offset` is undefined.
-     */
     public function testEncodeNoOffset(): void
     {
+        $this->expectExceptionMessage("given commit offset data invalid. `offset` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id' => 'test',
             'data' => [

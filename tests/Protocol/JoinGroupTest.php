@@ -51,21 +51,17 @@ final class JoinGroupTest extends TestCase
         self::assertSame($expected10, bin2hex($test10));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given join group data invalid. `group_id` is undefined.
-     */
     public function testEncodeNoGroupId(): void
     {
+        $this->expectExceptionMessage("given join group data invalid. `group_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $this->group9->encode();
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given join group data invalid. `session_timeout` is undefined.
-     */
     public function testEncodeNoSessionTimeout(): void
     {
+        $this->expectExceptionMessage("given join group data invalid. `session_timeout` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = ['group_id' => 'test'];
 
         $this->group9->encode($data);
@@ -74,11 +70,13 @@ final class JoinGroupTest extends TestCase
     /**
      * testEncodeNoMemberId
      *
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given join group data invalid. `member_id` is undefined.
+     *
+     *
      */
     public function testEncodeNoMemberId(): void
     {
+        $this->expectExceptionMessage("given join group data invalid. `member_id` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id'        => 'test',
             'session_timeout' => 6000,
@@ -87,12 +85,10 @@ final class JoinGroupTest extends TestCase
         $test = $this->group9->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given join group data invalid. `data` is undefined.
-     */
     public function testEncodeNoData(): void
     {
+        $this->expectExceptionMessage("given join group data invalid. `data` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id'        => 'test',
             'session_timeout' => 6000,
@@ -129,12 +125,10 @@ final class JoinGroupTest extends TestCase
         self::assertSame($expected10, bin2hex($test10));
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given join group data invalid. `protocol_name` is undefined.
-     */
     public function testEncodeNoProtocolName(): void
     {
+        $this->expectExceptionMessage("given join group data invalid. `protocol_name` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id'          => 'test',
             'session_timeout'   => 6000,
@@ -148,12 +142,10 @@ final class JoinGroupTest extends TestCase
         $this->group9->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `version` is undefined.
-     */
     public function testEncodeNoVersion(): void
     {
+        $this->expectExceptionMessage("given data invalid. `version` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id'          => 'test',
             'session_timeout'   => 6000,
@@ -167,12 +159,10 @@ final class JoinGroupTest extends TestCase
         $test = $this->group9->encode($data);
     }
 
-    /**
-     * @expectedException \Kafka\Exception\Protocol
-     * @expectedExceptionMessage given data invalid. `subscription` is undefined.
-     */
     public function testEncodeNoSubscription(): void
     {
+        $this->expectExceptionMessage("given data invalid. `subscription` is undefined.");
+        $this->expectException(\Kafka\Exception\Protocol::class);
         $data = [
             'group_id'          => 'test',
             'session_timeout'   => 6000,

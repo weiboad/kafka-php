@@ -30,12 +30,14 @@ class ScramTest extends TestCase
     /**
      * testScramVerify
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Verify server final response message is failure
+     *
+     *
      * @access public
      */
     public function testScramVerify(): void
     {
+        $this->expectExceptionMessage("Verify server final response message is failure");
+        $this->expectException(\Kafka\Exception::class);
         $provider = $this->getMockBuilder(Scram::class)
             ->setMethods(['generateNonce'])
             ->setConstructorArgs(['alice', 'alice-secret', Scram::SCRAM_SHA_256])
@@ -49,24 +51,28 @@ class ScramTest extends TestCase
     /**
      * testFinalMessageInvalid
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Server response challenge is invalid.
+     *
+     *
      * @access public
      */
     public function testFinalMessageInvalid(): void
     {
+        $this->expectExceptionMessage("Server response challenge is invalid.");
+        $this->expectException(\Kafka\Exception::class);
         $this->finalMessage();
     }
 
     /**
      * testFinalMessageInvalidSalt
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Server response challenge is invalid, paser salt is failure.
+     *
+     *
      * @access public
      */
     public function testFinalMessageInvalidSalt(): void
     {
+        $this->expectExceptionMessage("Server response challenge is invalid, paser salt is failure.");
+        $this->expectException(\Kafka\Exception::class);
         $message = 'r=5Fr49BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=,i=8192';
         $this->finalMessage($message);
     }
@@ -74,12 +80,14 @@ class ScramTest extends TestCase
     /**
      * testFinalMessageInvalidCnonce
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Server response challenge is invalid, cnonce is invalid.
+     *
+     *
      * @access public
      */
     public function testFinalMessageInvalidCnonce(): void
     {
+        $this->expectExceptionMessage("Server response challenge is invalid, cnonce is invalid.");
+        $this->expectException(\Kafka\Exception::class);
         $message = 'r=59BaTHKn0i9ytDBMw8YXNMOemtxbJ+opDL/miWK8=ou7tesfefbqo5ymk9dajioxiv,s=a3Vqa3JvOGRldzVpbWNxY3QwMXdzZW0yYg==,i=8192';
         $this->finalMessage($message);
     }
@@ -87,12 +95,14 @@ class ScramTest extends TestCase
     /**
      * testInvalidAlgorithm
      *
-     * @expectedException \Kafka\Exception
-     * @expectedExceptionMessage Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].
+     *
+     *
      * @access public
      */
     public function testInvalidAlgorithm(): void
     {
+        $this->expectExceptionMessage("Invalid hash algorithm given, it must be one of: [SCRAM_SHA_256, SCRAM_SHA_512].");
+        $this->expectException(\Kafka\Exception::class);
         new Scram('nmred', '123456', 64);
     }
 
