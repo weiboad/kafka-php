@@ -28,7 +28,7 @@ Kafka-php 使用纯粹的PHP 编写的 kafka 客户端，目前支持 0.8.x 以�
 
 添加 composer 依赖 `nmred/kafka-php` 到项目的 `composer.json` 文件中即可，如：
 
-```
+```json
 {
 	"require": {
 		"nmred/kafka-php": "0.2.*"
@@ -83,7 +83,7 @@ $producer->send(true);
 
 ### 同步方式调用生产者
 
-```
+```php
 <?php
 require '../vendor/autoload.php';
 date_default_timezone_set('PRC');
