@@ -156,7 +156,7 @@ class Socket
      * @param int $sendTimeoutSec
      * @param int $sendTimeoutUsec
      */
-    public function __construct($host, $port, $recvTimeoutSec = 0, $recvTimeoutUsec = 750000, $sendTimeoutSec = 0, $sendTimeoutUsec = 100000)
+    public function __construct($host, $port, $recvTimeoutSec = 5, $recvTimeoutUsec = 750000, $sendTimeoutSec = 5, $sendTimeoutUsec = 100000)
     {
         $this->host = $host;
         $this->port = $port;
