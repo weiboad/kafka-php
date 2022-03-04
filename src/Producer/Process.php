@@ -262,7 +262,7 @@ class Process
      */
     protected function succProduce(array $result, int $fd): void
     {
-        $msg = sprintf('Send message sucess, result: %s', json_encode($result));
+        $msg = sprintf('Send message success, result: %s', json_encode($result));
         $this->debug($msg);
 
         if ($this->success !== null) {
